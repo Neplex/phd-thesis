@@ -1,0 +1,43 @@
+[Part I] introduction
+
+[Part II] maintenance / coherence
+    [Chap 1] introduction
+        - graphs (RDF + LPG)
+        - constraints + coherence
+    [Chap 2] etat de l'art
+    [Chap 3] maintenance
+        - Cedric RDF/S documents (schema) -> Evaluation (bad) + manque évolutivité
+        - Logic (metier) -> Bad
+        - Version incrementale
+    [Chap 4] algos incremental reduction
+        - graph neo
+        - graph relationnel
+        - evaluation
+    [Chap 5] conclusion
+
+[Part III] integration de données textuelles
+    [Chap 1] introduction
+    - structuration
+        - introduction
+        - etat de l'art
+        - conclusion
+    - extraction d(informations
+        - introduction
+        - reconnaissance d'entités
+            - lexicon
+            - entites multi-valuée
+            - contextualisation (cascade CRFs)
+        - classification & requetage
+            - classification
+            - requetage
+        - extraction de relations
+    - conclusion
+
+[Part IV] conclusion + perspective
+    - Base de données floue (niveau de confiance)
+
+Rapporter:
+- Hubert Naacke
+- Zoubida Kedad
+
+Mail MIPTIS retoplaning soutenance

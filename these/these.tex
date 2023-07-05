@@ -1,0 +1,81 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Exemple de structuration de thèse utilisant le format Latex
+
+\pagestyle{fancy}
+
+\newgeometry{lmargin=20mm,tmargin=30mm,rmargin=20mm,bmargin=30mm,headsep=10mm,footskip=20mm,bindingoffset=10mm}
+\usefont{T1}{cmr}{m}{n}
+
+\frontmatter
+\section*{Remerciements}
+\lipsum[17-19]
+
+\newpage
+
+\tableofcontents
+\addcontentsline{toc}{part}{Liste des figures}
+\listoffigures
+\addcontentsline{toc}{part}{Liste des tables}
+\listoftables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter
+
+\part{Introduction}
+\input{these/introduction}
+
+%%%%%%%%%%%%%%%%%%
+
+\part{Maintenance / Cohérence}
+
+\chapter{Introduction}
+\input{these/part_1/introduction}
+
+\chapter{État de l'art}
+\input{these/part_1/chapter_1}
+
+\chapter{Maintien de la cohérence}
+\input{these/part_1/chapter_2}
+
+\chapter{Mise à jour incrémentale}
+\input{these/part_1/chapter_3}
+
+\chapter{Conclusion}
+\input{these/part_1/conclusion}
+
+%%%%%%%%%%%%%%%%%%
+
+\part{Intégration de données textuelles}
+
+\chapter{Introduction}
+\input{these/part_2/introduction}
+
+\chapter{Structuration d'informations}
+\input{these/part_2/chapter_1}
+
+\chapter{Extraction d'informations}
+\input{these/part_2/chapter_2}
+
+\chapter{Conclusion}
+\input{these/part_2/conclusion}
+
+%%%%%%%%%%%%%%%%%%
+
+\part{Conclusion et perspectives}
+\input{these/conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fin de la thèse
+%\clearpage         % verso
+\cleardoublepage    % recto-verso
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendices 
+\appendix
+\input{these/appendices.tex}
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\nocite{*}         % Pour inclure toutes les references (y compris celles qui ne sont pas citees)
+\addcontentsline{toc}{part}{Bibliographie}
+\bibliographystyle{plain}
+\bibliography{these/biblio}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printindex
