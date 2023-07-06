@@ -1,2 +1,12 @@
-La proposition de mise à jour incrémentale sur des bases de données graphes est implémentée sur le gestionnaire de base de données graphes Neo4J.
+La proposition de mise à jour incrémentale sur des bases de données graphes est implémentée sur le gestionnaire de base de données graphes \gls{neo4j} en définissant un ensemble de requêtes \gls{cypher}.
+La maintenance décrite dans \cite{chabinConsistentUpdatingDatabases2020} relève un cout important pour la récupération des atomes liés par des valeurs nulles.
+L'utilisation de base de données graphe ajoute une possibilité d'optimisation de cette opération.
+Le modèle de graphe doit mettre en avant ces relations et faciliter la recherche des homomorphismes.
 
+Pour ce faire, on choisit le modèle Figure~\ref{} proche de la logique où $t_i$ représente les constantes et $t_j$ les valeurs nulles.
+Les notations en dessous des arcs représente leur cardinalité : chaque \textit{Élément} est connecté à au moins un \textit{Atom} alors qu'un \textit{Atom} peut ne pas avoir de termes.
+Dans ce modèle un atome $P(t_1, \dots, t_n)$ est représenté comme un arbre qui a pour racine un noeud \textit{Atome} lié à un ensemble de noeuds \textit{Élément} représentants les termes.
+Les \textit{Atomes} ont le label \textbf{:Atom} et une unique propriété représentant le symbole de prédicat.
+Les \textit{Éléments} ont le label \textbf{:Element} et une unique propriété représentant la valeur de l'élément.
+On leur ajoute aussi un label \textbf{:Constant} ou \textbf{:Null} respectivement s'il s'agit d'une constante ou d'une valeur nulle.
+Les \textit{Atomes} sont connectés aux \textit{Éléments} par une relation qui a pour unique propriété le rang auquel apparait l'élément dans l'atome.

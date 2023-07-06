@@ -1,6 +1,6 @@
 \subsection{Logique du premier ordre}
 
-En assumant une certaine familiarité avec la logique du premier ordre, on utilise comme alphabet :
+En assumant une certaine familiarité avec la \gls{fol}, on utilise comme alphabet :
 \begin{itemize}
     \item un ensemble de prédicats $P, Q, R, \dots$
     \item un ensemble de variables $x, y, z, \dots$
@@ -44,10 +44,16 @@ Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, s'il ex
 Une instance $I$ d'une base de données est dites \textit{cohérente} par rapport à un ensemble de contraintes $\mathcal{C}$, noté $I \vDash \mathcal{C}$ si pour toute contrainte $c$ dans $\mathcal{C}$, $I \vDash c$.
 
 \subsection{Base de données graphes}
-
-Quand on parle de \index{base de données} graphe on peut distinguer deux grandes familles :
+Quand on parle de base de données graphe on peut distinguer deux grandes familles :
 \begin{description}
     \item[Les bases de triplets] principalement le \gls{rdf} porté par le \gls{w3c}.
         Ce type de base de données enregistre des triplets de la forme $<x, P, y>$ qui sont des prédicats binaires où $P$ est un symbole de prédicat, $x$, le sujet, est l'URI d'une ressource (un noeud) et $y$, l'objet est un URI ou un littéral (une valeur de propriétés).
-    \item[Les Graphes de Propriétés], en anglais \gls{lpg}
+        \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
+    \item[Les Graphes de Propriétés] ou \gls{lpg} en anglais, sont des bases de données composées de noeuds et d'arcs labellisés qui peuvent contenir des propriétés.
+        \gls{neo4j} est surement le gestionnaire de base de donnée le plus utilisé dans ce domaine.
+        Ils sont les créateurs du langage \gls{cypher} qui sert de base pour le nouveau langage \gls{iso} \gls{gql} en cours de développement.
 \end{description}
+
+Les base de données graphes sont conçus pour facilité les requêtes sur la structure des données.
+Cependant, le modèle ou schéma de la base est donc très dépendants des requêtes envisagées.
+Dans \gls{neo4j}, les noeud peuvent avoir une ou plusieurs étiquètes appelées \textit{label} alors que les relations ne peuvent en avoir qu'une appelée \textit{type} (dans le cas des relations on dupliquera l'arrête si plusieurs étiquètes sont nécessaires).

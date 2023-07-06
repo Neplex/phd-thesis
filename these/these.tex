@@ -12,6 +12,7 @@
 
 \newpage
 
+\dominitoc
 \tableofcontents
 \addcontentsline{toc}{part}{Liste des figures}
 \listoffigures
@@ -32,12 +33,15 @@
 \subfile{part_1/introduction}
 
 \chapter{État de l'art}
+\minitoc
 \subfile{part_1/chapter_1}
 
 \chapter{Maintien de la cohérence}
+\minitoc
 \subfile{part_1/chapter_2}
 
 \chapter{Mise à jour incrémentale}
+\minitoc
 \subfile{part_1/chapter_3}
 
 \chapter{Conclusion}
@@ -51,9 +55,11 @@
 \subfile{part_2/introduction}
 
 \chapter{Structuration d'informations}
+\minitoc
 \subfile{part_2/chapter_1}
 
 \chapter{Extraction d'informations}
+\minitoc
 \subfile{part_2/chapter_2}
 
 \chapter{Conclusion}
@@ -61,6 +67,7 @@
 
 %%%%%%%%%%%%%%%%%%
 
+% \bookmarksetup{startatroot}
 \part{Conclusion et perspectives}
 \subfile{conclusion}
 
@@ -78,7 +85,7 @@
 %\nocite{*}         % Pour inclure toutes les references (y compris celles qui ne sont pas citees)
 \addcontentsline{toc}{part}{Bibliographie}
 \bibliographystyle{plain}
-\bibliography{these/biblio}
+\bibliography{biblio}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \addcontentsline{toc}{part}{Glossaire}
 \printglossary
