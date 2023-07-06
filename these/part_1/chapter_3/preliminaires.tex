@@ -1,0 +1,47 @@
+\subsection{Logique du premier ordre}
+
+En assumant une certaine familiarité avec la logique du premier ordre, on utilise comme alphabet :
+\begin{itemize}
+    \item un ensemble de prédicats $P, Q, R, \dots$
+    \item un ensemble de variables $x, y, z, \dots$
+    \item un ensemble de constantes $a, b, c, \dots$
+    \item un ensemble de valeurs nulles marquée $N_1, N_2, N_3, \dots$
+    \item le quantificateur universel $\forall$ (quel que soit)
+    \item le quantificateur existentiel $\exists$ (il existe)
+\end{itemize}
+Avec cet alphabet, on définit un atome $P(t_1, \dots, t_n)$ où $P$ est le symbole de prédicat d'arité $n$ et $t_1, \dots, t_n$ sont les termes.
+Les termes peuvent être une variable, une constante ou une valeur nulles.
+Un fait est un atome composé uniquement de constantes et un atome instancié est un atome qui ne contient aucunes variables.
+Étant donné un atome instancié $A$, $null(A)$ représente l'ensemble des valeurs nulles de $A$.
+
+Un homomorphisme $h$ entre deux ensembles d'atomes $A$ et $B$ est une application surjective sur les termes de $A$ vers les termes de $B$ telle que :
+\begin{enumerate*}[label=(\roman*)]
+    \item si, $h(t) = t$, alors $t$ est une constante et
+    \item si, $P(t_1, \dots, t_n) \in A$, alors $P(h(t_1), \dots, h(t_n)) \in B$.
+\end{enumerate*}
+S'il existe un homomorphisme inverse $h^-$ tel que $h^-(h(t)) = t$ alors ont dit que $A$ est \textit{isomorphe} à $B$.
+
+$\Phi$ est l'ensemble de toutes les formules $\phi$, existentiellement quantifiées, de la forme $(\exists X)(\varphi_1(X_1) \land \dots \land \varphi_n(X_n))$ où $X$ est l'ensemble des variables et $\varphi_i(X_i)$ est une formule atomique dont $X_i \subset X$ représente l'ensemble des variables libres.
+$atoms(\phi)$ est l'ensemble des formules atomique de $phi$.
+Un modèle $M$ d'une formule $\phi$ est l'ensemble des faits qui ont un homomorphisme de $atoms(\phi)$ vers $M$.
+Étant donné deux formules $\phi_1$ et $\phi_2$ : $\phi_1 \implies \phi_2$ si tout modèle de $\phi_1$ est un modèle de $\phi_2$.
+$\phi_1$ et $\phi_2$ sont \textit{équivalents}, noté $\phi_1 \iff \phi_2$, si et seulement si $\phi_1 \implies \phi_2$ et $\phi_2 \implies \phi_1$.
+$\phi_1$ et \textit{plus simple que} $\phi_2$, noté $\phi_1 \sqsubseteq \phi_2$ si $\phi_1 \iff \phi_2$ et $atoms(\phi_1) \subseteq atoms(\phi_2)$.
+Une simplification $\phi_1$ de $\phi_2$ est \textit{minimale} si $\phi_1 \sqsubseteq \phi_2$ et qu'il n'existe pas de $\phi_1'$ tel que $\phi_1' \sqsubset \phi_1$.
+Par exemple, étant donné la formule $\phi = (\exists x, y)(P(a, x) \land P(a, y))$, les formules $(\exists x)(P(a, x))$ et $(\exists y)(P(a, y))$ sont équivalentes et sont toutes deux une simplification de $\phi$.
+De plus, \cite{chabinConsistentUpdatingDatabases2020} démontre que si $\phi_1$ et $\phi_2$ sont deux simplifications minimales d'une même formule $\phi$ alors les ensembles $atoms(\phi_1)$ et $atoms(\phi_2)$ sont isomorphes.
+La simplification minimale d'une formule $\phi$ est appelé le core et s'écrit $core(\phi)$.
+
+\subsection{Base de données}
+
+L'\textit{instance} d'une base de donnée peux être décrite comme la Skolémisation d'une formule $\phi$ correspondant a un ensemble minimal d'atomes instanciés tel que $core(\phi) = \phi$.
+La Skolémisation d'une formule $\phi$ noté $Sk(\phi)$ consiste à instancier l'ensemble des variables par des constantes ou des valeurs nulles et à éliminer toutes les occurrences de quantificateur existentiel.
+
+Une \textit{contrainte} (ou règle) sur une base de donnée est une dépendance génératrice de n-uplets (ou Tuple-generating dependency, TGD en anglais) de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
+Plus simplement écrit $body(X, Y) \to head(X, Z)$, $X$, $Y$ et $Z$ sont des ensembles de variables, $bod(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
+Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés, noté $I \vDash c$ si pour tout homomorphisme $h$ tel que $h(body(c)) \subseteq I$ il existe un homomorphisme $h'$ tel que $h(body(c)) = h(body(c))$ et $h'(head(c)) \subseteq I$.
+Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, s'il existe une instance du corps dans l'instance de la base de données, la tête correspondante doit aussi être présente.
+Une instance $I$ d'une base de données est dites \textit{cohérente} par rapport à un ensemble de contraintes $\mathcal{C}$, noté $I \vDash \mathcal{C}$ si pour toute contrainte $c$ dans $\mathcal{C}$, $I \vDash c$.
+
+\subsection{Graphes de Propriétés Étiquetés (Labeled Property Graph, LPG)}
+
