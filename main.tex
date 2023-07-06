@@ -33,12 +33,18 @@
 %\usepackage{algorithm}              % Pour les algorithmes
 %\usepackage{algorithmic}            % Pour les algorithmes
 \usepackage{lipsum}                  % Pour du blabla en latin
+\usepackage{subfiles}
 
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{tikz-dependency}
 \usepackage{pgfplots}
 \usepackage[inline]{enumitem}
 \usepackage[binary-units]{siunitx}
 \usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage{adjustbox}
+
+\usepackage[acronym,translate=babel]{glossaries}
 
 % Bib
 \selectbiblanguage{french}
@@ -58,7 +64,9 @@
 {\vspace*{\fill}\par\pagebreak}     % Action à la fermeture (\par : fin de paragraphe, \pagebreak : fin de page avec étalement)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\makeindex         % Création de l'index
+% Création de l'index
+\makeglossaries          
+\loadglsentries{these/glossaries}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DEBUT DU DOCUMENT
@@ -83,15 +91,15 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Page de garde :
-\include{orleans_couv/orlecouv}
+\subfile{orleans_couv/orlecouv}
 \thispagestyle{empty}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagestyle{fancy}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Contenu de la thèse 
-\include{these/these}
+% Contenu de la thèse
+\subfile{these/these}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % La page de dos :
@@ -100,6 +108,6 @@
 \newpage $\ $
 \newpage
 \thispagestyle{empty}
-\input{orleans_couv/orledos.tex}
+\subfile{orleans_couv/orledos.tex}
 
 \end{document}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

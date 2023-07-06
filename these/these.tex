@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Exemple de structuration de thèse utilisant le format Latex
+% Exemple de structuration de thèse utilisant le format Latex
 
 \pagestyle{fancy}
 
@@ -17,65 +17,70 @@
 \listoffigures
 \addcontentsline{toc}{part}{Liste des tables}
 \listoftables
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mainmatter
 
 \part{Introduction}
-\input{these/introduction}
+\subfile{introduction}
 
 %%%%%%%%%%%%%%%%%%
 
 \part{Maintenance et cohérence d'une base de donnée incomplète}
 
 \chapter{Introduction}
-\input{these/part_1/introduction}
+\subfile{part_1/introduction}
 
 \chapter{État de l'art}
-\input{these/part_1/chapter_1}
+\subfile{part_1/chapter_1}
 
 \chapter{Maintien de la cohérence}
-\input{these/part_1/chapter_2}
+\subfile{part_1/chapter_2}
 
 \chapter{Mise à jour incrémentale}
-\input{these/part_1/chapter_3}
+\subfile{part_1/chapter_3}
 
 \chapter{Conclusion}
-\input{these/part_1/conclusion}
+\subfile{part_1/conclusion}
 
 %%%%%%%%%%%%%%%%%%
 
 \part{Intégration de données textuelles}
 
 \chapter{Introduction}
-\input{these/part_2/introduction}
+\subfile{part_2/introduction}
 
 \chapter{Structuration d'informations}
-\input{these/part_2/chapter_1}
+\subfile{part_2/chapter_1}
 
 \chapter{Extraction d'informations}
-\input{these/part_2/chapter_2}
+\subfile{part_2/chapter_2}
 
 \chapter{Conclusion}
-\input{these/part_2/conclusion}
+\subfile{part_2/conclusion}
 
 %%%%%%%%%%%%%%%%%%
 
 \part{Conclusion et perspectives}
-\input{these/conclusion}
+\subfile{conclusion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Fin de la thèse
+% Fin de la thèse
 %\clearpage         % verso
 \cleardoublepage    % recto-verso
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Appendices 
+% Appendices
 \appendix
-\input{these/appendices.tex}
+\subfile{appendices}
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\backmatter
 %\nocite{*}         % Pour inclure toutes les references (y compris celles qui ne sont pas citees)
 \addcontentsline{toc}{part}{Bibliographie}
 \bibliographystyle{plain}
 \bibliography{these/biblio}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\printindex
+\addcontentsline{toc}{part}{Glossaire}
+\printglossary
+\addcontentsline{toc}{part}{Acronymes}
+\printglossary[type=acronym]

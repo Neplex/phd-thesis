@@ -5,7 +5,7 @@ En assumant une certaine familiarité avec la logique du premier ordre, on utili
     \item un ensemble de prédicats $P, Q, R, \dots$
     \item un ensemble de variables $x, y, z, \dots$
     \item un ensemble de constantes $a, b, c, \dots$
-    \item un ensemble de valeurs nulles marquée $N_1, N_2, N_3, \dots$
+    \item un ensemble de valeurs nulles marquées $N_1, N_2, N_3, \dots$
     \item le quantificateur universel $\forall$ (quel que soit)
     \item le quantificateur existentiel $\exists$ (il existe)
 \end{itemize}
@@ -43,5 +43,11 @@ Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés,
 Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, s'il existe une instance du corps dans l'instance de la base de données, la tête correspondante doit aussi être présente.
 Une instance $I$ d'une base de données est dites \textit{cohérente} par rapport à un ensemble de contraintes $\mathcal{C}$, noté $I \vDash \mathcal{C}$ si pour toute contrainte $c$ dans $\mathcal{C}$, $I \vDash c$.
 
-\subsection{Graphes de Propriétés Étiquetés (Labeled Property Graph, LPG)}
+\subsection{Base de données graphes}
 
+Quand on parle de \index{base de données} graphe on peut distinguer deux grandes familles :
+\begin{description}
+    \item[Les bases de triplets] principalement le \gls{rdf} porté par le \gls{w3c}.
+        Ce type de base de données enregistre des triplets de la forme $<x, P, y>$ qui sont des prédicats binaires où $P$ est un symbole de prédicat, $x$, le sujet, est l'URI d'une ressource (un noeud) et $y$, l'objet est un URI ou un littéral (une valeur de propriétés).
+    \item[Les Graphes de Propriétés], en anglais \gls{lpg}
+\end{description}
