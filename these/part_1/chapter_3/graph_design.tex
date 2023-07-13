@@ -3,10 +3,60 @@ La maintenance décrite dans \cite{chabinConsistentUpdatingDatabases2020} relèv
 L'utilisation de base de données graphe ajoute une possibilité d'optimisation de cette opération.
 Le modèle de graphe doit mettre en avant ces relations et faciliter la recherche des homomorphismes.
 
-Pour ce faire, on choisit le modèle Figure~\ref{} proche de la logique où $t_i$ représente les constantes et $t_j$ les valeurs nulles.
-Les notations en dessous des arcs représente leur cardinalité : chaque \textit{Élément} est connecté à au moins un \textit{Atom} alors qu'un \textit{Atom} peut ne pas avoir de termes.
-Dans ce modèle un atome $P(t_1, \dots, t_n)$ est représenté comme un arbre qui a pour racine un noeud \textit{Atome} lié à un ensemble de noeuds \textit{Élément} représentants les termes.
+\paragraph{Modèle}
+Pour ce faire, on choisit le modèle dans lequel un atome $P(t_1, \dots, t_n)$ est représenté comme un arbre qui a pour racine un noeud \textit{Atome} lié à un ensemble de noeuds \textit{Élément} représentants les termes.
 Les \textit{Atomes} ont le label \textbf{:Atom} et une unique propriété représentant le symbole de prédicat.
 Les \textit{Éléments} ont le label \textbf{:Element} et une unique propriété représentant la valeur de l'élément.
 On leur ajoute aussi un label \textbf{:Constant} ou \textbf{:Null} respectivement s'il s'agit d'une constante ou d'une valeur nulle.
 Les \textit{Atomes} sont connectés aux \textit{Éléments} par une relation qui a pour unique propriété le rang auquel apparait l'élément dans l'atome.
+Dans ce modèle Figure~\ref{fig:schema-graph} proche de la logique, le noeud rectangulaire représente l'\textit{Atome} et les neouds circulaires les \textit{Éléments}.
+$t_i$ représente les constantes et $t_j$ les valeurs nulles.
+Les notations en dessous des arcs représente leur cardinalité : chaque \textit{Élément} est connecté à au moins un \textit{Atom} alors qu'un \textit{Atom} peut ne pas avoir de termes.
+
+\begin{figure}[htb]
+    \centering
+    \begin{adjustbox}{width=.8\linewidth}
+        \begin{tikzpicture}[shorten >=3pt,->,node distance=16em,on grid,every text node part/.style={align=center}]
+            \node[draw] (a) {\textbf{:Atom}\\\textit{symbol}: $P$\\\textit{terms}: $\{t_1, \dots, t_n\}$};        % Atom
+            \node[draw,circle,left = of a] (nc) {\textbf{:Element}\\\textbf{:Constant}\\\textit{value}: $t_i$};   % Element/Constant
+            \node[draw,circle,right = of a] (nn) {\textbf{:Element}\\\textbf{:Null}\\\textit{value}: $t_j$};      % Element/Null
+            \path
+            (a) edge [] node[below, near start] {$0..*$} node[below, near end] {$1..*$} node[above] {\textbf{:P} \{\textit{rank}: $i$\}} (nc)
+            (a) edge [] node[below, near start] {$0..*$} node[below, near end] {$1..*$} node[above] {\textbf{:P} \{\textit{rank}: $j$\}} (nn)
+            ;
+        \end{tikzpicture}
+    \end{adjustbox}
+    \caption{Modèle de Graphe}
+    \label{fig:schema-graph}
+\end{figure}
+
+Ce modèle facilite la récupération des ensembles d'atomes liés ainsi que la recherche d'homomorphismes.
+En effet, une requête exprimée sous forme logique $Q(X) \gets \phi(X)$ se traduit par la recherche d'un sous graphe dans lequel les variables logiques deviennent naturellement les variables du motif.
+Cependant, dans ce modèle, les atomes sont représentés comme des arbres ce qui ne permet pas de récupérer un atome efficacement à cause du cout non négligeable de la reconnaissance de motifs.
+Cette récupération est importante, car elle permet de reconstruire les atomes sous forme logique afin d'être utilisés dans nos procédures locales.
+Dans \gls{neo4j}, la reconnaissance de motifs est réalisée par un parcours du graphe.
+Étant donné un noeud \textit{Élément} $e$, la récupération des noeuds \textit{Atomes} contenant $e$ et ayant $P$ pour symbole de prédicat, implique de :
+\begin{enumerate*}
+    \item parcourir l'ensemble des arêtes de $e$
+    \item pour chaque arrête, récupérer le noeud associé
+    \item pour chaque noeud, vérifier la valeur de la propriété représentant le symbole de prédicat
+\end{enumerate*}
+Si un noeud \textit{Élément} se retrouve lié a beaucoup de noeud \textit{Atomes} (c.-à-d. qu'il possède un grand nombre d'arêtes) alors, cette opération peut devenir couteuse.
+Malheureusement, ceci ne peut pas être résolu par l'utilisation d'un index car, aujourd'hui, \gls{neo4j} permet uniquement la création d'index globaux permettant de récupérer, par exemple, l'ensemble des \textit{Atomes} ayant le $P$ pour symbole de prédicat.
+Pour répondre au besoin, il faudrait un index hérité (l'arrête doit récupérer le symbole de prédicat du noeud \textit{Atome} associé) et local à un noeud (récupérer le sous ensemble correspondant de l'index global).
+
+\paragraph{Optimisations}
+En complément du modèle, des redondances d'informations et des index sont donc introduits afin d'optimiser ces différentes opérations :
+\begin{itemize}[wide=0pt]
+    \item[Pour limiter le parcours des arêtes] :
+        \begin{enumerate}
+            \item La liste ordonnée des termes comme propriété des noeuds \textit{Atomes} permettant de récupérer un atome complet depuis le noeud atome sans avoir à parcourir les arêtes (propriété $terms$ du noeud \textit{Atome} dans la figure~\ref{fig:schema-graph}) ;
+            \item Pour chaque arête, on lui associe comme type, le symbole de prédicat de l'\textit{Atome} associé (label $P$ dans la figure~\ref{fig:schema-graph}).
+        \end{enumerate}
+    \item[Pour faciliter la récupération des noeuds] :
+        \begin{enumerate}
+            \item Une contrainte d'unicité / index sur les noeuds \textit{Éléments} vérifiant la non-redondance des constantes et des valeurs nulles ;
+            \item Un index sur le symbole de prédicat des noeuds \textit{Atomes} ;
+            \item Une contrainte d'unicité / index sur le couple symbole/termes des noeuds \textit{Atomes} vérifiant la non-redondance des atomes.
+        \end{enumerate}
+\end{itemize}

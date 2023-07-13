@@ -1,0 +1,90 @@
+L'algorithme du \gls{chase} \cite{} est utilisé pour saturer une base en fonction des \gls{tgd}.
+Une contrainte est appliquée, c.-à-d. que l'on génère un nouvel atome instancié correspondant à la tête, quand le corps de la contrainte peux être instancié par des atomes dans la base.
+L'algorithme du \gls{chase} se termine quand plus aucune règle ne peut être instanciée ou que plus aucun nouvel atome n'est généré.
+Une version incrémentale de l'algorithme consiste à considérer uniquement les règles et leur instanciation sur l'ensemble d'atomes mis à jour.
+
+\begin{example}[Application de contraintes]
+    \label{algo:update:chase:ex1}
+    Si on considère l'ensemble de contraintes $\mathbb{C} = \{$\ref{algo:update:chase:ex:c1}, \ref{algo:update:chase:ex:c2}$\}$ et l'ensemble d'atomes $\mathcal{D} = \{A(a),$ $B(a, b),$ $B(c, b),$ $C(b)\}$.
+    \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
+        \item $A(x) \implies B(x, y)$ \label{algo:update:chase:ex:c1}
+        \item $B(x, y) \implies C(y)$ \label{algo:update:chase:ex:c2}
+    \end{enumerate}
+
+    L'insertion de l'ensemble $I = \{A(b), A(d)\}$ dans $\mathcal{D}$ implique l'application de la contrainte \ref{algo:update:chase:ex:c1} uniquement avec les instanciation $h_1 = \{x \mapsto b\}$ et $h_2 = \{x \mapsto c\}$.
+    L'instanciation $h = \{x \mapsto a\}$ n'a pas besoin d'etre calculé car $\mathcal{D}$ est déjà cohérente par rapport à $\mathbb{C}$.
+    A ce stade, il n'est pas non plus necessaire de verifier si \ref{algo:update:chase:ex:c2} est applicable.
+    L'application de $h_1($\ref{algo:update:chase:ex:c1}$)$ génére un nouvel atome $B(a, N_1)$.
+    Comme il existe déjà une instanciation plus spécifique dans la base : $B(a, b)$, ce nouvel atome n'a pas besoin d'etre ajouté.
+    L'application de $h_2($\ref{algo:update:chase:ex:c1}$)$ génére un nouvel atome $B(d, N_1)$.
+    Comme il n'existe pas dans $\mathcal{D}$, on l'ajoute et on recommence l'algo.
+    Avec l'insertion de $B(d, N_1)$, on declenche \ref{algo:update:chase:ex:c2} avec l'instanciation $h_3 = \{x \mapsto d, y \mapsto N_1\}$ qui genere a son tour l'atome $C(N_1)$.
+    Plus aucun atome ne peux etre généré et on obtient donc l'ensemble $\mathcal{D}' = \{A(a),$ $B(a, b),$ $B(c, b),$ $C(b), B(d, N_1), C(N_1)\}$.
+\end{example}
+
+\paragraph{Cycles et génération infinie}
+Dans ces travaux, les \glspl{tgd} peuvent contenir des variables existentielles dans la tête qui génèreront de nouvelles valeurs nulles lors de leur application.
+Cela peux engendrer une génération infinie d'atomes si des cycles existent dans les contraintes.
+Il est important de s'assurer que cette opération termine.
+Pour faire face à cette problématique, on associe à chaque valeur nulle, un entier appelé le degré de $N$ et dénoté par $\delta(N^k) = k$.
+À chaque mis à jour, le degré de toutes les valeurs nulles apparaissant dans $\mathcal{D}$ est fixé à $0$.
+Pendant le \gls{chase}, à chaque itération, les nouvelle valeurs nulles générées se voient attribuer un degré égal à $\delta + 1$, où $\delta$ est le degré maximal des valeurs nulles presentes dans les atomes du corps de la contrainte, ou $0$ si aucune valeur nulle n'apparaît dans le corps de la contrainte.
+On fixe donc un degré maximal $\delta_{max}$ qui permet l'interruption du \gls{chase} dès qu'une valeur nulle $N$ depasse ce seuil, tel que $\delta(N) > \delta_{max}$.
+
+\begin{example}[Génération infinie d'atomes]
+    \label{algo:update:chase:ex2}
+    Si on considère l'ensemble d'atomes $I = \{A(a, b)\}$ sur lequel on applique l'ensemble de contraintes $\mathbb{C} = \{$\ref{algo:update:chase:ex:c3}, \ref{algo:update:chase:ex:c4}$\}$ avec pour degrée maximal $\delta_{max} = 1$.
+    \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
+        \item $A(x, y) \implies B(y, z)$ \label{algo:update:chase:ex:c3}
+        \item $B(x, y) \implies A(y, z)$ \label{algo:update:chase:ex:c4}
+    \end{enumerate}
+
+    L'application de la regle \label{algo:update:chase:ex:c3} avec l'instanciation $h_1 = \{x \mapsto a, y \mapsto b\}$ génére l'atome $B(b, N_1^0)$.
+    Ce dernier permet l'application de la contrainte \label{algo:update:chase:ex:c3} avec l'instanciation $h_2 = \{x \mapsto b, y \mapsto N_1^0\}$ de qui génére l'atome $A(N_1^0, N_2^1)$, qui permet la génération de $B(N_2^1, N_3^2)$ via \label{algo:update:chase:ex:c3}.
+    l est facile de voir que la génération des atomes est infinie.
+    Cependant, comme le degrée de $N_3^2$ depasse le degrée maximal $\delta_{max}$ on arrete cette branche de la génération.
+    Si d'autres régles peuvent étres appliquée on continue de la génération.
+    L'ensemble de resultat $I'$ est invalid car une valeur nulle dépasse le degrée maximal.
+    On verifira dans la suite que cet ensemble n'est pas simplifiable (et donc valide si la simplification supprime cette valeur nulle) avant de rejeté la mise à jour si ce n'est pas le cas.
+\end{example}
+
+La procédure incrémentale du \gls{chase} est définie dans l'algorithme~\ref{algo:update:chase:insert}.
+L'ensemble $ToIns$ represente les effet de bords de $I$ à ajouter dans $\mathcal{D}$ tel que si $\mathcal{D}' = \mathcal{D} \cup ToIns$ : $I \subseteq \mathcal{D}'$ et $\mathcal{D}' \vDash \mathbb{C}$.
+La boucle (ligne~\ref{algo:update:chase:insert:while}) est l'application du \gls{chase} incrémentale qui respecte les conditions suivantes:
+\begin{enumerate}[label=(\arabic*),ref=(\arabic*)]
+    \item Une contrainte $c \in \mathbb{C}$ est appliquée \textit{uniquement} si au moins un atome de son corps fait parti des effet de bords $ToIns$  \label{algo:update:chase:insert:c1} ;
+    \item Un atome est généré uniquement s'il ne depasse pas le degrée maximum \label{algo:update:chase:insert:c2} ;
+    \item Un atome est généré uniquement s'il n'existe pas, dans $\mathcal{D}$, un atome plus specifique ou equivalent \label{algo:update:chase:insert:c3}
+\end{enumerate}
+
+\begin{algorithm}[ht]
+    \caption{$\textsc{Chase4Insert}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$}
+    \label{algo:update:chase:insert}
+    $ToIns := I$ \;
+	\While{\label{algo:update:chase:insert:while} il existe une contrainte $c \in \mathbb{C}$ et un $h$ tel que $h(body(c)) \in \mathcal{D}$ qui respecte :
+    \begin{enumerate}
+        \item[\ref{algo:update:chase:insert:c1}] $h(body(c)) \cap ToIns \neq \emptyset$
+        \item[\ref{algo:update:chase:insert:c2}] $\delta(h'(head(c))) \leq \delta_{\max}$ où $h' \supseteq h$ instancie les variables existentielles de $head(c)$ par des null
+        \item[\ref{algo:update:chase:insert:c3}] $\nexists h''$ tel que $h''(h'(head(c))) \in \mathcal{D} \cup ToIns$
+    \end{enumerate}
+    }{
+		$ToIns := ToIns \cup \{h'(head(c))\}$ \;
+	}
+	\Return{$ToIns$} \;
+\end{algorithm}
+
+\paragraph{\gls{cypher}}
+La recherche des instanciations d'une contrainte $c = L_1(\alpha_1), \dots, L_m(\alpha_m)$ dans la base $\mathcal{D}$ se traduit par une requête $Q_{chase}^{[c]}(\mathcal{D})$ présentée figure~\ref{algo:update:chase:query}.
+
+\begin{figure}[ht]
+	\begin{lstlisting}[mathescape]
+MATCH ($x_k$:Element {value: $t_i$})
+MATCH ($a_1$:Atom {symbol: `$L_1$`}), ..., ($a_m$:Atom {symbol: `$L_m$`})
+WHERE expr1 and NOT EXISTS { $\label{chase:not-exists}$
+      MATCH ($a$:Atom { symbol: `$L_0$`})
+      WHERE expr2
+} RETURN {$\alpha|_1:x_1, \alpha|_2:x_2, \dots, \alpha|_k:x_k$}}
+	\end{lstlisting}
+	\caption{Format des requêtes  $Q_{chase}^{[c]}$}
+    \label{algo:update:chase:query}
+\end{figure}

@@ -17,39 +17,67 @@
 \usepackage[scaled]{uarial}          % Arial pour les pages de couv et 4ème
 \usepackage[french]{babel}           % Adaptation de LaTeX au français si thèse rédigée en français
 \usepackage[fixlanguage]{babelbib}
+\usepackage[autolanguage]{numprint}
+\usepackage{hyphenat}
 
 % Autres packages non utilisés pour les couvertures / options
 \usepackage{subfiles}                % Relative file import
 \usepackage{amsmath}                 % Complement mathematique
 \usepackage{amssymb}                 % Ajoute des symboles
+\usepackage{amsthm}
 \usepackage{latexsym}                % Ajoute des symboles
 \usepackage{makeidx}                 % Pour l'index
 \usepackage{graphicx}                % Pour inclure des figures
 \usepackage{subfig}                  % Sous-figure (ou sous-tableau)
+\usepackage{xcolor}
 \usepackage{bookmark}
 \usepackage{hyperref}                % Lien hypertextes
 \usepackage[french]{minitoc}         % Produce a TOC for all chapters
-%\usepackage{array}                  % Outils supplémentaires pour les tableaux
-%\usepackage{multicol}               % Plusieurs colonnes possibles
+\usepackage{array}                   % Outils supplémentaires pour les tableaux
+\usepackage{multicol}                % Plusieurs colonnes possibles
 %\usepackage{indentfirst}            % Indenter le premier paragraphe après une nouvelle section
 %\usepackage{setspace}               % Pour les Interlignes
 %\usepackage{algorithm}              % Pour les algorithmes
 %\usepackage{algorithmic}            % Pour les algorithmes
 \usepackage{lipsum}                  % Pour du blabla en latin
-
+\usepackage{listings}
 \usepackage{url}
 \usepackage{tikz}
 \usepackage{tikz-dependency}
 \usepackage{pgfplots}
 \usepackage[inline]{enumitem}
 \usepackage[binary-units]{siunitx}
-\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage[linesnumbered,ruled,vlined,boxed,french,frenchkw,onelanguage]{algorithm2e}
+\usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
 \usepackage{adjustbox}
 
 \usepackage[acronym,translate=babel]{glossaries}
 
 % Bib
 \selectbiblanguage{french}
+
+% Tikz
+\usetikzlibrary{positioning}
+
+% Pgf
+\usepgfplotslibrary{units}
+\pgfplotsset{compat=1.9}
+
+% Listing
+\lstset{
+	basicstyle=\normalfont\small,
+	numbers=left,
+	stepnumber=1,
+	showstringspaces=false,
+	tabsize=2,
+	breaklines=true,
+	breakatwhitespace=false, 
+	frame=single,
+}
+
+% Theorems
+\theoremstyle{definition}
+\newtheorem{example}{Exemple}[section]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % En tete et pied de page :

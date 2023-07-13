@@ -1,0 +1,105 @@
+Comme expliqué dans la section~\ref{sec:update:pre:db}, une base de données $\mathcal{D}$ doit être minimale, c.-à-d. égale à son core afin d'éviter la redondance des données.
+La minimalité doit être maintenue à chaque mise à jour et de façon incrémentale.
+Pour ce faire, des algorithmes incrémentaux sont proposé avec pour objectif de recalculer le core de la base uniquement en fonction des valeurs nulles impacté par la mise à jour.
+Formellement, étant donné un ensemble d'atomes $I$ et un ensemble de valeurs nulles $\nu$ existant dans $I$, on recherche un homomorphisme $h$ tel que : pour toutes valeurs nulles $N \notin \nu$, $h(N) = N$, $h(I)$ est minimal et $h(I) \subseteq I$.
+L'exemple \ref{ex:update:nulls-simp} montre cependant que le choix de $\nu$ n'est pas arbitraire.
+
+\begin{example}
+    \label{ex:update:nulls-simp}
+\end{example}
+
+Étant donné un ensemble d'atomes $I$ et un ensemble de valeurs nulles liées $\nu_0$ dans $I$, l'ensemble des valeurs nulles liées $\nu$ doit être calculé.
+Pour cela, on calcule l'ensemble d'atomes $\textsf{LinkedNull}_{I,N}$ for chaque valeur nulle $N$ dans $\nu_0$.
+Cet ensemble est la limite de la séquence $(\textsf{LinkedNull}^k_{I,N})_{k \ge 0}$ définie par :
+\begin{align}
+    \textsf{LinkedNull}^0_{I,N} &= \{atom \in I \mid N \in nulls(atom)\} \\
+    \textsf{LinkedNull}^k_{I,N} &= \{atom \in I \mid (\exists atom' \in \textsf{LinkedNull}^{k-1}_{I,N})(nulls(atom) \cap nulls(atom') \neq \emptyset)\}
+\end{align} 
+
+Il est facile de voir que pour tout $k \geq 0$, $\textsf{LinkedNull}^k_{I,N} \subseteq \textsf{LinkedNull}^{k+1}_{I,N}$ et que $\textsf{LinkedNull}^k_{I,N} \subseteq I$.
+La séquence $(\textsf{LinkedNull}^k_{I,N})_{k \ge 0}$ est donc monotone et bornée par $I$.
+Comme $I$ est fini, la séquence à une unique limite qui est un sous-ensemble de $i$ noté $\textsf{LinkedNull}_{I,N}$.
+La redondance peut donc être uniquement vérifiée sur l'ensemble d'atomes défini par $\bigcup_{N \in \nu_0}\textsf{LinkedNull}_{I,N}$ et l'ensemble $\nu$ de valeurs nulles dans cet ensemble.
+
+\paragraph{\gls{cypher}}
+L'ensemble $\textsf{LinkedNull}_{\mathcal{D}}$ (où $\mathcal{D}$ est la base de données) calculé à l'aide de la requête \gls{cypher} figure~\ref{fig:update:core:query}.
+Il s'agit d'une requête paramétrée, reconnaissable par la présence d'une variable préfixé du symbole \verb|$|.
+L'opérateur \verb|UNWIND| (ligne~\ref{fig:update:core:query:unwind}) permet de convertir une variable de type liste en une table de résultat.
+Le \verb|MATCH| (ligne~\ref{fig:update:core:query:match}) recherche, dans le graphe, les homomorphismes du motif décrit.
+Ici, on recherche un neoud, que l'on stockera dans la variable \verb|nullValueNode|, ayant les labels \textbf{:Element} et \textbf{:Nulls} et ayant comme valeur de la propriété \textit{value} la valeur stocké dans la variable \verb|nullPredName|.
+La suite du motif (ligne~\ref{fig:update:core:query:range}) recherche un chemin \verb|pathP| de taille $n$, où $1 \leq n \leq \verb|maxPathLength|$, partant du noeud précédent.
+\verb|maxPathLength| est défini comme le double du nombre de valeurs nulles dans la base et permet d'empêcher le parcours de chemins que l'on sait d'avance inutile.
+La condition exprimée par l'opérateur \verb|WHERE|, vérifie que le neoud final du chemin soit différent du noeud de départ et qu'aucun noeud du chemin \verb|nodes(pathP)| n'ai le label \textbf{:Constant}.
+
+L'opérateur \verb|WITH| (ligne~\ref{fig:update:core:query:collect}) permet de faire une projection d'une table intermédiaire.
+Sa combinaison avec l'opérateur \verb|COLLECT| permet de regrouper les variables \verb|endNode| dans une variable \verb|linkedNodes| de type liste en fonction de la variable \verb|nullValueNode|.
+Cette combinaison est similaire à l'opérateur \verb|GROUP BY| en \gls{sql}.
+Intuitivement, on recherche pour chaque nulle l'ensemble des noeuds connectés uniquement par des neouds \textit{Atomes} ou des neouds \textit{Nulles}.
+Les ensembles de neouds sont séparés (ligne~\ref{fig:update:core:query:with}) en deux listes \verb|linkedAtoms| et \verb|linkedNulls| contenant respectivement l'ensemble des noeuds \textit{Atomes} liés par des valeurs nulles et l'ensemble des noeuds \textit{Nulles} liant cet ensemble d'atomes.
+L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requête chaque atome associé à l'ensemble des valeurs nulles auquel ils sont attachés.
+
+\begin{figure}[htb]
+	\begin{lstlisting}[escapechar=|]
+UNWIND $nulls AS nullPredName |\label{fig:update:core:query:unwind}|
+MATCH (nullValueNode:Element:Null {value: nullPredName}), |\label{fig:update:core:query:match}|
+	pathP = (nullValueNode)-[*1..maxPathLength]-(endNode) |\label{fig:update:core:query:range}|
+WHERE endNode <> nullValueNode AND
+	ALL(n IN nodes(pathP) WHERE NOT (n:Constant))
+WITH COLLECT(DISTINCT endNode) AS linkedNodes, nullValueNode |\label{fig:update:core:query:collect}|
+WITH [n IN linkedNodes WHERE (n:Atom)] AS linkedAtoms, |\label{fig:update:core:query:with}|
+	[nullValueNode] + [n IN linkedNodes WHERE (n:Null)] AS linkedNulls
+UNWIND linkedAtoms AS a RETURN a.symbol as a, a.terms as e, linkedNulls
+	\end{lstlisting}
+	\caption{Requête Cypher pour calculer l'ensemble $\textsf{LinkedNull}_{\mathcal{D}}$}
+	\label{fig:update:core:query}
+\end{figure}
+
+\begin{example}
+	
+\end{example}
+
+\paragraph{Simplification}
+La procédure pour éliminer la redondance sur un ensemble d'atomes $I$ en fonction d'un ensemble de valeurs nulles $\nu_0$ est donné par l'algorithme~\ref{algo:update:core}.
+Ligne~\ref{algo:update:core:pset}, les ensembles d'atomes, liée par des valeurs nulles et qui contiennent au moins une valeur nulle présente dans $\nu_0$, sont calculés.
+L'ensemble des valeurs nulles de $PSet$ est donc l'ensemble $\nu$.
+À la ligne~\ref{algo:update:core:qcore}, pour chaque ensemble d'atomes $P$, on construit la requête $Q_{core}(X) \gets \phi(X)$ où $\phi$ est l'ensemble des atomes de $P$ dans lequel chaque valeur nulle $N_i$ est remplacé par la variable correspondante $x_i$.
+En d'autres termes, la requête $Q_{core}$ retourne l'ensemble des homomorphismes sur les valeurs nulles de $P$.
+Si plusieurs homomorphismes sont retournés par la requête, cela signifie qu'il existe plusieurs instanciations possibles de $P$ et qu'il faut le simplifier, car $P$ est redondant.
+Dans ce cas, il faut choisir l'instanciation (ou homomorphisme) la \textit{plus spécifique} (ligne~\ref{algo:update:core:mostspecific}) et supprimer les atomes redondants (ligne~\ref{algo:update:core:select}).
+Si l'on ne prend pas l'instanciation la \textit{plus spécifique} il faudra la simplifier à nouveau.
+
+\begin{algorithm}[ht]
+	\caption{$\textsc{Simplify}(I, \nu_0)$}
+    \label{algo:update:core}
+	$PSet := \{\textsf{LinkedNull}_{I,N} \mid N \in \nu_0\}$\; \label{algo:update:core:pset}
+	\ForAll{$P \in PSet$}{
+		Construire et exécuter la requête $Q_{core}(I)$ pour récupérer l'ensemble des homomorphismes $H = \{h_1, \dots, h_n\}$\; \label{algo:update:core:qcore}
+		\If{$\mid (q_{core}(I)) \mid > 1$}{
+			$h_m :=$ $\text{PlusSpecifique}(H)$\; \label{algo:update:core:mostspecific}
+			$I := (I \setminus P) \cup h_m(P)$\; \label{algo:update:core:select}
+		}
+	}
+	\Return $I$\;
+\end{algorithm}
+
+Étant donné deux homomorphismes $h_1$ et $h_2$ sur le même alphabet $\Sigma$ : $h_1$ est dit \textit{moins spécifique} que $h_2$, noté $h_1 \preceq h_2$, s'il existe un homomorphisme $h$ sur $\Sigma$ tel que $h \circ h_1 = h_2$ (c.-à-d. qu'il existe une transformation de $h_1$ vers $h_2$ nommée $h$).
+$p$ est le nombre de valeurs nulles $N_j$ distinctes dans $P = \textsf{LinkedNull}_{I,N}$ et $q$ est le nombre d'homomorphismes $h_i$ retournés par la requête $Q_core$ avec $h_1$ étant l'identité de $P$.
+Pour trouver l'homomorphisme le plus spécifique sur $P$, on construit la table $H_P$ de $p$ colonnes et $q$ lignes où $H_P[i, j] = h_i(N_j)$.
+Dans la table $H_P$, $h_i \preceq h_i'$ si et seulement si, pour tout $j$ :
+
+\todo[inline]{Give insight abour HP calculus and cite the report for the proof and detailed explanation}
+\begin{itemize}
+	\item Si $H_P[i, j] \notin nulls(P)$ alors $H_P[i, j] = H_P[i', j]$
+	\item Si $H_P[i, j] \in nulls(P)$ alors pour tout $j' \neq j$ tel que $H_P[i, j] = H_P[i, j']$ on a $H_P[i', j] = H_P[i', j']$
+\end{itemize}
+
+\begin{example}
+	
+\end{example}
+
+Cette approche basée sur la table $H_P $ est comparable aux techniques d'optimisation de requêtes \cite{}.
+Cependant, elle diffère de \cite{ahoEfficientOptimizationClass1979,chandraOptimalImplementationConjunctive1977} sur deux points :
+\begin{enumerate*}[label=(\roman*)]
+	\item notre tableau est basé sur les réponses aux requêtes plutôt que sur le corps de la requête ;
+	\item nous calculons un homomorphisme le plus spécifique, alors que dans \cite{ahoEfficientOptimizationClass1979} ils rejettent les homomorphismes les moins spécifiques.
+\end{enumerate*}

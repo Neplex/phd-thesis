@@ -1,4 +1,5 @@
 \subsection{Logique du premier ordre}
+\label{sec:update:pre:logic}
 
 En assumant une certaine familiarité avec la \gls{fol}, on utilise comme alphabet :
 \begin{itemize}
@@ -33,27 +34,38 @@ De plus, \cite{chabinConsistentUpdatingDatabases2020} démontre que si $\phi_1$ 
 La simplification minimale d'une formule $\phi$ est appelé le core et s'écrit $core(\phi)$.
 
 \subsection{Base de données}
+\label{sec:update:pre:db}
 
-L'\textit{instance} d'une base de donnée peux être décrite comme la Skolémisation d'une formule $\phi$ correspondant a un ensemble minimal d'atomes instanciés tel que $core(\phi) = \phi$.
+L'\textit{instance} d'une base de donnée $\mathcal{D}$ peux être décrite comme la Skolémisation d'une formule $\phi$ correspondant a un ensemble minimal d'atomes instanciés tel que $core(\phi) = \phi$.
 La Skolémisation d'une formule $\phi$ noté $Sk(\phi)$ consiste à instancier l'ensemble des variables par des constantes ou des valeurs nulles et à éliminer toutes les occurrences de quantificateur existentiel.
 
-Une \textit{contrainte} (ou règle) sur une base de donnée est une dépendance génératrice de n-uplets (ou Tuple-generating dependency, TGD en anglais) de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
-Plus simplement écrit $body(X, Y) \to head(X, Z)$, $X$, $Y$ et $Z$ sont des ensembles de variables, $bod(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
-Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés, noté $I \vDash c$ si pour tout homomorphisme $h$ tel que $h(body(c)) \subseteq I$ il existe un homomorphisme $h'$ tel que $h(body(c)) = h(body(c))$ et $h'(head(c)) \subseteq I$.
-Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, s'il existe une instance du corps dans l'instance de la base de données, la tête correspondante doit aussi être présente.
-Une instance $I$ d'une base de données est dites \textit{cohérente} par rapport à un ensemble de contraintes $\mathcal{C}$, noté $I \vDash \mathcal{C}$ si pour toute contrainte $c$ dans $\mathcal{C}$, $I \vDash c$.
+Une \textit{requête} sur une base de donnée est une formule logique de la forme $(\forall X)(Q(X) \gets \phi(X))$ où $X$ est l'ensemble des variables libres de $\phi$.
+La réponse d'une requête sur $\mathcal{D}$ est l'ensemble des homomorphismes $h$ tel que $h(\phi(X)) \subseteq \mathcal{D}$.
+
+Une \textit{contrainte} (ou règle) sur une base de donnée est une dépendance génératrice de n-uplets, ou \gls{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
+Plus simplement écrit $body(X, Y) \to head(X, Z)$, $X$, $Y$ et $Z$ sont des ensembles de variables, $body(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
+Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés, noté $I \vDash c$ si pour tout homomorphisme $h$ tel que $h(body(c)) \subseteq I$ il existe un homomorphisme $h'$ tel que $h'(body(c)) = h(body(c))$ et $h'(head(c)) \in I$.
+Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, pour toute instanciation du corps présente dans la base de données, la tête correspondante doit aussi être présente dans la base.
+Une instance $I$ d'une base de données est dites \textit{cohérente} par rapport à un ensemble de contraintes $\mathbb{C}$, noté $I \vDash \mathbb{C}$ si pour toute contrainte $c$ dans $\mathbb{C}$, $I \vDash c$.
 
 \subsection{Base de données graphes}
+\label{sec:update:pre:graph}
+
 Quand on parle de base de données graphe on peut distinguer deux grandes familles :
 \begin{description}
     \item[Les bases de triplets] principalement le \gls{rdf} porté par le \gls{w3c}.
-        Ce type de base de données enregistre des triplets de la forme $<x, P, y>$ qui sont des prédicats binaires où $P$ est un symbole de prédicat, $x$, le sujet, est l'URI d'une ressource (un noeud) et $y$, l'objet est un URI ou un littéral (une valeur de propriétés).
+        Ce type de base de données enregistre des triplets de la forme $\langle x, P, y \rangle$ qui sont des atomes binaires où $P$ est un symbole de prédicat, $x$, le sujet, est l'\gls{uri} d'une ressource (un noeud) et $y$, l'objet est un \gls{uri} ou un littéral (une valeur de propriétés).
         \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
     \item[Les Graphes de Propriétés] ou \gls{lpg} en anglais, sont des bases de données composées de noeuds et d'arcs labellisés qui peuvent contenir des propriétés.
         \gls{neo4j} est surement le gestionnaire de base de donnée le plus utilisé dans ce domaine.
-        Ils sont les créateurs du langage \gls{cypher} qui sert de base pour le nouveau langage \gls{iso} \gls{gql} en cours de développement.
+        Ils sont les créateurs du langage \gls{cypher} qui sert de base pour le nouveau langage \gls{iso} : \gls{gql}, en cours de développement.
 \end{description}
 
 Les base de données graphes sont conçus pour facilité les requêtes sur la structure des données.
-Cependant, le modèle ou schéma de la base est donc très dépendants des requêtes envisagées.
+Le modèle ou schéma de la base est donc très dépendants des requêtes envisagées.
 Dans \gls{neo4j}, les noeud peuvent avoir une ou plusieurs étiquètes appelées \textit{label} alors que les relations ne peuvent en avoir qu'une appelée \textit{type} (dans le cas des relations on dupliquera l'arrête si plusieurs étiquètes sont nécessaires).
+
+\paragraph{\gls{cypher}} est un langage déclaratif de requête pour les graphes de propriétés.
+Le langage permet d'exprimer facilement des requêtes à l'aide du mot clés \verb|MATCH| comme une recherche de motif exprimé en art ASCII.
+Les requêtes s'écrivent comme un enchainement d'opérations où le résultat d'une opération est utilisé comme paramètre de la suivante.
+Bien que les requêtes s'effectuent sur un graphe, le résultat d'un opérateur est toujours une table d'affectation des variables (ayant autant de colonne que de variables et autant de lignes que de réponses).

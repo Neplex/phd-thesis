@@ -1,0 +1,20 @@
+L'objectif de cette section est de d'écrire l'ensemble des opérations incrémentales nécessaire pour la mise à jour cohérente d'une base de donnée.
+
+\subsection{Insertion}
+L'algorithme~\ref{algo:update:insert} décrit la procédure pour l'insertion d'un ensemble d'atomes instanciés $I$ dans la base $\mathcal{D}$ selon l'ensemble de contraintes $\mathbb{C}$.
+
+
+\begin{algorithm}[ht]
+    \caption{$\textsc{Insert}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$}
+    \label{algo:update:insert}
+	$ToIns := \textsc{Chase4Insert}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$ \;
+    $NullBucket := \{N_j \mid N_j \text{ est une valeur nulle obtenue par } Q_{bucket}(\mathcal{D} \cup ToIns)\}$ \;
+    $\mathcal{D}' := \textsc{Simplify}(\mathcal{D} \cup ToIns, NullBucket)$ \;
+    \uIf{$Q_{degree}(\mathcal{D}')_{[NullBucket,\delta_{max}]}$}{
+        $Q_{\delta}(\mathcal{D}')_{[NullBucket,0]}$ \;
+        \Return $\mathcal{D}'$ \;
+    }
+    \Else{
+        \Return $\mathcal{D}$ \;
+    }
+\end{algorithm}
