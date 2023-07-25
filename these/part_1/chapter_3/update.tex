@@ -1,6 +1,7 @@
 L'objectif de cette section est de d'écrire l'ensemble des opérations incrémentales nécessaire pour la mise à jour cohérente d'une base de donnée.
 
 \subsection{Insertion}
+\label{sec:update:insert}
 L'algorithme~\ref{algo:update:insert} décrit la procédure pour l'insertion d'un ensemble d'atomes instanciés $I$ dans la base $\mathcal{D}$ selon l'ensemble de contraintes $\mathbb{C}$.
 
 
@@ -18,3 +19,18 @@ L'algorithme~\ref{algo:update:insert} décrit la procédure pour l'insertion d'u
         \Return $\mathcal{D}$ \;
     }
 \end{algorithm}
+
+\subsection{Suppression}
+\label{sec:update:delete}
+
+\begin{algorithm}[ht]
+	\caption{$\textsc{Delete}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$}
+    \label{algo:update:delete}
+	$del_{iso} := Q_{iso}^{[I]}(\mathcal{D})$ \;
+	$ToDel, ToIns := \textsc{Chase4Delete} (\mathcal{D}, \mathbb{C}, \delta_{max}, del_{iso})$\;
+	$\mathcal{D}' := (\mathcal{D} \cup ToIns) \setminus ToDel$ \;
+	$NullBucket := \{N_j \mid N_j \text{ est une valeur nulle obtenue par } q_{bucket}(\mathcal{D}')_{[ToIns \cup ToDel]}\}$ \;
+	$\mathcal{D}' := \textsc{Simplify}(\mathcal{D}', NullBucket)$ \;
+	\Return $\mathcal{D}'$
+\end{algorithm}
+

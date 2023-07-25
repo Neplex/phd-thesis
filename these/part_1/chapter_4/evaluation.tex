@@ -1,0 +1,311 @@
+Les performances de la mise à jour incrémentale sont évaluées à l'aide de benchmarks sur trois jeux de données décrits de façon complète dans l'annexe~\ref{appendice:datasets} et accessibles sur le dépôt \gls{git}~\cite{hiotUpdateChase2023} :
+\begin{description}
+    \item[Movie]\label{dataset:movies}\footnote{\url{https://github.com/neo4j-graph-examples/movies}} est une base de données fournie par \gls{neo4j} ;
+          C'est un graphe de propriété représentant des nœuds films associé à des noeuds representants des acteurs et des réalisateurs.
+          Une partie du graphe se concentre sur les critiques de cinéma où des nœuds \textit{avis} sont attachés aux films et à l'auteur.
+          Cette base a été convertie, en \gls{fol}, avec \num{8} symboles de prédicats ayant une arité \numrange{2}{4} et \num{17} contraintes ont été construites.
+    \item[GOT]\label{dataset:got}\footnote{\url{https://github.com/neo4j-graph-examples/graph-data-science}} ou \textit{GameOfThrone} est une base de données \gls{lpg} fournie par \gls{neo4j} ;
+          Cette base est utilisée pour de l'analyse de graphe et décrit les personnages de la série de livres \textit{A Song of Ice and Fire} et mets en évidence leur interaction et leurs affiliations.
+          Elle est constituée de \num{19} prédicats ayant une arité \numrange{2}{7} et \num{26} contraintes.
+    \item[Social]\label{dataset:social}\footnote{\url{https://ldbcouncil.org/benchmarks/graphalytics/}} est un graphe étiqueté (sans propriétés) généré artificiellement par le \gls{ldbc} pour l'évaluation d'algorithmes de graphes ;
+          Elle synthétise un réseau social, comme un forum, dans lequel des personnes interagissent entre eux via des posts et des commentaires.
+          Cette base se constitue de \num{8} prédicats d'arité \numrange{1}{2} et \num{39} contraintes.
+\end{description}
+
+Les détails de la construction de ces jeux de données sont présentés dans l'annexe~\ref{appendice:datasets}.
+La table~\ref{table:update:xp:datasets}, montre les 9 instances qui ont été générées dont 8 qui contiennent des valeurs nulles.
+\ref{dataset:social} est un jeu de données qui ne contient, initialement, aucune valeur nulle.
+Cela a permis de construire des instances contenant un nombre variable de valeurs nulles afin de mesurer l'impact du nombre de valeurs nulles sur les performances.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l|c|c|c|c}
+        Instances              & Nombre d'atomes & Nombre de nulls & Nombre de règles & Null/Atome ($\tau$) \\
+        \hline
+        \hline
+        $Movie$                & \num{604}       & \num{340}       & \num{12}         & \num{0.56}          \\
+        $GOT$                  & \num{24818}     & \num{17232}     & \num{32}         & \num{0.69}          \\
+        \hline
+        $Social_{1K}$          & \num{2248}      & \num{190}       & \num{39}         & \num{0.08}          \\
+        $Social_{10K}$         & \num{16559}     & \num{1183}      & \num{39}         & \num{0.07}          \\
+        \hline
+        $Social_{10K}^{0N}$    & \num{16559}     & \num{0}         & \num{39}         & \num{0.00}          \\
+        $Social_{10K}^{50N}$   & \num{16559}     & \num{50}        & \num{39}         & \num{0.00}          \\
+        $Social_{10K}^{100N}$  & \num{16559}     & \num{100}       & \num{39}         & \num{0.01}          \\
+        $Social_{10K}^{500N}$  & \num{16559}     & \num{500}       & \num{39}         & \num{0.03}          \\
+        $Social_{10K}^{1000N}$ & \num{16559}     & \num{1000}      & \num{39}         & \num{0.06}          \\
+    \end{tabular}
+    \caption{Instance des jeux de données utilisée pour l'évaluation des performances}
+    \label{table:update:xp:datasets}
+\end{table}
+
+Les benchmarks se composent d'un ensemble d'exécution ayant chacune un jeu de paramètres différents.
+Ces exécutions sont construites pour chacune des instances de la table~\ref{table:update:xp:datasets} en faisant varier le type de mise à jour (insertion ou suppression) et sa taille (\numlist{1;5;10;20} atomes).
+La taille de l'instance est aussi variable, en augmentant artificiellement le nombre d'atomes en les dupliquant $n$-fois (échelle \numlist{1;2;5}), avec renommage des termes (on obtient donc des graphes à $n$ partie).
+Les exécutions sont réalisées \num{10} fois après \num{3} itérations de préchauffage afin de précharger le système, les index et le cache de la base de donnée qui ne sont pas mesurées.
+Entre chaque itération, l'instance est remise à zéro et la mémoire est nettoyée pour assurer une cohérence dans le temps d'exécution.
+L'ensemble du code nécessaire pour reproduire ces tests de performances est disponible sur le dépôt \gls{git}~\cite{hiotUpdateChase2023}.
+
+\paragraph{Système}
+Ces benchmarks sont implémentés en Java et exécutés avec {Java 16}, avec une base de données\gls{neo4j} 4.4.
+Le programme a été exécuté dans des containeurs \gls{docker} installé en version 20.10.21 sur une machine virtuelle \gls{rocky} 8.7 avec \num{4} vCPU and \SI{16}{\giga\byte} de mémoire primaire (\SI{8}{\giga\byte} réservés pour la base de données et \SI{5}{\giga\byte} pour la procédure) et avec \SI{1}{\giga\byte\per\second} de débit en lecture/écriture sur le disque.
+La base de données et la procédure de mise à jour s'exécutent sur le même serveur.
+Bien que cette configuration permet de comparer différentes instances et implémentations, les résultats obtenus ne sont pas représentatif des performances en condition réelles.
+
+\subsection{Implémentation sur un modèle relationnel}
+\label{sec:update:evaluation:mysql}
+À des fins de comparaison, les algorithmes ont aussi été implémenté sous \gls{mysql} 8.
+L'implémentation de la procédure en \gls{fol} sous un modèle relationnel est triviale : étant donné un atome instancié $P(t_1, \dots, t_n)$, notre modèle relationnel consiste à créer une table dont le schéma est $R_P[A_1, \dots, A_n]$ où chaque attribut $A_i$ est une valeur textuelle.
+C'est-à-dire que chaque symbole de prédicat correspond à une table, chaque atome représente un tuple de la table et chaque terme est représenté par un attribut textuel préfixé du symbole `\_' pour les valeurs nulles.
+La traduction des requêtes logique vers \gls{sql} est triviale.
+La requête $Q_{chase}^{[c]}$ suit l'idée décrite section~\ref{sec:update:chase} et s'écrit en \gls{sql} avec la clause \verb|NOT EXIST|.
+
+Cependant, la construction de l'ensemble \textsf{LinkedNull} est définie par une procédure récursive qui ne peux être exprimée en \gls{sql}.
+L'algorithme~\ref{algo:update:mysql:partition} implémente cette procédure récursive.
+L'utilisation d'une requête \gls{sql} récursive n'est pas approprié ici.
+En effet, pour ce faire, une table supplémentaire doit être introduite pour stocker les paires de valeurs nulles liées.
+L'opération se traduirait alors par :
+\begin{enumerate}
+    \item une requête \gls{sql} récursive pour calculer la fermeture transitive de cette nouvelle table et ;
+    \item un balayage de l'ensemble de la base de données pour récupérer tous les atomes correspondants
+\end{enumerate}
+De plus, la table supplémentaire doit être maintenue après chaque mise à jour, ce qui peux avoir un cout non négligeable.
+
+\begin{algorithm}[ht]
+	\caption{$\textsc{FindLinkedNull}(\mathcal{D}, NullBucket)$}
+    \label{algo:update:mysql:partition}
+	$newNull := \emptyset$ \;
+    $allNulls := \emptyset$ \;
+    $linkedNullSet := \emptyset$ \;
+	\While{$NullBucket \neq \emptyset$}{
+		$allNulls := allNulls \cup NullBucket$\;
+		\ForAll{table $R_P$ dans le schéma}{
+            $Q_N^{[R_P]} :=$ SELECT * FROM $R_P$ WHERE ANY $(A_1, \dots, A_n)$ IN $NullBucket$ \;
+			\ForAll{tuple $u$ dans $Q_N^{R_P}(\mathcal{D})$}{
+				$linkedNullSet := linkedNullSet \cup \{P(u)\}$ \;
+                $newNull := newNull \cup (\text{null}(u) \setminus allNulls)$ \;
+			}
+		}
+		$NullBucket := newNull$ \;
+		$newNull := \emptyset $\;
+	}
+	\Return $linkedNullSet$ \;
+\end{algorithm}
+
+\subsection{Évaluation des résultats}
+En raison des besoins élevés en mémoire primaire de la méthode "from-scratch" proposée dans \cite{chabinConsistentUpdatingDatabases2020}, la comparaison est limitée à la base de données \textit{Movie}.
+Avec l'instance \textit{Movie} à l'échelle 1, ces approches de mise à jour restes comparables bien qu'un avantage pour l'approche incrémentale se dessine, en particulier pour \gls{mysql}.
+Nous obtenons en moyenne \SI{9017}{\ms} pour la version en mémoire, \SI{151}{\ms} pour \gls{mysql} et \SI{2380}{\ms} pour \gls{neo4j}.
+En considérant une instance cinq fois plus grande, nous obtenons une moyenne de \SI{888966}{\ms} pour la version en mémoire, \SI{595}{\ms} pour \gls{mysql} et \SI{2706}{\ms} pour \gls{neo4j}.
+Ces résultats démontrent l'efficacité de l'approche incrémentale et de l'utilisation d'un \gls{sgbd} pour la mise à jour efficace d'instances de grande taille.
+En particulier, on remarque une augmentation beaucoup plus légère du temps d'exécution.
+
+La figure~\ref{figure:update:xp:db} montre, pour chacun des \gls{sgbd}, le temps d'exécution moyen par opération sur l'ensemble des instances (les outsiders présentant plus de \SI{30}{\s} de différences sont supprimés).
+La récupération des ensembles \textsf{LinkedNull} \ref{figure:update:xp:db:partitions} s'est avérée être l'opération la plus coûteuse de la politique de mise à jour avec le modèle relationnel.
+La modélisation du graphe, présenté dans la section~\ref{sec:update:db} (page~\pageref{sec:update:db}), se concentre sur l'optimisation de cet aspect.
+Les résultats montrent une nette amélioration de l'extraction des ensembles \textsf{LinkedNull} : elle est \num{25} fois moins coûteuse dans le modèle graphe que dans le modèle relationnel (soit une réduction de \SI{96}{\percent}).
+Cependant, l'utilisation d'un graphe éclaté complexifie la recherche de motif pour l'algorithme du \gls{chase} \ref{figure:update:xp:db:chase} qui est une opération connue pour être très couteuse \cite{}.
+Cette baisse de performance été attendue, mais elle s'avère plus importante que le gain obtenu sur l'extraction des ensembles \textsf{LinkedNull}.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[xbar, every axis plot/.append style={fill},, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL,Neo4J}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.25\textheight]
+            \addplot+[pattern=grid, area legend] table [y=db, x=chase, col sep=comma] {these/part_1/chapter_4/time_per_db.csv};
+            \addlegendentry{Chase};
+            \label{figure:update:xp:db:chase}
+
+            \addplot+[pattern=north east lines, area legend] table [y=db, x=nullBucket, col sep=comma] {these/part_1/chapter_4/time_per_db.csv};
+            \addlegendentry{Null bucket};
+            \label{figure:update:xp:db:nullBucket}
+
+            \addplot+[pattern=north west lines, area legend] table [y=db, x=partitions, col sep=comma, col sep=comma] {these/part_1/chapter_4/time_per_db.csv};
+            \addlegendentry{LinkedNulls};
+            \label{figure:update:xp:db:partitions}
+
+            \addplot+[pattern=crosshatch, area legend] table [y=db, x=simplifications, col sep=comma] {these/part_1/chapter_4/time_per_db.csv};
+            \addlegendentry{Simplifications};
+            \label{figure:update:xp:db:simplifications}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Temps moyen d'exécution (\si{\ms}) par SGBD et par opération}
+    \label{figure:update:xp:db}
+\end{figure}
+
+\paragraph{Analyse détaillée des performances}
+On analyse les performances des algorithmes incrémentaux en fonction du nombre de valeurs nulles dans la base (en abscisse), de la taille totale de l'instance \ref{figure:update:xp:nbfacts} sur l'axe de droite et du tau $\tau$ de valeurs nulles par faits \ref{figure:update:xp:tau}.
+Les courbes indiquent les valeurs moyennes obtenues pour toutes les itérations correspondantes.
+Pour améliorer la lisibilité, les graphiques ne tiennent pas compte des résultats pour les occurrences de \textit{GOT} avec plus de \num{17000} valeurs nulles.
+Les figures~\ref{figure:update:xp:mysql} et~\ref{figure:update:xp:neo4j} montre respectivement les résultats obtenus pour \gls{mysql} et \gls{neo4j}.
+On remarque que le type de mise à jour (insertion ou suppression) et le taux de valeurs nulles par faits $\tau$ ne semblent pas avoir d'impact significatif sur les résultats, quel que soit le \gls{sgbd}.
+
+La figure~\ref{figure:update:xp:query} montre l'évolution du nombre de requêtes soumissent à la base de données.
+Le nombre de requêtes augmente avec le nombre de valeurs nulles dans la base, à l'exception de trois pics où la taille de l'instance est très petite.
+C'est le cas pour la base de données \textit{Movies} : les pics coïncident avec les situations où seule cette base de données est concernée et on note quand même une augmentation du nombre de requêtes avec un plus grand nombre de valeurs nulles.
+La linéarité par rapport au nombre de valeurs nulles s'explique par le fait que la préservation de la cohérence implique la génération de nouvelles données liées par leurs nullités.
+Ainsi, en raison de notre méthode de construction, des bases de données plus importantes impliquent davantage de valeurs nulles liées (c.-à-d., des ensembles \textsc{LinkedNull} plus importants).
+Les bases de données plus grandes ont probablement plus de valeurs nulles impactées qui peuvent être simplifiées pendant le calcul du core, ce qui augmente le nombre de requêtes $Q_{core}$ nécessaires.
+La différence entre \gls{mysql} et \gls{neo4j} peux s'expliquer par la construction des ensembles \textsc{LinkedNull} qui nécessite plus de requête pour \gls{mysql} à cause de l'algorithme~\ref{algo:update:mysql:partition}.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Nombre de requêtes}, legend columns=-1, legend style={draw=none, at={(0.4,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+            \addplot+[mark=triangle*] table [x=nulls, y=mysqlAdd, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+            \addlegendentry{MySQL (INS)};
+
+            \addplot+[mark=triangle*] table [x=nulls, y=mysqlDel, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+            \addlegendentry{MySQL (DEL)};
+
+            \addplot+[mark=square*] table [x=nulls, y=neoAdd, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+            \addlegendentry{Neo4J (INS)};
+
+            \addplot+[mark=square*] table [x=nulls, y=neoDel, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+            \addlegendentry{Neo4J (DEL)};
+        \end{axis}
+        \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nombre de faits}, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+            \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+            \addlegendentry{Nombre de faits};
+            \label{figure:update:xp:nbfacts}
+        \end{axis}
+        \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+            \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+            \addlegendentry{$\tau$};
+            \label{figure:update:xp:tau}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Nombre de requêtes émissent par nombre de valeurs nulles dans l'instance}
+    \label{figure:update:xp:query}
+\end{figure}
+
+D'après les figures~\ref{figure:update:xp:mysql:simple} et~\ref{figure:update:xp:neo4j:simple}, on remarque que pour \gls{mysql}, le temps d'exécution dépend du nombre de valeurs nulles alors que pour \gls{neo4j} il dépend de la taille de l'instance.
+Afin de comprendre cette différence, on s'intéresse aux détails des opérations présentées dans les figures~\ref{figure:update:xp:mysql:full} et~\ref{figure:update:xp:neo4j:full}.
+Ces graphiques permettent de valider que l'implémentation sous \gls{mysql} est grandement impactée par la construction des ensembles \textsc{LinkedNull} (montré par la courbe~\ref{figure:update:xp:neo4j:full:linkednulls}) comme décrit dans la section~\ref{sec:update:evaluation:mysql} et observé dans la figure~\ref{figure:update:xp:db}.
+Comme il s'agit de la récupération des ensembles d'atomes liée par des valeurs nulles, il est normal que cette opération soit impacté par leur nombre dans la base.
+Pour \gls{neo4j}, on observe à nouveau que l'opération la plus couteuse est le calcul du \gls{chase} (courbe~\ref{figure:update:xp:neo4j:full:chase}).
+Cette dernière est dépendante de la taille de l'instance, car elle consiste à récupérer les instanciations du corps d'une règle.
+Dans ce cas, les constantes et les valeurs nulles sont traité de la même manière et il est donc cohérent que cette opération ne dépende pas du nombre de valeurs nulles présentent dans l'instance.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.4,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                \addplot+[mark=triangle*] table [x=nulls, y=mysqlAdd, col sep=comma] {these/part_1/chapter_4/time_per_nulls.csv};
+                \addlegendentry{Insert};
+
+                \addplot+[mark=triangle*] table [x=nulls, y=mysqlDel, col sep=comma] {these/part_1/chapter_4/time_per_nulls.csv};
+                \addlegendentry{Delete};
+            \end{axis}
+            \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.63,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_4/time_per_nulls.csv};
+                \addlegendentry{Number of facts};
+            \end{axis}
+            \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+                \addlegendentry{$\tau$};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Temps d'exécution par nombre de valeurs nulles dans l'instance}
+        \label{figure:update:xp:mysql:simple}
+    \end{subfigure}
+    \medskip
+    \begin{subfigure}{\linewidth}
+        \begin{adjustbox}{width=\linewidth}
+            \begin{tikzpicture}
+                \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=4, legend style={draw=none, at={(0.5,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot+[mark=*] table [x=nulls, y=mysqlChase, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{Chase};
+                    \label{figure:update:xp:mysql:chase}
+
+                    \addplot+[mark=square*] table [x=nulls, y=mysqlNullBucket, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{NullBucket};
+                    \label{figure:update:xp:mysql:bucket}
+
+                    \addplot+[mark=triangle*] table [x=nulls, y=mysqlPartitions, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{LinkedNulls};
+                    \label{figure:update:xp:mysql:linkednulls}
+
+                    \addplot+[mark=diamond*] table [x=nulls, y=mysqlSimplifications, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{Simplify};
+                    \label{figure:update:xp:mysql:core}
+                \end{axis}
+                \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.5,-0.3)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{Number of facts};
+                \end{axis}
+                \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+                    \addlegendentry{$\tau$};
+                \end{axis}
+            \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Temps d'exécution de chaque opération par nombre de valeurs nulles dans l'instance}
+        \label{figure:update:xp:mysql:full}
+    \end{subfigure}
+    \caption{Résultats des expérimentations sur \num{540} scenarios, obtenue par moyenne sur \num{10} itérations pour MySQL}
+    \label{figure:update:xp:mysql}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{\linewidth}
+        \begin{adjustbox}{width=\linewidth}
+            \begin{tikzpicture}
+                \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.4,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot+[mark=square*] table [x=nulls, y=neoAdd, col sep=comma] {these/part_1/chapter_4/time_per_nulls.csv};
+                    \addlegendentry{Insert};
+
+                    \addplot+[mark=square*] table [x=nulls, y=neoDel, col sep=comma] {these/part_1/chapter_4/time_per_nulls.csv};
+                    \addlegendentry{Delete};
+                \end{axis}
+                \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.63,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_4/time_per_nulls.csv};
+                    \addlegendentry{Number of facts};
+                \end{axis}
+                \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+                    \addlegendentry{$\tau$};
+                \end{axis}
+            \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Temps d'exécution par nombre de valeurs nulles dans l'instance}
+        \label{figure:update:xp:neo4j:simple}
+    \end{subfigure}
+    \medskip
+    \begin{subfigure}{\linewidth}
+        \begin{adjustbox}{width=\linewidth}
+            \begin{tikzpicture}
+                \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=4, legend style={draw=none, at={(0.5,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot+[mark=*] table [x=nulls, y=neoChase, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{Chase};
+                    \label{figure:update:xp:neo4j:full:chase}
+
+                    \addplot+[mark=square*] table [x=nulls, y=neoNullBucket, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{NullBucket};
+                    \label{figure:update:xp:neo4j:full:bucket}
+
+                    \addplot+[mark=triangle*] table [x=nulls, y=neoPartitions, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{LinkedNulls};
+                    \label{figure:update:xp:neo4j:full:linkednulls}
+
+                    \addplot+[mark=diamond*] table [x=nulls, y=neoSimplifications, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{Simplify};
+                    \label{figure:update:xp:neo4j:full:core}
+                \end{axis}
+                \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.5,-0.3)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_4/time_per_nulls_details.csv};
+                    \addlegendentry{Number of facts};
+                \end{axis}
+                \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
+                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_4/query_per_nulls.csv};
+                    \addlegendentry{$\tau$};
+                \end{axis}
+            \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Temps d'exécution de chaque opération par nombre de valeurs nulles dans l'instance}
+        \label{figure:update:xp:neo4j:full}
+    \end{subfigure}
+    \caption{Résultats des expérimentations sur \num{540} scenarios, obtenue par moyenne sur \num{10} itérations pour Neo4J}
+    \label{figure:update:xp:neo4j}
+\end{figure}

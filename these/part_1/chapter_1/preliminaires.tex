@@ -1,7 +1,15 @@
 \subsection{Logique du premier ordre}
 \label{sec:update:pre:logic}
 
-En assumant une certaine familiarité avec la \gls{fol}, on utilise comme alphabet :
+En \gls{fol}, l'information est représentée par un ensemble de faits.
+Les faits sont constitués de constantes représentant les individus et des symboles de prédicats définissant les relations entre les individus.
+Par exemple, le fait $auteur(Alice)$ contient le symbole de prédicat $auteur$ d'arité $1$ et la constante $Alice$.
+En supposant que chaque symbole de prédicat possède une sémantique (ici, intuitivement claire), l'existence de ce fait dans la base indique que $Alice$ appartient à l'ensemble des auteurs stockés.
+Au-delà des faits, il est possible de définir des règles d'inférence permettant de générer d'autres faits à partir d'une instance de la base, mais nous nous intéresserons ici aux contraintes.
+Ces dernières sont des règles permettant de préciser les relations et la sémantique associée aux prédicats.
+Prenons comme exemple la contrainte exprimée par la règle $\forall x~auteur(x) \implies \exists y~ecrit(x,y)$ signifiant que pour tout individu auteur présent dans la base, cette dernière doit aussi contenir au moins une œuvre écrite par cet auteur.
+
+Formellement, on utilise comme alphabet :
 \begin{itemize}
     \item un ensemble de prédicats $P, Q, R, \dots$
     \item un ensemble de variables $x, y, z, \dots$
@@ -51,21 +59,30 @@ Une instance $I$ d'une base de données est dites \textit{cohérente} par rappor
 \subsection{Base de données graphes}
 \label{sec:update:pre:graph}
 
+Ici, l'objectif est de présenter succinctement les base de données graphes.
+\cite{pokornyGraphDatabasesTheir2015} donne une introduction sur les avantages et les inconvénients de ces bases.
 Quand on parle de base de données graphe on peut distinguer deux grandes familles :
 \begin{description}
     \item[Les bases de triplets] principalement le \gls{rdf} porté par le \gls{w3c}.
-        Ce type de base de données enregistre des triplets de la forme $\langle x, P, y \rangle$ qui sont des atomes binaires où $P$ est un symbole de prédicat, $x$, le sujet, est l'\gls{uri} d'une ressource (un noeud) et $y$, l'objet est un \gls{uri} ou un littéral (une valeur de propriétés).
+        Ce type de base de données enregistre des triplets de la forme $\langle x, P, y \rangle$ qui sont des atomes binaires où $P$ est un symbole de prédicat, $x$, le sujet, est l'\gls{uri} d'une ressource (un nœud) et $y$, l'objet est un \gls{uri} ou un littéral (une valeur de propriétés).
         \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
-    \item[Les Graphes de Propriétés] ou \gls{lpg} en anglais, sont des bases de données composées de noeuds et d'arcs labellisés qui peuvent contenir des propriétés.
+    \item[Les Graphes de Propriétés] ou \gls{lpg} en anglais, sont des bases de données composées de nœuds et d'arcs labellisés qui peuvent contenir des propriétés.
         \gls{neo4j} est surement le gestionnaire de base de donnée le plus utilisé dans ce domaine.
         Ils sont les créateurs du langage \gls{cypher} qui sert de base pour le nouveau langage \gls{iso} : \gls{gql}, en cours de développement.
 \end{description}
 
 Les base de données graphes sont conçus pour facilité les requêtes sur la structure des données.
 Le modèle ou schéma de la base est donc très dépendants des requêtes envisagées.
-Dans \gls{neo4j}, les noeud peuvent avoir une ou plusieurs étiquètes appelées \textit{label} alors que les relations ne peuvent en avoir qu'une appelée \textit{type} (dans le cas des relations on dupliquera l'arrête si plusieurs étiquètes sont nécessaires).
+Dans \gls{neo4j}, les nœuds peuvent avoir une ou plusieurs étiquètes appelées \textit{label} alors que les relations ne peuvent en avoir qu'une appelée \textit{type} (dans le cas des relations on dupliquera l'arrête si plusieurs étiquètes sont nécessaires).
 
-\paragraph{\gls{cypher}} est un langage déclaratif de requête pour les graphes de propriétés.
+\paragraph{\gls{rdfs}}
+fournit des relations pour la définition d'ontologies (ou vocabulaires) destinés à structurer des ressources \gls{rdf}.
+Il permet de définir le schéma de la base : les classes (type des nœuds) et les propriétés (arrêtes).
+Il permet aussi d'expliciter des faits de subsomption en définissant une hiérarchie des éléments avec les faits \textbf{subClass} et \textbf{subProp}.
+\gls{rdfs} permet aussi de séparer l'instance du schéma.
+
+\paragraph{\gls{cypher}}
+est un langage déclaratif de requête pour les graphes de propriétés.
 Le langage permet d'exprimer facilement des requêtes à l'aide du mot clés \verb|MATCH| comme une recherche de motif exprimé en art ASCII.
 Les requêtes s'écrivent comme un enchainement d'opérations où le résultat d'une opération est utilisé comme paramètre de la suivante.
 Bien que les requêtes s'effectuent sur un graphe, le résultat d'un opérateur est toujours une table d'affectation des variables (ayant autant de colonne que de variables et autant de lignes que de réponses).

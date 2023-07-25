@@ -74,7 +74,7 @@ Si l'on ne prend pas l'instanciation la \textit{plus spécifique} il faudra la s
 	$PSet := \{\textsf{LinkedNull}_{I,N} \mid N \in \nu_0\}$\; \label{algo:update:core:pset}
 	\ForAll{$P \in PSet$}{
 		Construire et exécuter la requête $Q_{core}(I)$ pour récupérer l'ensemble des homomorphismes $H = \{h_1, \dots, h_n\}$\; \label{algo:update:core:qcore}
-		\If{$\mid (q_{core}(I)) \mid > 1$}{
+		\If{$\mid (Q_{core}(I)) \mid > 1$}{
 			$h_m :=$ $\text{PlusSpecifique}(H)$\; \label{algo:update:core:mostspecific}
 			$I := (I \setminus P) \cup h_m(P)$\; \label{algo:update:core:select}
 		}

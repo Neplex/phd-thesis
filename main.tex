@@ -5,7 +5,7 @@
 % Contact SCD : thelec@listes.univ-orleans.fr
 
 % Classe du document : book :
-\documentclass[a4paper,14pt]{book}
+\documentclass[a4paper,14pt,french]{book}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages :
@@ -15,7 +15,7 @@
 \usepackage[pdftex]{graphicx}        % inclure des graphiques
 \usepackage{geometry}                % Définition des marges
 \usepackage[scaled]{uarial}          % Arial pour les pages de couv et 4ème
-\usepackage[french]{babel}           % Adaptation de LaTeX au français si thèse rédigée en français
+\usepackage{babel}                   % Adaptation de LaTeX au français si thèse rédigée en français
 \usepackage[fixlanguage]{babelbib}
 \usepackage[autolanguage]{numprint}
 \usepackage{hyphenat}
@@ -28,11 +28,11 @@
 \usepackage{latexsym}                % Ajoute des symboles
 \usepackage{makeidx}                 % Pour l'index
 \usepackage{graphicx}                % Pour inclure des figures
-\usepackage{subfig}                  % Sous-figure (ou sous-tableau)
+\usepackage{subcaption}              % Sous-figure (ou sous-tableau)
 \usepackage{xcolor}
 \usepackage{bookmark}
 \usepackage{hyperref}                % Lien hypertextes
-\usepackage[french]{minitoc}         % Produce a TOC for all chapters
+\usepackage{minitoc}                 % Produce a TOC for all chapters
 \usepackage{array}                   % Outils supplémentaires pour les tableaux
 \usepackage{multicol}                % Plusieurs colonnes possibles
 %\usepackage{indentfirst}            % Indenter le premier paragraphe après une nouvelle section
@@ -40,14 +40,16 @@
 %\usepackage{algorithm}              % Pour les algorithmes
 %\usepackage{algorithmic}            % Pour les algorithmes
 \usepackage{lipsum}                  % Pour du blabla en latin
+\usepackage{float}
 \usepackage{listings}
 \usepackage{url}
+\usepackage{doi}
 \usepackage{tikz}
 \usepackage{tikz-dependency}
 \usepackage{pgfplots}
 \usepackage[inline]{enumitem}
 \usepackage[binary-units]{siunitx}
-\usepackage[linesnumbered,ruled,vlined,boxed,french,frenchkw,onelanguage]{algorithm2e}
+\usepackage[linesnumbered,ruled,vlined,boxed,frenchkw,onelanguage]{algorithm2e}
 \usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
 \usepackage{adjustbox}
 
@@ -61,17 +63,24 @@
 
 % Pgf
 \usepgfplotslibrary{units}
-\pgfplotsset{compat=1.9}
+\usepgfplotslibrary{colorbrewer}
+\pgfplotsset{
+    compat=newest,
+    cycle list/Set1,
+    scaled x ticks=false,
+    scaled y ticks=false
+}
 
 % Listing
 \lstset{
-	basicstyle=\normalfont\small,
+	basicstyle=\fontfamily{cmss}\small,
 	numbers=left,
+    numberstyle=\small,
 	stepnumber=1,
 	showstringspaces=false,
 	tabsize=2,
 	breaklines=true,
-	breakatwhitespace=false, 
+	breakatwhitespace=true,
 	frame=single,
 }
 

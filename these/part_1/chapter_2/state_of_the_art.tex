@@ -1,0 +1,32 @@
+Plusieurs travaux existent pour la maintenance des bases de données...
+
+\cite{raadDetectionLiensIdentite2017} présente des travaux concernant la détection d'équivalence entre deux nœuds dans un graphe \gls{rdf}.
+L'équivalence entre deux nœuds est déterminée en comparant les propriétés liées à chaque nœud ainsi que les valeurs indiquées par ces propriétés.
+L'idée est de maintenir la cohérence des relations d'équivalences.
+Ces travaux sont d'autant plus importants dans le cadre des \textit{Linked Open Data} où les utilisateurs peuvent oublier des liens d'équivalence ou pire en ajouter entre deux nœuds non-équivalents, faussant l'information contenue dans le graphe.
+
+\cite{mahfoudhAdaptationOntologiesAvec2015} cherche à fusionner deux ontologies au travers de règles de réécriture de graphes. Les travaux ne se basent cependant pas sur \gls{rdfs}. L'idée est relativement simple. Le pattern de la règle correspond aux contraintes d'intégrité posées par la sémantique de l'ontologie. La partie droite quant à elle définie l'état de la base après l'ajout du fait.
+
+\cite{flourisFormalFoundationsRDF2013} propose un formalisme logique de \gls{rdfs}.
+La grande partie de ces travaux utilisent une formalisation de la sémantique associée à \gls{rdfs} en logique du premier ordre.
+Il définit les règles d'intégrité que doit respecter une base \gls{rdfs} pour rester cohérente et introduit des symboles de prédicat (table~\ref{table:update:soa:rdfs}) permettant la traduction de la nomenclature \gls{rdf} vers un formalisme logique.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        RDFS                                                       & Prédicats logiques \\
+        \hline
+        $\langle x, \text{rdf:type}, \text{rdfs:Class} \rangle$    & $Cl(x)$            \\
+        $\langle x, \text{rdf:type}, \text{rdfs:Property} \rangle$ & $Pr(x)$            \\
+        $\langle x, \text{rdf:type}, \text{rdfs:Resource} \rangle$ & $Ind(x)$           \\
+        $\langle x, \text{rdf:type}, y \rangle$                    & $CI(x, y)$         \\
+        $\langle x, \text{rdf:subClassOf}, y \rangle$              & $CSub(x, y)$       \\
+        $\langle x, \text{rdf:subPropertyOf}, y \rangle$           & $PSub(x, y)$       \\
+        $\langle x, \text{rdf:domain}, y \rangle$                  & $Dom(x, y)$        \\
+        $\langle x, \text{rdf:range}, y \rangle$                   & $Rng(x, y)$        \\
+        \hline
+    \end{tabular}
+    \caption{Nomenclature des prédicats RDF/S en logique}
+    \label{table:update:soa:rdfs}
+\end{table}
