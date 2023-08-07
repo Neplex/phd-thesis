@@ -186,7 +186,22 @@ Ce graphe représente un réseau social avec des collections de postes, des comm
             $Post$ & 1 & $post$ & Un poste dans un forum \\
             $Comment$ & 1 & $comment$ & Un commentaire à un poste \\
             $Tag$ & 1 & $tag$ & Un label apposé sur un poste ou un forum \\
+            $TagClass$ & 1 & $class$ & Un type de label \\
+            $Person$ & 1 & $person$ & Une personne \\
             $Organisation$ & 1 & $org$ & Une entreprise, un organisme, une université \\
+            $Place$ & 1 & $place$ & Un lieu ville/région/pays/continent \\
+            $HasCreator$ & 2 & $commentOrPost, person$ & Lie un commentaire ou un poste a son auteur \\
+            $ContainerOf$ & 2 & $forum, post$ & Lie un poste au forum dans lequel il est présent \\
+            $ReplyOf$ & 2 & $comment, commentOrPost$ & Lie un commentaire au poste/commentaire auquel il répond \\
+            $IsLocatedIn$ & 2 & $x, place$ & Donne la localisation d'un objet ou d'une personne \\
+            $Knows$ & 2 & $person1, person2$ & Deux personnes se connaissent \\
+            $HasInterest$ & 2 & $person, tag$ & Une personne qui est intéressée par un topique \\
+            $HasMember$ & 2 & $forul, person$ & Une personne est membre d'un forum \\
+            $WorkAt$ & 2 & $person, org$ & L'emploi d'une personne \\
+            $StudyAt$ & 2 & $person, org$ & Les études d'une personne \\
+            $IsSubclassOf$ & 2 & $subClass, superClass$ & Une relation hiérarchique entre les types de labels \\
+            $IsPartOf$ & 2 & $subPlace, place$ & Une relation d'inclusion entre les lieux (Paris est dans la France) \\
+            $HasType$ & 2 & $tag, superClass$ & Lie un label a son type \\
         \end{tabular}
     \end{adjustbox}
     \caption{Description de la base \textit{Social}}

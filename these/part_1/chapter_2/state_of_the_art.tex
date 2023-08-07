@@ -1,17 +1,22 @@
-Plusieurs travaux existent pour la maintenance des bases de données...
+Maintenir la validité, la cohérence et l'absence de redondance des données est un enjeu essentiel et un domaine de recherche actif.
+Bien que les recherches se concentrent principalement sur l'interrogation des données, la problématique de la mise à jour cohérente des bases de données reste complexe et importante \cite{alvesUpdateRulesDatalog1998,scheweLimitationsRuleTriggering1998}.
+Divers travaux récents tentent d'apporter des solutions à cette problématique dans différents contextes.
 
-\cite{raadDetectionLiensIdentite2017} présente des travaux concernant la détection d'équivalence entre deux nœuds dans un graphe \gls{rdf}.
-L'équivalence entre deux nœuds est déterminée en comparant les propriétés liées à chaque nœud ainsi que les valeurs indiquées par ces propriétés.
-L'idée est de maintenir la cohérence des relations d'équivalences.
-Ces travaux sont d'autant plus importants dans le cadre des \textit{Linked Open Data} où les utilisateurs peuvent oublier des liens d'équivalence ou pire en ajouter entre deux nœuds non-équivalents, faussant l'information contenue dans le graphe.
-
-\cite{mahfoudhAdaptationOntologiesAvec2015} cherche à fusionner deux ontologies au travers de règles de réécriture de graphes. Les travaux ne se basent cependant pas sur \gls{rdfs}. L'idée est relativement simple. Le pattern de la règle correspond aux contraintes d'intégrité posées par la sémantique de l'ontologie. La partie droite quant à elle définie l'état de la base après l'ajout du fait.
-
-\cite{flourisFormalFoundationsRDF2013} propose un formalisme logique de \gls{rdfs}.
+En ce qui concerne les bases de données graphes, outre les ontologies qui définissent des règles sémantiques, il n'y a pas de schéma définissant des contraintes sur les données contrairement aux bases de données relationnelles.
+Pour remédier à cela, \cite{fanKeysGraphs2015} propose une notion de clés pour les nœuds d'un graphe qui permet d'établir des équivalences similaires aux clés primaires en \gls{sql}.
+De même, \cite{raadDetectionLiensIdentite2017} présente des travaux concernant la détection d'équivalence entre deux nœuds dans un graphe \gls{rdf}.
+L'équivalence est déterminée en comparant les propriétés liées à chaque nœud ainsi que les valeurs indiquées par ces propriétés.
+L'idée est de maintenir la cohérence des relations d'équivalences \textit{sameAs}.
+% Ces travaux sont d'autant plus importants dans le cadre des \textit{Linked Open Data} où les utilisateurs peuvent oublier des liens d'équivalence ou pire en ajouter entre deux nœuds non-équivalents, faussant l'information contenue dans le graphe.
+Pour aller plus loin, \cite{fanDependenciesGraphs2019} propose les \glsfirst{graphEntityDependencies} qui sont l'équivalent des dépendances fonctionnelles appliquées aux graphes.
+Ces concepts sont approfondis dans \cite{anglesPgkeysKeysProperty2021,bonifatiQueryingGraphs2018} qui constituent de bonnes introductions sur le sujet.
+\cite{maillotConsistencyEvaluationRDF2014} propose une mesure de cohérence sémantique entre un sous-graphe de la base \gls{rdf} d'origine et un sous-graphe issue de la mise à jour.
+L'idée est de déterminer si une mise à jour contribue à la cohérence globale de la base.
+\cite{flourisFormalFoundationsRDF2013} propose une modélisation de \gls{rdfs} en \gls{fol}.
 La grande partie de ces travaux utilisent une formalisation de la sémantique associée à \gls{rdfs} en logique du premier ordre.
 Il définit les règles d'intégrité que doit respecter une base \gls{rdfs} pour rester cohérente et introduit des symboles de prédicat (table~\ref{table:update:soa:rdfs}) permettant la traduction de la nomenclature \gls{rdf} vers un formalisme logique.
 
-\begin{table}
+\begin{table}[ht]
     \centering
     \begin{tabular}{|l|l|}
         \hline
@@ -30,3 +35,18 @@ Il définit les règles d'intégrité que doit respecter une base \gls{rdfs} pou
     \caption{Nomenclature des prédicats RDF/S en logique}
     \label{table:update:soa:rdfs}
 \end{table}
+
+Plusieurs méthodes de mise à jour sont proposées dans \cite{flourisFormalFoundationsRDF2013,goasdoueEfficientQueryAnswering2013,mahfoudhAdaptationOntologiesAvec2015,halfeld-ferrariRDFUpdatesConstraints2017,chabinUsingGraphGrammar2019,chabinConsistentUpdatingDatabases2020}.
+\cite{goasdoueEfficientQueryAnswering2013} se concentre sur les contraintes sémantiques de \gls{rdfs} mais ne traite que des contraintes au niveau de l'instance.
+\cite{halfeld-ferrariRDFUpdatesConstraints2017} repose également sur les contraintes de \gls{rdfs} mais aborde une forme simplifiée des \glspl{tgd}.
+Dans \cite{flourisFormalFoundationsRDF2013} et \cite{chabinUsingGraphGrammar2019} les contraintes sont des \gls{tgd} définit par l'utilisateur.
+\cite{halfeld-ferrariRDFUpdatesConstraints2017} et \cite{chabinUsingGraphGrammar2019} travaillent avec des valeurs nulles qui représente des informations incomplètes.
+\cite{flourisFormalFoundationsRDF2013,goasdoueEfficientQueryAnswering2013} abordent l'évolution de schéma.
+\cite{mahfoudhAdaptationOntologiesAvec2015} et \cite{chabinUsingGraphGrammar2019} utilisent la réécriture de graphes pour modéliser les mises à jour.
+\cite{mahfoudhAdaptationOntologiesAvec2015,mahfoudhAlgebraicGraphTransformations2015} aborde l'évolution d'ontologies \gls{owl} dans un monde ouvert (\acs{owa}).
+L'approche proposée ne permet pas le calcul de propriété transitive et l'utilisation du monde ouvert empêche de garantir la préservation de toutes les contraintes établies.
+\cite{chabinUsingGraphGrammar2019} se penche sur la sémantique de \gls{rdfs} et propose de donner priorité aux mises à jour, c.-à-d., de modifier l'instance et le schéma pour accepter les nouvelles informations.
+
+La mise à jour de données incomplètes avec des valeurs nulles marquée reste un problème ouvert \cite{libkinIncompleteDataWhat2014,consoleCopingIncompleteData2020}.
+Cela s'explique, en partie, par le fait que les \glspl{sgbd} relationnels n'implémentent pas les modèles théoriques \cite{zanioloDatabaseRelationsNull1982,faginSemanticsUpdatesDatabases1983,imielinskiIncompleteInformationRelational1984,abiteboulMiseajourBasesDonnees1985,reiterSoundSometimesComplete1986,faginUpdatingLogicalDatabases1986,winslettModelbasedApproachUpdating1988,grahneProblemIncompleteInformation1991,winslettUpdatingLogicalDatabases2004} et que les \glspl{sgbd} graphe utilisent la notion de monde ouvert (\acs{owa}) où toute propriété non renseignée est considérée comme une valeur nulle.
+\cite{sirangeloRepresentingQueryingIncomplete2014} est un des rares exemples qui explore la notion de d'incomplétude sur d'autres modèles de données.

@@ -1,12 +1,10 @@
-\cite{chabinUsingGraphGrammar2019} s'appuie sur la réécriture de graphes pour la maintenance des graphes \gls{rdf}.
+\cite{chabinUsingGraphGrammar2019} définit un cadre théorique et appliqué pour assurer la cohérence d'un graphe de connaissances \gls{rdf} basé sur la réécriture de graphe.
+Il propose \gls{setup} qui s'appuie sur la réécriture de graphes pour la maintenance des graphes \gls{rdf}.
 Étant donné une base \gls{rdf} modélisée avec le schéma \gls{rdfs}, l'objectif est de maintenir le respect des contraintes d'intégrité de \gls{rdfs} tel qu'expliqué dans \cite{flourisFormalFoundationsRDF2013}, \cite{halfeld-ferrariRDFUpdatesConstraints2017} ou encore \cite{chabinConsistentUpdatingDatabases2020} après mise à jour de l'instance.
-
-Les règles de la sémantique \gls{rdfs} ont été ensuite exprimées sous forme de règles logique en utilisant les symboles de prédicats définis plus haut.
-Si l'on prend la règle $\forall x,y~CI(x,y) \implies Cl(y)$, elle signifie que pour que tout $x$ soit instance de $y$ il faut que $y$ soit une classe.
-Dans les travaux en cours au \gls{lifo}, l'idée est de proposer une vérification similaire, mais en utilisant les techniques de réécriture de graphes.
-Dans ce cadre, les règles de la sémantique \gls{rdf} sont décrites via des règles de réécriture de graphe.
-
-L'exemple figure~\ref{fig:gram_rule} illustre comment les règles de la sémantique \gls{rdf} sont modélisées dans le cadre de la réécriture de graphes.
+Les règles de la sémantique \gls{rdfs} sont exprimées sous forme de règles logique en utilisant les symboles de prédicats définis dans la table~\ref{table:update:soa:rdfs}.
+Si l'on prend la règle $(\forall x,y) CI(x,y) \to Cl(y)$, elle signifie que pour que tout $x$ soit instance de $y$ il faut que $y$ soit une classe.
+\cite{chabinUsingGraphGrammar2019} propose de modéliser les règles de la sémantique \gls{rdf} en utilisant la réécriture de graphes comme montré sur la figure~\ref{fig:gram_rule}.
+Les règles ne peuvent s'appliquer que si leur application maintient la cohérence.
 
 \begin{figure}[ht]
     \centering
@@ -46,25 +44,21 @@ L'exemple figure~\ref{fig:gram_rule} illustre comment les règles de la sémanti
     \label{fig:gram_rule}
 \end{figure}
 
-\paragraph{}
 Une grammaire est un ensemble de règles définissant un langage.
 Ces règles de réécritures sont des fonctions qui, pour une entrée donnée donne une nouvelle sortie.
 Les grammaires permettent de définir l'ensemble des "mots" valide pour un langage donné.
 Les grammaires de graphes sont des grammaires appliquées aux graphes.
-Les règles de réécriture de graphes sont de la forme $\text{LHS} \implies \text{RHS}$ où \gls{lhs} est un motif et \gls{rhs} le résultat de l'application de la règle.
+Les règles de réécriture de graphes sont de la forme $\text{LHS} \to \text{RHS}$ où \gls{lhs} est un motif et \gls{rhs} le résultat de l'application de la règle.
 Il existe un morphisme entre \gls{lhs} et \gls{rhs} définissant comment la règle doit être appliquée (dans l'exemple précédent, un morphisme existe sur la classe $B$).
 Une règle est applicable s'il existe un isomorphisme entre \gls{lhs} et le graphe $G$ que l'on construit.
-Il est possible d'ajouter des \gls{nac}, comme \gls{lhs} elles permettent de définir un pattern qui, s'il trouve un isomorphisme dans $G$, rend la règle inapplicable (Dans l'exemple, les \gls{nac}s sont utilisées pour éviter l'insertion du fait s'il est déjà présent dans la base ou si le type de $A$ n'est pas le bon).
+Il est possible d'ajouter des \gls{nac}, comme \gls{lhs} elles permettent de définir un motif qui, s'il trouve un isomorphisme dans $G$, rend la règle inapplicable (Dans l'exemple, les \gls{nac}s sont utilisées pour éviter l'insertion du fait s'il est déjà présent dans la base ou si le type de $A$ n'est pas le bon).
 
-Les règles ne peuvent s'appliquer que si leur application maintient la cohérence.
-Nous allons plus loin et proposons avec \gls{setup} de donner la priorité aux mises à jour.
-Nous définissons un ensemble d'effet de bords qui doivent être réalisés pour modifier la base afin de rendre les règles applicables et de prioriser l'ajout d'un fait.
-Ces effets de bords se basent sur la sémantique de \gls{rdfs} et la cohérence de la base est garantie pendant la modification, car cette dernière ne fait qu'appeler des règles de réécriture respectant elle-même la cohérence de la base.
-
-Considérons une base de connaissance cohérente représentée par le graphe $G$ figure~\ref{fig:rule_ci}.
-Si l'on veut appliquer la règle de réécriture figure~\ref{fig:gram_rule} on remarque que la règle ne peut pas s'appliquer, car la \gls{nac} est vérifiée ($A$ est une classe).
-Il faut donc appliquer un effet de bords pour supprimer ce fait (en rouge).
-La règle devient alors applicable (en bleu).
+\begin{example}
+    En considérant une base de connaissance cohérente représentée par le graphe $G$ figure~\ref{fig:rule_ci}.
+    Si l'on veut appliquer la règle de réécriture figure~\ref{fig:gram_rule} on remarque que la règle ne peut pas s'appliquer, car la \gls{nac} est vérifiée ($A$ est une classe).
+    Il faut donc appliquer un effet de bords pour supprimer ce fait (en rouge).
+    La règle devient alors applicable (en bleu).
+\end{example}
 
 \begin{figure}
     \centering
@@ -90,35 +84,37 @@ La règle devient alors applicable (en bleu).
     \label{fig:rule_ci}
 \end{figure}
 
-\paragraph{}
-Bien que l'objectif premier est de donner la priorité à la mise à jour sur l'ensemble de la base, \cite{chabinUsingGraphGrammar2019} propose différents niveaux de modification autorisés.
+\gls{setup} donne priorité aux mises à jour, en définissant un ensemble d'effet de bords qui doivent être réalisés pour modifier la base afin de maintenir la cohérence après l'ajout d'un fait.
+Les effets de bord sont un ensemble de règle de réécriture construit à partir des règles sémantiques de \gls{rdfs}.
+\cite{chabinUsingGraphGrammar2019} propose différents niveaux de modification autorisés.
 Ce niveau peut être paramétré pour chaque utilisateur lui donnant ainsi certains droits de modification.
 Le niveau le plus élevé est autorisé à modifier le schéma et l'instance pour ajouter un fait.
 Un niveau moins élevé permet seulement de modifier l'instance tandis que le niveau le plus bas ne peut pas modifier la base et peut donc seulement ajouter ou supprimer un fait si la cohérence de la base est maintenue.
 
+\begin{example}
+    La figure~\ref{fig:app_rule} représente une base de connaissance initiale (en noir) et les modifications nécessaires (en bleu) pour l'ajout du fait $CSub(C_1, C_2)$.
+    En suivant les effets de bords figure~\ref{eq:rule_csub}, l'ajout du fait $CSub(C_1, C_2))$ implique que $C_1$ et $C_2$ soient des classes.
+    Comme $C_2$ n'est pas présent, le schéma doit être modifié.
+    Le fait $CSub(C_2, Resource)$ est alors ajouté.
+    Par la suite, le fait $CSub(C_1, C_2))$ peut être ajouté en ajoutant aussi le fait $CI(I, C_2)$ par transitivité de la relation $CI$ (figure~\ref{eq:rule_csub}(\ref{eq:rule_csub:ci})).
+    Cet exemple montre l'application d'effets de bords pour rendre applicable une règle.
+    Sans ces effets de bords, il aurait été impossible d'ajouter le fait voulu tout en respectant les règles d'intégrités.
+    Ici, notre individu est bien l'instance d'une classe et de toutes les sous-classes associées.
+    La base avant et après application de la règle est un graphe \gls{rdfs} valide.
+\end{example}
+
 \begin{figure}
-    \begin{eqnarray}
+    \begin{eqnarray*}
         Cl(x)\\
         Cl(y) \lor (y = Resource)\\
         \neg CSub(y, x)\\
-        \forall~z CSub(y, z) \implies CSub(x, z)\\
-        \forall~z CSub(z, x) \implies CSub(z, y)\\
-        \forall~z_i CI(z_i, x) \implies CI(z_i, y) \label{eq:rule_csub:ci}
-    \end{eqnarray}
+        \forall~z CSub(y, z) \to CSub(x, z)\\
+        \forall~z CSub(z, x) \to CSub(z, y)\\
+        \forall~z_i CI(z_i, x) \to CI(z_i, y) \label{eq:rule_csub:ci}
+    \end{eqnarray*}
     \caption{Effets de bord pour l'ajout du fait $CSub(x, y)$}
     \label{eq:rule_csub}
 \end{figure}
-
-\paragraph{}
-La figure~\ref{fig:app_rule} représente une base de connaissance initiale (en noir) et les modifications nécessaires (en bleu) pour l'ajout du fait $CSub(C_1, C_2)$.
-En suivant les effets de bords figure~\ref{eq:rule_csub}, l'ajout du fait $CSub(C_1, C_2))$ implique que $C_1$ et $C_2$ soient des classes.
-Comme $C_2$ n'est pas présent, le schéma doit être modifié.
-Le fait $CSub(C_2, Resource)$ est alors ajouté.
-Par la suite, le fait $CSub(C_1, C_2))$ peut être ajouté en ajoutant aussi le fait $CI(I, C_2)$ par transitivité de la relation $CI$ (figure~\ref{eq:rule_csub}(\ref{eq:rule_csub:ci})).
-Cet exemple montre l'application d'effets de bords pour rendre applicable une règle.
-Sans ces effets de bords, il aurait été impossible d'ajouter le fait voulu tout en respectant les règles d'intégrités.
-Ici, notre individu est bien l'instance d'une classe et de toutes les sous-classes associées.
-La base avant et après application de la règle est un graphe \gls{rdfs} valide.
 
 \begin{figure}[htb]
     \centering
@@ -139,13 +135,11 @@ La base avant et après application de la règle est un graphe \gls{rdfs} valide
     \label{fig:app_rule}
 \end{figure}
 
-\paragraph{}
-Concrètement, l'ensemble des travaux de \gls{setup} constituent les bases pour la création automatique d'une base de connaissances dans notre projet.
-Dans un premier temps, il est nécessaire de construire l'instance en suivant les règles de \gls{rdfs}.
-\gls{pullup} fournirait un ensemble de faits qu'il suffit d'ajouter à notre base par l'intermédiaire de \gls{setup}, ce dernier à ici pour objectif de construire un schéma (classes et propriétés) qui respecte \gls{rdfs} à partir des données brutes extraites.
+Une étude menée dans \cite{chabinGraphRewritingSystem2020,chabinGraphRewritingRules2021} montre des temps d'exécution élevée pour l'application des règles sur de petites instances.
+Ces performances s'expliquent par le calcul des effets de bords et la grande complexité de la réécriture de graphe.
+Cela rend \gls{setup} inutilisable dans un scénario ou des mises à jour arrivent régulièrement.
+De plus, l'implémentation actuelle n'a pas de fonctionnalité de type \textit{fallback} permettant d'annuler les changements effectués sur la base en cas d'échec de la mise à jour, si le niveau de l'utilisateur n'est pas suffisant, ce qui implique de travailler sur une copie de la base.
+Il reste intéressant pour le calcul mode déconnecté et de petite base du a son implémentation en mémoire primaire.
 
-Bien que \gls{setup} autorise des mises à jour cohérentes dans une base de données graphe, il ne peut cependant pas être utilisé pour la construction d'une base complète.
-L'application de règles de réécritures sur des graphes est d'une grande complexité (à cause de la détection d'isomorphisme).
-Bien que cela soit suffisant pour une mise à jour dans une petite base, une modification impliquant de nombreux changements et application de règles est inutilisable en production.
-De plus, l'implémentation actuelle n'a pas de fonctionnalité de type "fallback" permettant d'annuler les changements effectués sur la base en cas d'échec de la mise à jour.
-Bien que l'on donne la priorité aux mises à jour, si l'on autorise seulement les modifications de l'instance, il est possible de ne pouvoir ajouter un fait.
+Bien que \gls{setup} permette la gestion de différents schémas définit sous \gls{rdfs}, il ne permet pas d'ajouter des contraintes métiers.
+Définir de nouvelles contraintes impliquerait un travail conséquent et manuel pour leur traduction en règle de réécriture et la construction des effets de bords.

@@ -19,6 +19,7 @@
 \usepackage[fixlanguage]{babelbib}
 \usepackage[autolanguage]{numprint}
 \usepackage{hyphenat}
+\usepackage{csquotes}
 
 % Autres packages non utilisés pour les couvertures / options
 \usepackage{subfiles}                % Relative file import
@@ -53,10 +54,20 @@
 \usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
 \usepackage{adjustbox}
 
-\usepackage[acronym,translate=babel]{glossaries}
+\usepackage[acronym,shortcuts,translate=babel]{glossaries}
 
 % Bib
 \selectbiblanguage{french}
+
+% Sepration des publications personnelles de la bibliographie
+% \DeclareSourcemap{
+%   \maps[datatype=bibtex]{
+%     \map{
+%       \step[fieldsource=author, match=\regexp{Hiot}, final]
+%       \step[fieldset=keywords, fieldvalue=me]
+%     }
+%   }
+% }
 
 % Tikz
 \usetikzlibrary{positioning}
