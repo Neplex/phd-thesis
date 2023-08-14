@@ -1,0 +1,58 @@
+\cite{chabinConsistentUpdatingDatabases2020} introduit une sémantique formelle basée sur \gls{fol} pour mettre à jour des bases de données incomplètes contenant des valeurs nulles liées, en suivant les principes énoncés dans la sémantique de Reiter~\cite{reiterSoundSometimesComplete1986} (voir la section \ref{reiterSemantic} pour plus de détails).
+Cette approche de mise à jour est déterministe et exige le respect d'un ensemble de contraintes énoncées à l'aide de \glspl{tgd}.
+Les algorithmes présentés couvrent les opérations d'insertion et de suppression.
+Pour valider cette proposition, une implémentation en mémoire primaire est proposée.
+La mise à jour est structurée autour de deux actions fondamentales : \emph{chasing} et \emph{simplification}.
+La procédure du \gls{chase} est utilisée pour garantir la cohérence avec un ensemble de contraintes d'intégrité exprimées sous forme de règles, pouvant engendrer de nouvelles valeurs nulles.
+Le processus de simplification vise à réduire les redondances en éliminant les valeurs nulles qui peuvent être instanciées sans rompre leurs liens.
+Il s'agit du calcul du \gls{core}~\cite{faginDataExchangeGetting2005}.
+
+\todo[inline]{Expliquer simplement la proposition}
+
+\paragraph{Remarques}
+Basée sur la sémantique énoncée par Reiter, cette approche présente une flexibilité accrue par rapport à celle présentée dans \cite{chabinUsingGraphGrammar2019}, grâce à l'utilisation de contraintes exprimées au moyen de \glspl{tgd}.
+Cette approche a été choisie pour guider les travaux présentés dans cette partie.
+En travaillant avec des bases de données graphes, la proposition de mise à jour doit opérer en harmonie avec les \glspl{sgbd} tout en prenant en compte les contraintes propres à ces systèmes.
+Bien que les travaux exposés dans cette partie s'alignent sur la politique détaillée dans \cite{chabinConsistentUpdatingDatabases2020}, ils se distinguent par les éléments suivants :
+
+\begin{description}[wide]
+    \item[Incrémentalité] ~
+    \begin{enumerate}
+        \item Le calcul des mises à jour se limite aux contraintes et aux données spécifiquement concernées.
+        En contraste avec la méthodologie présentée dans \cite{chabinConsistentUpdatingDatabases2020}, qui exige la vérification de l'ensemble de la base de données pour chaque mise à jour.
+        
+        \item La simplification des valeurs est guidée par les valeurs nulles pouvant potentiellement être simplifiées en raison de la mise à jour.
+        Cette approche diffère de celle de \cite{chabinConsistentUpdatingDatabases2020}, où la simplification prend en compte l'ensemble des valeurs nulles indépendamment de la mise à jour.
+    \end{enumerate}
+
+    \item[Requêtes] ~
+    \begin{enumerate}
+        \item La requête $Q_{chase}$ effectue une recherche dans la base de données pour trouver l'instanciation complète du corps partiellement instancié de la règle, en utilisant les constantes issue des atomes mis à jour.
+        
+        \item La requête $Q_{bucket}$ récupère les valeurs nulles impactées par la mise à jour, permettant le calcul localisé du \gls{core}.
+
+        \item La requête $Q_{core}$ recherche les homomorphismes des ensembles \textsc{LinkedNulls} obtenus via $Q_{bucket}$, guidant la simplification.
+    \end{enumerate}
+
+    \item[SGBDs] ~
+    \begin{enumerate}
+        \item Bien que proposant une méthode pour les bases de données graphes, le modèle relationnelle est utilisé comme référence.
+        Chaque atome $R(A)$ est représenté par un tuple $A$ dans la table $R$.
+        Cependant, il est essentiel de noter que le processus le plus couteux consiste à extraire des groupes d'atomes connectés par des valeurs nulles.
+        Cette opération nécessite un balayage de l'ensemble des tables, étant donné que les valeurs nulles peuvent être liées à n'importe quel attribut d'une table, échappant ainsi à toute indexation.
+        
+        \item Les \glspl{sgbd} pour les \glspl{lpg} partent généralement de l'hypothèse que les graphes sont complets, ce qui ne correspond pas à la réalité des données souvent incomplètes.
+        L'approche adoptée par \gls{neo4j}, qui considère les valeurs nulles comme des valeurs inexistantes, s'avère insuffisante pour traiter les valeurs nulles liées.
+        Pour résoudre ce problème, une nouvelle conception de base de données est proposée, traitant les valeurs nulles comme une forme de constante.
+        
+        \item La modélisation proposée permet une indexation des valeurs nulles, facilitant ainsi l'identification de tous les atomes directement ou indirectement liés à ces valeurs.
+        Cette approche simplifie grandement les opérations de manipulation des valeurs nulles impactées par une mise à jour pour le calcul du \gls{core}.
+    \end{enumerate}
+\end{description}
+
+Our proposal follows the database evolution semantics from~\cite{chabinConsistentUpdatingDatabases2020}, which has been shown to be effective\footnote{If an update is not rejected, the updated database contains the inserted data and does not contain the deleted ones}, deterministic, and adhere to a minimal change property.
+Let $\mathcal{D}$ be an incomplete but consistent database instance and $U$ be a set of updates.
+The notation $\mathcal{D} \diamondsuit U$ represents the insertion or deletion of the required updates in or from $\mathcal{D}$.
+In \cite{CHL20}, a from-scratch approach generates a new database instance denoted as $\mathcal{D}' = core(upd(\mathcal{D} \diamondsuit U))$, where $upd$ is the update process described in \cite{chabinConsistentUpdatingDatabases2020}.
+In contrast, our paper describes an \textit{incremental} version of the update process denoted as $upd_{|U}$.
+Therefore, the new database instance is represented as $\mathcal{D}' = core_{|NullBucket}(upd_{|U}(\mathcal{D}\diamondsuit U))$, where $NullBucket$ refers to the set of nulls affected by the update ($upd_{|U}$) applied to $\mathcal{D} \diamondsuit U$.

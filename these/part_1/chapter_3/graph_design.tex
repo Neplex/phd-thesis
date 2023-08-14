@@ -1,7 +1,7 @@
 La proposition de mise à jour incrémentale sur des bases de données graphes est implémentée sur le gestionnaire de base de données graphes \gls{neo4j} en définissant un ensemble de requêtes \gls{cypher}.
-La maintenance décrite dans \cite{chabinConsistentUpdatingDatabases2020} relève un cout important pour la récupération des atomes liés par des valeurs nulles.
+La maintenance décrite dans \cite{chabinConsistentUpdatingDatabases2020} relève un cout important pour la récupération des atomes liés par des valeurs nulles (le calcul de l'ensemble \textsc{LinkedNull}).
 L'utilisation de base de données graphe ajoute une possibilité d'optimisation de cette opération.
-Le modèle de graphe doit mettre en avant ces relations et faciliter la recherche des homomorphismes.
+Le modèle de graphe doit mettre en avant ces relations entre les valeurs nulles et faciliter la recherche des homomorphismes.
 
 \paragraph{Modèle}
 Pour ce faire, on choisit le modèle dans lequel un atome $P(t_1, \dots, t_n)$ est représenté comme un arbre qui a pour racine un noeud \textit{Atome} lié à un ensemble de noeuds \textit{Élément} représentants les termes.

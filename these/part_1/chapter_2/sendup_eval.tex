@@ -1,10 +1,10 @@
-\cite{chabinUsingGraphGrammar2019} définit un cadre théorique et appliqué pour assurer la cohérence d'un graphe de connaissances \gls{rdf} basé sur la réécriture de graphe.
-Il propose \gls{setup} qui s'appuie sur la réécriture de graphes pour la maintenance des graphes \gls{rdf}.
-Étant donné une base \gls{rdf} modélisée avec le schéma \gls{rdfs}, l'objectif est de maintenir le respect des contraintes d'intégrité de \gls{rdfs} tel qu'expliqué dans \cite{flourisFormalFoundationsRDF2013}, \cite{halfeld-ferrariRDFUpdatesConstraints2017} ou encore \cite{chabinConsistentUpdatingDatabases2020} après mise à jour de l'instance.
-Les règles de la sémantique \gls{rdfs} sont exprimées sous forme de règles logique en utilisant les symboles de prédicats définis dans la table~\ref{table:update:soa:rdfs}.
-Si l'on prend la règle $(\forall x,y) CI(x,y) \to Cl(y)$, elle signifie que pour que tout $x$ soit instance de $y$ il faut que $y$ soit une classe.
-\cite{chabinUsingGraphGrammar2019} propose de modéliser les règles de la sémantique \gls{rdf} en utilisant la réécriture de graphes comme montré sur la figure~\ref{fig:gram_rule}.
-Les règles ne peuvent s'appliquer que si leur application maintient la cohérence.
+\cite{chabinUsingGraphGrammar2019} définit un cadre formel pour garantir la cohérence d'un graphe de connaissances \gls{rdf}.
+L'approche introduit \gls{setup}, une méthode de maintenance des graphes \gls{rdf} qui se repose sur la réécriture de graphes.
+L'objectif est de maintenir le respect des contraintes d'intégrité du modèle \gls{rdfs} tel qu'expliqué dans \cite{flourisFormalFoundationsRDF2013}, \cite{halfedferrariRDFUpdatesConstraints2017} ou encore \cite{chabinConsistentUpdatingDatabases2020}.
+Les règles de la sémantique \gls{rdfs} sont formulées sous forme de règles logiques en utilisant les symboles de prédicats définis dans la table~\ref{table:update:soa:rdfs}.
+Par exemple, la règle $(\forall x,y) CI(x,y) \to Cl(y)$ exprime que pour qu'un élément $x$ soit une instance de $y$, $y$ doit être une classe.
+Pour modéliser ces règles de la sémantique, \cite{chabinUsingGraphGrammar2019} propose l'utilisation de la réécriture de graphes, illustrée par la figure~\ref{fig:gram_rule}.
+Les règles ne peuvent être appliquées que si leur application préserve la cohérence du graphe.
 
 \begin{figure}[ht]
     \centering
@@ -18,7 +18,7 @@ Les règles ne peuvent s'appliquer que si leur application maintient la cohéren
             \path[every node/.style={font=\sffamily\small}]
             (3) edge node {CI} (4);
         \end{tikzpicture}
-        \caption{NAC}
+        \caption{\acs{nac}}
         \label{fig:gram_rule:nac}
     \end{subfigure}
     \begin{subfigure}[b]{.3\textwidth}
@@ -26,7 +26,7 @@ Les règles ne peuvent s'appliquer que si leur application maintient la cohéren
         \begin{tikzpicture}[->,auto,node distance=2.5cm,thick,main node/.style={draw}]
             \node[main node] (2) {Class: $B$};
         \end{tikzpicture}
-        \caption{LHS}
+        \caption{\acs{lhs}}
         \label{fig:gram_rule:lhs}
     \end{subfigure}
     \begin{subfigure}[b]{.3\textwidth}
@@ -37,30 +37,30 @@ Les règles ne peuvent s'appliquer que si leur application maintient la cohéren
             \path[every node/.style={font=\sffamily\small}]
             (2) edge node {CI} (1);
         \end{tikzpicture}
-        \caption{RHS}
+        \caption{\acs{rhs}}
         \label{fig:gram_rule:rhs}
     \end{subfigure}
     \caption{Règle de réécriture simplifiée pour le fait $CI(A,B)$}
     \label{fig:gram_rule}
 \end{figure}
 
-Une grammaire est un ensemble de règles définissant un langage.
-Ces règles de réécritures sont des fonctions qui, pour une entrée donnée donne une nouvelle sortie.
-Les grammaires permettent de définir l'ensemble des "mots" valide pour un langage donné.
-Les grammaires de graphes sont des grammaires appliquées aux graphes.
-Les règles de réécriture de graphes sont de la forme $\text{LHS} \to \text{RHS}$ où \gls{lhs} est un motif et \gls{rhs} le résultat de l'application de la règle.
-Il existe un morphisme entre \gls{lhs} et \gls{rhs} définissant comment la règle doit être appliquée (dans l'exemple précédent, un morphisme existe sur la classe $B$).
-Une règle est applicable s'il existe un isomorphisme entre \gls{lhs} et le graphe $G$ que l'on construit.
-Il est possible d'ajouter des \gls{nac}, comme \gls{lhs} elles permettent de définir un motif qui, s'il trouve un isomorphisme dans $G$, rend la règle inapplicable (Dans l'exemple, les \gls{nac}s sont utilisées pour éviter l'insertion du fait s'il est déjà présent dans la base ou si le type de $A$ n'est pas le bon).
+Les règles de réécriture sont des outils qui permettent de définir et de manipuler la structure des graphes en spécifiant comment graphe doit évolué selon certaines conditions.
+Elles prennent la forme $\acs{lhs} \to \acs{rhs}$, où \gls{lhs} représente un motif dans le graphe et \gls{rhs} est le résultat de l'application de la règle.
+Pour effectuer la réécriture, un morphisme est défini entre \gls{lhs} et \gls{rhs}, indiquant comment la règle doit être appliquée.
+Par exemple, dans la figure~\ref{fig:gram_rule}, un morphisme existe sur la classe $B$.
+Une règle de réécriture est applicable si un isomorphisme existe entre \gls{lhs} et le graphe $G$ que l'on construit.
+En d'autres termes, si le motif spécifié dans \gls{lhs} se trouve dans $G$, la règle peut être appliquée pour générer \gls{rhs}.
+Cependant, il est possible d'introduire des \gls{nac}, qui permettent de définir des motifs qui, s'ils sont trouvés dans le graphe $G$, rendent la règle inapplicable.
+Dans la figure~\ref{fig:gram_rule}, les \gls{nac}s sont utilisées pour éviter l'insertion du fait s'il est déjà présent dans la base ou si le type de $A$ n'est pas le bon
 
 \begin{example}
-    En considérant une base de connaissance cohérente représentée par le graphe $G$ figure~\ref{fig:rule_ci}.
-    Si l'on veut appliquer la règle de réécriture figure~\ref{fig:gram_rule} on remarque que la règle ne peut pas s'appliquer, car la \gls{nac} est vérifiée ($A$ est une classe).
-    Il faut donc appliquer un effet de bords pour supprimer ce fait (en rouge).
-    La règle devient alors applicable (en bleu).
+    En prenant en compte une base de connaissance cohérente représentée par le graphe $G$ illustré dans la figure~\ref{fig:rule_ci}, on peut observer qu'en tentant d'appliquer la règle de réécriture présentée dans la figure~\ref{fig:gram_rule}, la règle ne peut pas être directement mise en œuvre, car la condition de la \gls{nac} est satisfaite (l'élément $A$ est une classe).
+    Pour résoudre cette situation, une intervention supplémentaire est nécessaire pour supprimer le fait concerné (indiqué en rouge).
+    Une fois cette intervention effectuée, la règle de réécriture devient applicable, conduisant à la création de nouveaux éléments conformément à la règle (représentés en bleu).
+    Cette intervention, appelée \emph{effet de bord}, est une action préalable qui vise à modifier l'état du graphe de manière à permettre l'application de la règle de réécriture.
 \end{example}
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{.45\textwidth}
         \centering
@@ -103,7 +103,7 @@ Un niveau moins élevé permet seulement de modifier l'instance tandis que le ni
     La base avant et après application de la règle est un graphe \gls{rdfs} valide.
 \end{example}
 
-\begin{figure}
+\begin{figure}[ht]
     \begin{eqnarray*}
         Cl(x)\\
         Cl(y) \lor (y = Resource)\\
@@ -116,7 +116,7 @@ Un niveau moins élevé permet seulement de modifier l'instance tandis que le ni
     \label{eq:rule_csub}
 \end{figure}
 
-\begin{figure}[htb]
+\begin{figure}[ht]
     \centering
     \begin{tikzpicture}[->,auto,node distance=3cm,thick,main node/.style={draw}]
         \node[main node] (1) {Ind: $I$};
@@ -135,11 +135,11 @@ Un niveau moins élevé permet seulement de modifier l'instance tandis que le ni
     \label{fig:app_rule}
 \end{figure}
 
+\paragraph{Remarques}
 Une étude menée dans \cite{chabinGraphRewritingSystem2020,chabinGraphRewritingRules2021} montre des temps d'exécution élevée pour l'application des règles sur de petites instances.
 Ces performances s'expliquent par le calcul des effets de bords et la grande complexité de la réécriture de graphe.
 Cela rend \gls{setup} inutilisable dans un scénario ou des mises à jour arrivent régulièrement.
-De plus, l'implémentation actuelle n'a pas de fonctionnalité de type \textit{fallback} permettant d'annuler les changements effectués sur la base en cas d'échec de la mise à jour, si le niveau de l'utilisateur n'est pas suffisant, ce qui implique de travailler sur une copie de la base.
+De plus, l'implémentation actuelle n'a pas de fonctionnalité de type \emph{fallback} permettant d'annuler les changements effectués sur la base en cas d'échec de la mise à jour, si le niveau de l'utilisateur n'est pas suffisant, ce qui implique de travailler sur une copie de la base.
 Il reste intéressant pour le calcul mode déconnecté et de petite base du a son implémentation en mémoire primaire.
-
 Bien que \gls{setup} permette la gestion de différents schémas définit sous \gls{rdfs}, il ne permet pas d'ajouter des contraintes métiers.
 Définir de nouvelles contraintes impliquerait un travail conséquent et manuel pour leur traduction en règle de réécriture et la construction des effets de bords.

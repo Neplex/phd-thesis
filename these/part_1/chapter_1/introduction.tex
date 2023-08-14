@@ -1,0 +1,48 @@
+Le projet implique la collecte d'informations provenant de diverses sources, notamment via des processus automatisés d'extraction d'informations à partir de textes.
+Ces informations peuvent être incomplètes, contenir des erreurs ou ne pas respecter dans la totalité un ensemble de règles métiers.
+L'objectif fondamental est d'intégrer ces nouvelles informations tout en veillant à ce qu'elles respectent les règles métiers prédéfinies.
+Lorsque ces règles sont respectées, on parle alors de \emph{base de données cohérente} par rapport à un ensemble de contraintes.
+L'effort vise à maintenir la cohérence de la base de données à mesure que des mises à jour sont effectuées.
+Certaines approches se focalisent sur l'application de règles au moment de l'interrogation de la base de données.
+Toutefois, maintenir la cohérence dès les mises à jour réduit la nécessité de calculs fréquents lors de l'intérogation, car les mises à jour sont estimées moins régulières.
+De plus, une base de données cohérente offre une plus grande facilité d'analyse. %et convient à l'intégration de données.
+Cela garantit un niveau de qualité de données uniforme pour tous les utilisateurs, même si cela implique une certaine limitation de la flexibilité.
+Les contraintes imposées ne sont plus adaptées à chaque utilisateur ou exigence métier.
+Bien qu'il soit possible d'ajouter des contraintes supplémentaires lors de l'interrogation, les contraintes déjà appliquées restent fixées et ne peuvent être modifiées.
+À titre d'exemple, une contrainte exprimée par la \gls{tgd} $c1$ : $Pat(x),$ $SOSY(x, y) \rightarrow PrescExam(x, z)$ stipulant que si un patient $x$ présente un symptôme $y$, alors il doit subir un examen $z$.
+Ainsi, lorsque la base contient une entrée pour une patiente nommée Lea souffrant de douleurs aux mains ($Pat(Lea)$ et $ SOSY(Lea,$ $\textit{douleur aux mains})$), pour étre cohérente, la base de données doit également inclure l'atome $PrescExam(Lea, N_1)$.
+Cet atome indique qu'un examen a été prescrit à Lea, même si le type d'examen n'est pas encore connu.
+
+L'importance de pouvoir gérer l'incomplétude se révèle dans l'intégration d'informations provenant de sources textuelles.
+Dans ces travaux, l'incomplétude prend la forme de valeurs manquantes.
+Dans le contexte des textes, cela peut être dû à des valeurs non observées, à des omissions liées à une connaissance générale ou simplement à des erreurs d'extraction.
+Pour l'intégration de bases de données, les valeurs manquantes peuvent résulter d'erreurs de saisie, de données confidentielles ou du fait que certaines informations ne couvrent pas toute l'étendue de notre base.
+Par exemple, lorsque l'on intègre une base de médicaments ou de patients, les interactions entre les entités, telles que définies par les règles métiers, peuvent ne pas être explicitées.
+Reiter propose une sémantique pour les valeurs nulles en utilisant la \gls{fol}.
+Il les décrit comme des individus existants mais inconnus \hyphentextcquote{english}[p.1]{reiterSoundSometimesComplete1986}{\label{reiterSemantic}\textelp{} these nulls represent existing but unknown individuals}.
+Ces valeurs inconnues peuvent alors étres représentées par des valeurs nulles marquées (ou nommées), permettant leur référencement multiple.
+Pour illustrer, prenons l'exemple d'une instance de base de données $\mathcal{D}_1= \{PrescExam(Lea, N_1),$ $ExamResult(Lea, N_1, N_2)\}$.
+Cette instance indique qu'un examen non spécifié, symbolisé par $N_1$, a été prescrit à Lea, et qu'un résultat inconnu, représenté par $N_2$, est associé.
+Ces valeurs nulles reflètent une information partielle et se conforment à l'approche du \gls{cwa}.
+
+Dans le contexte de l'\gls{owa}, la sémantique diffère : les valeurs inconnues sont simplement omises avec l'hypothèse sous-jacente que, si elles existent, elles sont disponibles quelque part.
+Les travaux présentés dans cette thèse se focalisent sur le \gls{cwa}, qui facilite l'analyse des données et permet de travailler en mode déconnecté.
+En pratique, on peux imaginer que l'application du \gls{cwa} se limite à une partie spécifique des données (en particulier, les données privée inaccessibles à l'exterieur).
+Ces données peuvent ensuite être liées à des sources externes (telles que les bases de données des autorités de santé), en suivant une approche \gls{owa}.
+Les règles seraient alors élaborées exclusivement à partir des données confidentielles.
+
+Un autre défi inhérent à la mise à jour réside dans la nécessité d'éviter la redondance d'information tout en maintenant la cohérence.
+Pour illustrer, considérons l'ajout de la nouvelle information $PrescExam(Lea, \textit{x-ray})$ à l'instance $\mathcal{D}_1$ mentionnée précédemment.
+Dans cette situation, il n'est pas possible de substituer $N_1$ par \textit{x-ray} dans $PrescExam(Lea, N_1)$, car $N_1$ apparaît également dans $ExamResult(Lea, N_1, N_2)$, indiquant ainsi une dépendance liée à $N_1$.
+Cependant, si nous recevons par la suite l'information $ExamResult(Lea, \textit{x-ray}, \textit{join inflammation})$, alors il est envisageable de remplacer $N_1$ par \textit{x-ray}, car l'instanciation de $N_1$ demeure identique dans tous les atomes où elle est présente.
+En d'autres termes, l'information partielle qui précise que \enquote{Lea a subi un examen pour lequel un résultat a été obtenu} se révèle redondante avec l'information détaillée \enquote{Lea a subi un examen de type radiographie, ayant comme résultat la détection d'une inflammation}.
+Dans ce scénario, l'instance obtenue se présenterait comme $\mathcal{D}'_1 = \{$$ExamResult(Lea, \textit{x-ray}, \textit{join inflammation}),$ $PrescExam(Lea, \textit{x-ray})\}$.
+
+\paragraph{}
+Basée sur le cadre conceptuel de \gls{fol} exposé dans \cite{chabinConsistentUpdatingDatabases2020}, les travaux présentés ici visent à appliquer cette approche de manière \emph{incrémentale} à des \emph{base de données graphes}.
+Cette proposition capitalise sur les avantages inhérents aux fonctionnalités d'accès, de manipulation et de gestion de données offertes par les \glspl{sgbd} orientés graphes.
+Cette approche diffère de la version en mémoire présentée dans \cite{chabinConsistentUpdatingDatabases2020}.
+De plus, l'objectif est d'améliorer la création des ensembles d'atomes liés par des valeurs nullespour le calcul du \gls{core}, processus qui constitue une étape coûteuse dans \cite{chabinConsistentUpdatingDatabases2020}.
+
+\paragraph{Organisation}
+Pour commencer, le chapitre~\ref{chp:update:soa} offre un état de l'art et expose les distinctions entre l'approche préconisée ici et celle décrite dans \cite{chabinConsistentUpdatingDatabases2020}. Ensuite, le chapitre~\ref{chp:update:algos} présente en détail l'approche proposée, tandis qu'une évaluation critique illustrant les avantages et les limites de l'exploitation des \glspl{sgbd} graphes est exposée dans le chapitre~\ref{chp:update:eval}, avant de conclure cette partie.

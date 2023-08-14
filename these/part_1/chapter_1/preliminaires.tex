@@ -1,13 +1,18 @@
+Cette section constitue une vue d'ensemble des concepts et des notions fondamentales qui serviront de base aux chapitres suivants.
+Dans un premier temps une définition de la \glsfirst{fol} ainsi que les concepts de contraintes et de règles dans ce contexte seront présentés.
+Par la suite, nous aborderons les bases de données en adoptant le formalisme \gls{fol} et offrirons une brève introduction aux bases de données graphes.
+
 \subsection{Logique du premier ordre}
 \label{sec:update:pre:logic}
 
-En \gls{fol}, l'information est représentée par un ensemble de faits.
-Les faits sont constitués de constantes représentant les individus et des symboles de prédicats définissant les relations entre les individus.
-Par exemple, le fait $auteur(Alice)$ contient le symbole de prédicat $auteur$ d'arité $1$ et la constante $Alice$.
-En supposant que chaque symbole de prédicat possède une sémantique (ici, intuitivement claire), l'existence de ce fait dans la base indique que $Alice$ appartient à l'ensemble des auteurs stockés.
-Au-delà des faits, il est possible de définir des règles d'inférence permettant de générer d'autres faits à partir d'une instance de la base, mais nous nous intéresserons ici aux contraintes.
-Ces dernières sont des règles permettant de préciser les relations et la sémantique associée aux prédicats.
-Prenons comme exemple la contrainte exprimée par la règle $\forall x~auteur(x) \implies \exists y~ecrit(x,y)$ signifiant que pour tout individu auteur présent dans la base, cette dernière doit aussi contenir au moins une œuvre écrite par cet auteur.
+En \glsfirst{fol}, l'information se matérialise par un ensemble de faits.
+Ces faits sont constitués de constantes représentant les individus, ainsi que de symboles de prédicats définissant les relations entre ces individus.
+Par exemple, le fait $auteur(Alice)$ comprend le symbole de prédicat $auteur$ d'arité $1$ et la constante $Alice$.
+Si l'on suppose que chaque symbole de prédicat détient une signification (ici, intuitivement claire), ce fait indique que $Alice$ est un auteur.
+Au-delà des faits, des règles d'inférence peuvent être établies pour engendrer de nouveaux faits à partir de faits existants.
+Cependant, notre attention se porte ici sur les contraintes.
+Ces dernières consistent en des règles visant à spécifier les relations et la signification associée aux prédicats.
+Par exemple, la contrainte exprimée par la règle $\forall x~auteur(x) \implies \exists y~ecrit(x,y)$ signifie que pour chaque individu $x$ considéré comme auteur ($auteur(x)$) dans l'ensemble de fait, celui-ci doit également contenir au moins une œuvre $y$ écrite par cet auteur ($ecrit(x,y)$).
 
 Formellement, on utilise comme alphabet :
 \begin{itemize}
@@ -19,70 +24,75 @@ Formellement, on utilise comme alphabet :
     \item le quantificateur existentiel $\exists$ (il existe)
 \end{itemize}
 Avec cet alphabet, on définit un atome $P(t_1, \dots, t_n)$ où $P$ est le symbole de prédicat d'arité $n$ et $t_1, \dots, t_n$ sont les termes.
-Les termes peuvent être une variable, une constante ou une valeur nulles.
-Un fait est un atome composé uniquement de constantes et un atome instancié est un atome qui ne contient aucunes variables.
+Les termes peuvent être une variable, une constante ou une valeur nulle.
+Un fait est un atome composé exclusivement de constantes, tandis qu'un atome instancié est un atome ne contenant aucune variable.
 Étant donné un atome instancié $A$, $null(A)$ représente l'ensemble des valeurs nulles de $A$.
 
-Un homomorphisme $h$ entre deux ensembles d'atomes $A$ et $B$ est une application surjective sur les termes de $A$ vers les termes de $B$ telle que :
+Un homomorphisme $h$ entre deux ensembles d'atomes $A$ et $B$ est une application surjective des termes de $A$ vers les termes de $B$, telle que :
 \begin{enumerate*}[label=(\roman*)]
-    \item si, $h(t) = t$, alors $t$ est une constante et
+    \item si, $h(t) = t$, alors $t$ est une constante
     \item si, $P(t_1, \dots, t_n) \in A$, alors $P(h(t_1), \dots, h(t_n)) \in B$.
 \end{enumerate*}
-S'il existe un homomorphisme inverse $h^-$ tel que $h^-(h(t)) = t$ alors ont dit que $A$ est \textit{isomorphe} à $B$.
+S'il existe un homomorphisme inverse $h^-$ tel que $h^-(h(t)) = t$ alors ont dit que $A$ est \emph{isomorphe} à $B$.
 
 $\Phi$ est l'ensemble de toutes les formules $\phi$, existentiellement quantifiées, de la forme $(\exists X)(\varphi_1(X_1) \land \dots \land \varphi_n(X_n))$ où $X$ est l'ensemble des variables et $\varphi_i(X_i)$ est une formule atomique dont $X_i \subset X$ représente l'ensemble des variables libres.
 $atoms(\phi)$ est l'ensemble des formules atomique de $phi$.
 Un modèle $M$ d'une formule $\phi$ est l'ensemble des faits qui ont un homomorphisme de $atoms(\phi)$ vers $M$.
 Étant donné deux formules $\phi_1$ et $\phi_2$ : $\phi_1 \implies \phi_2$ si tout modèle de $\phi_1$ est un modèle de $\phi_2$.
-$\phi_1$ et $\phi_2$ sont \textit{équivalents}, noté $\phi_1 \iff \phi_2$, si et seulement si $\phi_1 \implies \phi_2$ et $\phi_2 \implies \phi_1$.
-$\phi_1$ et \textit{plus simple que} $\phi_2$, noté $\phi_1 \sqsubseteq \phi_2$ si $\phi_1 \iff \phi_2$ et $atoms(\phi_1) \subseteq atoms(\phi_2)$.
-Une simplification $\phi_1$ de $\phi_2$ est \textit{minimale} si $\phi_1 \sqsubseteq \phi_2$ et qu'il n'existe pas de $\phi_1'$ tel que $\phi_1' \sqsubset \phi_1$.
+$\phi_1$ et $\phi_2$ sont \emph{équivalents}, noté $\phi_1 \iff \phi_2$, si et seulement si $\phi_1 \implies \phi_2$ et $\phi_2 \implies \phi_1$.
+$\phi_1$ et \emph{plus simple que} $\phi_2$, noté $\phi_1 \sqsubseteq \phi_2$ si $\phi_1 \iff \phi_2$ et $atoms(\phi_1) \subseteq atoms(\phi_2)$.
+Une simplification $\phi_1$ de $\phi_2$ est \emph{minimale} si $\phi_1 \sqsubseteq \phi_2$ et qu'il n'existe pas de $\phi_1'$ tel que $\phi_1' \sqsubset \phi_1$.
 Par exemple, étant donné la formule $\phi = (\exists x, y)(P(a, x) \land P(a, y))$, les formules $(\exists x)(P(a, x))$ et $(\exists y)(P(a, y))$ sont équivalentes et sont toutes deux une simplification de $\phi$.
 De plus, \cite{chabinConsistentUpdatingDatabases2020} démontre que si $\phi_1$ et $\phi_2$ sont deux simplifications minimales d'une même formule $\phi$ alors les ensembles $atoms(\phi_1)$ et $atoms(\phi_2)$ sont isomorphes.
-La simplification minimale d'une formule $\phi$ est appelé le core et s'écrit $core(\phi)$.
+La simplification minimale d'une formule $\phi$ est appelé le \gls{core} et s'écrit $core(\phi)$.
 
 \subsection{Base de données}
 \label{sec:update:pre:db}
 
-L'\textit{instance} d'une base de donnée $\mathcal{D}$ peux être décrite comme la Skolémisation d'une formule $\phi$ correspondant a un ensemble minimal d'atomes instanciés tel que $core(\phi) = \phi$.
-La Skolémisation d'une formule $\phi$ noté $Sk(\phi)$ consiste à instancier l'ensemble des variables par des constantes ou des valeurs nulles et à éliminer toutes les occurrences de quantificateur existentiel.
+L'\emph{instance} d'une base de données $\mathcal{D}$ peut être définie comme la Skolémisation d'une formule $\phi$, représentant un ensemble minimal d'atomes instanciés, pour lequel $core(\phi) = \phi$.
+La Skolémisation d'une formule $\phi$, notée $Sk(\phi)$, revient à substituer l'ensemble des variables par des constantes ou des valeurs nulles, tout en éliminant chaque occurrence du quantificateur existentiel.
 
-Une \textit{requête} sur une base de donnée est une formule logique de la forme $(\forall X)(Q(X) \gets \phi(X))$ où $X$ est l'ensemble des variables libres de $\phi$.
-La réponse d'une requête sur $\mathcal{D}$ est l'ensemble des homomorphismes $h$ tel que $h(\phi(X)) \subseteq \mathcal{D}$.
+Une \emph{requête} effectuée sur une base de données est une formule logique de la forme $(\forall X)(Q(X) \gets \phi(X))$, où $X$ représente l'ensemble des variables libres de $\phi$.
+La réponse à une requête effectuée sur une base de données $\mathcal{D}$ correspond à l'ensemble des homomorphismes $h$ tels que $h(\phi(X)) \subseteq \mathcal{D}$.
 
-Une \textit{contrainte} (ou règle) sur une base de donnée est une dépendance génératrice de n-uplets, ou \gls{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
-Plus simplement écrit $body(X, Y) \to head(X, Z)$, $X$, $Y$ et $Z$ sont des ensembles de variables, $body(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
+Une \emph{contrainte} (ou règle) sur une base de donnée est une dépendance génératrice de n-uplets, également appelée \glsfirst{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
+Plus simplement écrit $body(X, Y) \to head(X, Z)$, où $X$, $Y$ et $Z$ représentent des ensembles de variables, $body(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
 Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés, noté $I \vDash c$ si pour tout homomorphisme $h$ tel que $h(body(c)) \subseteq I$ il existe un homomorphisme $h'$ tel que $h'(body(c)) = h(body(c))$ et $h'(head(c)) \in I$.
 Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, pour toute instanciation du corps présente dans la base de données, la tête correspondante doit aussi être présente dans la base.
-Une instance $I$ d'une base de données est dites \textit{cohérente} par rapport à un ensemble de contraintes $\mathbb{C}$, noté $I \vDash \mathbb{C}$ si pour toute contrainte $c$ dans $\mathbb{C}$, $I \vDash c$.
+Une instance $I$ d'une base de données est dites \emph{cohérente} vis-à-vis d'un ensemble de contraintes $\mathbb{C}$, noté $I \vDash \mathbb{C}$ si pour toute contrainte $c$ dans $\mathbb{C}$, $I \vDash c$.
 
 \subsection{Base de données graphes}
 \label{sec:update:pre:graph}
 
-Ici, l'objectif est de présenter succinctement les base de données graphes.
-\cite{pokornyGraphDatabasesTheir2015} donne une introduction sur les avantages et les inconvénients de ces bases.
-Quand on parle de base de données graphe on peut distinguer deux grandes familles :
+Dans cette section, nous visons à fournir une introduction concise aux bases de données de graphes.
+\cite{pokornyGraphDatabasesTheir2015} offre une vue d'ensemble des avantages et des inconvénients de ce type de bases de données.
+Lorsque nous évoquons les bases de données de graphes, nous pouvons identifier deux grandes familles :
 \begin{description}
-    \item[Les bases de triplets] principalement le \gls{rdf} porté par le \gls{w3c}.
-        Ce type de base de données enregistre des triplets de la forme $\langle x, P, y \rangle$ qui sont des atomes binaires où $P$ est un symbole de prédicat, $x$, le sujet, est l'\gls{uri} d'une ressource (un nœud) et $y$, l'objet est un \gls{uri} ou un littéral (une valeur de propriétés).
-        \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
-    \item[Les Graphes de Propriétés] ou \gls{lpg} en anglais, sont des bases de données composées de nœuds et d'arcs labellisés qui peuvent contenir des propriétés.
-        \gls{neo4j} est surement le gestionnaire de base de donnée le plus utilisé dans ce domaine.
-        Ils sont les créateurs du langage \gls{cypher} qui sert de base pour le nouveau langage \gls{iso} : \gls{gql}, en cours de développement.
+    \item[Les bases de triplets], notamment représentées par le modèle \glsfirst{rdf} développé par le \gls{w3c}.
+    Ces bases enregistrent des triplets sous la forme $\langle x, P, y \rangle$, où chaque triplet représente un atome $P(x, y)$ et est constitué de trois éléments : $x$, le sujet représenté par l'\gls{uri} d'une ressource (un nœud), $P$ est un symbole de prédicat, et $y$, l'objet, peut être soit un \gls{uri}, soit un littéral (une valeur de propriétés).
+    \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
+    
+    \item[Les Graphes de Propriétés], aussi connus sous le nom de \glsfirst{lpg} en anglais, sont des bases de données composées de nœuds reliés par des arcs. Les deux sont labellisés et peuvent contenir des propriétés.
+    Parmi les \gls{sgbd} de ce type, \gls{neo4j} est l'un des plus populaires.
+    Notamment, \gls{neo4j} est à l'origine du langage de requête \gls{cypher}, qui sert de fondation au nouveau langage du standard \gls{iso} : \gls{gql}, actuellement en cours de développement.
 \end{description}
 
-Les base de données graphes sont conçus pour facilité les requêtes sur la structure des données.
-Le modèle ou schéma de la base est donc très dépendants des requêtes envisagées.
-Dans \gls{neo4j}, les nœuds peuvent avoir une ou plusieurs étiquètes appelées \textit{label} alors que les relations ne peuvent en avoir qu'une appelée \textit{type} (dans le cas des relations on dupliquera l'arrête si plusieurs étiquètes sont nécessaires).
+Les bases de données graphes sont spécialement conçues pour simplifier l'interrogation de la structure des données.
+Le modèle de la base de données (ou schéma, pour faire une analogie avec le modèle relationnel, bien qu'aucune règle structurelle ne soit imposée) est étroitement lié aux types de requêtes envisagées.
+Dans le cadre de \gls{neo4j}, par exemple, les nœuds peuvent être étiquetés avec une ou plusieurs étiquettes, appelées \emph{labels}, tandis que les relations ne peuvent en porter qu'une, dénommée \emph{type} (si plusieurs étiquettes sont nécessaires pour une relation, cette dernière sera dupliquée).
 
-\paragraph{\gls{rdfs}}
-fournit des relations pour la définition d'ontologies (ou vocabulaires) destinés à structurer des ressources \gls{rdf}.
-Il permet de définir le schéma de la base : les classes (type des nœuds) et les propriétés (arrêtes).
-Il permet aussi d'expliciter des faits de subsomption en définissant une hiérarchie des éléments avec les faits \textbf{subClass} et \textbf{subProp}.
-\gls{rdfs} permet aussi de séparer l'instance du schéma.
+\paragraph{\acs{rdfs}}
+fournit des relations pour la définition d'ontologies (ou vocabulaires) destinées à structurer des ressources \gls{rdf}.
+Il permet de définir le schéma de la base : les classes (correspondant aux types de nœuds) et les propriétés (correspondant aux arêtes).
+De plus, il offre la possibilité de spécifier des relations de subordination et de subsomption en établissant une hiérarchie entre les éléments au moyen des propriétés \textbf{subClass} et \textbf{subProp}.
+\gls{rdfs} permet également la séparation de l'instance et du schéma.
 
 \paragraph{\gls{cypher}}
-est un langage déclaratif de requête pour les graphes de propriétés.
-Le langage permet d'exprimer facilement des requêtes à l'aide du mot clés \verb|MATCH| comme une recherche de motif exprimé en art ASCII.
-Les requêtes s'écrivent comme un enchainement d'opérations où le résultat d'une opération est utilisé comme paramètre de la suivante.
-Bien que les requêtes s'effectuent sur un graphe, le résultat d'un opérateur est toujours une table d'affectation des variables (ayant autant de colonne que de variables et autant de lignes que de réponses).
+est un langage déclaratif de requête conçu pour les graphes de propriétés.
+Ce langage offre la facilité d'exprimer des requêtes en utilisant le mot-clé \verb|MATCH| pour la recherche de motifs, exprimés sous forme d'art ASCII.
+Les requêtes sont formulées comme une séquence d'opérations, où le résultat d'une opération devient le paramètre de la suivante.
+Même si les requêtes portent sur des graphes, les résultats des opérations sont toujours une table d'affectation des variables (avec autant de colonnes que de variables et autant de lignes que de réponses).
+
+\begin{example}{Requete \gls{cypher}}
+    
+\end{example}

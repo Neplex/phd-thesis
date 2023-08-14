@@ -1,17 +1,22 @@
-@inproceedings{abiteboulMiseajourBasesDonnees1985,
-  title = {Mise-\`a-Jour Des {{Bases}} de {{Donn\'ees}} Contenant de l'information Incompl\`ete},
-  booktitle = {Journ\'ees Bases de Donn\'ees Avanc\'es, 6-8 Mars 1985, St. {{Pierre}} de Chartreuse (Informal Proceedings).},
+@inproceedings{abiteboulUpdateSemanticsIncomplete1985,
+  title = {Update Semantics for Incomplete Databases},
+  booktitle = {Proceedings of the 11th International Conference on {{Very Large Data Bases}} - {{Volume}} 11},
   author = {Abiteboul, Serge and Grahne, G{\"o}sta},
+  editor = {Pirotte, Alain and Vassiliou, Yannis},
   year = {1985},
-  optbibsource = {dblp computer science bibliography, http://dblp.org},
-  optbiburl = {http://dblp.org/rec/bib/conf/bda/AbiteboulG85},
-  optcrossref = {DBLP:conf/bda/1985},
-  opttimestamp = {Tue, 31 Oct 2006 14:01:45 +0100},
-  keywords = {\#nosource,⛔ No DOI found}
+  month = aug,
+  series = {{{VLDB}} '85},
+  pages = {1--12},
+  publisher = {{VLDB Endowment}},
+  address = {{Stockholm, Sweden}},
+  url = {https://dblp.org/rec/conf/vldb/AbiteboulG85},
+  abstract = {A database containing some incomplete information is viewed as a set of possible states of the real world. The semantics of updates is given based on simple set operations on the set of states. Some basic results concerning the capabilities of known models of incomplete databases to handle updates are exhibited.},
+  isbn = {0-934613-17-6},
+  keywords = {\#nosource,{$\warning$}️ Invalid DOI,⛔ No DOI found},
+  file = {C\:\\Users\\nhiot\\Zotero\\storage\\3SJCDNV4\\1286760.html}
 }
 
 @article{ahoEfficientOptimizationClass1979,
-  ids = {ASU79,ahoEfficientOptimizationClass1979a},
   title = {Efficient Optimization of a Class of Relational Expressions},
   author = {Aho, Alfred V. and Sagiv, Yehoshua and Ullman, Jeffrey D.},
   year = {1979},
@@ -23,42 +28,29 @@
   issn = {0362-5915},
   doi = {10.1145/320107.320112},
   abstract = {The design of several database query languages has been influenced by Codd's relational algebra. This paper discusses the difficulty of optimizing queries based on the relational algebra operations select, project, and join. A matrix, called a tableau, is proposed as a useful device for representing the value of a query, and optimization of queries is couched in terms of finding a minimal tableau equivalent to a given one. Functional dependencies can be used to imply additional equivalences among tableaux. Although the optimization problem is NP-complete, a polynomial time algorithm exists to optimize tableaux that correspond to an important subclass of queries.},
-  optbibsource = {dblp computer science bibliography, https://dblp.org},
-  optbiburl = {https://dblp.org/rec/journals/tods/AhoSU79.bib},
-  optdoi = {10.1145/320107.320112},
-  opttimestamp = {Tue, 06 Nov 2018 12:51:47 +0100},
-  opturl = {https://doi.org/10.1145/320107.320112},
   keywords = {equivalence of queries,NP-completeness,query optimization,relational algebra,relational database,tableaux},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\2SKKF3ZD\\Aho et al. - 1979 - Efficient optimization of a class of relational ex.pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1979\\Aho et al. - 1979 - Efficient optimization of a class of relational ex.pdf}
 }
 
-@article{alvesUpdateRulesDatalog1998,
-  ids = {HLS98},
-  title = {Update {{Rules}} in {{Datalog Programs}}},
-  author = {ALVES, M{\'i}RIAN HALFELD FERRARI and LAURENT, {\relax DOMINIQUE} and SPYRATOS, {\relax NICOLS}},
-  year = {1998},
-  month = dec,
-  journal = {Journal of Logic and Computation},
-  volume = {8},
-  number = {6},
-  pages = {745--775},
-  publisher = {{OUP}},
-  issn = {1465-363X},
-  doi = {10.1093/logcom/8.6.745},
-  abstract = {We propose a deductive database model containing two kinds of rules: update rules of the form L0{$\leftarrow$}L1, where L0 and L1 are literals, and query rules of the form of normal logic program rules. A basic feature of our approach is that new knowledge inputs are always assimilated. Moreover, updates are always deterministic and they preserve database consistency.We consider that update rules have higher priority than query rules, i.e., update rules may generate exceptions to query-driven derivations. We introduce a semantics framework for database update and query answering, based on the well-founded semantics. We also suggest an alternative approach based on extended logic programs and we show that our database model can be defined in terms of non-monotonic formalisms.},
-  optbibsource = {dblp computer science bibliography, http://dblp.org},
-  optbiburl = {http://dblp.uni-trier.de/rec/bib/journals/logcom/AlvesLS98},
-  optdoi = {10.1093/logcom/8.6.745},
-  opttimestamp = {Wed, 29 Jun 2011 15:52:37 +0200},
-  opturl = {http://dx.doi.org/10.1093/logcom/8.6.745},
-  keywords = {\#nosource,Datalog,deductive database,update},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\7CB956IH\\8142245.html;C\:\\Users\\nhiot\\Zotero\\storage\\B72S7SY9\\8142245.html}
+@article{ahoTheoryJoinsRelational1979,
+  ids = {ahoTheoryJoinsRelational1977},
+  title = {The Theory of Joins in Relational Databases},
+  author = {Aho, Alfred V. and Beeri, Catriel and Ullman, Jeffrey D.},
+  year = {1979},
+  journal = {ACM Transactions on Database Systems (TODS)},
+  volume = {4},
+  number = {3},
+  pages = {297--314},
+  publisher = {{ACM New York, NY, USA}},
+  doi = {10.1145/320083.320091},
+  abstract = {Answering queries in a relational database often requires that the natural join of two or more relations be computed. However, not all joins are semantically meaningful. This paper gives an efficient algorithm to determine whether the join of several relations is semantically meaningful (lossless) and an efficient algorithm to determine whether a set of relations has a subset with a lossy join. These algorithms assume that all data dependencies are functional. Similar techniques also apply to the case where data dependencies are multivalued.},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1979\\Aho et al. - 1979 - The theory of joins in relational databases.pdf}
 }
 
 @inproceedings{amaviNaturalLanguageQuerying2020,
   title = {Natural {{Language Querying System Through Entity Enrichment}}},
   booktitle = {{{ADBIS}}, {{TPDL}} and {{EDA}} 2020 {{Common Workshops}} and {{Doctoral Consortium}}: {{International Workshops}}: {{DOING}}, {{MADEISD}}, {{SKG}}, {{BBIGAP}}, {{SIMPDA}}, {{AIMinScience}} 2020 and {{Doctoral Consortium}}, {{Lyon}}, {{France}}, {{August}} 25\textendash 27, 2020, {{Proceedings}} 24},
-  author = {Amavi, Joshua and Halfeld Ferrari, Mirian and Hiot, Nicolas},
+  author = {Amavi, Joshua and Halfed Ferrari, Mirian and Hiot, Nicolas},
   editor = {Bellatreche, Ladjel and Bielikov{\'a}, M{\'a}ria and Boussa{\"i}d, Omar and Catania, Barbara and Darmont, J{\'e}r{\^o}me and Demidova, Elena and Duchateau, Fabien and Hall, Mark and Mer{\v c}un, Tanja and Novikov, Boris and Papatheodorou, Christos and Risse, Thomas and Romero, Oscar and Sautot, Lucile and Talens, Guilaine and Wrembel, Robert and {\v Z}umer, Maja},
   year = {2020},
   month = aug,
@@ -67,7 +59,7 @@
   pages = {36--48},
   publisher = {{Springer International Publishing}},
   address = {{Cham}},
-  doi = {10/gg8642},
+  doi = {10.1007/978-3-030-55814-7_3},
   abstract = {This paper focuses on a domain expert querying system over databases. It presents a solution designed for a French enterprise interested in offering a natural language interface for its clients. The approach, based on entity enrichment, aims at translating natural language queries into database queries. In this paper, the database is treated through a logical paradigm, suggesting the adaptability of our approach to different database models. The good precision of our method is shown through some preliminary experiments.},
   copyright = {All rights reserved},
   hal_id = {hal-02959502},
@@ -75,11 +67,10 @@
   isbn = {978-3-030-55814-7},
   langid = {english},
   keywords = {\#nosource,Database query,me,NLI,NLP,Question answering},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\FIIBATP8\\Amavi et al. - 2020 - Natural Language Querying System Through Entity En.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\XGTK6R7N\\DOING13.mp4;C\:\\Users\\nhiot\\Zotero\\storage\\MT5B2A5X\\978-3-030-55814-7_3.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2020\\Amavi et al. - 2020 - Natural Language Querying System Through Entity En.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\XGTK6R7N\\DOING13.mp4;C\:\\Users\\nhiot\\Zotero\\storage\\MT5B2A5X\\978-3-030-55814-7_3.html}
 }
 
 @inproceedings{anglesPGKeysKeysProperty2021,
-  ids = {anglesPgkeysKeysProperty2021},
   title = {{{PG-Keys}}: {{Keys}} for Property Graphs},
   shorttitle = {Pg-Keys},
   booktitle = {Proceedings of the 2021 {{International Conference}} on {{Management}} of {{Data}}},
@@ -89,28 +80,46 @@
   publisher = {{ACM}},
   doi = {10.1145/3448016.3457561},
   keywords = {\#nosource},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\FMUARDIF\\Angles et al. - 2021 - PG-Keys Keys for property graphs.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\7YULBJER\\3448016.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2021\\Angles et al. - 2021 - PG-Keys Keys for property graphs.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\FMUARDIF\\Angles et al. - 2021 - PG-Keys Keys for property graphs.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\7YULBJER\\3448016.html}
 }
 
 @book{bonifatiQueryingGraphs2018,
-  ids = {BFVY2018},
-  title = {Querying Graphs},
+  ids = {bonifatiQueryingGraphs2018a},
+  title = {Querying {{Graphs}}},
   author = {Bonifati, Angela and Fletcher, George and Voigt, Hannes and Yakovets, Nikolay and Jagadish, H. V.},
   year = {2018},
-  series = {Synthesis Lectures on Data Management},
+  series = {Synthesis {{Lectures}} on {{Data Management}}},
   volume = {10},
-  publisher = {{Morgan \& Claypool Publishers}},
-  optbibsource = {dblp computer science bibliography, https://dblp.org},
-  optbiburl = {https://dblp.org/rec/series/synthesis/2018Bonifati.bib},
-  optdoi = {10.2200/S00873ED1V01Y201808DTM051},
-  opttimestamp = {Mon, 15 Nov 2021 16:15:59 +0100},
-  opturl = {https://doi.org/10.2200/S00873ED1V01Y201808DTM051},
-  keywords = {\#nosource},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\ZTHHVBZS\\Bonifati et al. - 2018 - Querying graphs.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\9CCKMBG8\\978-3-031-01864-0.html}
+  publisher = {{Springer International Publishing}},
+  address = {{Cham}},
+  doi = {10.1007/978-3-031-01864-0},
+  abstract = {Graph data modeling and querying arises in many practical application domains such as social and biological networks where the primary focus is on concepts and their relationships and the rich patterns in these complex webs of interconnectivity. In this book, we present a concise unified view on the basic challenges which arise over the complete life cycle of formulating and processing queries on graph databases. To that purpose, we present all major concepts relevant to this life cycle, formulated in terms of a common and unifying ground: the property graph data model\textemdash the pre-dominant data model adopted by modern graph database systems. We aim especially to give a coherent and in-depth perspective on current graph querying and an outlook for future developments. Our presentation is self-contained, covering the relevant topics from: graph data models, graph query languages and graph query specification, graph constraints, and graph query processing. We conclude by indicating major open research challenges towards the next generation of graph data management systems.},
+  isbn = {978-3-031-00736-1 978-3-031-01864-0},
+  langid = {english},
+  keywords = {\#nosource,Computers / Information Technology,Computers / Information Theory,Computers / Internet / General,Computers / Networking / General,Computers / Online Services,Computers / Programming / Algorithms},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2018\\Bonifati et al. - 2018 - Querying Graphs.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\9CCKMBG8\\978-3-031-01864-0.html}
+}
+
+@inproceedings{bravoSemanticallyCorrectQuery2006,
+  title = {Semantically {{Correct Query Answers}} in the {{Presence}} of {{Null Values}}},
+  booktitle = {Current {{Trends}} in {{Database Technology}} \textendash{} {{EDBT}} 2006},
+  author = {Bravo, Loreto and Bertossi, Leopoldo},
+  editor = {Grust, Torsten and H{\"o}pfner, Hagen and Illarramendi, Arantza and Jablonski, Stefan and Mesiti, Marco and M{\"u}ller, Sascha and Patranjan, Paula-Lavinia and Sattler, Kai-Uwe and Spiliopoulou, Myra and Wijsen, Jef},
+  year = {2006},
+  series = {Lecture {{Notes}} in {{Computer Science}}},
+  pages = {336--357},
+  publisher = {{Springer}},
+  address = {{Berlin, Heidelberg}},
+  doi = {10.1007/11896548_27},
+  abstract = {For several reasons a database may not satisfy a given set of integrity constraints (ICs), but most likely most of the information in it is still consistent with those ICs; and could be retrieved when queries are answered. Consistent answers to queries wrt a set of ICs have been characterized as answers that can be obtained from every possible minimally repaired consistent version of the original database. In this paper we consider databases that contain null values and are also repaired, if necessary, using null values. For this purpose, we propose first a precise semantics for IC satisfaction in a database with null values that is compatible with the way null values are treated in commercial database management systems. Next, a precise notion of repair is introduced that privileges the introduction of null values when repairing foreign key constraints, in such a way that these new values do not create an infinite cycle of new inconsistencies. Finally, we analyze how to specify this kind of repairs of a database that contains null values using disjunctive logic programs with stable model semantics.},
+  isbn = {978-3-540-46790-8},
+  langid = {english},
+  keywords = {Database Instance,Disjunctive Logic Program,Integrity Constraint,Query Answer,Stable Model Semantic},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2006\\Bravo et Bertossi - 2006 - Semantically Correct Query Answers in the Presence2.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\CMVWCZF5\\semantically-correct-query-answers-in-z9VL6b.html}
 }
 
 @article{chabinConsistentUpdatingDatabases2020,
-  ids = {CHL19,CHL20,ConsistentUpdatingDatabase,chabinConsistentUpdatingDatabase,chabinConsistentUpdatingDatabases2019,chabinConsistentUpdatingDatabases2019b,chabinConsistentUpdatingDatabases2020a,chabinConsistentUpdatingDatabases2020b,ferrariConsistentUpdatingDatabases2020},
+  ids = {chabinConsistentUpdatingDatabases2019},
   title = {Consistent {{Updating}} of {{Databases}} with {{Marked Nulls}}},
   author = {Chabin, Jacques and {Halfeld-Ferrari}, Mirian and Laurent, Dominique},
   year = {2020},
@@ -119,44 +128,37 @@
   volume = {62},
   number = {4},
   pages = {1571--1609},
-  publisher = {{Springer}},
   issn = {0219-3116},
   doi = {10.1007/s10115-019-01402-w},
   urldate = {2023-07-05},
   abstract = {This paper revisits the problem of consistency maintenance when insertions or deletions are performed on a valid database containing marked nulls. This problem comes back to light in real-world linked data or RDF databases when blank nodes are associated with null values. This paper proposes solutions for the main problems one has to face when dealing with updates and constraints, namely update determinism, minimal change and leanness of an RDF graph instance. The update semantics is formally introduced and the notion of core is used to ensure a database as small as possible (i.e.~~ the RDF graph leanness). Our algorithms allow the use of constraints such as tuple-generating dependencies, offering a way for solving many practical problems.},
   langid = {english},
-  optbibsource = {dblp computer science bibliography, https://dblp.org},
-  optbiburl = {https://dblp.org/rec/journals/kais/ChabinFL20.bib},
-  optdoi = {10.1007/s10115-019-01402-w},
-  opttimestamp = {Mon, 04 May 2020 13:22:49 +0200},
-  opturl = {https://doi.org/10.1007/s10115-019-01402-w},
   keywords = {\#nosource,Constraints,Logical database,Null values,RDF,TGD,Updates},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\ZZP3MJCM\\Chabin et al. - 2020 - Consistent Updating of Databases with Marked Nulls.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\4YE6ECDH\\s10115-019-01402-w.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2020\\Chabin et al. - 2020 - Consistent Updating of Databases with Marked Nulls.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\4YE6ECDH\\s10115-019-01402-w.html}
 }
 
 @inproceedings{chabinContextdrivenQueryingSystem2018,
   title = {A {{Context-driven Querying System}} for {{Urban Graph Analysis}}},
-  booktitle = {Proceedings of the 22nd {{International Database Engineering}} \& {{Applications Symposium}}},
+  booktitle = {Proceedings of the 22nd {{International Database Engineering}} \& {{Applications Symposium}} on - {{IDEAS}} 2018},
   author = {Chabin, Jacques and {Gomes-Jr.}, Luiz and {Halfeld-Ferrari}, Mirian},
   year = {2018},
   series = {{{IDEAS}} 2018},
   pages = {297--301},
   publisher = {{ACM Press}},
   address = {{Villa San Giovanni, Italy}},
-  doi = {10/gfvn2w},
+  doi = {10.1145/3216122.3216148},
   urldate = {2018-12-29},
   abstract = {This paper presents a context-driven query system for urban computing where users are responsible for defining their own restrictions over which datalog-like queries are built. Instead of imposing constraints on databases, our goal is to filter consistent data during the query process. Our query language is able to express aggregates in recursive rules, allowing it to capture network properties typical of graph analysis. This paper presents our query system and analyzes its capabilities using use cases in Urban Computing.},
   isbn = {978-1-4503-6527-7},
   langid = {english},
   keywords = {constraints,data graph,data quality,Query language,smart city},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\BQTKFT9V\\Chabin et al. - 2018 - A Context-driven Querying System for Urban Graph A.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\MGXJHLF7\\citation.html;C\:\\Users\\nhiot\\Zotero\\storage\\QEF3INHL\\hal-01837921.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\ACM Press2018\\Chabin et al. - 2018 - A Context-driven Querying System for Urban Graph A.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\MGXJHLF7\\citation.html;C\:\\Users\\nhiot\\Zotero\\storage\\QEF3INHL\\hal-01837921.html}
 }
 
 @inproceedings{chabinGraphRewritingRules2020,
-  ids = {chabinGraphRewritingRules2020a},
   title = {Graph {{Rewriting Rules}} for {{RDF Database Evolution Management}}},
   booktitle = {Proceedings of the 22nd {{International Conference}} on {{Information Integration}} and {{Web-based Applications}} \& {{Services}}},
-  author = {Chabin, Jacques and Eichler, C{\'e}dric and {Halfeld-Ferrari}, Mirian and Hiot, Nicolas},
+  author = {Chabin, Jacques and Eichler, C{\'e}dric and Halfed Ferrari, Mirian and Hiot, Nicolas},
   year = {2020},
   month = nov,
   series = {{{iiWAS}} '20},
@@ -168,14 +170,13 @@
   abstract = {This paper introduces SetUp, a theoretical and applied framework for the management of RDF/S database evolution on the basis of graph rewriting rules. Rewriting rules formalize instance or schema changes, ensuring graph's consistency with respect to given constraints. Constraints considered in this paper are a well known variant of RDF/S semantic, but the approach can be adapted to user-defined constraints. Furthermore, SetUp manages updates by ensuring rule applicability through the generation of side-effects: new updates which guarantee that rule application conditions hold. We provide herein formal validation and experimental evaluation of SetUp.},
   isbn = {978-1-4503-8922-8},
   keywords = {Constraints,Database Management,Graph rewriting,me,Update},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\98WY6YI9\\Chabin et al. - 2020 - Graph Rewriting Rules for RDF Database Evolution M.pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2020\\Chabin et al. - 2020 - Graph Rewriting Rules for RDF Database Evolution M.pdf}
 }
 
 @article{chabinGraphRewritingRules2021,
-  ids = {chabinGraphRewritingRules2021a,chabinGraphRewritingRules2021b},
   title = {Graph Rewriting Rules for {{RDF}} Database Evolution: Optimizing Side-Effect Processing},
   shorttitle = {Graph Rewriting Rules for {{RDF}} Database Evolution},
-  author = {Chabin, Jacques and Eichler, C{\'e}dric and Ferrari, Mirian Halfeld and Hiot, Nicolas},
+  author = {Chabin, Jacques and Eichler, C{\'e}dric and Halfed Ferrari, Mirian and Hiot, Nicolas},
   year = {2021},
   month = aug,
   journal = {International Journal of Web Information Systems},
@@ -190,35 +191,46 @@
 
 @techreport{chabinGraphRewritingSystem2020,
   type = {Research {{Report}}},
-  ids = {chabinGraphRewritingSystem2020b,rewritingRules},
   title = {Graph {{Rewriting System}} for {{Consistent Evolution}} of {{RDF}}/{{S}} Databases},
-  author = {Chabin, Jacques and Eichler, C{\'e}dric and {Halfeld-Ferrari}, Mirian and Hiot, Nicolas},
+  author = {Chabin, Jacques and Eichler, C{\'e}dric and Halfed Ferrari, Mirian and Hiot, Nicolas},
   year = {2020},
   institution = {{LIFO, Universit\'e d'Orl\'eans, INSA Centre Val de Loire}},
+  url = {https://hal.science/hal-02560325},
   urldate = {2023-08-03},
   abstract = {This paper investigates the use of graph rewriting rules to model updates-instance or schema changes-on RDF/S databases which are expected to satisfy RDF intrinsic semantic constraints. Such databases being modeled as knowledge graphs, we propose graph rewriting rules formalizing atomic updates whose application transforms the graph and necessarily preserves its consistency. If an update has to be applied when the application conditions of the corresponding rule do not hold, side-effects are generated: they engender new updates in order to ensure the rule applicability. Our system, SetUp, implements our updating approach for RDF/S data and offers a theoretical and applied framework for ensuring consistency when a RDF knowledge graph evolves.},
   copyright = {All rights reserved},
   keywords = {me},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\9GMCC3QH\\Chabin et al. - 2020 - Graph Rewriting System for Consistent Evolution of.pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2020\\Chabin et al. - 2020 - Graph Rewriting System for Consistent Evolution of.pdf}
 }
 
-@article{chabinIncrementalConsistentUpdating2023,
+@misc{chabinIncrementalConsistentUpdating2023,
   title = {Incremental {{Consistent Updating}} of {{Incomplete Databases}}},
   author = {Chabin, Jacques and Ferrari, Mirian Halfeld and Hiot, Nicolas and Laurent, Dominique},
   year = {2023},
-  journal = {arXiv preprint arXiv:2302.06246},
+  month = feb,
+  number = {arXiv:2302.06246},
   eprint = {2302.06246},
+  primaryclass = {cs},
+  publisher = {{arXiv}},
+  doi = {10.48550/arXiv.2302.06246},
+  urldate = {2023-08-07},
+  abstract = {Efficient consistency maintenance of incomplete and dynamic real-life databases is a quality label for further data analysis. In prior work, we tackled the generic problem of database updating in the presence of tuple generating constraints from a theoretical viewpoint. The current paper considers the usability of our approach by (a) introducing incremental update routines (instead of the previous from-scratch versions) and (b) removing the restriction that limits the contents of the database to fit in the main memory. In doing so, this paper offers new algorithms, proposes queries and data models inviting discussions on the representation of incompleteness on databases. We also propose implementations under a graph database model and the traditional relational database model. Our experiments show that computation times are similar globally but point to discrepancies in some steps.},
   archiveprefix = {arxiv},
-  keywords = {\#nosource,⛔ No DOI found,me}
+  keywords = {\#nosource,⛔ No DOI found,Computer Science - Databases,me},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2023\\Chabin et al. - 2023 - Incremental Consistent Updating of Incomplete Data.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\WNDR3UKH\\2302.html}
 }
 
 @techreport{chabinSpecificationSideeffectManagement2020,
-  type = {{{PhD Thesis}}},
+  type = {Research {{Report}}},
   title = {Specification of Side-Effect Management Techniques for Semantic Graph Sanitization},
-  author = {Chabin, Jacques and Eichler, C{\'e}dric and {Halfeld-Ferrari}, Mirian and Hiot, Nicolas},
+  author = {Chabin, Jacques and Eichler, C{\'e}dric and Halfed Ferrari, Mirian and Hiot, Nicolas},
   year = {2020},
+  number = {D6},
   institution = {{LIFO, Universit\'e d'Orl\'eans, INSA Centre Val de Loire}},
-  keywords = {\#nosource,me}
+  url = {https://hal.science/hal-02957974},
+  abstract = {The goal of the SENDUP project is to propose anonymisation mechanisms for data organized as graphs with an underlying semantic. Such mechanisms trig- gers updates on the database. This deliverable presents the update approach and side-effect management techniques defined in SENDUP. We focus on updates -instance or schema changes- on RDF/S databases which are expected to satisfy RDF intrinsic semantic constraints. We model RDF/S databases as type graphs and use graph rewriting rules to formalize updates. Such rules define both the effect of a graph transformation and its applicability conditions. We propose 19 rules modelling atomic updates and prove that their application necessarily preserves the database's consistency. If an update has to be applied when the application conditions of the corre- sponding rule do not hold, side-effects are generated: they engender new updates in order to ensure the rule applicability. These techniques are implemented in a dedicated software module S1 called SetUp. This deliverable also presents a preliminary experimental validation and evaluation of SetUp.},
+  keywords = {\#nosource,me},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2020\\Chabin et al. - 2020 - Specification of side-effect management techniques.pdf}
 }
 
 @unpublished{chabinUsingGraphGrammar2019,
@@ -230,7 +242,6 @@
 }
 
 @inproceedings{chandraOptimalImplementationConjunctive1977,
-  ids = {CM77,chandraOptimalImplementationConjunctive1977a},
   title = {Optimal Implementation of Conjunctive Queries in Relational Data Bases},
   booktitle = {Proceedings of the Ninth Annual {{ACM}} Symposium on {{Theory}} of Computing},
   author = {Chandra, Ashok K. and Merlin, Philip M.},
@@ -243,11 +254,23 @@
   doi = {10.1145/800105.803397},
   abstract = {We define the class of conjunctive queries in relational data bases, and the generalized join operator on relations. The generalized join plays an important part in answering conjunctive queries, and it can be implemented using matrix multiplication. It is shown that while answering conjunctive queries is NP complete (general queries are PSPACE complete), one can find an implementation that is within a constant of optimal. The main lemma used to show this is that each conjunctive query has a unique minimal equivalent query (much like minimal finite automata).},
   isbn = {978-1-4503-7409-5},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\JWTIK2V2\\Chandra et Merlin - 1977 - Optimal implementation of conjunctive queries in r.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\6D3X624J\\800105.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1977\\Chandra et Merlin - 1977 - Optimal implementation of conjunctive queries in r.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\6D3X624J\\800105.html}
+}
+
+@article{coddRelationalModelData1970,
+  title = {A Relational Model of Data for Large Shared Data Banks},
+  author = {Codd, Edgar F.},
+  year = {1970},
+  journal = {Communications of the ACM},
+  volume = {13},
+  number = {6},
+  pages = {377--387},
+  publisher = {{ACM New York, NY, USA}},
+  doi = {10.1145/362384.362685},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1970\\Codd - 1970 - A relational model of data for large shared data b.pdf}
 }
 
 @inproceedings{consoleCopingIncompleteData2020,
-  ids = {CGLT20},
   title = {Coping with {{Incomplete Data}}: {{Recent Advances}}},
   shorttitle = {Coping with {{Incomplete Data}}},
   booktitle = {Proceedings of the 39th {{ACM SIGMOD-SIGACT-SIGAI Symposium}} on {{Principles}} of {{Database Systems}}},
@@ -263,7 +286,7 @@
   abstract = {Handling incomplete data in a correct manner is a notoriously hard problem in databases. Theoretical approaches rely on the computationally hard notion of certain answers, while practical solutions rely on ad hoc query evaluation techniques based on three-valued logic. Can we find a middle ground, and produce correct answers efficiently? The paper surveys results of the last few years motivated by this question. We re-examine the notion of certainty itself, and show that it is much more varied than previously thought. We identify cases when certain answers can be computed efficiently and, short of that, provide deterministic and probabilistic approximation schemes for them. We look at the role of three-valued logic as used in SQL query evaluation, and discuss the correctness of the choice, as well as the necessity of such a logic for producing query answers.},
   isbn = {978-1-4503-7108-7},
   keywords = {\#nosource,approximate query answering,certain answers,incomplete information,many-valued logics,naive evaluation,relational databases},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\WHPR3IS7\\Console et al. - 2020 - Coping with Incomplete Data Recent Advances.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\KJF3RWAC\\3375395.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2020\\Console et al. - 2020 - Coping with Incomplete Data Recent Advances.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\KJF3RWAC\\3375395.html}
 }
 
 @article{cowieInformationExtraction2000,
@@ -274,11 +297,58 @@
   volume = {56},
   pages = {57},
   keywords = {⛔ No DOI found},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\4Y7VTHGY\\Cowie et Wilks - 2000 - Information extraction.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\43IETTRD\\books.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2000\\Cowie et Wilks - 2000 - Information extraction.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\43IETTRD\\books.html}
+}
+
+@article{degiacomoDealingInconsistenciesIncompleteness2009,
+  ids = {poggiDealingInconsistenciesIncompleteness},
+  title = {Dealing with Inconsistencies and Incompleteness in Database Update (Position Paper)},
+  author = {De Giacomo, Giuseppe and Lenzerini, Maurizio and Poggi, Antonella and Rosati, Riccardo},
+  year = {2009},
+  month = aug,
+  url = {https://www.academia.edu/61920314/Dealing\_with\_inconsistencies\_and\_incompleteness\_in\_database\_update\_position\_paper\_},
+  abstract = {Several areas of research and various application domains have been concerned in the last years with the problem of dealing with incomplete databases. Data integration as well as the Semantic Web are notable examples. Surprisingly, while many research efforts have been focusing on several interesting issues related to incomplete databases, as query answering, not much investigation have been done concerning updates. In this position paper we aim at highlighting some of the issues we are dealing with in our work on updates over incomplete databases. Instance level updates under constraints Our interest in this area stems mainly from the need to deal with updates in Description Logics based ontologies. Description logics (DLs) are logics for expressing the conceptual knowledge about a domain in terms of classes and associations between them [1]. Such logics are currently considered among the most promising formalisms for representing ontologies by the Semantic Web community [2]. DL-based ontologies are often used for accessing data stored in a data layer by means of query answering.},
+  keywords = {⛔ No DOI found},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2009\\De Giacomo et al. - 2009 - Dealing with inconsistencies and incompleteness in.pdf}
+}
+
+@inproceedings{degiacomoPracticalUpdateManagement2017,
+  title = {Practical {{Update Management}} in {{Ontology-Based Data Access}}},
+  booktitle = {The {{Semantic Web}} \textendash{} {{ISWC}} 2017},
+  author = {De Giacomo, Giuseppe and Lembo, Domenico and Oriol, Xavier and Savo, Domenico Fabio and Teniente, Ernest},
+  editor = {{d'Amato}, Claudia and Fernandez, Miriam and Tamma, Valentina and Lecue, Freddy and {Cudr{\'e}-Mauroux}, Philippe and Sequeda, Juan and Lange, Christoph and Heflin, Jeff},
+  year = {2017},
+  series = {Lecture {{Notes}} in {{Computer Science}}},
+  pages = {225--242},
+  publisher = {{Springer International Publishing}},
+  address = {{Cham}},
+  doi = {10.1007/978-3-319-68288-4_14},
+  abstract = {Ontology-based Data Access (OBDA) is gaining importance both scientifically and practically. However, little attention has been paid so far to the problem of updating OBDA systems. This is an essential issue if we want to be able to cope with modifications of data both at the ontology and at the source level, while maintaining the independence of the data sources. In this paper, we propose mechanisms to properly handle updates in this context. We show that updating data both at the ontology and source level is first-order rewritable. We also provide a practical implementation of such updating mechanisms based on non-recursive Datalog.},
+  isbn = {978-3-319-68288-4},
+  langid = {english},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2017\\De Giacomo et al. - 2017 - Practical Update Management in Ontology-Based Data.pdf}
+}
+
+@article{faginDataExchangeGetting2005,
+  title = {Data Exchange: Getting to the Core},
+  shorttitle = {Data Exchange},
+  author = {Fagin, Ronald and Kolaitis, Phokion G. and Popa, Lucian},
+  year = {2005},
+  month = mar,
+  journal = {ACM Transactions on Database Systems (TODS)},
+  volume = {30},
+  number = {1},
+  pages = {174--210},
+  publisher = {{ACM New York, NY, USA}},
+  issn = {0362-5915, 1557-4644},
+  doi = {10.1145/1061318.1061323},
+  urldate = {2023-08-08},
+  abstract = {Data exchange is the problem of taking data structured under a source schema and creating an instance of a target schema that reflects the source data as accurately as possible. Given a source instance, there may be many solutions to the data exchange problem, that is, many target instances that satisfy the constraints of the data exchange problem. In an earlier article, we identified a special class of solutions that we call universal. A universal solution has homomorphisms into every possible solution, and hence is a ``most general possible'' solution. Nonetheless, given a source instance, there may be many universal solutions. This naturally raises the question of whether there is a ``best'' universal solution, and hence a best solution for data exchange. We answer this question by considering the well-known notion of the core of a structure, a notion that was first studied in graph theory, and has also played a role in conjunctive-query processing. The core of a structure is the smallest substructure that is also a homomorphic image of the structure. All universal solutions have the same core (up to isomorphism); we show that this core is also a universal solution, and hence the smallest universal solution. The uniqueness of the core of a universal solution together with its minimality make the core an ideal solution for data exchange. We investigate the computational complexity of producing the core. Well-known results by Chandra and Merlin imply that, unless P = NP, there is no polynomial-time algorithm that, given a structure as input, returns the core of that structure as output. In contrast, in the context of data exchange, we identify natural and fairly broad conditions under which there are polynomial-time algorithms for computing the core of a universal solution. We also analyze the computational complexity of the following decision problem that underlies the computation of cores: given two graphs G and H, is H the core of G? Earlier results imply that this problem is both NP-hard and coNP-hard. Here, we pinpoint its exact complexity by establishing that it is a DP-complete problem. Finally, we show that the core is the best among all universal solutions for answering existential queries, and we propose an alternative semantics for answering queries in data exchange settings.},
+  langid = {english},
+  keywords = {Certain answers,chase,computational complexity,conjunctive queries,core,data exchange,data integration,dependencies,query answering,universal solutions}
 }
 
 @inproceedings{faginSemanticsUpdatesDatabases1983,
-  ids = {FUV83},
   title = {On the Semantics of Updates in Databases},
   booktitle = {Proceedings of the 2nd {{ACM SIGACT-SIGMOD Symposium}} on {{Principles}} of {{Database Systems}}},
   author = {Fagin, Ronald and Ullman, Jeffrey D. and Vardi, Moshe Y.},
@@ -292,33 +362,23 @@
   urldate = {2023-08-03},
   abstract = {We suggest here a methodology for updating databases with integrity constraints and rules for deriving inexphcit information. First we consider the problem of updating arbitrary theories by inserting into them or deleting from them arbitrary sentences. The solution involves two key ideas when replacing an old theory by a new one we wish to minimize the change in the theory, and when there are several theories that involve minimal changes, we look for a new theory that reflects that ambiguity. The methodology is also adapted to updating databases, where different facts can carry different priorities, and to updating user views.},
   isbn = {978-0-89791-097-2},
-  optbibsource = {dblp computer science bibliography, http://dblp.org},
-  optbiburl = {http://dblp.org/rec/bib/conf/pods/FaginUV83},
-  optcrossref = {DBLP:conf/pods/83},
-  optdoi = {10.1145/588058.588100},
-  opttimestamp = {Wed, 29 Mar 2017 16:45:25 +0200},
-  opturl = {http://doi.acm.org/10.1145/588058.588100},
   keywords = {\#nosource},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\7NHGP5T8\\Fagin et al. - 1983 - On the semantics of updates in databases.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\7SGAML5K\\588058.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1983\\Fagin et al. - 1983 - On the semantics of updates in databases.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\7SGAML5K\\588058.html}
 }
 
 @article{faginUpdatingLogicalDatabases1986,
-  ids = {FKUV86},
-  title = {Updating Logical Databases},
+  title = {Updating {{Logical Databases}}},
   author = {Fagin, Ronald and Kuper, Gabriel M. and Ullman, Jeffrey D. and Vardi, Moshe Y.},
   year = {1986},
   journal = {Advances in Computing Research},
   volume = {3},
   pages = {1--18},
-  optbibsource = {dblp computer science bibliography, http://dblp.org},
-  optbiburl = {http://dblp.org/rec/bib/journals/acr/FaginKUV86},
-  opttimestamp = {Thu, 03 Jan 2002 12:12:04 +0100},
+  doi = {10.21236/ada144937},
   keywords = {\#nosource,⛔ No DOI found},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\D2WVHHQN\\Fagin et al. - 1986 - Updating logical databases.pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1986\\Fagin et al. - 1986 - Updating logical databases.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\RS48PZZC\\ADA144937.html}
 }
 
 @article{fanDependenciesGraphs2019,
-  ids = {fanDependenciesGraphs2019a},
   title = {Dependencies for {{Graphs}}},
   author = {Fan, Wenfei and Lu, Ping},
   year = {2019},
@@ -350,11 +410,10 @@
   doi = {10.14778/2824032.2824056},
   urldate = {2023-08-03},
   abstract = {Keys for graphs aim to uniquely identify entities represented by vertices in a graph. We propose a class of keys that are recursively defined in terms of graph patterns, and are interpreted with subgraph isomorphism. Extending conventional keys for relations and XML, these keys find applications in object identification, knowledge fusion and social network reconciliation. As an application, we study the entity matching problem that, given a graph G and a set {$\Sigma$} of keys, is to find all pairs of entities (vertices) in G that are identified by keys in {$\Sigma$}. We show that the problem is intractable, and cannot be parallelized in logarithmic rounds. Nonetheless, we provide two parallel scalable algorithms for entity matching, in MapReduce and a vertex-centric asynchronous model. Using real-life and synthetic data, we experimentally verify the effectiveness and scalability of the algorithms.},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\BZI62NTT\\Fan et al. - 2015 - Keys for graphs.pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2015\\Fan et al. - 2015 - Keys for graphs.pdf}
 }
 
 @article{flourisFormalFoundationsRDF2013,
-  ids = {FKAC13},
   title = {Formal Foundations for {{RDF}}/{{S KB}} Evolution},
   author = {Flouris, Giorgos and Konstantinidis, George and Antoniou, Grigoris and Christophides, Vassilis},
   year = {2013},
@@ -367,16 +426,11 @@
   doi = {10.1007/s10115-012-0500-2},
   urldate = {2019-06-20},
   langid = {english},
-  optbibsource = {dblp computer science bibliography, http://dblp.org},
-  optbiburl = {http://dblp.uni-trier.de/rec/bib/journals/kais/FlourisKAC13},
-  optdoi = {10.1007/s10115-012-0500-2},
-  opttimestamp = {Tue, 09 Apr 2013 17:54:05 +0200},
-  opturl = {http://dx.doi.org/10.1007/s10115-012-0500-2},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\HGGAA4CM\\Flouris et al. - 2013 - Formal foundations for RDFS KB evolution.pdf}
+  annotation = {QID: Q58198067},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2013\\Flouris et al. - 2013 - Formal foundations for RDFS KB evolution.pdf}
 }
 
 @inproceedings{goasdoueEfficientQueryAnswering2013,
-  ids = {GMR13,goasdoueEfficientQueryAnswering2013a},
   title = {Efficient Query Answering against Dynamic {{RDF}} Databases},
   booktitle = {Proceedings of the 16th {{International Conference}} on {{Extending Database Technology}}},
   author = {Goasdou{\'e}, Fran{\c c}ois and Manolescu, Ioana and Roati{\c s}, Alexandra},
@@ -391,25 +445,24 @@
   abstract = {A promising method for efficiently querying RDF data consists of translating SPARQL queries into efficient RDBMS-style operations. However, answering SPARQL queries requires handling RDF reasoning, which must be implemented outside the relational engines that do not support it. We introduce the database (DB) fragment of RDF, going beyond the expressive power of previously studied RDF fragments. We devise novel sound and complete techniques for answering Basic Graph Pattern (BGP) queries within the DB fragment of RDF, exploring the two established approaches for handling RDF semantics, namely reformulation and saturation. In particular, we focus on handling database updates within each approach and propose a method for incrementally maintaining the saturation; updates raise specific difficulties due to the rich RDF semantics. Our techniques are designed to be deployed on top of any RDBMS(-style) engine, and we experimentally study their performance trade-offs.},
   isbn = {978-1-4503-1597-5},
   keywords = {query answering,RDF fragments,reasoning},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\RV9HFH5N\\Goasdoué et al. - 2013 - Efficient query answering against dynamic RDF data.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\ZEREIB62\\2452376.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2013\\Goasdoué et al. - 2013 - Efficient query answering against dynamic RDF data.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\ZEREIB62\\2452376.html}
 }
 
 @book{grahneProblemIncompleteInformation1991,
-  ids = {Gra91},
-  title = {The Problem of Incomplete Information in Relational Databases},
+  title = {The {{Problem}} of {{Incomplete Information}} in {{Relational Databases}}},
   author = {Grahne, G{\"o}sta},
   year = {1991},
-  series = {Lecture Notes in Computer Science},
+  month = nov,
+  series = {Lecture {{Notes}} in {{Computer Science}}},
   volume = {554},
-  publisher = {{Springer}},
-  optbiburl = {http://dblp.org/rec/bib/books/sp/Grahne91},
-  optdoi = {10.1007/3-540-54919-6},
-  optisbn = {3-540-54919-6},
-  optoptbibsource = {dblp computer science bibliography, http://dblp.org},
-  opttimestamp = {Tue, 16 May 2017 14:01:46 +0200},
-  opturl = {https://doi.org/10.1007/3-540-54919-6},
-  keywords = {\#nosource},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\R23IRBKN\\3-540-54919-6_10.html}
+  publisher = {{Springer Science \& Business Media}},
+  address = {{Berlin, Heidelberg}},
+  doi = {10.1007/3-540-54919-6},
+  abstract = {In a relational database the information is recorded as rows in tables. However, in many practical situations the available information is incomplete and the values for some columns are missing. Yet few existing database management systems allow the user to enter null values in the database. This monograph analyses the problems raised by allowing null values in relational databases. The analysis covers semantical, syntactical, and computational aspects. Algorithms for query evaluation, dependency enforcement and updates in the presence of null values are also given. The analysis of the computational complexity of the algorithms suggests that from a practical point of view the database should be stored as Horn tables, which are generalizations of ordinary relations, allowing null values and Horn clause-like restrictions on these null values. Horn tables efficiently support a large class of queries, dependencies and updates.},
+  isbn = {978-3-540-54919-2 978-3-540-46507-2},
+  langid = {english},
+  keywords = {\#nosource,⛔ No DOI found,Computers / Artificial Intelligence / General,Computers / Database Administration \& Management,Computers / Information Technology,Computers / Information Theory,Computers / Programming / Algorithms},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1991\\Grahne - 1991 - The Problem of Incomplete Information in Relationa.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\R23IRBKN\\3-540-54919-6_10.html}
 }
 
 @inproceedings{grishmanInformationExtractionTechniques1997,
@@ -422,16 +475,31 @@
   pages = {10--27},
   publisher = {{Springer}},
   address = {{Berlin, Heidelberg}},
-  doi = {10/c998rq},
+  doi = {10.1007/3-540-63438-x_2},
   isbn = {978-3-540-63438-6 978-3-540-69548-6},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\3TCL6VGD\\Grishman - 1997 - Information extraction Techniques and challenges.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\PYHSUCCK\\10.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1997\\Grishman - 1997 - Information extraction Techniques and challenges.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\PYHSUCCK\\10.html}
 }
 
-@inproceedings{halfeld-ferrariRDFUpdatesConstraints2017,
-  ids = {HHU17,halfeld-ferrariRDFUpdatesConstraints2017a},
+@article{guagliardoCorrectnessSQLQueries2017,
+  title = {Correctness of {{SQL Queries}} on {{Databases}} with {{Nulls}}},
+  author = {Guagliardo, Paolo and Libkin, Leonid},
+  year = {2017},
+  month = oct,
+  journal = {ACM SIGMOD Record},
+  volume = {46},
+  number = {3},
+  pages = {5--16},
+  issn = {0163-5808},
+  doi = {10.1145/3156655.3156657},
+  urldate = {2023-08-08},
+  abstract = {Multiple issues with SQL's handling of nulls have been well documented. Having efficiency as its main goal, SQL disregards the standard notion of correctness on incomplete databases -- certain answers -- due to its high complexity. As a result, the evaluation of SQL queries on databases with nulls may produce answers that are just plain wrong. However, SQL evaluation can be modified, at least for relational algebra queries, to approximate certain answers, i.e., return only correct answers. We examine recently proposed approximation schemes for certain answers and analyze their complexity, both theoretical bounds and real-life behavior},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2017\\Guagliardo et Libkin - 2017 - Correctness of SQL Queries on Databases with Nulls.pdf}
+}
+
+@inproceedings{halfedferrariRDFUpdatesConstraints2017,
   title = {{{RDF Updates}} with {{Constraints}}},
   booktitle = {Knowledge {{Engineering}} and {{Semantic Web}} - 8th {{International Conference}}, {{KESW}}, {{Szczecin}}, {{Poland}}, {{Proceedings}}},
-  author = {{Halfeld-Ferrari}, Mirian and Hara, Carmem S. and Uber, Flavio R.},
+  author = {Halfed Ferrari, Mirian and Hara, Carmem S. and Uber, Flavio R.},
   editor = {R{\'o}{\.z}ewski, Przemys{\l}aw and Lange, Christoph},
   year = {2017},
   series = {Communications in {{Computer}} and {{Information Science}}},
@@ -439,18 +507,30 @@
   pages = {229--245},
   publisher = {{Springer International Publishing}},
   address = {{Szczecin, Poland}},
-  doi = {10/gf4bcm},
+  doi = {10.1007/978-3-319-69548-8_16},
   abstract = {This paper deals with the problem of updating an RDF database, expected to satisfy user-defined constraints as well as RDF intrinsic semantic constraints. As updates may violate these constraints, side-effects are generated in order to preserve consistency. We investigate the use of nulls (blank nodes) as placeholders for unknown required data as a technique to provide this consistency and to reduce the number of side-effects. Experimental results validate our goals.},
   isbn = {978-3-319-69547-1 978-3-319-69548-8},
   langid = {english},
-  optbibsource = {dblp computer science bibliography, https://dblp.org},
-  optbiburl = {https://dblp.org/rec/bib/conf/kesw/FerrariHU17},
-  optcrossref = {DBLP:conf/kesw/2017},
-  optdoi = {10.1007/978-3-319-69548-8{$_1$}6},
-  opttimestamp = {Tue, 09 Jan 2018 07:58:14 +0100},
-  opturl = {https://doi.org/10.1007/978-3-319-69548-8{$_1$}6},
   keywords = {Constraints,RDF,RDFS,Updates},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\U89ZHHD4\\Halfeld-Ferrari et al. - 2017 - RDF Updates with Constraints.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\KT9SZGTE\\978-3-319-69548-8_16.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2017\\Halfed Ferrari et al. - 2017 - RDF Updates with Constraints.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\KT9SZGTE\\978-3-319-69548-8_16.html}
+}
+
+@article{halfeldferrariUpdateRulesDatalog1998,
+  title = {Update {{Rules}} in {{Datalog Programs}}},
+  author = {Halfeld Ferrari, Mirian and Laurent, Dominique and Spyratos, Nicolas},
+  year = {1998},
+  month = dec,
+  journal = {Journal of Logic and Computation},
+  volume = {8},
+  number = {6},
+  pages = {745--775},
+  publisher = {{OUP}},
+  issn = {0955-792X, 1465-363X},
+  doi = {10.1093/logcom/8.6.745},
+  abstract = {We propose a deductive database model containing two kinds of rules: update rules of the form L0{$\leftarrow$}L1, where L0 and L1 are literals, and query rules of the form of normal logic program rules. A basic feature of our approach is that new knowledge inputs are always assimilated. Moreover, updates are always deterministic and they preserve database consistency.We consider that update rules have higher priority than query rules, i.e., update rules may generate exceptions to query-driven derivations. We introduce a semantics framework for database update and query answering, based on the well-founded semantics. We also suggest an alternative approach based on extended logic programs and we show that our database model can be defined in terms of non-monotonic formalisms.},
+  langid = {english},
+  keywords = {\#nosource,Datalog,deductive database,update},
+  file = {C\:\\Users\\nhiot\\Zotero\\storage\\7CB956IH\\8142245.html;C\:\\Users\\nhiot\\Zotero\\storage\\B72S7SY9\\8142245.html}
 }
 
 @inproceedings{hiotDOINGDEFTUtilisation2021,
@@ -463,6 +543,7 @@
   pages = {41--53},
   publisher = {{ATALA}},
   address = {{Lille, France}},
+  url = {https://hal.archives-ouvertes.fr/hal-03265924},
   abstract = {Nous pr\'esentons dans cet article notre participation \`a la t\^ache 1 de la campagne d'\'evaluation francophone DEFT 2021, sur l'identification du profil clinique du patient. Nous proposons une m\'ethode \'evolutive et efficace en temps et en ressources pour la classification de documents m\'edicaux pouvant \^etre facilement adapt\'ee \`a d'autres domaines de recherche. Notre syst\`eme a obtenu les meilleures performances sur cette t\^ache avec une F-mesure de 0,814.},
   copyright = {All rights reserved},
   hal_id = {hal-03265924},
@@ -470,7 +551,7 @@
   langid = {french},
   pdf = {https://hal.archives-ouvertes.fr/hal-03265924/file/75.pdf},
   keywords = {⛔ No DOI found,cas clinique,classification.,lexique,me,transducteur fini},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\F3TVPRP8\\Hiot et al. - 2021 - DOING@DEFT  utilisation de lexiques pour une clas.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\FHMF4CQI\\hal-03265924.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2021\\Hiot et al. - 2021 - DOING@DEFT  utilisation de lexiques pour une clas.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\FHMF4CQI\\hal-03265924.html}
 }
 
 @misc{hiotUpdateChase2023,
@@ -478,6 +559,7 @@
   author = {Hiot, Nicolas and {Moret-Bailly}, Lucas and Chabin, Jacques},
   year = {2023},
   month = jan,
+  url = {https://gitlab.com/jacques-chabin/UpdateChase},
   urldate = {2023-07-21},
   abstract = {Impl\'ementation et benchmarks des algorithmes incr\'ementaux pour la mise \`a jour coh\'erente d'une base de donn\'ees graphe},
   keywords = {me},
@@ -485,7 +567,6 @@
 }
 
 @article{imielinskiIncompleteInformationRelational1984,
-  ids = {imielinskiIncompleteInformationRelational1984a},
   title = {Incomplete Information in Relational Databases},
   author = {Imielinski, Tomasz and Lipski Jr., Witold},
   year = {1984},
@@ -498,11 +579,11 @@
   issn = {0004-5411},
   doi = {10.1145/1634.1886},
   keywords = {\#nosource},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\3MBFN4IU\\Imielinski et Lipski Jr. - 1984 - Incomplete information in relational databases.pdf}
+  annotation = {QID: Q56698644},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1984\\Imielinski et Lipski Jr. - 1984 - Incomplete information in relational databases.pdf}
 }
 
 @inproceedings{libkinIncompleteDataWhat2014,
-  ids = {libkinIncompleteDataWhat2014a},
   title = {Incomplete Data: What Went Wrong, and How to Fix It},
   shorttitle = {Incomplete Data},
   booktitle = {Proceedings of the 33rd {{ACM SIGMOD-SIGACT-SIGART}} Symposium on {{Principles}} of Database Systems},
@@ -518,21 +599,39 @@
   abstract = {Incomplete data is ubiquitous: the more data we accumulate and the more widespread tools for integrating and exchanging data become, the more instances of incompleteness we have. And yet the subject is poorly handled by both practice and theory. Many queries for which students get full marks in their undergraduate courses will not work correctly in the presence of incomplete data, but these ways of evaluating queries are cast in stone -- SQL standard. We have many theoretical results on handling incomplete data but they are, by and large, about showing high complexity bounds, and thus are often dismissed by practitioners. Even worse, we have a basic theoretical notion of what it means to answer queries over incomplete data, and yet this is not at all what practical systems do. Is there a way out of this predicament? Can we have a theory of incompleteness that will appeal to theoreticians and practitioners alike, by explaining incompleteness and being at the same time implementable and useful for applications? After giving a critique of both the practice and the theory of handling incompleteness in databases, the paper outlines a possible way out of this crisis. The key idea is to combine three hitherto used approaches to incompleteness: one based on certain answers and representation systems, one based on viewing incomplete databases as logical theories, and one based on orderings expressing relative value of information.},
   isbn = {978-1-4503-2375-8},
   keywords = {incomplete information,query evaluation},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\RBSKIYBY\\Libkin - 2014 - Incomplete data what went wrong, and how to fix i.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\VN5CSSYT\\2594538.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2014\\Libkin - 2014 - Incomplete data what went wrong, and how to fix i.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\VN5CSSYT\\2594538.html}
+}
+
+@article{libkinSQLThreeValuedLogic2016,
+  title = {{{SQL}}'s {{Three-Valued Logic}} and {{Certain Answers}}},
+  author = {Libkin, Leonid},
+  year = {2016},
+  journal = {ACM Transactions on Database Systems (TODS)},
+  volume = {41},
+  number = {1},
+  pages = {1--28},
+  publisher = {{ACM New York, NY, USA}},
+  issn = {0362-5915},
+  doi = {10.1145/2877206},
+  abstract = {The goal of the article is to bridge the difference between theoretical and practical approaches to answering queries over databases with nulls. Theoretical research has long ago identified the notion of correctness of query answering over incomplete data: one needs to find certain answers, which are true regardless of how incomplete information is interpreted. This serves as the notion of correctness of query answering, but carries a huge complexity tag. In practice, on the other hand, query answering must be very efficient, and to achieve this, SQL uses three-valued logic for evaluating queries on databases with nulls. Due to the complexity mismatch, the two approaches cannot coincide, but perhaps they are related in some way. For instance, does SQL always produce answers we can be certain about? This is not so: SQL's and certain answers semantics could be totally unrelated. We show, however, that a slight modification of the three-valued semantics for relational calculus queries can provide the required certainty guarantees. The key point of the new scheme is to fully utilize the three-valued semantics, and classify answers not into certain or noncertain, as was done before, but rather into certainly true, certainly false, or unknown. This yields relatively small changes to the evaluation procedure, which we consider at the level of both declarative (relational calculus) and procedural (relational algebra) queries. These new evaluation procedures give us certainty guarantees even for queries returning tuples with null values.},
+  keywords = {❓ Multiple DOI,certain answers,incomplete information,Null values,query evaluation,three-valued logic},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2016\\Libkin - 2016 - SQL’s Three-Valued Logic and Certain Answers.pdf}
 }
 
 @phdthesis{mahfoudhAdaptationOntologiesAvec2015,
-  ids = {mahfoudhAdaptationOntologiesAvec2015a},
+  ids = {Ma15},
   title = {{Adaptation d'ontologies avec les grammaires de graphes typ\'es : \'evolution et fusion}},
   shorttitle = {{Adaptation d'ontologies avec les grammaires de graphes typ\'es}},
   author = {Mahfoudh, Mariem},
   year = {2015},
   month = may,
+  url = {https://tel.archives-ouvertes.fr/tel-01528579/document},
   urldate = {2019-03-07},
   abstract = {\'Etant une repr\'esentation formelle et explicite des connaissances d'un domaine, les ontologies font r\'eguli\`erement l'objet de nombreux changements et ont ainsi besoin d'\^etre constamment adapt\'ees pour notamment pouvoir \^etre r\'eutilis\'ees et r\'epondre aux nouveaux besoins. Leur r\'eutilisation peut prendre diff\'erentes formes (\'evolution, alignement, fusion, etc.), et pr\'esente plusieurs verrous scientifiques. L'un des plus importants est la pr\'eservation de la consistance de l'ontologie lors de son changement. Afin d'y r\'epondre, nous nous int\'eressons dans cette th\`ese \`a \'etudier les changements ontologiques et proposons un cadre formel capable de faire \'evoluer et de fusionner des ontologies sans affecter leur consistance. Premi\`erement, nous proposons TGGOnto (Typed Graph Grammars for Ontologies), un nouveau formalisme permettant la repr\'esentation des ontologies et leurs changements par les grammaires de graphes typ\'es. Un couplage entre ces deux formalismes est d\'efini afin de profiter des concepts des grammaires de graphes, notamment les NAC (Negative Application Conditions), pour la pr\'eservation de la consistance de l'ontologie adapt\'ee.Deuxi\`emement, nous proposons EvOGG (Evolving Ontologies with Graph Grammars), une approche d'\'evolution d'ontologies qui se base sur le formalisme GGTOnto et traite les inconsistances d'une mani\`ere a priori. Nous nous int\'eressons aux ontologies OWL et nous traitons \`a la fois : (1) l'enrichissement d'ontologies en \'etudiant leur niveau structurel et (2) le peuplement d'ontologies en \'etudiant les changements qui affectent les individus et leurs assertions. L'approche EvOGG d\'efinit des changements ontologiques de diff\'erents types (\'el\'ementaires, compos\'ees et complexes) et assure leur impl\'ementation par l'approche alg\'ebrique de transformation de graphes, SPO (Simple PushOut). Troisi\`emement, nous proposons GROM (Graph Rewriting for Ontology Merging), une approche de fusion d'ontologies capable d'\'eviter les redondances de donn\'ees et de diminuer les conflits dans le r\'esultat de fusion. L'approche propos\'ee se d\'ecompose en trois \'etapes : (1) la recherche de similarit\'e entre concepts en se basant sur des techniques syntaxiques, structurelles et s\'emantiques ; (2) la fusion d'ontologies par l'approche alg\'ebrique SPO ; (3) l'adaptation de l'ontologie globale r\'esultante par le biais des r\`egles de r\'e\'ecriture de graphes.Afin de valider les travaux men\'es dans cette th\`ese, nous avons d\'evelopp\'e plusieurs outils open source bas\'es sur l'outil AGG (Attributed Graph Grammar). Ces outils ont \'et\'e appliqu\'es sur un ensemble d'ontologies, essentiellement sur celles d\'evelopp\'ees dans le cadre du projet europ\'een CCAlps (Creatives Companies in Alpine Space) qui a financ\'e les travaux de cette th\`ese.},
   langid = {french},
   school = {Universit\'e de Haute Alsace-Mulhouse},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\58TKAI5X\\Mahfoudh - 2015 - Adaptation d'ontologies avec les grammaires de gra.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\ZHAL55QA\\tel-01528579.html}
+  keywords = {\#nosource},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2015\\Mahfoudh - 2015 - Adaptation d'ontologies avec les grammaires de gra.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\ZHAL55QA\\tel-01528579.html}
 }
 
 @article{mahfoudhAlgebraicGraphTransformations2015,
@@ -544,11 +643,30 @@
   pages = {212--226},
   issn = {0950-7051},
   doi = {10.1016/j.knosys.2014.10.007},
-  keywords = {\#nosource,AGG,Algebraic graph transformations,Consistency,Ontology evolution,Typed Graph Grammars}
+  keywords = {\#nosource,AGG,Algebraic graph transformations,Consistency,Ontology evolution,Typed Graph Grammars},
+  annotation = {QID: Q114826529},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\Knowledge-Based Systems2015\\Mahfoudh et al. - 2015 - Algebraic graph transformations for formalizing on.pdf}
+}
+
+@article{maierTestingImplicationsData1979,
+  title = {Testing Implications of Data Dependencies},
+  author = {Maier, David and Mendelzon, Alberto O. and Sagiv, Yehoshua},
+  year = {1979},
+  month = dec,
+  journal = {ACM Transactions on Database Systems (TODS)},
+  volume = {4},
+  number = {4},
+  pages = {455--469},
+  publisher = {{ACM New York, NY, USA}},
+  issn = {0362-5915},
+  doi = {10.1145/320107.320115},
+  urldate = {2023-08-08},
+  abstract = {Presented is a computation method\textemdash the chase\textemdash for testing implication of data dependencies by a set of data dependencies. The chase operates on tableaux similar to those of Aho, Sagiv, and Ullman. The chase includes previous tableau computation methods as special cases. By interpreting tableaux alternately as mappings or as templates for relations, it is possible to test implication of join dependencies (including multivalued dependencies) and functional dependencies by a set of dependencies.},
+  keywords = {chase,data dependencies,functional dependencies,join dependencies,multivalued dependencies,relational databases,tableaux},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1979\\Maier et al. - 1979 - Testing implications of data dependencies.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\5DK3BYZS\\320107.html}
 }
 
 @inproceedings{maillotConsistencyEvaluationRDF2014,
-  ids = {maillotConsistencyEvaluationRDF2014a,maillotConsistencyEvaluationRDF2014b},
   title = {Consistency {{Evaluation}} of {{RDF Data}}: {{How Data}} and {{Updates}} Are {{Relevant}}},
   shorttitle = {Consistency {{Evaluation}} of {{RDF Data}}},
   booktitle = {Tenth International Conference on Signal-Image Technology and Internet-Based Systems, {{SITIS}} 2014, Marrakech, Morocco, November 23-27, 2014},
@@ -559,38 +677,50 @@
   publisher = {{IEEE}},
   doi = {10.1109/SITIS.2014.39},
   abstract = {Trust and quality maintenance have always been problematic in the Semantic Web RDF bases. Numerous propositions to address these problems of data integration have been made, either based on ontologies or on additional metadata. However ontologies suffer from a adaptation speed slower than the data evolution speed and metadata requires ad-hoc manipulations of data by addition of extra-data. In this article we propose an original approach, based exclusively on data from the base, to evaluate the consistency of a candidate update to a RDF base, and finally to know if this update is relevant to the base. Our approach is inspired by case-based reasoning and uses similarity evaluation and query relaxation methods to compare a candidate update to the data from the base. If the modifications of a candidate update make the target part of the base more similar to other part (s) of the base, then this candidate update is considered consistent with the base and can be applied.},
-  optbibsource = {dblp computer science bibliography, https://dblp.org},
-  optbiburl = {https://dblp.org/rec/bib/conf/sitis/MaillotRGL14},
-  optcrossref = {DBLP:conf/sitis/2014},
-  optdoi = {10.1109/SITIS.2014.39},
-  opttimestamp = {Wed, 16 Oct 2019 14:14:55 +0200},
-  opturl = {https://doi.org/10.1109/SITIS.2014.39},
   keywords = {Case-based reasoning,Cognition,Consistency,Context,Data Integration,Databases,Ontologies,Ontology,Resource description framework,Semantic Web,Similarity,Weight measurement},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\SFABESXG\\Maillot et al. - 2014 - Consistency Evaluation of RDF Data How Data and U.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\7463EG8S\\7081546.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2014\\Maillot et al. - 2014 - Consistency Evaluation of RDF Data How Data and U.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\7463EG8S\\7081546.html}
 }
 
 @inproceedings{minardDOINGDEFTCascade2020,
   title = {{DOING@DEFT : cascade de CRF pour l'annotation d'entit\'es cliniques imbriqu\'ees}},
   shorttitle = {{DOING@DEFT}},
-  booktitle = {{6e conf\'erence conjointe Journ\'ees d'\'Etudes sur la Parole (JEP, 33e \'edition), Traitement Automatique des Langues Naturelles (TALN, 27e \'edition), Rencontre des \'Etudiants Chercheurs en Informatique pour le Traitement Automatique des Langues (R\'ECITAL, 22e \'edition). Atelier D\'Efi Fouille de Textes}},
+  booktitle = {{Actes de la 6e conf\'erence conjointe Journ\'ees d'\'Etudes sur la Parole (JEP, 33e \'edition), Traitement Automatique des Langues Naturelles (TALN, 27e \'edition), Rencontre des \'Etudiants Chercheurs en Informatique pour le Traitement Automatique des Langues (R\'ECITAL, 22e \'edition). Atelier D\'Efi Fouille de Textes}},
   author = {Minard, Anne-Lyse and Roques, Andr{\'e}ane and Hiot, Nicolas and Halfeld Ferrari Alves, Mirian and Savary, Agata},
-  editor = {Cardon, R{\'e}mi and Grabar, Natalia and Grouin, Cyril and Hamon, Thierry},
   year = {2020},
+  month = jun,
   pages = {66--78},
-  publisher = {{ATALA; AFCP}},
+  publisher = {{ATALA et AFCP}},
   address = {{Nancy, France}},
-  abstract = {Cet article pr\'esente le syst\`eme d\'evelopp\'e par l'\'equipe DOING pour la campagne d'\'evaluation DEFT 2020 portant sur la similarit\'e s\'emantique et l'extraction d'information fine. L'\'equipe a particip\'e uniquement \`a la t\^ache 3 : "extraction d'information". Nous avons utilis\'e une cascade de CRF pour annoter les diff\'erentes informations \`a rep\'erer. Nous nous sommes concentr\'es sur la question de l'imbrication des entit\'es et de la pertinence d'un type d'entit\'e pour apprendre \`a reconna\^itre un autre. Nous avons \'egalement test\'e l'utilisation d'une ressource externe, MedDRA, pour am\'eliorer les performances du syst\`eme et d'un pipeline plus complexe mais ne g\'erant pas l'imbrication des entit\'es. Nous avons soumis 3 runs et nous obtenons en moyenne sur toutes les classes des F-mesures de 0,64, 0,65 et 0,61.},
+  url = {https://hal.archives-ouvertes.fr/hal-02784743},
+  urldate = {2023-08-07},
+  abstract = {Cet article pr\'esente le syst\`eme d\'evelopp\'e par l'\'equipe DOING pour la campagne d'\'evaluation DEFT 2020 portant sur la similarit\'e s\'emantique et l'extraction d'information fine. L'\'equipe a particip\'e uniquement \`a la t\^ache 3 : ``extraction d'information''. Nous avons utilis\'e une cascade de CRF pour annoter les diff\'erentes informations \`a rep\'erer. Nous nous sommes concentr\'es sur la question de l'imbrication des entit\'es et de la pertinence d'un type d'entit\'e pour apprendre \`a reconna\^itre un autre. Nous avons \'egalement test\'e l'utilisation d'une ressource externe, MedDRA, pour am\'eliorer les performances du syst\`eme et d'un pipeline plus complexe mais ne g\'erant pas l'imbrication des entit\'es. Nous avons soumis 3 runs et nous obtenons en moyenne sur toutes les classes des F-mesures de 0,64, 0,65 et 0,61.},
   copyright = {All rights reserved},
   hal_id = {hal-02784743},
   hal_version = {v3},
   langid = {french},
   pdf = {https://hal.archives-ouvertes.fr/hal-02784743v3/file/212.pdf},
   keywords = {⛔ No DOI found,apprentissage automatique,cas cliniques,CRF.,entit\'es cliniques,entit\'es imbriqu\'ees,extraction d'information fine,me},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\8PM6XVUJ\\Minard et al. - 2020 - DOING@DEFT  cascade de CRF pour l'annotation d'en.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\DY6IJYRR\\hal-02784743.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2020\\Minard et al. - 2020 - DOING@DEFT  cascade de CRF pour l'annotation d'en.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\DY6IJYRR\\hal-02784743.html}
+}
+
+@article{nikolaouQueryingIncompleteInformation2016,
+  title = {Querying Incomplete Information in {{RDF}} with {{SPARQL}}},
+  author = {Nikolaou, Charalampos and Koubarakis, Manolis},
+  year = {2016},
+  month = aug,
+  journal = {Artificial Intelligence},
+  volume = {237},
+  pages = {138--171},
+  issn = {0004-3702},
+  doi = {10.1016/j.artint.2016.04.005},
+  urldate = {2023-08-08},
+  abstract = {Incomplete information has been studied in-depth in relational databases and knowledge representation. In the context of the Web, incomplete information issues have been studied in detail for XML, but very few papers exist that do the same for RDF. In this paper we make the first general proposal for extending RDF with the ability to represent property values that exist but are unknown or partially known using constraints. Following ideas from incomplete information literature, we develop a semantics for this extension of RDF, called RDFi, and study query evaluation for SPARQL. We transfer the concept of representation systems from incomplete information in relational databases to the case of RDFi and identify two very important fragments of SPARQL that can be used to define a representation system for RDFi. The first corresponds to the monotone fragment of graph patterns that uses only the operators AND, UNION, and FILTER. The second corresponds to the well-designed graph patterns, that is, a fragment that uses only operators AND, FILTER, and OPT, and enjoys interesting properties that make query evaluation efficient. We prove that each of the two fragments can be used to define a representation system for CONSTRUCT queries without blank nodes in their templates. We also define the fundamental concept of certain answers to SPARQL queries over RDFi databases and present an algorithm for its computation. Then, we present complexity results for computing certain answers by considering equality, temporal, and spatial constraint languages and the class of CONSTRUCT queries of our representation systems. Finally, we demonstrate the usefulness of RDFi in geospatial Semantic Web applications by giving a number of examples and comparing the modeling capabilities of RDFi with related formalisms found in the literature.},
+  langid = {english},
+  keywords = {Incomplete information,RDF,Semantic Web,SPARQL},
+  file = {C\:\\Users\\nhiot\\Zotero\\storage\\4JHSGVQ9\\Nikolaou et Koubarakis - 2016 - Querying incomplete information in RDF with SPARQL.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\N8CIQSEH\\S0004370216300467.html}
 }
 
 @inproceedings{pokornyGraphDatabasesTheir2015,
-  ids = {pokornyGraphDatabasesTheir2015a},
   title = {Graph {{Databases}}: {{Their Power}} and {{Limitations}}},
   shorttitle = {Graph {{Databases}}},
   booktitle = {Computer {{Information Systems}} and {{Industrial Management}}: 14th {{IFIP TC}} 8 {{International Conference}}, {{CISIM}} 2015, {{Warsaw}}, {{Poland}}, {{September}} 24-26, 2015, {{Proceedings}} 14},
@@ -606,7 +736,7 @@
   isbn = {978-3-319-24369-6},
   langid = {english},
   keywords = {Big graphs,Graph database,Graph querying,Graph scalability,Graph storage},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\4PLH92NN\\Pokorný - 2015 - Graph Databases Their Power and Limitations.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\Z5XWGHCZ\\978-3-319-24369-6_5.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2015\\Pokorný - 2015 - Graph Databases Their Power and Limitations.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\Z5XWGHCZ\\978-3-319-24369-6_5.html}
 }
 
 @inproceedings{raadDetectionLiensIdentite2017,
@@ -619,14 +749,45 @@
   series = {Actes {{IC}} 2017 28es {{Journ\'ees}} Francophones d'{{Ing\'enierie}} Des {{Connaissances}}},
   pages = {56--67},
   address = {{Caen, France}},
+  url = {https://hal.archives-ouvertes.fr/hal-01570053},
   urldate = {2019-03-04},
   abstract = {De nombreuses applications du Web de donn\'ees exploitent des liens d'identit\'es d\'eclar\'es \`a l'aide du constructeur owl :sameAs. Cependant, diff\'erentes \'etudes ont montr\'e qu'une utilisation abusive de ces liens peut conduire \`a des inf\'erences erron\'ees ou contradictoires. Dans ce papier nous proposons de calculer des liens d'identit\'es contextuels qui permettent d'expliciter les contextes dans lesquels ces liens sont valides. La notion de contexte que nous proposons est repr\'esent\'ee en se basant sur l'ontologie de domaine dans laquelle les instances sont repr\'esent\'ees. Nous avons exp\'eriment\'e cette approche dans le domaine des donn\'ees scientifiques o\`u les \'el\'ements d\'ecrivant les exp\'eriences partagent rarement un lien d'identit\'e tel que d\'efini par owl :sameAs.},
   keywords = {Bases de connaissances,Contextes,Enrichissement,Liage de donn\'ees,Ontologies},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\2TW56Q92\\Raad et al. - 2017 - Détection de liens d'identité contextuels dans une.pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2017\\Raad et al. - 2017 - Détection de liens d'identité contextuels dans une.pdf}
+}
+
+@article{raadDetectionLiensIdentite2018,
+  title = {D\'etection de Liens d'identit\'e Erron\'es En Utilisant La D\'etection de Communaut\'es Dans Les Graphes d'identit\'e},
+  author = {Raad, Joe and BECK, Wouter and Pernelle, Nathalie and Sais, Fatiha and Harmelen, Frank},
+  year = {2018},
+  month = aug,
+  journal = {Ing\'enierie des syst\`emes d'information},
+  volume = {23},
+  number = {3-4},
+  pages = {61--88},
+  doi = {10.3166/isi.23.3-4.61-88},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2018\\Raad et al. - 2018 - Détection de liens d’identité erronés en utilisant2.pdf}
+}
+
+@incollection{reiterLogicalReconstructionRelational1989,
+  title = {Towards a {{Logical Reconstruction}} of {{Relational Database Theory}}},
+  booktitle = {Readings in {{Artificial Intelligence}} and {{Databases}}},
+  author = {Reiter, Raymond},
+  editor = {Mylopolous, John and Brodie, Michael},
+  year = {1989},
+  month = jan,
+  pages = {301--327},
+  publisher = {{Elsevier}},
+  address = {{San Francisco (CA)}},
+  doi = {10.1016/B978-0-934613-53-8.50025-X},
+  urldate = {2023-08-07},
+  abstract = {Insofar as database theory can be said to owe a debt to logic, the currency on loan is model theoretic in the sense that a database can be viewed as a particular kind of first order interpretation, and query evaluation is a process of truth Junctional evaluation of first order formulae with respect to this interpretation. It is this model theoretic paradigm which leads, for example, to many valued propositional logies for databases with null values. In this chapter I argue that a proof theoretic view of databases is possible, and indeed much more fruitful. Specifically, I show how relational databases can be seen as special theories of first order logic, namely theories incorporating the following assumptions:1.The domain closure assumption. The individuals occurring in the database are all and only the existing individuals.2.The unique name assumption. Individuals with distinct names are distinct.3.The closed world assumption. The only possible instances of a relation are those implied by the database. It will follow that a proof theoretic paradigm for relational databases provides a correct treatment of:1.Query evaluation for databases that have incomplete information, including null values.2.Integrity constraints and their enforcement.3.Conceptual modelling and the extension of the relational model to incorporate more real world semantics.},
+  isbn = {978-0-934613-53-8},
+  langid = {english},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1989\\Reiter - 1989 - Towards a Logical Reconstruction of Relational Dat.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\4VPCJ9R4\\B978093461353850025X.html}
 }
 
 @article{reiterSoundSometimesComplete1986,
-  ids = {reiterSoundSometimesComplete1986a},
   title = {A Sound and Sometimes Complete Query Evaluation Algorithm for Relational Databases with Null Values},
   author = {Reiter, Raymond},
   year = {1986},
@@ -640,49 +801,63 @@
   doi = {10.1145/5383.5388},
   abstract = {A sound and, in certain cases, complete method is described for evaluating queries in relational databases with null values where these nulls represent existing but unknown individuals. The soundness and completeness results are proved relative to a formalization of such databases as suitable theories of first-order logic. Because the algorithm conforms to the relational algebra, it may easily be incorporated into existing relational systems.},
   keywords = {\#nosource},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\5I5LMVN4\\Reiter - 1986 - A sound and sometimes complete query evaluation al.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\J9PHZZNY\\5383.html}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1986\\Reiter - 1986 - A sound and sometimes complete query evaluation al.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\J9PHZZNY\\5383.html}
 }
 
 @inproceedings{savaryRelationExtractionClinical2022,
-  title = {Relation Extraction from Clinical Cases for a Knowledge Graph},
+  title = {Relation {{Extraction}} from~{{Clinical Cases}} for~a~{{Knowledge Graph}}},
   booktitle = {European {{Conference}} on {{Advances}} in {{Databases}} and {{Information Systems}}},
   author = {Savary, Agata and Silvanovich, Alena and Minard, Anne-Lyse and Hiot, Nicolas and Halfeld Ferrari, Mirian},
+  editor = {Chiusano, Silvia and Cerquitelli, Tania and Wrembel, Robert and N{\o}rv{\aa}g, Kjetil and Catania, Barbara and {Vargas-Solar}, Genoveva and Zumpano, Ester},
   year = {2022},
+  series = {Communications in {{Computer}} and {{Information Science}}},
   pages = {353--365},
-  publisher = {{Springer}},
-  keywords = {\#nosource,⛔ No DOI found,me}
+  publisher = {{Springer International Publishing}},
+  address = {{Cham}},
+  doi = {10.1007/978-3-031-15743-1_33},
+  abstract = {We describe a system for automatic extraction of semantic relations between entities in a medical corpus of clinical cases. It builds upon a previously developed module for entity extraction and upon a morphosyntactic parser. It uses experimentally designed rules based on syntactic dependencies and trigger words, as well as on sequencing and nesting of entities of particular types. The results obtained on a small corpus are promising. Our larger perspective is transforming information extracted from medical texts into knowledge graphs.},
+  isbn = {978-3-031-15743-1},
+  langid = {english},
+  keywords = {\#nosource,⛔ No DOI found,me},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2022\\Savary et al. - 2022 - Relation Extraction from Clinical Cases for a Know.pdf}
 }
 
 @article{scheweLimitationsRuleTriggering1998,
-  ids = {ScT98},
+  ids = {scheweLimitationsRuleTriggering1998a},
   title = {Limitations of Rule Triggering Systems for Integrity Maintenance in the Context of Transition Specifications},
   author = {Schewe, Klaus-Dieter and Thalheim, Bernhard},
   year = {1998},
+  month = jan,
   journal = {Acta Cybernetica},
   volume = {13},
   number = {3},
   pages = {277--304},
   publisher = {{University of Szeged}},
-  optbibsource = {dblp computer science bibliography, https://dblp.org},
-  optbiburl = {https://dblp.org/rec/bib/journals/actaC/ScheweT98},
-  opttimestamp = {Tue, 09 Jul 2013 18:10:34 +0200},
-  opturl = {http://www.inf.u-szeged.hu/actacybernetica/edb/vol13n3/Schewe{$_1$}998\textsubscript{A}ctaCybernetica.xml},
+  issn = {2676-993X},
+  doi = {10.1007/3-540-63699-4_12},
+  urldate = {2023-08-08},
+  abstract = {Integrity Maintenance is considered one of the major application fields of rule triggering systems (RTSs). In the case of a given integrity constraint being violated by a database transition these systems trigger repairing actions. Then it is necessary to guarantee the termination of the RTS, its determinacy and the consistency of final states. Transition specifications provide some kind of dynamic semantics requiring certasin effects on database states to occur. In the context of transition specifications integrity maintenance has to cope with the additional problem of effect preservation. Limitations of RTSs with respect to this extended problems are investigated. It will be shown that for any set of constraints there exist non-repairable transitions, which depend on the closure of the constraint set. This implies that integrity maintenance by RTSs is only possible, if the constraint implication problem is decidable. Even if unrepairable transitions are excluded, this does not prevent the RTS to produce undesired behaviour. Analyzing the behaviour of RTSs leads to the definition of critical paths in associated rule hypergraphs and the requirement of such paths being absent. It will be shown that this requirement can be satisfied if the underlying set of constraints is stratified, but this notion turns out to be too strong to be also necessary. A sufficient and necessary condition for the absence of critical paths is obtained, if sets of constraints are required to be locally stratified.},
+  copyright = {Copyright (c)},
+  langid = {english},
   keywords = {\#nosource,⛔ No DOI found},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\YW5ZUGF8\\Schewe et Thalheim - 1998 - Limitations of rule triggering systems for integri.pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1998\\Schewe et Thalheim - 1998 - Limitations of rule triggering systems for integri2.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\QNHWPH6A\\294150.html}
 }
 
 @phdthesis{sirangeloRepresentingQueryingIncomplete2014,
-  ids = {sirangeloRepresentingQueryingIncomplete2014a},
+  type = {{{HDR}}},
   title = {Representing and {{Querying Incomplete Information}}: A {{Data Interoperability Perspective}}},
   shorttitle = {Representing and {{Querying Incomplete Information}}},
   author = {Sirangelo, Cristina},
   year = {2014},
-  optbibsource = {dblp computer science bibliography, https://dblp.org},
-  optbiburl = {https://dblp.org/rec/books/hal/Sirangelo14.bib},
-  opttimestamp = {Sat, 30 Sep 2017 21:10:29 +0200},
+  month = dec,
+  address = {{Cachan}},
+  url = {https://tel.archives-ouvertes.fr/tel-01092547},
+  urldate = {2023-08-07},
+  abstract = {This habilitation thesis presents some of my most recent work, which has been done in collaboration with several other people. In particular this thesis concentrates on our contributions to the study of incomplete information in the context of data interoperability. In this scenario data is heterogenous and decentralized, needs to be integrated from several sources and exchanged between different applications. Incompleteness, i.e. the presence of ``missing'' or ``unknown'' portions of data, is naturally generated in data exchange and integration, due to data heterogeneity. The management of incomplete information poses new challenges in this context.The focus of our study is the development of models of incomplete information suitable to data interoperability tasks, and the study of techniques for efficiently querying several forms of incompleteness.},
+  langid = {english},
   school = {Ecole Normale Sup\'erieure de Cachan},
   keywords = {\#nosource},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\QL9267EA\\Sirangelo - 2014 - Representing and Querying Incomplete Information .pdf}
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\2014\\Sirangelo - 2014 - Representing and Querying Incomplete Information .pdf}
 }
 
 @article{winslettModelbasedApproachUpdating1988,
@@ -699,11 +874,11 @@
   doi = {10.1145/42338.42386},
   urldate = {2023-08-03},
   abstract = {Suppose one wishes to construct, use, and maintain a database of facts about the real world, even though the state of that world is only partially known. In the artificial intelligence domain, this problem arises when an agent has a base set of beliefs that reflect partial knowledge about the world, and then tries to incorporate new, possibly contradictory knowledge into this set of beliefs. In the database domain, one facet of this situation is the well-known null values problem. We choose to represent such a database as a logical theory, and view the models of the theory as representing possible states of the world that are consistent with all known information. How can new information be incorporated into the database? For example, given the new information that ``b or c is true,'' how can one get rid of all outdated information about b and c, add the new information, and yet in the process not disturb any other information in the database? In current-day database management systems, the difficult and tedious burden of determining exactly what to add and remove from the database is placed on the user. The goal of our research was to relieve users of that burden, by equipping the database management system with update algorithms that can automatically determine what to add and remove from the database. Under our approach, new information about the state of the world is input to the database management system as a well-formed formula that the state of the world is now known to satisfy. We have constructed database update algorithms to interpret this update formula and incorporate the new information represented by the formula into the database without further assistance from the user. In this paper we show how to embed the incomplete database and the incoming information in the language of mathematical logic, explain the semantics of our update operators, and discuss the algorithms that implement these operators.},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\JHFT95PM\\Winslett - 1988 - A model-based approach to updating databases with .pdf;C\:\\Users\\nhiot\\Zotero\\storage\\IP27ELLK\\42338.html}
+  langid = {english},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1988\\Winslett - 1988 - A model-based approach to updating databases with .pdf;C\:\\Users\\nhiot\\Zotero\\storage\\IP27ELLK\\42338.html}
 }
 
 @book{winslettUpdatingLogicalDatabases2004,
-  ids = {UpdatingLogicalDatabases},
   title = {Updating {{Logical Databases}} ({{Cambridge Tracts}} in {{Theoretical Computer Science}})},
   author = {Winslett, Marianne},
   year = {2004},
@@ -713,12 +888,19 @@
   file = {C\:\\Users\\nhiot\\Zotero\\storage\\R49IGIG4\\1207643.html}
 }
 
-@inproceedings{zanioloDatabaseRelationsNull1982,
+@article{zanioloDatabaseRelationsNull1984,
   title = {Database Relations with Null Values},
-  booktitle = {Proceedings of the 1st {{ACM SIGACT-SIGMOD}} Symposium on {{Principles}} of Database Systems},
   author = {Zaniolo, Carlo},
-  year = {1982},
-  pages = {27--33},
-  keywords = {⛔ No DOI found},
-  file = {C\:\\Users\\nhiot\\Zotero\\storage\\H9GM6357\\Zaniolo - 1982 - Database relations with null values.pdf}
+  year = {1984},
+  month = feb,
+  journal = {Journal of Computer and System Sciences},
+  volume = {28},
+  number = {1},
+  pages = {142--166},
+  issn = {0022-0000},
+  doi = {10.1016/0022-0000(84)90080-1},
+  urldate = {2023-08-08},
+  abstract = {A new formal approach is proposed for modeling incomplete database information by means of null values. The basis of our approach is an interpretation of nulls which obviates the need for more than one type of null. The conceptual soundness of this approach is demonstrated by generalizing the formal framework of the relational data model to include null values. In particular, the set-theoretical properties of relations with nulls are studied and the definitions of set inclusion, set union, and set difference are generalized. A simple and efficient strategy for evaluating queries in the presence of nulls is provided. The operators of relational algebra are then generalized accordingly. Finally, the deep-rooted logical and computational problems of previous approaches are reviewed to emphasize the superior practicability of the solution.},
+  langid = {english},
+  file = {C\:\\Users\\nhiot\\OneDrive\\zotero\\1984\\Zaniolo - 1984 - Database relations with null values.pdf;C\:\\Users\\nhiot\\Zotero\\storage\\N6ACRI36\\0022000084900801.html}
 }
