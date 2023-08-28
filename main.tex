@@ -70,7 +70,31 @@
 % }
 
 % Tikz
-\usetikzlibrary{positioning}
+\usetikzlibrary{automata, positioning, fit, tikzmark, shapes.multipart, arrows.meta}
+
+\tikzset{
+  labeled node/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split draw splits=false,
+    rounded corners,
+    very thick,
+    draw=blue!50,
+    rectangle split part fill={blue!50, white},
+    align=left,
+    font=\sffamily\bfseries\boldmath\small
+  },
+  labeled edge/.style={
+    rectangle split, rectangle split parts=1,
+    rectangle split draw splits=false,
+    rounded corners,
+    very thick,
+    draw=orange!60,
+    rectangle split part fill={orange!60, white},
+    align=left,
+    font=\sffamily\bfseries\boldmath\small
+  },
+  every two node part/.style={font=\sffamily\small},
+}
 
 % Pgf
 \usepgfplotslibrary{units}

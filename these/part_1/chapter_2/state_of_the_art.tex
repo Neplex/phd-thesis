@@ -35,7 +35,7 @@ Cette approche introduit des symboles de prédicat (présenté dans la table~\re
     \label{table:update:soa:rdfs}
 \end{table}
 
-Plusieurs approches de mise à jour sont proposées dans \cite{flourisFormalFoundationsRDF2013,goasdoueEfficientQueryAnswering2013,mahfoudhAdaptationOntologiesAvec2015,halfedferrariRDFUpdatesConstraints2017,chabinUsingGraphGrammar2019,chabinConsistentUpdatingDatabases2020}.
+Plusieurs approches de mise à jour cohérentes sont proposées dans \cite{scheweTheoryConsistencyEnforcement1999,linkArithmeticTheoryConsistency2002,pichlerComplexityEvaluatingTuple2011,flourisFormalFoundationsRDF2013,goasdoueEfficientQueryAnswering2013,mahfoudhAdaptationOntologiesAvec2015,halfedferrariRDFUpdatesConstraints2017,chabinUsingGraphGrammar2019,chabinConsistentUpdatingDatabases2020}.
 Dans \cite{goasdoueEfficientQueryAnswering2013}, l'attention est portée sur les contraintes sémantiques de \gls{rdfs}, bien que les contraintes soient limitées au niveau de l'instance.
 D'autres travaux tels que \cite{halfedferrariRDFUpdatesConstraints2017} se fondent également sur les contraintes de \gls{rdfs}, mais ils se concentrent sur une forme simplifiée des \glspl{tgd}.
 Les approches présentées dans \cite{flourisFormalFoundationsRDF2013} et \cite{chabinUsingGraphGrammar2019} mettent en œuvre des contraintes sous la forme de \glspl{tgd}, définies par les utilisateurs.
@@ -45,6 +45,8 @@ D'autres aspects tels que l'évolution de schéma est abordé par \cite{flourisF
 Cependant, l'approche proposée dans ces travaux ne permet pas le calcul des propriétés transitives et l'utilisation du monde ouvert ne permet pas de garantir la préservation de toutes les contraintes établies.
 Enfin, \cite{chabinUsingGraphGrammar2019} se penche sur la sémantique de \gls{rdfs} et propose de donner la priorité aux mises à jour.
 Cela signifie que l'approche vise à modifier à la fois l'instance et le schéma pour accommoder les nouvelles informations de manière cohérente.
+L'objectif de \cite{faginDataExchangeGetting2005}, \cite{gottlobComputingCoresData2005} et \cite{pichlerComplexityEvaluatingTuple2011} est d'obtenir l'ensemble minimal d'une instance de base de données dans le contexte de l'intégration des données.
+Ils étudient aussi la complexité du calcul de cet ensemble minimal, le \gls{core}.
 
 La mise à jour de données incomplètes avec des valeurs nulles marquée reste un problème ouvert \cite{libkinIncompleteDataWhat2014,consoleCopingIncompleteData2020}.
 Cette problématique persiste en partie parce que les \glspl{sgbd} relationnels ne mettent pas en œuvre les modèles théoriques en raison d'un manque de consensus dans ce domaine \cite{zanioloDatabaseRelationsNull1984,faginSemanticsUpdatesDatabases1983,imielinskiIncompleteInformationRelational1984,abiteboulUpdateSemanticsIncomplete1985,reiterSoundSometimesComplete1986,faginUpdatingLogicalDatabases1986,winslettModelbasedApproachUpdating1988,grahneProblemIncompleteInformation1991,winslettUpdatingLogicalDatabases2004}.

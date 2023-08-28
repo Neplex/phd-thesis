@@ -68,31 +68,166 @@ Dans cette section, nous visons à fournir une introduction concise aux bases de
 \cite{pokornyGraphDatabasesTheir2015} offre une vue d'ensemble des avantages et des inconvénients de ce type de bases de données.
 Lorsque nous évoquons les bases de données de graphes, nous pouvons identifier deux grandes familles :
 \begin{description}
-    \item[Les bases de triplets], notamment représentées par le modèle \glsfirst{rdf} développé par le \gls{w3c}.
-    Ces bases enregistrent des triplets sous la forme $\langle x, P, y \rangle$, où chaque triplet représente un atome $P(x, y)$ et est constitué de trois éléments : $x$, le sujet représenté par l'\gls{uri} d'une ressource (un nœud), $P$ est un symbole de prédicat, et $y$, l'objet, peut être soit un \gls{uri}, soit un littéral (une valeur de propriétés).
-    \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
-    
-    \item[Les Graphes de Propriétés], aussi connus sous le nom de \glsfirst{lpg} en anglais, sont des bases de données composées de nœuds reliés par des arcs. Les deux sont labellisés et peuvent contenir des propriétés.
-    Parmi les \gls{sgbd} de ce type, \gls{neo4j} est l'un des plus populaires.
-    Notamment, \gls{neo4j} est à l'origine du langage de requête \gls{cypher}, qui sert de fondation au nouveau langage du standard \gls{iso} : \gls{gql}, actuellement en cours de développement.
+    \item[Les bases de triplets] Notamment représentées par le modèle \glsfirst{rdf} développé par le \gls{w3c}.
+          Ces bases enregistrent des triplets sous la forme $\langle x, P, y \rangle$, où chaque triplet représente un atome $P(x, y)$ et est constitué de trois éléments : $x$, le sujet représenté par l'\gls{uri} d'une ressource (un nœud), $P$ est un symbole de prédicat, et $y$, l'objet, peut être soit un \gls{uri}, soit un littéral (une valeur de propriétés).
+          \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
+
+    \item[Les Graphes de Propriétés] Aussi connus sous le nom de \glsfirst{lpg} en anglais, sont des bases de données composées de nœuds reliés par des arcs. Les deux sont labellisés et peuvent contenir des propriétés.
+          Parmi les \gls{sgbd} de ce type, \gls{neo4j} est l'un des plus populaires.
+          Notamment, \gls{neo4j} est à l'origine du langage de requête \gls{cypher}, qui sert de fondation au nouveau langage du standard \gls{iso} : \gls{gql}, actuellement en cours de développement.
 \end{description}
 
 Les bases de données graphes sont spécialement conçues pour simplifier l'interrogation de la structure des données.
 Le modèle de la base de données (ou schéma, pour faire une analogie avec le modèle relationnel, bien qu'aucune règle structurelle ne soit imposée) est étroitement lié aux types de requêtes envisagées.
 Dans le cadre de \gls{neo4j}, par exemple, les nœuds peuvent être étiquetés avec une ou plusieurs étiquettes, appelées \emph{labels}, tandis que les relations ne peuvent en porter qu'une, dénommée \emph{type} (si plusieurs étiquettes sont nécessaires pour une relation, cette dernière sera dupliquée).
 
-\paragraph{\acs{rdfs}}
-fournit des relations pour la définition d'ontologies (ou vocabulaires) destinées à structurer des ressources \gls{rdf}.
+% \paragraph{\acs{rdfs}}
+\subsubsection{RDFS}
+\gls{rdfs} fournit des relations pour la définition d'ontologies (ou vocabulaires) destinées à structurer des ressources \gls{rdf}.
 Il permet de définir le schéma de la base : les classes (correspondant aux types de nœuds) et les propriétés (correspondant aux arêtes).
 De plus, il offre la possibilité de spécifier des relations de subordination et de subsomption en établissant une hiérarchie entre les éléments au moyen des propriétés \textbf{subClass} et \textbf{subProp}.
 \gls{rdfs} permet également la séparation de l'instance et du schéma.
 
-\paragraph{\gls{cypher}}
-est un langage déclaratif de requête conçu pour les graphes de propriétés.
+\subsubsection{Interrogation de graphe avec Cypher}
+\gls{cypher} est un langage déclaratif de requête conçu pour les graphes de propriétés.
 Ce langage offre la facilité d'exprimer des requêtes en utilisant le mot-clé \verb|MATCH| pour la recherche de motifs, exprimés sous forme d'art ASCII.
 Les requêtes sont formulées comme une séquence d'opérations, où le résultat d'une opération devient le paramètre de la suivante.
 Même si les requêtes portent sur des graphes, les résultats des opérations sont toujours une table d'affectation des variables (avec autant de colonnes que de variables et autant de lignes que de réponses).
 
-\begin{example}{Requete \gls{cypher}}
-    
+\begin{figure}
+    \begin{subfigure}{\linewidth}
+        \begin{adjustbox}{width=\linewidth}
+            \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 6cm,on grid]
+                \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
+                \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
+                \node[labeled node, right=of sosy] (person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
+                \node[labeled node, right=of person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
+                \node[labeled node, right=of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
+                \node[labeled node, below=of exam] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
+                \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
+
+                \path
+                (person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
+                (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
+                (person) edge node[labeled edge, anchor=center] {PassExam} (exam)
+                (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
+            \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Instance sous forme de graphe}
+    \end{subfigure}
+    \begin{subfigure}{\linewidth}
+        \centering
+        \begin{adjustbox}{varwidth=\linewidth}
+            \centering
+            \begin{tabular}{c|l}
+                \multicolumn{2}{l}{\textbf{Anatomy}} \\
+                \hline
+                \hline
+                id & name                            \\
+                \hline
+                0  & \emph{both eyes}                \\
+                1  & \emph{corneal stroma}           \\
+                2  & \emph{descemet membrane}
+            \end{tabular}
+            \quad
+            \begin{tabular}{c|l}
+                \multicolumn{2}{l}{\textbf{Symptom}}             \\
+                \hline
+                \hline
+                id & name                                        \\
+                \hline
+                0  & \emph{blurring of vision}                   \\
+                1  & \emph{numerous circular to oval fleck-like}
+            \end{tabular}
+            \quad
+            \begin{tabular}{c|l}
+                \multicolumn{2}{l}{\textbf{Examination}} \\
+                \hline
+                \hline
+                id & name                                \\
+                \hline
+                0  & \emph{slit-lamp}
+            \end{tabular}
+            \quad
+            \begin{tabular}{c|l|l}
+                \multicolumn{2}{l}{\textbf{Person}} \\
+                \hline
+                \hline
+                id & name           & age           \\
+                \hline
+                0  & \emph{unknown} & \emph{55-60}  \\
+            \end{tabular}
+            \quad
+            \begin{tabular}{c|c}
+                \multicolumn{2}{l}{\textbf{ConcernsAnat}} \\
+                \hline
+                \hline
+                symptom & anatomy                         \\
+                \hline
+                0       & 0                               \\
+                1       & 1                               \\
+                1       & 2
+            \end{tabular}
+            \quad
+            \begin{tabular}{c|c}
+                \multicolumn{2}{l}{\textbf{GivesRes}} \\
+                \hline
+                \hline
+                exam & symptom                        \\
+                \hline
+                0    & 1                              \\
+            \end{tabular}
+            \quad
+            \begin{tabular}{c|c}
+                \multicolumn{2}{l}{\textbf{PassExam}} \\
+                \hline
+                \hline
+                person & exam                         \\
+                \hline
+                0      & 0                            \\
+            \end{tabular}
+            \quad
+            \begin{tabular}{c|c}
+                \multicolumn{2}{l}{\textbf{HasSym}} \\
+                \hline
+                \hline
+                person & symptom                    \\
+                \hline
+                0      & 0                          \\
+            \end{tabular}
+        \end{adjustbox}
+        \caption{Instance au format relationnel}
+    \end{subfigure}
+    \caption{Exemple d'instance d'une base de donnée graphe et son équivalent en relationnel}
+    \label{fig:update:pre:graph}
+\end{figure}
+
+\begin{example}
+    En considérant une instance de base de donnée graphe représente figure~\ref{fig:update:pre:graph}, la récupération de l'ensemble de l'ensemble des noms de partie du corps (\emph{Anatomy}) présents dans l'instance s'écrit, en \gls{cypher} : \verb|MATCH (x:Anatomy) RETURN x.name| ;
+    Le \verb|MATCH| recherche le motif \verb|(x:Anatomy)|.
+    Les parenthèses représentent un nœud, \verb|x| est le nom de la variable pour ce nœud et \verb|:Anatomy| indique que l'on cherche uniquement les nœuds qui ont l'étiquette \emph{Anatomy}.
+    L'opération \verb|RETURN| termine la requête et renvoie la table d'instanciation suivante :
+
+    \begin{center}
+        \begin{tabular}{c|l}
+              & x.name                   \\
+            \hline
+            0 & \emph{both eyes}         \\
+            1 & \emph{corneal stroma}    \\
+            2 & \emph{descemet membrane}
+        \end{tabular}
+    \end{center}
+
+    La requête \verb|MATCH (x:Examination)-[y:GivesRes]->() RETURN x, y| retourne l'ensemble des nœuds \emph{Examination} qui sont dans une relation y ayant le type \emph{GivesRes} representé par \verb|-[y:GivesRes]->|.
+    Ici, la relation est dirigée indiquant que l'on cherche uniquement les nœuds \emph{Examination} qui sont source de la relation.
+    Le nœud de destination de la relation n'a aucune contrainte et est donc représenté uniquement par \verb|()|.
+    Le langage \gls{cypher} permet également de construire des requêtes récursives.
+    Par exemple, étant donné une relation \verb|knows| entre des personnes indiquant quelles se connaissent, pour obtenir l'ensemble des groupes de personnes où chaque membre connaît au moins une autre personne du groupe, on peut écrire en \gls{cypher} : \verb|MATCH (x:Person)-[:knows*]-(y:Person) RETURN COLLECT(DISTINCT y) AS persons|.
+    Dans l'expression \verb|-[:knows*]-|, le symbole \verb|*| indique que la relation peut être traversée plusieurs fois de manière récursive.
+    La requête est toujours assurée de se terminer, car \gls{neo4j} ne permet pas de traverser la même arête à plusieurs reprises pour un même motif.
+    L'opération \verb|COLLECT(DISTINCT y)| permet de regrouper les instanciations de la variable \verb|y| en fonction des autres variables (équivalent à l'opération \verb|group by| en \gls{sql}), ici \verb|x|, en évitant les doublons (\verb|DISTINCT|).
+    L'ensemble est retourné sous forme d'une liste.
+    \gls{neo4j} autorise les types complexes dans les requêtes, mais aussi comme valeur de propriété.
 \end{example}

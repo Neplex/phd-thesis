@@ -15,7 +15,7 @@ Cette approche a été choisie pour guider les travaux présentés dans cette pa
 En travaillant avec des bases de données graphes, la proposition de mise à jour doit opérer en harmonie avec les \glspl{sgbd} tout en prenant en compte les contraintes propres à ces systèmes.
 Bien que les travaux exposés dans cette partie s'alignent sur la politique détaillée dans \cite{chabinConsistentUpdatingDatabases2020}, ils se distinguent par les éléments suivants :
 
-\begin{description}[wide]
+\begin{description}
     \item[Incrémentalité] ~
     \begin{enumerate}
         \item Le calcul des mises à jour se limite aux contraintes et aux données spécifiquement concernées.
@@ -49,10 +49,3 @@ Bien que les travaux exposés dans cette partie s'alignent sur la politique dét
         Cette approche simplifie grandement les opérations de manipulation des valeurs nulles impactées par une mise à jour pour le calcul du \gls{core}.
     \end{enumerate}
 \end{description}
-
-Our proposal follows the database evolution semantics from~\cite{chabinConsistentUpdatingDatabases2020}, which has been shown to be effective\footnote{If an update is not rejected, the updated database contains the inserted data and does not contain the deleted ones}, deterministic, and adhere to a minimal change property.
-Let $\mathcal{D}$ be an incomplete but consistent database instance and $U$ be a set of updates.
-The notation $\mathcal{D} \diamondsuit U$ represents the insertion or deletion of the required updates in or from $\mathcal{D}$.
-In \cite{CHL20}, a from-scratch approach generates a new database instance denoted as $\mathcal{D}' = core(upd(\mathcal{D} \diamondsuit U))$, where $upd$ is the update process described in \cite{chabinConsistentUpdatingDatabases2020}.
-In contrast, our paper describes an \textit{incremental} version of the update process denoted as $upd_{|U}$.
-Therefore, the new database instance is represented as $\mathcal{D}' = core_{|NullBucket}(upd_{|U}(\mathcal{D}\diamondsuit U))$, where $NullBucket$ refers to the set of nulls affected by the update ($upd_{|U}$) applied to $\mathcal{D} \diamondsuit U$.

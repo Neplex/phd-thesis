@@ -91,30 +91,30 @@ Ce niveau peut être paramétré pour chaque utilisateur lui donnant ainsi certa
 Le niveau le plus élevé est autorisé à modifier le schéma et l'instance pour ajouter un fait.
 Un niveau moins élevé permet seulement de modifier l'instance tandis que le niveau le plus bas ne peut pas modifier la base et peut donc seulement ajouter ou supprimer un fait si la cohérence de la base est maintenue.
 
-\begin{example}
-    La figure~\ref{fig:app_rule} représente une base de connaissance initiale (en noir) et les modifications nécessaires (en bleu) pour l'ajout du fait $CSub(C_1, C_2)$.
-    En suivant les effets de bords figure~\ref{eq:rule_csub}, l'ajout du fait $CSub(C_1, C_2))$ implique que $C_1$ et $C_2$ soient des classes.
-    Comme $C_2$ n'est pas présent, le schéma doit être modifié.
-    Le fait $CSub(C_2, Resource)$ est alors ajouté.
-    Par la suite, le fait $CSub(C_1, C_2))$ peut être ajouté en ajoutant aussi le fait $CI(I, C_2)$ par transitivité de la relation $CI$ (figure~\ref{eq:rule_csub}(\ref{eq:rule_csub:ci})).
-    Cet exemple montre l'application d'effets de bords pour rendre applicable une règle.
-    Sans ces effets de bords, il aurait été impossible d'ajouter le fait voulu tout en respectant les règles d'intégrités.
-    Ici, notre individu est bien l'instance d'une classe et de toutes les sous-classes associées.
-    La base avant et après application de la règle est un graphe \gls{rdfs} valide.
-\end{example}
-
 \begin{figure}[ht]
-    \begin{eqnarray*}
+    \begin{align}
         Cl(x)\\
         Cl(y) \lor (y = Resource)\\
         \neg CSub(y, x)\\
         \forall~z CSub(y, z) \to CSub(x, z)\\
         \forall~z CSub(z, x) \to CSub(z, y)\\
         \forall~z_i CI(z_i, x) \to CI(z_i, y) \label{eq:rule_csub:ci}
-    \end{eqnarray*}
+    \end{align}
     \caption{Effets de bord pour l'ajout du fait $CSub(x, y)$}
     \label{eq:rule_csub}
 \end{figure}
+
+\begin{example}
+    La figure~\ref{fig:app_rule} représente une base de connaissance initiale (en noir) et les modifications nécessaires (en bleu) pour l'ajout du fait $CSub(C_1, C_2)$.
+    En suivant les effets de bords figure~\ref{eq:rule_csub}, l'ajout du fait $CSub(C_1, C_2))$ implique que $C_1$ et $C_2$ soient des classes.
+    Comme $C_2$ n'est pas présent, le schéma doit être modifié.
+    Le fait $CSub(C_2, Resource)$ est alors ajouté.
+    Par la suite, le fait $CSub(C_1, C_2))$ peut être ajouté en ajoutant aussi le fait $CI(I, C_2)$ par transitivité de la relation $CI$ (effet de bord~\ref{eq:rule_csub:ci}, figure~\ref{eq:rule_csub}).
+    Cet exemple montre l'application d'effets de bords pour rendre applicable une règle.
+    Sans ces effets de bords, il aurait été impossible d'ajouter le fait voulu tout en respectant les règles d'intégrités.
+    Ici, notre individu est bien l'instance d'une classe et de toutes les sous-classes associées.
+    La base avant et après application de la règle est un graphe \gls{rdfs} valide.
+\end{example}
 
 \begin{figure}[ht]
     \centering

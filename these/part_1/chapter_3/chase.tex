@@ -22,7 +22,8 @@ Une version incrémentale de l'algorithme consiste à considérer uniquement les
     Plus aucun atome ne peux etre généré et on obtient donc l'ensemble $\mathcal{D}' = \{A(a),$ $B(a, b),$ $B(c, b),$ $C(b), B(d, N_1), C(N_1)\}$.
 \end{example}
 
-\paragraph{Cycles et génération infinie}
+% \paragraph{Cycles et génération infinie}
+\subsection{Cycles et génération infinie}
 Dans ces travaux, les \glspl{tgd} peuvent contenir des variables existentielles dans la tête qui génèreront de nouvelles valeurs nulles lors de leur application.
 Cela peux engendrer une génération infinie d'atomes si des cycles existent dans les contraintes.
 Il est important de s'assurer que cette opération termine.
@@ -48,6 +49,7 @@ On fixe donc un degré maximal $\delta_{max}$ qui permet l'interruption du \gls{
     On verifira dans la suite que cet ensemble n'est pas simplifiable (et donc valide si la simplification supprime cette valeur nulle) avant de rejeté la mise à jour si ce n'est pas le cas.
 \end{example}
 
+\subsection{Utilisation du graphe pour le Chase}
 La procédure incrémentale du \gls{chase} est définie dans l'algorithme~\ref{algo:update:chase:insert}.
 L'ensemble $ToIns$ represente les effet de bords de $I$ à ajouter dans $\mathcal{D}$ tel que si $\mathcal{D}' = \mathcal{D} \cup ToIns$ : $I \subseteq \mathcal{D}'$ et $\mathcal{D}' \vDash \mathbb{C}$.
 La boucle (ligne~\ref{algo:update:chase:insert:while}) est l'application du \gls{chase} incrémentale qui respecte les conditions suivantes:
@@ -112,7 +114,7 @@ AND NOT EXISTS { $\label{query:update:chase:not-exist}$
 
 \end{example}
 
-\paragraph{\gls{chase} en arriére}
+\subsection{Chase en arriére}
 Il peut arriver que la suppression d'un atome instancié $a$ rende la base de données incohérente lorsqu'il est une conséquence d'une contrainte $c$.
 C'est à dire que, pour toute contrainte $c$, s'il existe un homomorphisme $h$ tel que $h(head(c)) = a$ et une extension de $h$ noté $h'$ tel que $h'(body(c)) \subseteq \mathcal{D}$ alors la base ne respecte plus la contrainte $c$ et l'on doit regenerer la tête, que l'on veux supprimer, afin de maintenir la cohérence.
 L'idée du chase arriére est de supprimer recursivement les atomes $a' \in h'(body(c))$ qui interviennent dans le corps.

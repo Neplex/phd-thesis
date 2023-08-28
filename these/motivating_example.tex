@@ -1,0 +1,81 @@
+\begin{quote}
+    Un patient de 78 ans suivi pour cancer prostatique avec métastases ganglionnaires ayant déjà subi une résection endoscopique prostatique avec pulpectomie a été admis en urgence pour insuffisance rénale aiguë obstructive à 330 mmol/l de créatinine avec fièvre et urétérohydronéphrose bilatérale à l'échographie.
+\end{quote}
+
+\begin{multicols}{2}%
+    \small%
+\begin{align}
+    CasClinique(\textit{c-2-3}) \\
+    hasPatient(\textit{c-2-3}, p1) \\
+    Patient(p_1, 78, H) \\
+    hasPatho(p_1, cancer) \\
+    concernsAnat(cancer, prostate) \\
+    Anatomy(prostate) \\
+    leadTo(cancer, \textit{métastases ganglionnaires}) \\
+    getTreatment(\textit{résection endoscopique}, prostate) \\
+    forPatho(\textit{résection endoscopique}, cancer)
+\end{align}
+
+\begin{align}
+    exam(p_1, e_1, et_1, \textit{01-01-01}) \\
+    paramClinique(e_1, creatine, \textit{330mmol/L}) \\
+    reveal(e_1, \textit{insuffisance rénale}) \\
+    exam(p_1, e_2, et_2, \textit{01-01-01}) \\
+    paramClinique(e_2, temperature, t_1) \\
+    reveal(e_2, fievre) \\
+    exam(p_1, e_3, \textit{echographie}, \textit{01-01-01}) \\
+    paramClinique(e_3, param_1, res_1) \\
+    reveal(e_3, \textit{urétérohydronéphrose bilatérale})
+\end{align}
+\end{multicols}
+
+\begin{figure}
+    \small
+    \centering
+    \begin{adjustbox}{varwidth=\linewidth,max height=\textheight}
+        \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 5cm,on grid]
+            \node[labeled node] (patient) {Patient \nodepart{two} name: \emph{$p_1$}\\sex: \emph{H}\\age: \emph{78}};
+            \node[labeled node, below=of patient] (exam1) {Exam \nodepart{two} name: \emph{constantes}};
+            \node[labeled node, below=of exam1] (param1) {ParamClinique \nodepart{two} name: \emph{créatinine}\\value: \emph{330 mmol/l}};
+            \node[labeled node, below=of param1] (sosy1) {SOSY \nodepart{two} name: \emph{insuffisance}\\~~~~~~~~~~\emph{rénale}};
+            \node[labeled node, right=of exam1] (exam2) {Exam \nodepart{two} name: \emph{échographie}};
+            \node[labeled node, below=of exam2] (param2) {ParamClinique \nodepart{two} name: \emph{unknown}\\ value: \emph{unknown}};
+            \node[labeled node, below=of param2] (sosy2) {SOSY \nodepart{two} name: \emph{urétérohydronéphrose}\\~~~~~~~~~~\emph{bilatérale}};
+            \node[labeled node, left=of param1] (param3) {ParamClinique \nodepart{two} name: \emph{temperature}\\ value: \emph{unknown}};
+            \node[labeled node, below=of param3] (sosy3) {SOSY \nodepart{two} name: \emph{fiévre}};
+            \node[labeled node, above=of param3] (cas) {CasClinique \nodepart{two} doc: \emph{c-2-3}};
+            \node[labeled node, above=of cas] (testicule) {Anatomie \nodepart{two} name: \emph{testicule}};
+            \node[labeled node, above=of patient] (traitement) {Traitement};
+            \node[labeled node, above=of traitement] (traitmentType) {TraitmentType \nodepart{two} name: \emph{résection}\\~~~~~~~~~~\emph{endoscopique}};
+            \node[labeled node, above=of testicule] (traitement2) {Traitement};
+            \node[labeled node, above=of traitement2] (traitmentType2) {TraitmentType \nodepart{two} name: \emph{pulpectomie}};
+            \node[labeled node, above=of exam2] (metastase) {Symptom \nodepart{two} name: \emph{métastases}\\~~~~~~~~~~\emph{ganglionnaires}};
+            \node[labeled node, above=of metastase] (cancer) {Pathologie \nodepart{two} name: \emph{cancer}};
+            \node[labeled node, above=of cancer] (prostate) {Anatomie \nodepart{two} name: \emph{prostate}};
+
+            \path
+            (cas) edge node[labeled edge, anchor=center] {hasPatient} (patient)
+            (patient) edge node[labeled edge, anchor=center] {hasPatho} (cancer)
+            (patient) edge node[labeled edge, anchor=center] {getTreatment} (traitement)
+            (cancer) edge node[labeled edge, anchor=center] {concernsAnat} (prostate)
+            (patient) edge node[labeled edge, anchor=center] {getTreatment} (traitement2)
+            (cancer) edge node[labeled edge, anchor=center] {leadTo} (metastase)
+            (traitement) edge node[labeled edge, anchor=center] {forPatho} (cancer)
+            (traitement) edge node[labeled edge, anchor=center] {concernsAnat} (prostate)
+            (traitement) edge node[labeled edge, anchor=center] {hasType} (traitmentType)
+            (traitement2) edge node[labeled edge, anchor=center] {concernsAnat} (testicule)
+            (traitement2) edge node[labeled edge, anchor=center] {hasType} (traitmentType2)
+            (patient) edge node[labeled edge, anchor=center] {passExam} (exam1)
+            (exam1) edge node[labeled edge, anchor=center] {reveal} (param1)
+            (param1) edge node[labeled edge, anchor=center] {show} (sosy1)
+            (patient) edge node[labeled edge, anchor=center] {passExam} (exam2)
+            (exam2) edge node[labeled edge, anchor=center] {reveal} (param2)
+            (param2) edge node[labeled edge, anchor=center] {show} (sosy2)
+            (exam1) edge node[labeled edge, anchor=center] {reveal} (param3)
+            (param3) edge node[labeled edge, anchor=center] {show} (sosy3)
+            ;
+        \end{tikzpicture}
+    \end{adjustbox}
+    \caption{Instance sous forme de graphe}
+    \label{fig:runex:graph}
+\end{figure}
