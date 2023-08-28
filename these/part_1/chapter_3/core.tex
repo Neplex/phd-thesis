@@ -5,7 +5,7 @@ Formellement, étant donné un ensemble d'atomes $I$ et un ensemble de valeurs n
 L'exemple \ref{ex:update:nulls-simp} montre cependant que le choix de $\nu$ n'est pas arbitraire.
 
 \begin{example}
-    \label{ex:update:nulls-simp}
+	\label{ex:update:nulls-simp}
 	En considérant l'ensemble non minimal $I = {P(a, N_1), P(N_1, N_2), P(a, b), P(b, c), P(a, N_3)}$, si l'ensemble $\nu = {N_1}$, alors seuls les atomes $P(a, N_1)$ et $P(N_1, N_2)$ sont à prendre en compte pour la simplification.
 	Cependant, aucune simplification n'existe en prenant uniquement en compte l'élément $N_1$, il est également nécessaire de considérer la valeur nulle $N_2$.
 	Pour parvenir à la simplification souhaitée de l'ensemble $I$, l'ensemble $\nu$ doit être élargi pour obtenir $\nu' = {N_1, N_2}$.
@@ -18,9 +18,9 @@ Comme discuté dans l'exemple \ref{ex:update:nulls-simp}, étant donné un ensem
 Pour cela, on calcule l'ensemble d'atomes $\textsf{LinkedNull}_{I,N}$ pour chaque valeur nulle $N$ dans $\nu_0$.
 Cet ensemble est la limite de la séquence $(\textsf{LinkedNull}^k_{I,N})_{k \ge 0}$ définie par :
 \begin{align}
-    \textsf{LinkedNull}^0_{I,N} &= \{atom \in I \mid N \in nulls(atom)\} \\
-    \textsf{LinkedNull}^k_{I,N} &= \{atom \in I \mid (\exists atom' \in \textsf{LinkedNull}^{k-1}_{I,N})(nulls(atom) \cap nulls(atom') \neq \emptyset)\}
-\end{align} 
+	\textsf{LinkedNull}^0_{I,N} & = \{atom \in I \mid N \in nulls(atom)\}                                                                                 \\
+	\textsf{LinkedNull}^k_{I,N} & = \{atom \in I \mid (\exists atom' \in \textsf{LinkedNull}^{k-1}_{I,N})(nulls(atom) \cap nulls(atom') \neq \emptyset)\}
+\end{align}
 
 Il est facile de voir que pour tout $k \geq 0$, $\textsf{LinkedNull}^k_{I,N} \subseteq \textsf{LinkedNull}^{k+1}_{I,N}$ et que $\textsf{LinkedNull}^k_{I,N} \subseteq I$.
 La séquence $(\textsf{LinkedNull}^k_{I,N})_{k \ge 0}$ est donc monotone et bornée par $I$.
@@ -65,56 +65,57 @@ UNWIND linkedAtoms AS a RETURN a.symbol as a, a.terms as e, linkedNulls
 	Dans le graphe d'instance donné figure~\ref{fig:update:db:runex}, la récupération de l'ensemble $\textsf{LinkedNull}_{\mathcal{D}, N_1}$ en utilisant la requête figure~\ref{fig:update:core:query} de traduit par l'exécution pas à pas suivante :
 	\begin{enumerate}[label=Etape~\arabic*]
 		\item L'opération \verb|MATCH WHERE| ligne~\ref{fig:update:core:query:match} retourne la table d'instanciation suivante de tous les chemins \verb|pathP| partant de $N_1$ de taille maximale 6 (car 3 valeurs nulles sont présentes dans l'instance) ne contenant que des valeurs nulles et des atomes :
-		\begin{center}
-			\begin{tabular}{ccl}
-				\hline
-				\verb|nullValueNode| & \verb|endNode| & \verb|pathP| \\
-				\hline
-				$n_{1}$ & $n_{21}$ & $[n_{1}, r_{1}, n_{21}]$\\
-				$n_{1}$ & $n_{22}$ & $[n_{1}, r_{3}, n_{22}]$\\
-				$n_{1}$ & $n_{26}$ & $[n_{1}, r_{11}, n_{21}]$\\
-				$n_{1}$ & $n_{28}$ & $[n_{1}, r_{15}, n_{28}]$\\
-				$n_{1}$ & $n_{8}$ & $[n_{1}, r_{15}, n_{28}, r_{16}, n_{8}]$\\
-				$n_{1}$ & $n_{10}$ & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}]$\\
-				$n_{1}$ & $n_{30}$ & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}, r_{21}, n_{30}]$\\
-				$n_{1}$ & $n_{13}$ & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}, r_{21}, n_{30}, r_{23}, n_{13}]$\\
-				\hline
-			\end{tabular}
-		\end{center}
+		      \begin{center}
+			      \begin{tabular}{ccl}
+				      \hline
+				      \verb|nullValueNode|    & \verb|endNode|          & \verb|pathP|                                                              \\
+				      \hline
+				      $n_{1}$                 & $n_{21}$                & $[n_{1}, r_{1}, n_{21}]$                                                  \\
+				      $n_{1}$                 & $n_{22}$                & $[n_{1}, r_{3}, n_{22}]$                                                  \\
+				      $n_{1}$                 & $n_{26}$                & $[n_{1}, r_{11}, n_{21}]$                                                 \\
+				      $n_{1}$                 & $n_{28}$                & $[n_{1}, r_{15}, n_{28}]$                                                 \\
+				      $n_{1}$                 & $n_{8}$                 & $[n_{1}, r_{15}, n_{28}, r_{16}, n_{8}]$                                  \\
+				      $n_{1}$                 & $n_{10}$                & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}]$                                 \\
+				      $n_{1}$                 & $n_{30}$                & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}, r_{21}, n_{30}]$                 \\
+				      $n_{1}$                 & $n_{13}$                & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}, r_{21}, n_{30}, r_{23}, n_{13}]$ \\
+				      \hline
+			      \end{tabular}
+		      \end{center}
 		\item Le premier \verb|WITH| ligne~\ref{fig:update:core:query:collect} permet de regrouper l'ensemble des nœuds destination sous forme d'une liste :
-		\begin{center}
-			\begin{tabular}{cl}
-				\hline
-				\verb|nullValueNode| & \verb|linkedNodes| \\
-				\hline
-				$n_{1}$ & $[n_{21}, n_{22}, n_{26}, n_{28}, n_{8}, n_{10}, n_{30}, n_{13}]$\\
-				\hline
-			\end{tabular}
-		\end{center}
+		      \begin{center}
+			      \begin{tabular}{cl}
+				      \hline
+				      \verb|nullValueNode|    & \verb|linkedNodes|                                                        \\
+				      \hline
+				      $n_{1}$                 & $[n_{8}, n_{10}, n_{13}, n_{21}, n_{22}, n_{26}, n_{28}, n_{29}, n_{30}]$ \\
+				      \hline
+			      \end{tabular}
+		      \end{center}
 		\item Le dernier \verb|WITH| ligne~\ref{fig:update:core:query:with} permet de séparer les atomes des valeurs nulles :
-		\begin{center}
-			\begin{tabular}{cl}
-				\hline
-				\verb|linkedAtoms| & \verb|linkedNulls| \\
-				\hline
-				$[n_{21}, n_{22}, n_{26}, n_{28}, n_{30}]$ & $[n_{1}, n_{8}, n_{10}, n_{13}]$\\
-				\hline
-			\end{tabular}
-		\end{center}
+		      \begin{center}
+			      \begin{tabular}{cl}
+				      \hline
+				      \verb|linkedAtoms|                                 & \verb|linkedNulls|               \\
+				      \hline
+				      $[n_{21}, n_{22}, n_{26}, n_{28}, n_{29}, n_{30}]$ & $[n_{1}, n_{8}, n_{10}, n_{13}]$ \\
+				      \hline
+			      \end{tabular}
+		      \end{center}
 		\item Pour finir on retourne l'ensemble des atomes associé à l'ensemble \textsf{LinkedNull} auquel ils appartiennent :
-		\begin{center}
-			\begin{tabular}{cll}
-				\hline
-				& \verb|a| & \verb|e| & \verb|linkedNulls| \\
-				\hline
-				hasPatho & [$N_1$, cancer] & $[n_{1}, n_{8}, n_{10}, n_{13}]$\\
-				$n_{22}$ &  & $[n_{1}, n_{8}, n_{10}, n_{13}]$\\
-				$n_{26}$ &  & $[n_{1}, n_{8}, n_{10}, n_{13}]$\\
-				$n_{28}$ &  & $[n_{1}, n_{8}, n_{10}, n_{13}]$\\
-				$n_{30}$ &  & $[n_{1}, n_{8}, n_{10}, n_{13}]$\\
-				\hline
-			\end{tabular}
-		\end{center}
+		      \begin{center}
+			      \begin{tabular}{lll}
+				      \hline
+				      \verb|a|                & \verb|e|                        & \verb|linkedNulls|               \\
+				      \hline
+				      hasPatho                & [$N_1$, cancer]                 & $[n_{1}, n_{8}, n_{10}, n_{13}]$ \\
+				      getTreatment            & [$N_1$, résection]              & $[n_{1}, n_{8}, n_{10}, n_{13}]$ \\
+				      Patient                 & [$N_1$, homme, 78]              & $[n_{1}, n_{8}, n_{10}, n_{13}]$ \\
+				      Exam                    & [$N_1$, $N_2$, $N_3$, 01-01-01] & $[n_{1}, n_{8}, n_{10}, n_{13}]$ \\
+				      Reveal                  & [$N_3$, fiévre]                 & $[n_{1}, n_{8}, n_{10}, n_{13}]$ \\
+				      Parameter               & [$N_3$, température, $N_4$]     & $[n_{1}, n_{8}, n_{10}, n_{13}]$ \\
+				      \hline
+			      \end{tabular}
+		      \end{center}
 	\end{enumerate}
 \end{example}
 
@@ -131,7 +132,7 @@ Si l'on ne prend pas l'instanciation la \textit{plus spécifique} il faudra la s
 
 \begin{algorithm}[ht]
 	\caption{$\textsc{Simplify}(I, \nu_0)$}
-    \label{algo:update:core}
+	\label{algo:update:core}
 	$PSet := \{\textsf{LinkedNull}_{I,N} \mid N \in \nu_0\}$\; \label{algo:update:core:pset}
 	\ForAll{$P \in PSet$}{
 		Construire et exécuter la requête $Q_{core}(I)$ pour récupérer l'ensemble des homomorphismes $H = \{h_1, \dots, h_n\}$\; \label{algo:update:core:qcore}
@@ -155,7 +156,7 @@ Dans la table $H_P$, $h_i \preceq h_i'$ si et seulement si, pour tout $j$ :
 \end{itemize}
 
 \begin{example}
-	
+
 \end{example}
 
 Cette approche basée sur la table $H_P $ est comparable aux techniques d'optimisation de requêtes \cite{}.
