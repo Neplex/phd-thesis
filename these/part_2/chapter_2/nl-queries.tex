@@ -1,0 +1,62 @@
+Les systèmes d'interrogation des bases de données graphiques qui s'adressent aux \textit{experts du domaine}, plutôt qu'aux experts des bases de données, sont d'un grand intérêt dans la recherche contemporaine.
+Il faut donc veiller à développer ces systèmes pour qu'ils soient plus conviviaux et accessibles à ceux qui n'ont pas de connaissances techniques approfondies.
+Bien que \gls{sparql} et \gls{cypher} soient des langages d'interrogation puissants, ils nécessitent une connaissance de la structure de la base de données pour extraire des informations.
+Afin d'améliorer l'accessibilité des bases de données structurées, la recherche sur les \gls{nli} a suscité beaucoup d'intérêt~\cite{wangCrossdomainNaturalLanguage2019,zhengQuestionAnsweringKnowledge2018}.
+L'objectif fondamental des interfaces en langage naturel est de permettre aux utilisateurs de se concentrer sur le sens de leurs requêtes plutôt que sur les mécanismes de recherche d'informations.
+
+Cette proposition met l'accent sur les requêtes factoïdes relatives aux instances d'une "classe" \gls{rdf} permettant
+\begin{enumerate*}[label=(\roman*)]
+    \item la prise en compte et l'application à d'autres domaines et
+    \item la création de concepts d'interrogation plus complexes.
+\end{enumerate*}
+L'idée est de fournir un système d'interrogation qui permette aux utilisateurs d'effectuer une recherche par facettes, qui consiste à filtrer les résultats de la recherche concernant uniquement les instances d'une seule classe \gls{rdf} (appelé \emph{classe cible}) en appliquant plusieurs critères.
+La proposition vise à convertir une requête exprimée en langage naturel (dénommée NL-query) en une requête de base de données (nommée DB-query).
+Cette approche repose sur le formalisme établi dans la section~\ref{sec:update:pre:db}, page~\pageref{sec:update:pre:db} basé sur \gls{fol}.
+En conséquence, ces requêtes peuvent être facilement traduites vers une modélisation graphe ou relationnelle en utilisant les langages de requêtes tels que \gls{sql}, \gls{sparql}, \gls{cypher}, etc.
+On définit une formule logique $\phi$ ayant pour atomes :
+\begin{enumerate}
+    \item $P(t_1, \dots, t_n)$ où $P$ est un symbole de prédicat d'arité $n$ et $t_1, \dots, t_n$ sont des termes pouvant être des constantes ou des variables ;
+    \item $\top$ (Vrai) / $\bot$ (Faux) ;
+    \item $(t\ op\ \alpha)$ où $t$ est un terme, $\alpha$ est un terme ou un littéral et $op$ est un opérateur de comparaison.
+\end{enumerate}
+On rappelle qu'un fait est un atome $P(t_1, \dots, t_n)$ où l'ensemble des termes $t_1, \dots, t_n$ sont des constantes.
+Par exemple, en \gls{rdf}, le fait $Book(Anatomy)$ signifie que $Anatomy$ est une instance de la classe \textbf{Book}.
+De manière similaire, $writtenBy(Anatomy, Bob)$, exprime que $Anatomy$ possède la valeur $Bob$ pour la propriété \textit{writtenBy}.
+Le schéma de la base de données est représenté par un ensemble de prédicats $\mathcal{S}$ et l'instance de la base de données est représenté par l'ensemble de faits $\mathcal{D}$
+
+\begin{definition}[NL-query]
+    Une NL-query est une requête exprimée en langage naturel qui suit le format suivant : \enquote{Trouver des livres qui...} (en établissant \textbf{Book} comme classe cible), \enquote{Trouver des médecins qui...} (en utilisant \textbf{Doctor} comme classe cible), etc.
+    Une requête valide sélectionne exclusivement des instances de  \emph{classe cible} (c'est-à-dire des nœuds du type donné) par l'intermédiaire de propriétés dont le domaine ou la portée est la \emph{classe cible} (c.-à-d. les arcs sortant ou entrant).
+    Par exemple, en supposant que \textbf{Book} est une \emph{classe cible}, une requête demandant des instances de \enquote{livres édités par le docteur Alice sur la cardiologie parut après 2018} est une requête acceptable.
+    Cependant, une requête demandant des exemples de \enquote{livres édités par le docteur Alice qui est cardiologue n'est pas acceptable}, car \emph{est un cardiologue} n'est pas une propriété (ou une arête) de la \emph{classe cible} sélectionnée.
+    Si l'utilisateur souhaite identifier des médecins écrivains, il doit d'abord modifier la spécification de sa classe solaire.
+    Plus simplement, on ne considère que des requêtes simples qui sont traduites en requêtes conjonctives de base de données identifiant des instances d'une classe particulière, même si elles fournissent également des informations sur les propriétés de ces instances.
+\end{definition}
+
+\begin{definition}[DB-query]
+    Une DB-query $q$ est une requête conjonctive sur un schéma donné $\mathcal{S}$ de la forme $R_0(u_0) \leftarrow \phi$ où $\phi = R_1(u_1) \dots  R_n(u_n), comp_1, \dots, comp_m$ où $n \geq 0$, $R_i$ sont des symboles de prédicats avec $0 \leq i \leq n$, $u_i$ est le tuple de termes de $R_i$ de longueur égale à l'arité de $R_i$ et $com_j$ sont des formules de comparaison qui incluent des variables trouvées dans au moins un tuple de $u_i$ avec $0 \leq j \leq m$.
+    $head(q)$ (respectivement $body(q)$) représente la partie gauche de la règle, dénommée tête (respectivement la partie droite, dénommée corps) de $q$.
+    $\mathbb{I}_q$ représente l'ensemble de réponses de $q$.
+    
+    Les réponses de $q$ sont des instanciations du tuple $u_0$ où l'ensemble des termes $t \in u_0$ sont des constantes.
+    C-à-d. qu'il existe, pour chaque instanciation $I \in \mathbb{I}_q$, une surjection $h_I$ de $u_0$ vers $I$ (qui associe des variables à des constantes et une constante à elle-même) tel que : $\{R_1(h_t((u_1)), \dots, R_n(h_t((u_n))\} \subseteq \mathcal{D}$, la conjonction de tous les $h_I(comp_j)$ est évaluée à vrai (selon la sémantique habituelle des opérateurs $op$) et $h_I(u_0)= I$.
+
+    % In this rule-based formalism, the union is expressed by allowing more than one rule with the same head.
+    % For instance, 
+    % $q(X) \leftarrow writtenBy(X, Bob)$ together with
+    % $q(X) \leftarrow editedBy(X, Bob)$
+    % express a query looking for documents written or edited by \textit{Bob}.
+\end{definition}
+
+
+
+
+
+Pour illustrer notre propos, nous utiliserons la requête $Q_{run}$ comme exemple de travail.
+Nous utiliserons le terme $NLQ_{run}$ pour illustrer le processus d'obtention d'une DB-query dans la suite de la section.
+Nous utiliserons cette notation lorsque nous nous référerons spécifiquement à la version NL-query.
+
+
+
+
+La requête en langage naturel suivante sera utilisée à titre d'exemple : \enquote{Localiser les livres intitulés \enquote{Principes de médecine} qui ont été écrits conjointement par Bob et Alice et dont le prix est inférieur à 30 euros.}

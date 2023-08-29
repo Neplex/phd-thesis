@@ -1,6 +1,6 @@
 Cette section constitue une vue d'ensemble des concepts et des notions fondamentales qui serviront de base aux chapitres suivants.
 Dans un premier temps une définition de la \glsfirst{fol} ainsi que les concepts de contraintes et de règles dans ce contexte seront présentés.
-Par la suite, nous aborderons les bases de données en adoptant le formalisme \gls{fol} et offrirons une brève introduction aux bases de données graphes.
+Par la suite, nous aborderons les bases de données en adoptant le formalisme \gls{fol} (se référer à~\cite{abiteboulFoundationsDatabases1995} pour plus d'informations sur cet aspect) et offrirons une brève introduction aux bases de données graphes.
 
 \subsection{Logique du premier ordre}
 \label{sec:update:pre:logic}
@@ -23,18 +23,24 @@ Formellement, on utilise comme alphabet :
     \item le quantificateur universel $\forall$ (quel que soit)
     \item le quantificateur existentiel $\exists$ (il existe)
 \end{itemize}
+
+\begin{definition}[Atome]
 Avec cet alphabet, on définit un atome $P(t_1, \dots, t_n)$ où $P$ est le symbole de prédicat d'arité $n$ et $t_1, \dots, t_n$ sont les termes.
 Les termes peuvent être une variable, une constante ou une valeur nulle.
 Un fait est un atome composé exclusivement de constantes, tandis qu'un atome instancié est un atome ne contenant aucune variable.
 Étant donné un atome instancié $A$, $null(A)$ représente l'ensemble des valeurs nulles de $A$.
+\end{definition}
 
+\begin{definition}[Homomorphisme]
 Un homomorphisme $h$ entre deux ensembles d'atomes $A$ et $B$ est une application surjective des termes de $A$ vers les termes de $B$, telle que :
 \begin{enumerate*}[label=(\roman*)]
     \item si, $h(t) = t$, alors $t$ est une constante
     \item si, $P(t_1, \dots, t_n) \in A$, alors $P(h(t_1), \dots, h(t_n)) \in B$.
 \end{enumerate*}
 S'il existe un homomorphisme inverse $h^-$ tel que $h^-(h(t)) = t$ alors ont dit que $A$ est \emph{isomorphe} à $B$.
+\end{definition}
 
+\begin{definition}[Simplication]
 $\Phi$ est l'ensemble de toutes les formules $\phi$, existentiellement quantifiées, de la forme $(\exists X)(\varphi_1(X_1) \land \dots \land \varphi_n(X_n))$ où $X$ est l'ensemble des variables et $\varphi_i(X_i)$ est une formule atomique dont $X_i \subset X$ représente l'ensemble des variables libres.
 $atoms(\phi)$ est l'ensemble des formules atomique de $phi$.
 Un modèle $M$ d'une formule $\phi$ est l'ensemble des faits qui ont un homomorphisme de $atoms(\phi)$ vers $M$.
@@ -45,21 +51,28 @@ Une simplification $\phi_1$ de $\phi_2$ est \emph{minimale} si $\phi_1 \sqsubset
 Par exemple, étant donné la formule $\phi = (\exists x, y)(P(a, x) \land P(a, y))$, les formules $(\exists x)(P(a, x))$ et $(\exists y)(P(a, y))$ sont équivalentes et sont toutes deux une simplification de $\phi$.
 De plus, \cite{chabinConsistentUpdatingDatabases2020} démontre que si $\phi_1$ et $\phi_2$ sont deux simplifications minimales d'une même formule $\phi$ alors les ensembles $atoms(\phi_1)$ et $atoms(\phi_2)$ sont isomorphes.
 La simplification minimale d'une formule $\phi$ est appelé le \gls{core} et s'écrit $core(\phi)$.
+\end{definition}
 
 \subsection{Base de données}
 \label{sec:update:pre:db}
 
+\begin{definition}[Instance]
 L'\emph{instance} d'une base de données $\mathcal{D}$ peut être définie comme la Skolémisation d'une formule $\phi$, représentant un ensemble minimal d'atomes instanciés, pour lequel $core(\phi) = \phi$.
 La Skolémisation d'une formule $\phi$, notée $Sk(\phi)$, revient à substituer l'ensemble des variables par des constantes ou des valeurs nulles, tout en éliminant chaque occurrence du quantificateur existentiel.
+\end{definition}
 
+\begin{definition}[Requête]
 Une \emph{requête} effectuée sur une base de données est une formule logique de la forme $(\forall X)(Q(X) \gets \phi(X))$, où $X$ représente l'ensemble des variables libres de $\phi$.
 La réponse à une requête effectuée sur une base de données $\mathcal{D}$ correspond à l'ensemble des homomorphismes $h$ tels que $h(\phi(X)) \subseteq \mathcal{D}$.
+\end{definition}
 
+\begin{definition}[Contrainte]
 Une \emph{contrainte} (ou règle) sur une base de donnée est une dépendance génératrice de n-uplets, également appelée \glsfirst{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
 Plus simplement écrit $body(X, Y) \to head(X, Z)$, où $X$, $Y$ et $Z$ représentent des ensembles de variables, $body(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
 Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés, noté $I \vDash c$ si pour tout homomorphisme $h$ tel que $h(body(c)) \subseteq I$ il existe un homomorphisme $h'$ tel que $h'(body(c)) = h(body(c))$ et $h'(head(c)) \in I$.
 Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, pour toute instanciation du corps présente dans la base de données, la tête correspondante doit aussi être présente dans la base.
 Une instance $I$ d'une base de données est dites \emph{cohérente} vis-à-vis d'un ensemble de contraintes $\mathbb{C}$, noté $I \vDash \mathbb{C}$ si pour toute contrainte $c$ dans $\mathbb{C}$, $I \vDash c$.
+\end{definition}
 
 \subsection{Base de données graphes}
 \label{sec:update:pre:graph}
