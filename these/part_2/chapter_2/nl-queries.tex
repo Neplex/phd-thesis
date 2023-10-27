@@ -1,17 +1,19 @@
-Les systèmes d'interrogation des bases de données graphiques qui s'adressent aux \textit{experts du domaine}, plutôt qu'aux experts des bases de données, sont d'un grand intérêt dans la recherche contemporaine.
-Il faut donc veiller à développer ces systèmes pour qu'ils soient plus conviviaux et accessibles à ceux qui n'ont pas de connaissances techniques approfondies.
-Bien que \gls{sparql} et \gls{cypher} soient des langages d'interrogation puissants, ils nécessitent une connaissance de la structure de la base de données pour extraire des informations.
-Afin d'améliorer l'accessibilité des bases de données structurées, la recherche sur les \gls{nli} a suscité beaucoup d'intérêt~\cite{wangCrossdomainNaturalLanguage2019,zhengQuestionAnsweringKnowledge2018}.
-L'objectif fondamental des interfaces en langage naturel est de permettre aux utilisateurs de se concentrer sur le sens de leurs requêtes plutôt que sur les mécanismes de recherche d'informations.
+Les systèmes d'interrogation de bases de donnés graphes visant les \emph{experts du domaine} plutôt que les experts dans des bases de données, suscitent un intérêt grandissant, car ce sont ces utilisateurs auxquels profite le plus l'information et qui sont les plus aptes à la transformer en connaissance.
+Il est donc crucial de rendre ces systèmes plus conviviaux et accessibles aux utilisateurs sans compétences techniques avancées.
+Malgré la puissance des langages d'interrogation comme \gls{sql} \gls{sparql} ou encore \gls{cypher}, leur utilisation nécessite une compréhension de la structure des données et de leurs interactions.
+Afin d'améliorer l'accessibilité à l'information sauvegardée dans ces \gls{sgbd}, la recherche sur les \gls{nli} a suscité beaucoup d'intérêt ces dernières années \cite{zhengQuestionAnsweringKnowledge2018,wangCrossdomainNaturalLanguage2019}.
+L'intérêt fondamental des interfaces en langage naturel réside dans la capacité à permettre aux utilisateurs de se concentrer sur la signification de leurs requêtes, plutôt que sur les mécanismes sous-jacents de recherche d'information.
 
-Cette proposition met l'accent sur les requêtes factoïdes relatives aux instances d'une "classe" \gls{rdf} permettant
+Dans ce contexte, et en s'appuyant sur les méthodes de reconnaissances d'informations textuelles présentées dans les sections précédentes, on s'intéresse aux requêtes factuelles sur les instances d'une \emph{classe} \gls{rdf} avec deux objectifs principaux :
 \begin{enumerate*}[label=(\roman*)]
-    \item la prise en compte et l'application à d'autres domaines et
+    \item la facilité d'appliquer le système à divers domaines et
     \item la création de concepts d'interrogation plus complexes.
 \end{enumerate*}
-L'idée est de fournir un système d'interrogation qui permette aux utilisateurs d'effectuer une recherche par facettes, qui consiste à filtrer les résultats de la recherche concernant uniquement les instances d'une seule classe \gls{rdf} (appelé \emph{classe cible}) en appliquant plusieurs critères.
-La proposition vise à convertir une requête exprimée en langage naturel (dénommée NL-query) en une requête de base de données (nommée DB-query).
-Cette approche repose sur le formalisme établi dans la section~\ref{sec:update:pre:db}, page~\pageref{sec:update:pre:db} basé sur \gls{fol}.
+L'objectif est de concevoir un système d'interrogation permettant aux utilisateurs d'effectuer des recherches par facettes.
+La recherche par facette consiste à filtrer une collection de données basée sur une unique collection d'individus par l'application de différents critères.
+Il s'agit d'une requête conjonctive sur une unique classe appelée \emph{classe cible}.
+
+La proposition faite dans cette section est la transformation d'une requête exprimée en langage naturel (nommée NL-query) en une requête de base de données (dénommée DB-query) et repose sur le formalisme établi dans la section~\ref{sec:update:pre:db}, page~\pageref{sec:update:pre:db} basé sur \gls{fol}.
 En conséquence, ces requêtes peuvent être facilement traduites vers une modélisation graphe ou relationnelle en utilisant les langages de requêtes tels que \gls{sql}, \gls{sparql}, \gls{cypher}, etc.
 On définit une formule logique $\phi$ ayant pour atomes :
 \begin{enumerate}
@@ -25,7 +27,7 @@ De manière similaire, $writtenBy(Anatomy, Bob)$, exprime que $Anatomy$ possède
 Le schéma de la base de données est représenté par un ensemble de prédicats $\mathcal{S}$ et l'instance de la base de données est représenté par l'ensemble de faits $\mathcal{D}$
 
 \begin{definition}[NL-query]
-    Une NL-query est une requête exprimée en langage naturel qui suit le format suivant : \enquote{Trouver des livres qui...} (en établissant \textbf{Book} comme classe cible), \enquote{Trouver des médecins qui...} (en utilisant \textbf{Doctor} comme classe cible), etc.
+    Une NL-query est une requête exprimée en langage naturel qui suit le format suivant : \enquote{Trouver des livres qui \dots} (en établissant \textbf{Book} comme \emph{classe cible}), \enquote{Quels médecins \dots} (en utilisant \textbf{Doctor} comme \emph{classe cible}), etc.
     Une requête valide sélectionne exclusivement des instances de  \emph{classe cible} (c'est-à-dire des nœuds du type donné) par l'intermédiaire de propriétés dont le domaine ou la portée est la \emph{classe cible} (c.-à-d. les arcs sortant ou entrant).
     Par exemple, en supposant que \textbf{Book} est une \emph{classe cible}, une requête demandant des instances de \enquote{livres édités par le docteur Alice sur la cardiologie parut après 2018} est une requête acceptable.
     Cependant, une requête demandant des exemples de \enquote{livres édités par le docteur Alice qui est cardiologue n'est pas acceptable}, car \emph{est un cardiologue} n'est pas une propriété (ou une arête) de la \emph{classe cible} sélectionnée.
@@ -37,7 +39,7 @@ Le schéma de la base de données est représenté par un ensemble de prédicats
     Une DB-query $q$ est une requête conjonctive sur un schéma donné $\mathcal{S}$ de la forme $R_0(u_0) \leftarrow \phi$ où $\phi = R_1(u_1) \dots  R_n(u_n), comp_1, \dots, comp_m$ où $n \geq 0$, $R_i$ sont des symboles de prédicats avec $0 \leq i \leq n$, $u_i$ est le tuple de termes de $R_i$ de longueur égale à l'arité de $R_i$ et $com_j$ sont des formules de comparaison qui incluent des variables trouvées dans au moins un tuple de $u_i$ avec $0 \leq j \leq m$.
     $head(q)$ (respectivement $body(q)$) représente la partie gauche de la règle, dénommée tête (respectivement la partie droite, dénommée corps) de $q$.
     $\mathbb{I}_q$ représente l'ensemble de réponses de $q$.
-    
+
     Les réponses de $q$ sont des instanciations du tuple $u_0$ où l'ensemble des termes $t \in u_0$ sont des constantes.
     C-à-d. qu'il existe, pour chaque instanciation $I \in \mathbb{I}_q$, une surjection $h_I$ de $u_0$ vers $I$ (qui associe des variables à des constantes et une constante à elle-même) tel que : $\{R_1(h_t((u_1)), \dots, R_n(h_t((u_n))\} \subseteq \mathcal{D}$, la conjonction de tous les $h_I(comp_j)$ est évaluée à vrai (selon la sémantique habituelle des opérateurs $op$) et $h_I(u_0)= I$.
 
@@ -48,15 +50,25 @@ Le schéma de la base de données est représenté par un ensemble de prédicats
     % express a query looking for documents written or edited by \textit{Bob}.
 \end{definition}
 
+\begin{example}
+    La requête $NLQ_{run}$ en langage naturel suivante sera utilisée à titre d'exemple :
+    \begin{displayquote}
+        Localiser les livres intitulés \enquote{Principes de médecine} qui ont été écrits conjointement par Bob et Alice et dont le prix est inférieur à 30 euros.
+    \end{displayquote}
+
+    Dans cette requête, \textbf{Book} est la \emph{classe cible} et se traduit dans la DB-query $Q_{run}$ suivante :
+    \begin{multline*}
+        Q(x)  \leftarrow Book (x), hasTitle (x, y_1), writtenBy (x, y_2), Person (y_2), writtenBy (x, y_3), Person(y_3),\\
+        hasPrice(x, y_4), (y_1 = \text{"Principles of Medicine"}), (y_2= \text{:bob}), (y_3 = \text{:alice}), (y_4 < 30)
+    \end{multline*}
+\end{example}
+
+\subsection{Reconnaissance d'entités}
 
 
+\subsection{Construction de DB-query à partir d'entités enrichies}
 
 
-Pour illustrer notre propos, nous utiliserons la requête $Q_{run}$ comme exemple de travail.
-Nous utiliserons le terme $NLQ_{run}$ pour illustrer le processus d'obtention d'une DB-query dans la suite de la section.
-Nous utiliserons cette notation lorsque nous nous référerons spécifiquement à la version NL-query.
+\subsection{Évaluation}
 
 
-
-
-La requête en langage naturel suivante sera utilisée à titre d'exemple : \enquote{Localiser les livres intitulés \enquote{Principes de médecine} qui ont été écrits conjointement par Bob et Alice et dont le prix est inférieur à 30 euros.}

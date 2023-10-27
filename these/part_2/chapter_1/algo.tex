@@ -1,0 +1,301 @@
+\begin{algorithm}[H]
+    \caption{$\textsf{ALGO}(T = (D, t), epochs, \tau, minSupport)$}
+    \SetKwFunction{reduce}{reduce}
+    \SetKwFunction{findGroups}{findGroups}
+    \SetKwFunction{findSubgroups}{findSubgroups}
+    \SetKwFunction{mergeGroups}{mergeGroups}
+    \SetKwFunction{findCollections}{findCollections}
+    \SetKwFunction{findRelationship}{findRelationship}
+
+    \While{$i \leq \text{epochs}$ and $simp$}{
+        $i \gets i + 1$\;
+        simp $\gets$ True\;
+
+        \tcp{Supprimer les neouds redondants}
+        \lForAll{$p \in D_i$  tel que $t_i(p) \notin \{`ENT`, `LEAF`\}$}{
+            \reduce{$T_i$, $p$, $\emptyset$}
+        }
+
+        \tcp{Identifier les neouds groupes}
+        \findGroups{$T_i$, $\tau$, minSupport}\;
+
+        \tcp{Ajouter des neouds pour separer un sous-groupe frequent}
+        simp $\gets$ \findSubgroups{$T_i$, $\tau$, minSupport}\;
+
+        \tcp{Fusionner des noeuds voisin pour augmenter un groupes}
+        \lIf{simp = False}{
+            simp $\gets$ \mergeGroups{$T_i$, $\tau$, minSupport}
+        }
+
+        \tcp{Identifier les collections de groupes}
+        \lIf{simp = False}{
+            simp $\gets$ \findCollections{$T_i$, $\tau$, minSupport}
+        }
+
+        \tcp{Identifier les relations}
+        \lIf{simp = False}{
+            simp $\gets$ \findRelationship{$T_i$, $\tau$, minSupport}
+        }
+
+        \tcp{Identifier les collections de relations}
+        \lIf{simp = False}{
+            simp $\gets$ \findCollections{$T_i$, $\tau$, minSupport}
+        }
+
+        \tcp{Aplatir l'arbre en haut}
+        \If{simp = False}{
+            \ForEach{$p \in D_i$  tel que $\text{depth}(p) = 1$}{
+                simp $\gets$ \reduce{$T_i$, p, $\{`ENT`, `GROUP`, `REL`, `COLL`\}$}\;
+            }
+        }
+
+        \tcp{Supprimer les noeuds non labelisés en bas}
+        \If{simp = False}{
+            \ForEach{$u.j \in D_i$ où $t(u.j) = `ENT$'}{
+                simp $\gets$ \reduce{$T_i$, u, $\{`ENT`, `GROUP`, `REL`, `COLL`\}$}\;
+            }
+        }
+    }
+\end{algorithm}
+
+\FloatBarrier
+
+\subsection{Opérations de structuration}
+
+\begin{algorithm}
+    \caption{$\textsf{findGroups}(T = (D, t), \tau, minSupport)$}
+    \SetKwFunction{findSTwithMinLeavesTree}{findSTwithMinLeavesTree}
+    \SetKwFunction{insElem}{ins\_elem}
+    \SetKwFunction{delElem}{del\_elem}
+    \SetKwFunction{leaves}{leaves}
+
+    \tcp{Identifier les clusters de sous arbres equivalent et garder uniquement les fréquents}
+    $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/\equiv_\tau, |equiv\_pos| \ge minSupport\}$\;
+    $k \gets 0$\;
+
+    \While{$equivalent\_st \neq \emptyset$}{
+        $ST\_min \gets \findSTwithMinLeavesTree(equivalent\_st)$\;
+        $equivalent\_st \gets equivalent\_st \setminus ST\_min$\;
+
+        \ForEach{$st \in ST\_min$ tel que $\{e | e \in st, t(e) \neq `GROUP`\} = \emptyset$}{
+            $j \gets 0$\;
+            Construire $T_{GROUP} = (D_{GROUP}, t_{GROUP})$ un nouvel arbre avec $t_{GROUP}(\epsilon) = `GROUP_k`$\;
+
+            \ForEach{$l \in \leaves(st)$}{
+                $\insElem(T_{GROUP}, l, j)$\;
+                $j \gets j + 1$\;
+            }
+
+            $\insElem(T_i, st)$\;
+            $\delElem(T_i, t_{GROUP}, st)$\;
+            $k \gets k+1$\;
+        }
+    }
+\end{algorithm}
+
+% \nh{Something is not great here, in findSubgroups. We mixed a set of positions with a set of labels. The set contains trees but the combinaition should not allow a label to appear multiple times}
+
+\begin{algorithm}
+    \caption{$\textsf{findSubgroups}(T = (D, t), minSupport)$}
+    \SetKwData{groupFound}{groupFound}
+    \SetKwData{st}{st}
+
+    \SetKwFunction{combination}{combination}
+    \SetKwFunction{insElem}{ins\_elem}
+    \SetKwFunction{delElem}{del\_elem}
+
+    $\groupFound \gets$ \textbf{False}\;
+
+    \ForAll{sous-arbre \st tel que $\st = T|_u$ et $t(u) \notin \{`ENT`, `REL`, `COLL`\}$}{
+        $S_{ENT} \gets \{T|_{u.i} \mid \forall i \ t(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
+        $group\_support \gets |[\st]_\tau|$\;
+
+        $k \gets |S_{ENT}|$\;
+        \While{$k > 1$}{
+            $j \gets 0$\;
+
+            \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S_{ENT}}$}
+            \ForEach{combinaison  $combi_j \in \combination(S_{ENT}, k)$}{
+                $T_j \gets \text{copy}(T)$ \tcp*{$T_j$ est l'arbre où l'on remplace l'ensemble $combi_j$ par un groupe}
+                
+                $\insElem(T_j, GROUP, u.0)$\;
+                \ForAll{$\st_E \in combi_j$}{
+                    $\delElem(T_j, u.i)$ tel que $T_j|_{u.i} = \st_E$\;
+                    $\insElem(T_j, \st_E, u.0.0)$\;
+                }
+
+                $support_j \gets |[T_j|_{u.0}]|$ \tcp*{$[T_j|_{u.0}]$ est l'ensemble équivalent qui contient le sous-arbre $T_j|_{u.0}$}
+                $j \gets j + 1$\;
+            }
+
+            \BlankLine
+            \tcp{Choisir le groupe qui a le plus grand support}
+            $j_{max}$ est un indice tel que $support_{j_{max}} = \max(support_j)$\;
+
+            \If{$support_{j_{max}} \ge min\_support$ et $support_{j_{max}} > group\_support$}{
+                \tcp{On continue de combiner les arbres d'entités restants dans \st}
+                $\groupFound \gets$ \textbf{True}\;
+                $S_{ENT} \gets S_{ENT} \setminus combi_{j_{max}}$\;
+                \tcp{La taille de la combinaison suivante $k$ est reduite lorsque $|S_{ENT}| < k$}
+                $k \gets \min(|S_{ENT}|, k)$\;
+                $T \gets T_{j_{max}}$ \tcp*[l]{L'arbre modifié est sauvegardé}
+            } \Else {
+                $k \gets k - 1$\;
+            }
+        }
+    }
+
+    \Return \groupFound \;
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{$\textsf{mergeGroups}(T = (D, t), minSupport)$}
+    \SetKwData{groupFound}{groupFound}
+    \SetKwData{st}{st}
+
+    \SetKwFunction{combination}{combination}
+    \SetKwFunction{insElem}{ins\_elem}
+    \SetKwFunction{delElem}{del\_elem}
+
+    $\groupFound \gets$ \textbf{False}\;
+
+    \ForAll{subtree \st such that $\st = T|_u$ and $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
+        $S_{GROUP} = \{T|_{u.i} \mid \forall i \ t(u.i) = `GROUP`\}$ \tcp*{Ensemble des arbres groupe enfants de \st}
+        $S_{ENT} = \{T|_{u.i} \mid \forall i \ t(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
+
+        $k \gets |S_{GROUP}/\equiv_\tau| + |S_{ENT}|$\;
+        \While{$k > 1$}{
+            $j \gets 0$\;
+
+            \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S_{GROUP} \cup S_{ENT}}$}
+            \ForAll{combination $combi_j \in \text{Combination}(S_{GROUP} \cup S_{ENT}, k)$}{
+                \tcp{For each subset of size $k$ in $\mathcal{P}_{S}$}
+                $ST = \{x \mid \forall x~t(x) = `GROUP`\}$\;
+                $ST_{ENT} = \{T|_{u.i} \mid \forall x~t(x) = `ENT`\} \cup \{x \mid \forall g \in ST, \forall x \in g\}$\;
+
+                \lIf{$ST_{ENT}$ contient plusieurs fois la même entitée}{SKIP}
+
+                $subgroup\_support_j \gets \max(|g| \mid \forall g \in ST)$\;
+                $T_j \gets \text{copy}(T)$ \tcp*{$T_j$ est l'arbre où l'on remplace l'ensemble $combi_j$ par un groupe}
+
+                $\insElem(T_j, GROUP, u.0)$\;
+                \ForAll{$\st_E \in ST_{ENT}$}{
+                    $\delElem(T_j, u.i)$ such that $T_j|_{u.i} = \st_E$\;
+                    $\insElem(T_j, \st_E, u.0.0)$\;
+                }
+
+                $support_j \gets |[T_j|_{u.0}]_\tau|$ \tcp*{$[T_j|_{u.0}]$ est l'ensemble équivalent qui contient le sous-arbre $T_j|_{u.0}$}
+                $j \gets j + 1$\;
+            }
+
+            \BlankLine
+            \tcp{Choisir le groupe qui a le plus grand support}
+            $j_{max}$ est un indice tel que $support_{j_{max}} = \max(support_j \mid support_j \ge subgroup\_support_j)$\;
+
+            \If{$support_{j_{max}} \ge min\_support$}{
+                \tcp{On continue de combiner les arbres d'entités restants dans \st}
+                $\groupFound \gets$ \textbf{True}\;
+                $S_{ENT} \gets S_{ENT} \setminus combi_{j_{max}}$\;
+                \tcp{La taille de la combinaison suivante $k$ est reduite lorsque $|S_{ENT}| < k$}
+                $k \gets \min(|S_{ENT}|, k)$\;
+                $T \gets T_{j_{max}}$ \tcp*[l]{L'arbre modifié est sauvegardé}
+            } \Else {
+                $k \gets k - 1$\;
+            }
+        }
+    }
+
+    \Return \groupFound \;
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{$\textsf{findRelationship}(T = (D, t), minSupport)$}
+    \SetKwData{relationshipFound}{relationshipFound}
+    \SetKwData{splitColl}{splitColl}
+    \SetKwData{st}{st}
+
+    \SetKwFunction{combination}{combination}
+    \SetKwFunction{insElem}{ins\_elem}
+    \SetKwFunction{delElem}{del\_elem}
+
+    $\relationshipFound \gets$ \textbf{False}\;
+
+    \ForEach{sous-arbre \st tel que $\st = T|_u$, $|\st| = 2$, et $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
+
+        \If{$t(u.0) = `GROUP`$ and $t(u.1) = `GROUP`$}{
+            \tcp{tout les enfants de \st sont des noeuds groupe, il est donc marqué comme relation}
+            $t(u) \gets `REL`$\;
+            $\relationshipFound \gets$ \textbf{True}\;
+        }
+
+        \If{$(t(u.0) = `COLL`$ et $t(u.1) = `GROUP`)$ or $(t(u.0) = `GROUP`$ et $t(u.1) = `COLL`)$}{
+            $group \gets u.l$ tel que $t(u.l) = `GROUP`$\;
+            $coll \gets u.m$ tel que $t(u.m) = `GROUP`$\;
+
+            \ForAll{$i \in coll$}{
+                $pos \gets |T|_{coll}|$\;
+                \tcp{Ajout d'une relation pour chaque paire $\langle group, T|_{coll.i} \rangle$}
+                $\insElem(T, `REL`, u.pos)$\;
+                $\insElem(T, T|_{group}, u.pos.0)$\;
+                $\insElem(T, T|_{coll.i}, u.pos.1)$\;
+                $\delElem(T, coll.i)$\;
+            }
+            
+            $\delElem(T, group)$\;
+            $\relationshipFound \gets$ \textbf{True}\;
+        }
+    }
+
+    \Return \relationshipFound \;
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{findCollections($T = (D, t), \text{minSupport}$)}
+    \SetKwData{collectionFound}{collectionFound}
+    \SetKwData{subSet}{subSet}
+    \SetKwData{subPos}{subPos}
+    \SetKwData{st}{st}
+
+    \SetKwFunction{combination}{combination}
+    \SetKwFunction{insElem}{ins\_elem}
+    \SetKwFunction{delElem}{del\_elem}
+
+    $\collectionFound \gets \text{False}$
+
+    \ForEach{sous-arbre \st tel que $\st = T|_u$ et $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
+        $pos \gets |st|$\\
+
+        \tcp{Construction d'une collection de groupes ou de relations}
+        \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $t|_{u.i} \in [x]$, $t(u.i) \in \{`GROUP`, `REL`\}$ et $|\subSet| \ge 2$}{
+            $\collectionFound \gets \text{True}$
+            $\insElem(T, `COLL`, u.pos)$
+            \ForAll{$u.i \in \subSet$}{
+                $\insElem(T, T|_{u.i}, u.pos.0)$
+                $\delElem(T, \subPos)$
+            }
+        }
+
+        \tcp{Fusion de collections}
+        \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $T|_{u.i} \in [x]$, $t(u.i) \in \{`COLL`\}$ et $|\subSet| \ge 2$}{
+            $\collectionFound \gets \text{True}$
+            $\insElem(T, `COLL`, u.pos)$
+
+            \ForAll{$u.i.j$ tel que $u.i \in \subSet$}{
+                $\insElem(T, T|_{u.i.j}, u.pos.0)$
+                $\delElem(T, u.i.j)$
+            }
+        }
+
+        \tcp{Ajout d'elements à une collection}
+        \ForAll{$group, coll$ tel que $\exists x, i, j$ où $t(u.i) = `GROUP`$, $t(u.j) = `COLL`$, $T|_{u.i} \in [x]$ et $\forall k T|_{u.j,k} \in [x]$}{
+            $\collectionFound \gets \text{True}$
+            $group\_pos = |T|_{u.j}|$
+            $\insElem(T, T|_{u.i}, u.j.group\_pos)$
+            $\delElem(T, u.i)$
+        }
+    }
+
+    \Return \collectionFound \;
+\end{algorithm}
+
+\FloatBarrier

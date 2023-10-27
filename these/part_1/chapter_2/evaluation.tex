@@ -110,20 +110,20 @@ Cette baisse de performance été attendue, mais elle s'avère plus importante q
 \begin{figure}[ht]
     \centering
     \begin{tikzpicture}
-        \begin{axis}[xbar, every axis plot/.append style={fill},, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL,Neo4J}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.25\textheight]
-            \addplot+[pattern=grid, area legend] table [y=db, x=chase, col sep=comma] {these/part_1/chapter_3/time_per_db.csv};
+        \begin{axis}[xbar, every axis plot/.append style={fill}, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL,Neo4J}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.25\textheight]
+            \addplot+[pattern=grid, area legend] table [y=db, x=chase, col sep=comma] {these/part_1/chapter_2/time_per_db.csv};
             \addlegendentry{Chase};
             \label{figure:update:xp:db:chase}
 
-            \addplot+[pattern=north east lines, area legend] table [y=db, x=nullBucket, col sep=comma] {these/part_1/chapter_3/time_per_db.csv};
+            \addplot+[pattern=north east lines, area legend] table [y=db, x=nullBucket, col sep=comma] {these/part_1/chapter_2/time_per_db.csv};
             \addlegendentry{Null bucket};
             \label{figure:update:xp:db:nullBucket}
 
-            \addplot+[pattern=north west lines, area legend] table [y=db, x=partitions, col sep=comma, col sep=comma] {these/part_1/chapter_3/time_per_db.csv};
+            \addplot+[pattern=north west lines, area legend] table [y=db, x=partitions, col sep=comma, col sep=comma] {these/part_1/chapter_2/time_per_db.csv};
             \addlegendentry{LinkedNulls};
             \label{figure:update:xp:db:partitions}
 
-            \addplot+[pattern=crosshatch, area legend] table [y=db, x=simplifications, col sep=comma] {these/part_1/chapter_3/time_per_db.csv};
+            \addplot+[pattern=crosshatch, area legend] table [y=db, x=simplifications, col sep=comma] {these/part_1/chapter_2/time_per_db.csv};
             \addlegendentry{Simplifications};
             \label{figure:update:xp:db:simplifications}
         \end{axis}
@@ -151,25 +151,25 @@ La différence entre \gls{mysql} et \gls{neo4j} peux s'expliquer par la construc
     \centering
     \begin{tikzpicture}
         \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Nombre de requêtes}, legend columns=-1, legend style={draw=none, at={(0.4,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-            \addplot+[mark=triangle*] table [x=nulls, y=mysqlAdd, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+            \addplot+[mark=triangle*] table [x=nulls, y=mysqlAdd, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
             \addlegendentry{MySQL (INS)};
 
-            \addplot+[mark=triangle*] table [x=nulls, y=mysqlDel, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+            \addplot+[mark=triangle*] table [x=nulls, y=mysqlDel, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
             \addlegendentry{MySQL (DEL)};
 
-            \addplot+[mark=square*] table [x=nulls, y=neoAdd, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+            \addplot+[mark=square*] table [x=nulls, y=neoAdd, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
             \addlegendentry{Neo4J (INS)};
 
-            \addplot+[mark=square*] table [x=nulls, y=neoDel, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+            \addplot+[mark=square*] table [x=nulls, y=neoDel, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
             \addlegendentry{Neo4J (DEL)};
         \end{axis}
         \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nombre de faits}, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-            \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+            \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
             \addlegendentry{Nombre de faits};
             \label{figure:update:xp:nbfacts}
         \end{axis}
         \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-            \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+            \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
             \addlegendentry{$\tau$};
             \label{figure:update:xp:tau}
         \end{axis}
@@ -191,18 +191,18 @@ Dans ce cas, les constantes et les valeurs nulles sont traité de la même mani�
     \begin{subfigure}{\linewidth}
         \begin{tikzpicture}
             \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.4,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                \addplot+[mark=triangle*] table [x=nulls, y=mysqlAdd, col sep=comma] {these/part_1/chapter_3/time_per_nulls.csv};
+                \addplot+[mark=triangle*] table [x=nulls, y=mysqlAdd, col sep=comma] {these/part_1/chapter_2/time_per_nulls.csv};
                 \addlegendentry{Insert};
 
-                \addplot+[mark=triangle*] table [x=nulls, y=mysqlDel, col sep=comma] {these/part_1/chapter_3/time_per_nulls.csv};
+                \addplot+[mark=triangle*] table [x=nulls, y=mysqlDel, col sep=comma] {these/part_1/chapter_2/time_per_nulls.csv};
                 \addlegendentry{Delete};
             \end{axis}
             \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.63,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_3/time_per_nulls.csv};
+                \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_2/time_per_nulls.csv};
                 \addlegendentry{Number of facts};
             \end{axis}
             \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+                \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
                 \addlegendentry{$\tau$};
             \end{axis}
         \end{tikzpicture}
@@ -214,28 +214,28 @@ Dans ce cas, les constantes et les valeurs nulles sont traité de la même mani�
         \begin{adjustbox}{width=\linewidth}
             \begin{tikzpicture}
                 \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=4, legend style={draw=none, at={(0.5,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot+[mark=*] table [x=nulls, y=mysqlChase, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=*] table [x=nulls, y=mysqlChase, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{Chase};
                     \label{figure:update:xp:mysql:chase}
 
-                    \addplot+[mark=square*] table [x=nulls, y=mysqlNullBucket, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=square*] table [x=nulls, y=mysqlNullBucket, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{NullBucket};
                     \label{figure:update:xp:mysql:bucket}
 
-                    \addplot+[mark=triangle*] table [x=nulls, y=mysqlPartitions, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=triangle*] table [x=nulls, y=mysqlPartitions, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{LinkedNulls};
                     \label{figure:update:xp:mysql:linkednulls}
 
-                    \addplot+[mark=diamond*] table [x=nulls, y=mysqlSimplifications, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=diamond*] table [x=nulls, y=mysqlSimplifications, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{Simplify};
                     \label{figure:update:xp:mysql:core}
                 \end{axis}
                 \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.5,-0.3)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{Number of facts};
                 \end{axis}
                 \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
                     \addlegendentry{$\tau$};
                 \end{axis}
             \end{tikzpicture}
@@ -243,7 +243,7 @@ Dans ce cas, les constantes et les valeurs nulles sont traité de la même mani�
         \caption{Temps d'exécution de chaque opération par nombre de valeurs nulles dans l'instance}
         \label{figure:update:xp:mysql:full}
     \end{subfigure}
-    \caption[Résultats des expérimentations pour MySQL]{Résultats des expérimentations sur \num{540} scenarios, obtenue par moyenne sur \num{10} itérations pour \gls{mysql}}
+    \caption[Résultats des expérimentations pour MySQL]{Résultats des expérimentations sur \num{540} scenarios, obtenue par moyenne sur \num{10} itérations pour \gls*{mysql}}
     \label{figure:update:xp:mysql}
 \end{figure}
 
@@ -253,18 +253,18 @@ Dans ce cas, les constantes et les valeurs nulles sont traité de la même mani�
         \begin{adjustbox}{width=\linewidth}
             \begin{tikzpicture}
                 \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.4,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot+[mark=square*] table [x=nulls, y=neoAdd, col sep=comma] {these/part_1/chapter_3/time_per_nulls.csv};
+                    \addplot+[mark=square*] table [x=nulls, y=neoAdd, col sep=comma] {these/part_1/chapter_2/time_per_nulls.csv};
                     \addlegendentry{Insert};
 
-                    \addplot+[mark=square*] table [x=nulls, y=neoDel, col sep=comma] {these/part_1/chapter_3/time_per_nulls.csv};
+                    \addplot+[mark=square*] table [x=nulls, y=neoDel, col sep=comma] {these/part_1/chapter_2/time_per_nulls.csv};
                     \addlegendentry{Delete};
                 \end{axis}
                 \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.63,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_3/time_per_nulls.csv};
+                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_2/time_per_nulls.csv};
                     \addlegendentry{Number of facts};
                 \end{axis}
                 \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
                     \addlegendentry{$\tau$};
                 \end{axis}
             \end{tikzpicture}
@@ -277,28 +277,28 @@ Dans ce cas, les constantes et les valeurs nulles sont traité de la même mani�
         \begin{adjustbox}{width=\linewidth}
             \begin{tikzpicture}
                 \begin{axis}[enlarge x limits = 0, ymin=0, xlabel={Nb of nulls}, ylabel={Time}, y unit=\si{\ms}, legend columns=4, legend style={draw=none, at={(0.5,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot+[mark=*] table [x=nulls, y=neoChase, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=*] table [x=nulls, y=neoChase, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{Chase};
                     \label{figure:update:xp:neo4j:full:chase}
 
-                    \addplot+[mark=square*] table [x=nulls, y=neoNullBucket, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=square*] table [x=nulls, y=neoNullBucket, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{NullBucket};
                     \label{figure:update:xp:neo4j:full:bucket}
 
-                    \addplot+[mark=triangle*] table [x=nulls, y=neoPartitions, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=triangle*] table [x=nulls, y=neoPartitions, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{LinkedNulls};
                     \label{figure:update:xp:neo4j:full:linkednulls}
 
-                    \addplot+[mark=diamond*] table [x=nulls, y=neoSimplifications, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot+[mark=diamond*] table [x=nulls, y=neoSimplifications, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{Simplify};
                     \label{figure:update:xp:neo4j:full:core}
                 \end{axis}
                 \begin{axis}[enlarge x limits = 0, ymin=0, hide x axis, ylabel near ticks, yticklabel pos=right, ylabel={Nb of facts}, legend style={draw=none, at={(0.5,-0.3)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_3/time_per_nulls_details.csv};
+                    \addplot[no marks, dashed] table [x=nulls, y=facts, col sep=comma] {these/part_1/chapter_2/time_per_nulls_details.csv};
                     \addlegendentry{Number of facts};
                 \end{axis}
                 \begin{axis}[enlarge x limits = 0, ymin=0, ymax=1, hide x axis, hide y axis, legend style={draw=none, at={(0.89,-0.15)}, anchor=north}, width=.9\textwidth, height=.4\textheight]
-                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_3/query_per_nulls.csv};
+                    \addplot[no marks, dotted] table [x=nulls, y expr={\thisrow{nulls}/\thisrow{facts}}, col sep=comma] {these/part_1/chapter_2/query_per_nulls.csv};
                     \addlegendentry{$\tau$};
                 \end{axis}
             \end{tikzpicture}
@@ -306,6 +306,8 @@ Dans ce cas, les constantes et les valeurs nulles sont traité de la même mani�
         \caption{Temps d'exécution de chaque opération par nombre de valeurs nulles dans l'instance}
         \label{figure:update:xp:neo4j:full}
     \end{subfigure}
-    \caption[Résultats des expérimentations pour Neo4J]{Résultats des expérimentations sur \num{540} scenarios, obtenue par moyenne sur \num{10} itérations pour \gls{neo4j}}
+    \caption[Résultats des expérimentations pour Neo4J]{Résultats des expérimentations sur \num{540} scenarios, obtenue par moyenne sur \num{10} itérations pour \gls*{neo4j}}
     \label{figure:update:xp:neo4j}
 \end{figure}
+
+\FloatBarrier

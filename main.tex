@@ -9,6 +9,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages :
+\usepackage{etex}
 \usepackage[T1]{fontenc}             % Codage de caractères T1
 \usepackage[utf8x]{inputenc}         % Attention encodage => UTF 8 
 \usepackage{xspace}                  % Gestion des espaces
@@ -20,12 +21,14 @@
 \usepackage[autolanguage]{numprint}
 \usepackage{hyphenat}
 \usepackage{csquotes}
+\usepackage{changepage}
 
 % Autres packages non utilisés pour les couvertures / options
 \usepackage{subfiles}                % Relative file import
 \usepackage{amsmath}                 % Complement mathematique
 \usepackage{amssymb}                 % Ajoute des symboles
 \usepackage{amsthm}
+\usepackage{mathtools}
 \usepackage{latexsym}                % Ajoute des symboles
 \usepackage{makeidx}                 % Pour l'index
 \usepackage{graphicx}                % Pour inclure des figures
@@ -42,19 +45,30 @@
 %\usepackage{algorithmic}            % Pour les algorithmes
 \usepackage{lipsum}                  % Pour du blabla en latin
 \usepackage{float}
+\usepackage{placeins}
 \usepackage{listings}
 \usepackage{url}
 \usepackage{doi}
 \usepackage{tikz}
 \usepackage{tikz-dependency}
+\usepackage{tikz-qtree}
+\usepackage{tikz-qtree-compat}
 \usepackage{pgfplots}
+\usepackage{forest}
+\usepackage{simplebnf}
+\usepackage{syntaxdi}
 \usepackage[inline]{enumitem}
 \usepackage[binary-units]{siunitx}
 \usepackage[linesnumbered,ruled,vlined,boxed,frenchkw,onelanguage]{algorithm2e}
 \usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
 \usepackage{adjustbox}
+\usepackage{pdflscape}
+\usepackage{afterpage}
+\usepackage{capt-of}
 
 \usepackage[acronym,shortcuts,translate=babel]{glossaries}
+
+\usepackage[type={CC},modifier={by-nc-nd},lang=french,version={4.0}]{doclicense}
 
 % Bib
 \selectbiblanguage{french}
@@ -69,8 +83,15 @@
 %   }
 % }
 
+% Algorithm2e
+\newcommand\commentStyle[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{commentStyle}
+
 % Tikz
-\usetikzlibrary{automata, positioning, fit, tikzmark, shapes.multipart, arrows.meta}
+\usetikzlibrary{
+  automata, positioning, fit, tikzmark,
+  shapes.multipart, arrows.meta, quotes, graphs
+}
 
 \tikzset{
   labeled node/.style={
@@ -166,7 +187,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Page de garde :
-\subfile{orleans_couv/orlecouv}
+\subfile{orleans_couv/orlecouv.tex}
 \thispagestyle{empty}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

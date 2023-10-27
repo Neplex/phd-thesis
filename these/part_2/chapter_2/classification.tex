@@ -1,0 +1,121 @@
+Dans la littérature, la classification de documents est souvent traitée comme un problème de classification traditionnelle.
+Étant donné des individus (documents) représentés sous forme vectorielle, l'objectif est de prédire la classe (un label) de chaque individu à partir d'un modèle qui a été entraîné sur un corpus d'exemples.
+Lorsque l'on traite des documents textuels, la représentation vectorielle ne parait pas évidente.
+La méthode souvent retenue est celle du sac de mots, l'idée est de sélectionner un ensemble de mots de taille $n$ qui représenteront les dimensions de notre espace vectoriel.
+Ainsi, chaque document est représenté par un vecteur de booléen (représentant l'apparition du mot ou non dans le texte) ou un vecteur d'entier représentant le nombre d'occurrences des termes dans le texte.
+
+Afin de travailler sur un espace à dimensions réduites, une sélection des mots les plus révélateurs de chaque classe est nécessaire.
+Chaque terme est trié selon un certain critère et de sélectionner les $m$ éléments ayant le score le plus élevé.
+Une mesure simple est le \gls{tfidf} \cite{sparckjonesStatisticalInterpretationTerm1972}.
+Intuitivement, cette mesure est un ratio entre la fréquence d'apparition du terme dans une classe donnée et sa fréquence dans l'ensemble du corpus qui repose sur la loi de Zipf \cite{zipfPsychobiologyLanguage1935} (un terme a plus de chance d'être révélateur d'une classe s'il y est souvent présent ; au contraire, si un terme est trop fréquent dans le corpus, il n'est pas assez discriminant).
+Dans \cite{wengMedicalSubdomainClassification2017}, les auteurs cherchent à extraire le domaine médical auquel appartiennent un ensemble de documents.
+Ils comparent une approche utilisant des réseaux de neurones et une approche utilisant des sacs de mots pondérés par \gls{tfidf} avec un classifieur \gls{svm}.
+Ils montrent des résultats similaires pour les deux approches avec un gain en explicabilité pour l'approche sac de mots.
+D'autres mesures de pondération existent comme l'index de Jaccard \cite{jaccardDistributionFloreAlpine1901}.
+\cite{mihalceaTextrankBringingOrder2004} proposent une autre méthode de pondération des termes basée sur l'algorithme de PageRank \cite{brinAnatomyLargescaleHypertextual1998} dans un graphe représentant les interactions entre les mots.
+
+\paragraph{}
+Cependant, dans un cadre ou les données nécessaires à l'apprentissage de tels modèles ne sont pas toujours accessible des alternatives sont nécessaires.
+Les différents outils d'extraction d'informations décrits dans ce chapitre répondent à cette problématique et sont aussi efficaces pour la classification de cas cliniques.
+Cette section présente un système développé pour l'identification du profil clinique du patient \cite{hiotDOINGDEFTUtilisation2021} lors d'une participation à \gls{deft} 2021~\footnote{\url{https://deft.lisn.upsaclay.fr/2021/}} \cite{grouinClassificationCasCliniques2021} qui a obtenue les meilleurs résultats pour la tâche n°1.
+La tâche consistait à identifier les types de maladies d'un patient décrit dans un cas clinique et correspondant aux entrées génériques du chapitre \ref{mesh:C} du \gls{mesh}, un thésaurus bilingue anglais-français du domaine médical fournit par la \gls{nlm}.
+Chaque document décrivant le cas clinique d'un patient, l'extraction des classes du \gls{mesh} peut être vue comme un problème de classification (pour chaque classe du \gls{mesh} on cherche à savoir si la classe est représentée dans le cas ou non).
+Bien que certaines des remarques discutées dans cette section sont spécifiques a la tache de \gls{deft} et à la particularité des documents de cas cliniques, cette technique est applicable à d'autres types de document médicaux, mais aussi d'autres domaines.
+
+\subsection{Système de classification basé sur l'extraction par lexiques}
+Le système, présenté dans la figure~\ref{fig:class:sys-sch}, utilise une méthode symbolique, basée sur l'extraction par lexique présentée section~\ref{sec:ie:lexicon}.
+Le lexique permet l'extraction des termes révélateurs de chaque classe et permet de remplacer un éventuel apprentissage d'un modèle \gls{tfidf}.
+Une phase de post-traitement des annotations retournées par le transducteur est utilisée pour nettoyer les résultats obtenus.
+Elle se charge de gérer les négations (section \ref{sec:class:neg}) et de traiter l'ambiguïté engendrée par certains termes sur le genre (section \ref{sec:class:genre}).
+
+\begin{figure}[htb]
+    \small
+    \centering
+    \begin{tikzpicture}[node distance = 2cm, on grid, auto, thick]
+        \node[rectangle, draw] (text) {Texte};
+        % \node[rectangle, draw, right = of text] (stop) {Mots vides};
+        % \node[rectangle, draw, right = of stop] (stemme) {Racine};
+        \node[rectangle, draw, right = of text, minimum size=1cm] (fst) {\acs{fst}};
+        \node[rectangle, draw, right = of fst] (neg) {Négation};
+        \node[rectangle, draw, right = of neg] (sex) {Genre};
+        \node[rectangle, draw, right = of sex] (out) {Classes \acs{mesh}};
+        \node[rectangle, draw, above = of fst] (lex) {Lexique};
+        
+        \path [-stealth]
+            % (text) edge node {} (stop)
+            % (stop) edge node {} (stemme)
+            % (stemme) edge node {} (fst)
+            (text) edge node {} (fst)
+            (fst) edge node {} (neg)
+            (neg) edge node {} (sex)
+            (sex) edge node {} (out)
+            (lex) edge node {} (fst);
+        
+        % \node[draw, dotted, fit=(stop) (stemme), label=above:Pré-traitement] {};
+        \node[draw, dotted, fit=(neg) (sex), label=above:Post-traitement] {};
+    \end{tikzpicture}
+    \caption{Schéma du système d'identification du profil clinique du patient}
+    \label{fig:class:sys-sch}
+\end{figure}
+
+Pour la construction du lexique, seule la catégorie \ref{mesh:C} du \gls{mesh} (maladie) a été utilisée pour cette tâche.
+Elle contient \num{26} classes, qui correspondent aux types de maladie à identifier dans les cas cliniques.
+La table~\ref{tab:classesMesh} donne les identifiants et les noms de chaque classe (trois classes ne sont pas mentionnées dans le tableau, car elles n'étaient pas utilisées dans la classification).
+Chaque classe est structurée en une arborescence de descripteurs, eux-mêmes constitués de concepts auxquels sont associés des termes.
+Nous avons extrait pour chaque classe du chapitre \ref{mesh:C} tous les termes associés à des concepts.
+Au total \num{40052} termes ont été extraits.
+Il est à noter qu'un même terme peut être associé à plusieurs classes.
+Par exemple "diabète gestationnel" est associé aux classes \ref{mesh:C:13}, \ref{mesh:C:18} et \ref{mesh:C:19}.
+
+\begin{multicols}{2}
+    \begin{enumerate}[label=\textbf{C\arabic*}]
+        \item \label{mesh:C:01} Infections bactériennes et mycoses
+        \item \label{mesh:C:02} Maladies virales
+        \item \label{mesh:C:03} Maladies parasitaires
+        \item \label{mesh:C:04} Tumeurs
+        \item \label{mesh:C:05} Maladies ostéomusculaires
+        \item \label{mesh:C:06} Maladies de l'appareil digestif
+        \item \label{mesh:C:07} Maladies du système stomatognathique
+        \item \label{mesh:C:08} Maladies de l'appareil respiratoire
+        \item \label{mesh:C:09} Maladies oto-rhino-laryngologiques
+        \item \label{mesh:C:10} Maladies du système nerveux
+        \item \label{mesh:C:11} Maladies de l'œil
+        \item \label{mesh:C:12} Maladies urogénitales de l'homme
+        \item \label{mesh:C:13} Maladies de l'appareil urogénital féminin et complications de la grossesse
+        \item \label{mesh:C:14} Maladies cardiovasculaires
+        \item \label{mesh:C:15} Hémopathies et maladies lymphatiques
+        \item \label{mesh:C:16} Malformations et maladies congénitales, héréditaires et néonatales
+        \item \label{mesh:C:17} Maladies de la peau et du tissu conjonctif
+        \item \label{mesh:C:18} Maladies métaboliques et nutritionnelles
+        \item \label{mesh:C:19} Maladies endocriniennes
+        \item \label{mesh:C:20} Maladies du système immunitaire
+        \setcounter{enumi}{22}
+        \item \label{mesh:C:23} États, signes et symptômes pathologiques
+        \setcounter{enumi}{24}
+        \item \label{mesh:C:25} Troubles dus à des produits chimiques
+        \item \label{mesh:C:26} Plaies et blessures
+    \end{enumerate}
+\end{multicols}
+
+Bien que la ressource \gls{mesh} soit assez riche, le lexique peux être complété avec des lexèmes supplémentaires obtenus dans \gls{meddra} grâce aux correspondances établies entre les classes dans l'\gls{umls}.
+Au total, \num{13} classes de \gls{meddra} ont été considérées, ajoutant \num{58071} termes au lexique.
+Le \gls{mesh} contient un certains nombres de termes trop générique (par exemple \emph{maladie}) ou ambigus (par exemple \emph{pris}).
+En suivant la loi de Zipf, ces termes peuvent être éliminés en utilisant un corpus de termes fréquent extérieur au domaine médical.
+Le corpus \gls{wikipedia} FR2008 \cite{REDACCorpusTexte} fournit une liste des termes avec leur fréquence dans l'ensemble du corpus.
+L'ensemble des lexèmes présent dans le corpus et qui sont suffisamment fréquents peuvent ainsi êtres supprimés pour nettoyer le lexique.
+Une évaluation a montré un meilleur rappel avec une fréquence maximum d'apparition de \num{5000} et une meilleure précision avec une fréquence de \num{100}.
+La F-mesure maximale a été obtenue avec une fréquence de \num{1000}.
+
+\subsection{Négation et incertitude}
+\label{sec:class:neg}
+La négation est un phénomène linguistique complexe et très présent, elle porteuse de sens comme l'information elle-même.
+Les cas cliniques font parfois référence à l'absence de symptômes, comme un résultat d'examen négatif.
+Dans le cas de la classification, ces termes sont reconnus par les lexiques, mais ne doivent pas êtres signalés comme marqueur d'une classe.
+La négation peut prendre différentes formes et être explicite ou implicite, mais est souvent portée par un mot (\enquote{non}, \enquote{pas}, \dots), un groupe de mot (par exemple \enquote{ne \textelp{} pas}) ou un affixe (\enquote{faire / \emph{dé}-faire}, \enquote{possible / \emph{im}-possible}, \dots).
+De plus, elle n'est pas aussi stricte qu'en logique, la négation d'un fait n'est pas obligatoirement égale à son opposé dans le langage naturel.
+C'est le cas de la double négation comme \enquote{Il n'est pas impossible que \textelp{}} qui ne signifie pas que c'est possible.
+
+\cite{blancoIssuesDetectingNegation2011} présente la complexité de la détection de la négation.
+Les auteurs étudient aussi la problématique de la portée de la négation.
+\cite{moranteLearningScopeNegation2008} propose une approche basée sur l'apprentissage pour identifier la portée de la négation dans des textes médicaux.
+

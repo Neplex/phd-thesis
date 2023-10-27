@@ -1,0 +1,145 @@
+L'organisation de données non structurées comme du texte présente des défis importants.
+Les bases de données sont des structures complexes dont l'apparence peut différer considérablement.
+Cependant, on retrouve toujours une structure intrinsèque composée des données nommées (ou attributs) organisé en groupe (tuples ou nœuds) eux même regrouper par type (table ou label).
+On identifie aussi certains groupes spéciaux qui connecte des groupes entre eux et qu'on appelle relations.
+
+\cite{barretGenericAbstractionsData2021a} utilise cette structure universelle pour identifier des connexions entre des jeux de données hétérogènes.
+Les auteurs introduisent la notion de \emph{sub-record} pour une donnée, de \emph{record} pour les groupements de données et de collections, reliés entre eux sous forme d'arborescence.
+Dans ce modèle, un jeu de données forme donc un arbre.
+Chaque type de nœud est associé à une sémantique : un \emph{record} ne peux avoir que des \emph{sub-record} comme enfants, une collection est hétérogène et ne peux donc pas contenir différents \emph{record}.
+
+On définit une méta-grammaire comme une grammaire S-attribuée figure~\ref{table:struct:meta} en utilisant la \gls{bnf}.
+
+\begin{landscape}
+    \centering
+    \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
+        \parbox{\linewidth}{\begin{align}
+                \epsilon                                     & ::= \langle root_{eL',gL',cgL',rL',crL'} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL} \rangle  & [eL' \subseteq eL; gL' \subseteq gL; cgL' \subseteq cgL; rL' \subseteq rL; crL' \subseteq crL]         \\
+                \langle root_{eL,gL,cgL,rL,crL} \rangle      & ::= ROOT \to \langle rootList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                                              \\[1em]
+                % Root list
+                \langle rootList_{eL,gL,cgL,rL,crL}  \rangle & ::= \epsilon                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset] \\
+                                                             & ~~ \mid ~  ENT_{name}   ~ \langle rootList_{eL',gL,cgL,rL,crL} \rangle                                       & [name \notin eL'; eL \gets \{name\} \cup eL']                                                          \\
+                                                             & ~~ \mid ~  GROUP_{name} ~ \langle rootList_{eL,gL',cgL,rL,crL} \rangle                                       & [name \notin gL'; gL \gets \{name\} \cup gL']                                                          \\
+                                                             & ~~ \mid ~  REL_{name}   ~ \langle rootList_{eL,gL,cgL,rL',crL} \rangle                                       & [name \notin rL'; rL \gets \{name\} \cup rL']                                                          \\
+                                                             & ~~ \mid ~  COLL_{name}  ~ \langle rootList_{eL,gL,cgL',rL,crL} \rangle                                       & [name \notin cgL'; cgL \gets \{name\} \cup cgL']                                                       \\
+                                                             & ~~ \mid ~  COLL_{name}  ~ \langle rootList_{eL,gL,cgL,rL,crL'} \rangle                                       & [name \notin crL'; crL \gets \{name\} \cup crL']                                                       \\[1em]
+                % Rules list
+                \langle ruleList_{eL,gL,cgL,rL,crL}  \rangle & ::= \epsilon                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset] \\
+                                                             & ~~ \mid ~ \langle entity_{name}          \rangle ~\textsc{eol}~ \langle ruleList_{eL',gL,cgL,rL,crL} \rangle & [name \notin eL'; eL \gets \{name\} \cup eL']                                                          \\
+                                                             & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle & [name \notin gL'; eL' \subseteq eL; gL \gets \{name\} \cup gL']                                        \\
+                                                             & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle & [name \notin rL'; gL' \subseteq gL; rL \gets \{name\} \cup rL']                                        \\
+                                                             & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle & [name \notin cgL'; grpName \in gL; cgL \gets \{name\} \cup cgL']                                       \\
+                                                             & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle & [name \notin crL'; relName \in rL; crL \gets \{name\} \cup crL']                                       \\[1em]
+                % Groups
+                \langle group_{name, eL} \rangle             & ::= GROUP_{name} \to \langle entList_{eL} \rangle                                                                                                                                                                     \\
+                \langle collGrp_{name,grpName} \rangle       & ::= COLL_{name} \to GROUP_{grpName}^+                                                                                                                                                                                 \\[1em]
+                % Relations
+                \langle relation_{name, gL} \rangle          & ::= REL_{name} \to GROUP_{name1} ~ GROUP_{name2}                                                             & [gL \gets \{name1, name2\}; name1 \neq name2]                                                          \\
+                \langle collRel_{name,relName} \rangle       & ::= COLL_{name} \to REL_{relName}^+                                                                                                                                                                                   \\[1em]
+                % Entities
+                \langle entList_{eL} \rangle                 & ::= ENT_{name}                                                                                               & [eL \gets \{name\}]                                                                                    \\
+                                                             & ~~ \mid ~ ENT_{name} ~ \langle entList_{eL'} \rangle                                                         & [eL \gets \{name\} \cup eL'; name \notin eL']                                                          \\
+                \langle entity_{name} \rangle                & ::= ENT_{name} \to \langle data \rangle
+            \end{align}}
+    \end{adjustbox}
+    \captionof{table}{Méta-grammaire S-attribuée des schémas de base de donnée au format \glsname*{bnf} \label{table:struct:meta}}
+\end{landscape}
+
+
+\begin{example}
+    Etant donné un schema $S$ definit par la grammaire suivante :
+    \begin{align*}
+        ROOT & \to GROUP_A ~ COLL_1      \\
+        COLL_1 & \to REL_X^+             \\
+        REL_X & \to GROUP_A ~ GROUP_B    \\
+        GROUP_A & \to ENT_1              \\
+        GROUP_B & \to ENT_1 ~ ENT_2      \\
+        ENT_1 & \to \langle data \rangle \\
+        ENT_2 & \to \langle data \rangle
+    \end{align*}
+\end{example}
+
+\begin{landscape}
+    \centering
+    \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
+        \begin{forest}
+            for tree={align=center}
+            [\huge{$\epsilon$}
+                [{\large{$\langle root \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}gL=\{A\}$}
+                    [$ROOT$]
+                    [$\to$,before computing xy={s/.average={s}{siblings}}]
+                    [{\large{$\langle rootList \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}gL=\{A\}$}
+                        [$GROUP_A$]
+                        [{\large{$\langle rootList \rangle$}\\$\color{blue}crL=\{1\}$}
+                            [$COLL_1$]
+                            [\large{$\langle rootList \rangle$}
+                                [$\epsilon$]
+                            ]
+                        ]
+                    ]
+                ]
+                [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                [{\large{$\langle ruleList \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}rL=\{X\}$\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
+                    [{\large{$\langle collRel \rangle$}\\$\color{blue}name=1$\\$\color{blue}relName=X$}
+                        [$COLL_1$]
+                        [$\to$,before computing xy={s/.average={s}{siblings}}]
+                        [$REL_X^+$]
+                    ]
+                    [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                    [{\large{$\langle ruleList \rangle$}\\$\color{blue}rL=\{X\}$\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
+                        [{\large{$\langle relation \rangle$}\\$\color{blue}name=X$\\$\color{blue}gL=\{A, B\}$}
+                            [$REL_X$]
+                            [$\to$]
+                            [$GROUP_A$]
+                            [$GROUP_B$]
+                        ]
+                        [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                        [{\large{$\langle ruleList \rangle$}\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
+                            [{\large{$\langle group \rangle$}\\$\color{blue}name=A$\\$\color{blue}eL=\{1\}$}
+                                [$GROUP_A$]
+                                [$\to$,before computing xy={s/.average={s}{siblings}}]
+                                [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{1\}$}
+                                    [$ENT_1$]
+                                ]
+                            ]
+                            [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                            [{\large{$\langle ruleList \rangle$}\\$\color{blue}gL=\{B\}$\\$\color{blue}eL=\{1, 2\}$}
+                                [{\large{$\langle group \rangle$}\\$\color{blue}name=B$\\$\color{blue}eL=\{1, 2\}$}
+                                    [$GROUP_B$]
+                                    [$\to$,before computing xy={s/.average={s}{siblings}}]
+                                    [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{1, 2\}$}
+                                        [$ENT_1$]
+                                        [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{2\}$}
+                                            [$ENT_2$]
+                                        ]
+                                    ]
+                                ]
+                                [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                                [{\large{$\langle ruleList \rangle$}\\$\color{blue}eL=\{1, 2\}$}
+                                    [{\large{$\langle ent \rangle$}\\$\color{blue}name=1$}
+                                        [$ENT_1$]
+                                        [$\to$]
+                                        [$\langle data \rangle$]
+                                    ]
+                                    [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                                    [{\large{$\langle ruleList \rangle$}\\$\color{blue}eL=\{2\}$}
+                                        [{\large{$\langle ent \rangle$}\\$\color{blue}name=2$}
+                                            [$ENT_2$]
+                                            [$\to$]
+                                            [$\langle data \rangle$]
+                                        ]
+                                        [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                                        [\large{$\langle ruleList \rangle$}
+                                            [$\epsilon$]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \captionof{figure}{Exemple de dérivation de la méta-grammaire}
+\end{landscape}

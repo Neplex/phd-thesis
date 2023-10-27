@@ -23,13 +23,14 @@ Il les décrit comme des individus existants mais inconnus \hyphentextcquote{eng
 Ces valeurs inconnues peuvent alors étres représentées par des valeurs nulles marquées (ou nommées), permettant leur référencement multiple.
 Pour illustrer, prenons l'exemple d'une instance de base de données $\mathcal{D}_1= \{PrescExam(Lea, N_1),$ $ExamResult(Lea, N_1, N_2)\}$.
 Cette instance indique qu'un examen non spécifié, symbolisé par $N_1$, a été prescrit à Lea, et qu'un résultat inconnu, représenté par $N_2$, est associé.
-Ces valeurs nulles reflètent une information partielle et se conforment à l'approche du \gls{cwa}.
+Ces valeurs nulles reflètent une information partielle et se conforment à l'approche du \gls{cwa} où toute information non presente est considéré comme fausse.
 
-Dans le contexte de l'\gls{owa}, la sémantique diffère : les valeurs inconnues sont simplement omises avec l'hypothèse sous-jacente que, si elles existent, elles sont disponibles quelque part.
-Les travaux présentés dans cette thèse se focalisent sur le \gls{cwa}, qui facilite l'analyse des données et permet de travailler en mode déconnecté.
-En pratique, on peux imaginer que l'application du \gls{cwa} se limite à une partie spécifique des données (en particulier, les données privée inaccessibles à l'exterieur).
-Ces données peuvent ensuite être liées à des sources externes (telles que les bases de données des autorités de santé), en suivant une approche \gls{owa}.
-Les règles seraient alors élaborées exclusivement à partir des données confidentielles.
+Dans le contexte de l'\gls{owa}, la sémantique diffère : les valeurs inconnues sont simplement omises.% avec l'hypothèse sous-jacente que, si elles existent, elles sont disponibles quelque part.
+La logique sous-jacente est à trois valeurs de verité, vrai, faux, ou inconnu si le fait est manquand dans la base.
+Les travaux présentés dans cette thèse se focalisent sur le \gls{cwa}, qui facilite l'analyse des données. %et permet de travailler en mode déconnecté.
+% En pratique, on peux imaginer que l'application du \gls{cwa} se limite à une partie spécifique des données (en particulier, les données privée inaccessibles à l'exterieur).
+% Ces données peuvent ensuite être liées à des sources externes (telles que les bases de données des autorités de santé), en suivant une approche \gls{owa}.
+% Les règles seraient alors élaborées exclusivement à partir des données confidentielles.
 
 Un autre défi inhérent à la mise à jour réside dans la nécessité d'éviter la redondance d'information tout en maintenant la cohérence.
 Pour illustrer, considérons l'ajout de la nouvelle information $PrescExam(Lea, \textit{x-ray})$ à l'instance $\mathcal{D}_1$ mentionnée précédemment.
@@ -44,5 +45,6 @@ Cette proposition capitalise sur les avantages inhérents aux fonctionnalités d
 Cette approche diffère de la version en mémoire présentée dans \cite{chabinConsistentUpdatingDatabases2020}.
 De plus, l'objectif est d'améliorer la création des ensembles d'atomes liés par des valeurs nullespour le calcul du \gls{core}, processus qui constitue une étape coûteuse dans \cite{chabinConsistentUpdatingDatabases2020}.
 
-\paragraph{Organisation}
-Pour commencer, le chapitre~\ref{chp:update:soa} offre un état de l'art et expose les distinctions entre l'approche préconisée ici et celle décrite dans \cite{chabinConsistentUpdatingDatabases2020}. Ensuite, le chapitre~\ref{chp:update:algos} présente en détail l'approche proposée, tandis qu'une évaluation critique illustrant les avantages et les limites de l'exploitation des \glspl{sgbd} graphes est exposée dans le chapitre~\ref{chp:update:eval}, avant de conclure cette partie.
+\paragraph{Organisation de la partie}
+Pour commencer, la section~\ref{sec:update:pre} définit les preliminaires et las section~\ref{sec:update:soa} présente des travaux connexes et expose les distinctions entre l'approche préconisée ici et celle décrite dans \cite{chabinConsistentUpdatingDatabases2020}.
+Dans la suite, le chapitre~\ref{chp:update:algos} présente en détail l'approche proposée, tandis qu'une évaluation critique illustrant les avantages et les limites de l'exploitation des \glspl{sgbd} graphes est exposée dans le chapitre~\ref{chp:update:eval}, avant de conclure cette partie.

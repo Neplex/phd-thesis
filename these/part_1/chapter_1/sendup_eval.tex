@@ -134,12 +134,3 @@ Un niveau moins élevé permet seulement de modifier l'instance tandis que le ni
     \caption{Exemple de modification pour l'application d'une règle}
     \label{fig:app_rule}
 \end{figure}
-
-\paragraph{Remarques}
-Une étude menée dans \cite{chabinGraphRewritingSystem2020,chabinGraphRewritingRules2021} montre des temps d'exécution élevée pour l'application des règles sur de petites instances.
-Ces performances s'expliquent par le calcul des effets de bords et la grande complexité de la réécriture de graphe.
-Cela rend \gls{setup} inutilisable dans un scénario ou des mises à jour arrivent régulièrement.
-De plus, l'implémentation actuelle n'a pas de fonctionnalité de type \emph{fallback} permettant d'annuler les changements effectués sur la base en cas d'échec de la mise à jour, si le niveau de l'utilisateur n'est pas suffisant, ce qui implique de travailler sur une copie de la base.
-Il reste intéressant pour le calcul mode déconnecté et de petite base du a son implémentation en mémoire primaire.
-Bien que \gls{setup} permette la gestion de différents schémas définit sous \gls{rdfs}, il ne permet pas d'ajouter des contraintes métiers.
-Définir de nouvelles contraintes impliquerait un travail conséquent et manuel pour leur traduction en règle de réécriture et la construction des effets de bords.

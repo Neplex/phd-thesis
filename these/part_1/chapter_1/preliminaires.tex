@@ -5,15 +5,16 @@ Par la suite, nous aborderons les bases de données en adoptant le formalisme \g
 \subsection{Logique du premier ordre}
 \label{sec:update:pre:logic}
 
-En \glsfirst{fol}, l'information se matérialise par un ensemble de faits.
-Ces faits sont constitués de constantes représentant les individus, ainsi que de symboles de prédicats définissant les relations entre ces individus.
-Par exemple, le fait $auteur(Alice)$ comprend le symbole de prédicat $auteur$ d'arité $1$ et la constante $Alice$.
-Si l'on suppose que chaque symbole de prédicat détient une signification (ici, intuitivement claire), ce fait indique que $Alice$ est un auteur.
-Au-delà des faits, des règles d'inférence peuvent être établies pour engendrer de nouveaux faits à partir de faits existants.
-Cependant, notre attention se porte ici sur les contraintes.
-Ces dernières consistent en des règles visant à spécifier les relations et la signification associée aux prédicats.
-Par exemple, la contrainte exprimée par la règle $\forall x~auteur(x) \implies \exists y~ecrit(x,y)$ signifie que pour chaque individu $x$ considéré comme auteur ($auteur(x)$) dans l'ensemble de fait, celui-ci doit également contenir au moins une œuvre $y$ écrite par cet auteur ($ecrit(x,y)$).
+% En \glsfirst{fol}, l'information est représentée par un ensemble de faits de la forme $P(t_1, \dots t_n)$.
+% Ces faits sont constitués de constantes représentant les individus, ainsi que de symboles de prédicats définissant les relations entre ces individus.
+% Par exemple, le fait $auteur(Alice)$ comprend le symbole de prédicat $auteur$ d'arité $1$ et la constante $Alice$.
+% Si l'on suppose que chaque symbole de prédicat détient une signification (ici, intuitivement claire), ce fait indique que $Alice$ est un auteur.
+% Au-delà des faits, des règles d'inférence peuvent être établies pour engendrer de nouveaux faits à partir de faits existants.
+% Cependant, notre attention se porte ici sur les contraintes.
+% Ces dernières consistent en des règles visant à spécifier les relations et la signification associée aux prédicats.
+% Par exemple, la contrainte exprimée par la règle $\forall x~auteur(x) \implies \exists y~ecrit(x,y)$ signifie que pour chaque individu $x$ considéré comme auteur ($auteur(x)$) dans l'ensemble de fait, celui-ci doit également contenir au moins une œuvre $y$ écrite par cet auteur ($ecrit(x,y)$).
 
+En \glsfirst{fol}, l'information est représentée par un ensemble d'atomes.
 Formellement, on utilise comme alphabet :
 \begin{itemize}
     \item un ensemble de prédicats $P, Q, R, \dots$
@@ -26,9 +27,12 @@ Formellement, on utilise comme alphabet :
 
 \begin{definition}[Atome]
 Avec cet alphabet, on définit un atome $P(t_1, \dots, t_n)$ où $P$ est le symbole de prédicat d'arité $n$ et $t_1, \dots, t_n$ sont les termes.
-Les termes peuvent être une variable, une constante ou une valeur nulle.
+Les prédicats représentent les relations entre les termes qui peuvent être des variables, des constantes ou des valeurs nulles.
 Un fait est un atome composé exclusivement de constantes, tandis qu'un atome instancié est un atome ne contenant aucune variable.
 Étant donné un atome instancié $A$, $null(A)$ représente l'ensemble des valeurs nulles de $A$.
+
+Par exemple, le fait $auteur(Alice)$ comprend le symbole de prédicat $auteur$ d'arité $1$ et la constante $Alice$.
+Si l'on suppose que chaque symbole de prédicat détient une signification (ici, intuitivement claire), ce fait indique que $Alice$ est un auteur.
 \end{definition}
 
 \begin{definition}[Homomorphisme]
@@ -42,12 +46,13 @@ S'il existe un homomorphisme inverse $h^-$ tel que $h^-(h(t)) = t$ alors ont dit
 
 \begin{definition}[Simplication]
 $\Phi$ est l'ensemble de toutes les formules $\phi$, existentiellement quantifiées, de la forme $(\exists X)(\varphi_1(X_1) \land \dots \land \varphi_n(X_n))$ où $X$ est l'ensemble des variables et $\varphi_i(X_i)$ est une formule atomique dont $X_i \subset X$ représente l'ensemble des variables libres.
-$atoms(\phi)$ est l'ensemble des formules atomique de $phi$.
+$atoms(\phi)$ est l'ensemble des formules atomique de $\phi$.
 Un modèle $M$ d'une formule $\phi$ est l'ensemble des faits qui ont un homomorphisme de $atoms(\phi)$ vers $M$.
 Étant donné deux formules $\phi_1$ et $\phi_2$ : $\phi_1 \implies \phi_2$ si tout modèle de $\phi_1$ est un modèle de $\phi_2$.
 $\phi_1$ et $\phi_2$ sont \emph{équivalents}, noté $\phi_1 \iff \phi_2$, si et seulement si $\phi_1 \implies \phi_2$ et $\phi_2 \implies \phi_1$.
 $\phi_1$ et \emph{plus simple que} $\phi_2$, noté $\phi_1 \sqsubseteq \phi_2$ si $\phi_1 \iff \phi_2$ et $atoms(\phi_1) \subseteq atoms(\phi_2)$.
 Une simplification $\phi_1$ de $\phi_2$ est \emph{minimale} si $\phi_1 \sqsubseteq \phi_2$ et qu'il n'existe pas de $\phi_1'$ tel que $\phi_1' \sqsubset \phi_1$.
+
 Par exemple, étant donné la formule $\phi = (\exists x, y)(P(a, x) \land P(a, y))$, les formules $(\exists x)(P(a, x))$ et $(\exists y)(P(a, y))$ sont équivalentes et sont toutes deux une simplification de $\phi$.
 De plus, \cite{chabinConsistentUpdatingDatabases2020} démontre que si $\phi_1$ et $\phi_2$ sont deux simplifications minimales d'une même formule $\phi$ alors les ensembles $atoms(\phi_1)$ et $atoms(\phi_2)$ sont isomorphes.
 La simplification minimale d'une formule $\phi$ est appelé le \gls{core} et s'écrit $core(\phi)$.
@@ -67,11 +72,14 @@ La réponse à une requête effectuée sur une base de données $\mathcal{D}$ co
 \end{definition}
 
 \begin{definition}[Contrainte]
-Une \emph{contrainte} (ou règle) sur une base de donnée est une dépendance génératrice de n-uplets, également appelée \glsfirst{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
+Une \emph{contrainte} (ou règle) sur une base de données est une dépendance génératrice de n-uplets, également appelée \glsfirst{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
 Plus simplement écrit $body(X, Y) \to head(X, Z)$, où $X$, $Y$ et $Z$ représentent des ensembles de variables, $body(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
 Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés, noté $I \vDash c$ si pour tout homomorphisme $h$ tel que $h(body(c)) \subseteq I$ il existe un homomorphisme $h'$ tel que $h'(body(c)) = h(body(c))$ et $h'(head(c)) \in I$.
 Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, pour toute instanciation du corps présente dans la base de données, la tête correspondante doit aussi être présente dans la base.
 Une instance $I$ d'une base de données est dites \emph{cohérente} vis-à-vis d'un ensemble de contraintes $\mathbb{C}$, noté $I \vDash \mathbb{C}$ si pour toute contrainte $c$ dans $\mathbb{C}$, $I \vDash c$.
+
+Par exemple, la contrainte exprimée par la règle $\forall x~auteur(x) \implies \exists y~ecrit(x,y)$ signifie que pour chaque individu $x$ considéré comme auteur ($auteur(x)$) dans l'ensemble de fait, celui-ci doit également contenir au moins une œuvre $y$ écrite par cet auteur ($ecrit(x,y)$).
+Dans ce contexte, l'ensemble $I_1 = \{auteur(Alice)\}$ n'est pas \emph{cohérent} contrairement aux ensemble $I_2 = \{auteur(Alice), ecrit(Alice, N_1)\}$, $I_3 = \emptyset$ et $I_4 = \{ecrit(Alice, N_1)\}$.
 \end{definition}
 
 \subsection{Base de données graphes}
@@ -83,7 +91,7 @@ Lorsque nous évoquons les bases de données de graphes, nous pouvons identifier
 \begin{description}
     \item[Les bases de triplets] Notamment représentées par le modèle \glsfirst{rdf} développé par le \gls{w3c}.
           Ces bases enregistrent des triplets sous la forme $\langle x, P, y \rangle$, où chaque triplet représente un atome $P(x, y)$ et est constitué de trois éléments : $x$, le sujet représenté par l'\gls{uri} d'une ressource (un nœud), $P$ est un symbole de prédicat, et $y$, l'objet, peut être soit un \gls{uri}, soit un littéral (une valeur de propriétés).
-          \gls{rdf} est interrogé en utilisant le langage \gls{sparql}.
+          \acs{rdf} est interrogé en utilisant le langage \gls{sparql}.
 
     \item[Les Graphes de Propriétés] Aussi connus sous le nom de \glsfirst{lpg} en anglais, sont des bases de données composées de nœuds reliés par des arcs. Les deux sont labellisés et peuvent contenir des propriétés.
           Parmi les \gls{sgbd} de ce type, \gls{neo4j} est l'un des plus populaires.
@@ -101,7 +109,11 @@ Il permet de définir le schéma de la base : les classes (correspondant aux typ
 De plus, il offre la possibilité de spécifier des relations de subordination et de subsomption en établissant une hiérarchie entre les éléments au moyen des propriétés \textbf{subClass} et \textbf{subProp}.
 \gls{rdfs} permet également la séparation de l'instance et du schéma.
 
-\subsubsection{Interrogation de graphe avec Cypher}
+\subsection{Requête sur les graphes de propriétés}
+% \subsubsection{Interrogation de graphe avec Cypher}
+Dans ce manuscrit, notre intérêt se porte exclusivement sur les graphes de propriétés.
+Cette section propose une brève introduction à l'interrogation de ces graphes.
+
 \gls{cypher} est un langage déclaratif de requête conçu pour les graphes de propriétés.
 Ce langage offre la facilité d'exprimer des requêtes en utilisant le mot-clé \verb|MATCH| pour la recherche de motifs, exprimés sous forme d'art ASCII.
 Les requêtes sont formulées comme une séquence d'opérations, où le résultat d'une opération devient le paramètre de la suivante.
@@ -128,7 +140,29 @@ Même si les requêtes portent sur des graphes, les résultats des opérations s
                 (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
             \end{tikzpicture}
         \end{adjustbox}
-        \caption{Instance sous forme de graphe}
+        \caption{Instance sous forme de graphe de propriétés}
+    \end{subfigure}
+    \begin{subfigure}{\linewidth}
+        \begin{adjustbox}{width=\linewidth}
+            \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 6cm,on grid]
+                \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
+                \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
+                \node[labeled node, right=of sosy] (person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
+                \node[labeled node, right=of person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
+                \node[labeled node, right=of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
+                \node[labeled node, below=of exam] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
+                \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
+
+                \path
+                (person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
+                (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
+                (person) edge node[labeled edge, anchor=center] {PassExam} (exam)
+                (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
+            \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Instance sous forme de graphe RDF}
     \end{subfigure}
     \begin{subfigure}{\linewidth}
         \centering
@@ -233,7 +267,7 @@ Même si les requêtes portent sur des graphes, les résultats des opérations s
         \end{tabular}
     \end{center}
 
-    La requête \verb|MATCH (x:Examination)-[y:GivesRes]->() RETURN x, y| retourne l'ensemble des nœuds \emph{Examination} qui sont dans une relation y ayant le type \emph{GivesRes} representé par \verb|-[y:GivesRes]->|.
+    La requête \verb|MATCH (x:Examination)-[y:GivesRes]->() RETURN x, y| retourne l'ensemble des nœuds labellisés \emph{Examination} qui sont dans une relation y ayant le type \emph{GivesRes} representé par \verb|-[y:GivesRes]->|.
     Ici, la relation est dirigée indiquant que l'on cherche uniquement les nœuds \emph{Examination} qui sont source de la relation.
     Le nœud de destination de la relation n'a aucune contrainte et est donc représenté uniquement par \verb|()|.
     Le langage \gls{cypher} permet également de construire des requêtes récursives.

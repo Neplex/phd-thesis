@@ -1,6 +1,4 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Exemple de structuration de thèse utilisant le format Latex
-
 \pagestyle{fancy}
 
 \newgeometry{lmargin=20mm,tmargin=30mm,rmargin=20mm,bmargin=30mm,headsep=10mm,footskip=20mm,bindingoffset=10mm}
@@ -9,6 +7,10 @@
 \frontmatter
 \section*{Remerciements}
 \lipsum[17-19]
+
+\vfill
+
+\doclicenseThis
 
 \newpage
 
@@ -22,12 +24,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mainmatter
 
+\bookmarksetup{startatroot}
 \chapter{Introduction}
 \subfile{introduction}
 
 %%%%%%%%%%%%%%%%%%
 
 \part{Maintenance et cohérence d'une base de donnée incomplète}
+\glsresetall
+
+\addtocontents{toc}{\protect\begin{adjustwidth}{1cm}{0cm}}
 
 \chapter{Maintien de la cohérence}
 \label{chp:update:intro}
@@ -39,19 +45,14 @@
 \minitoc
 \subfile{part_1/chapter_2}
 
-\chapter{Évaluation et Conclusion}
-\label{chp:update:eval}
-\minitoc
-\subfile{part_1/chapter_3}
+\addtocontents{toc}{\protect\end{adjustwidth}}
 
 %%%%%%%%%%%%%%%%%%
 
 \part{Intégration de données textuelles}
 \glsresetall
 
-\chapter{Introduction}
-\minitoc
-\subfile{part_2/introduction}
+\addtocontents{toc}{\protect\begin{adjustwidth}{1cm}{0cm}}
 
 \chapter{Structuration d'informations}
 \minitoc
@@ -60,6 +61,8 @@
 \chapter{Extraction d'informations}
 \minitoc
 \subfile{part_2/chapter_2}
+
+\addtocontents{toc}{\protect\end{adjustwidth}}
 
 %%%%%%%%%%%%%%%%%%
 
