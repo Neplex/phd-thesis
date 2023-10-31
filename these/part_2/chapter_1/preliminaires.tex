@@ -19,7 +19,7 @@ De plus, cette seconde partie s'intéresse aussi à la définition des opératio
 
 \begin{definition}[Arbre de dérivation]
     Un arbre de dérivation, arbre d'analyse ou arbre de syntaxe décrit une dérivation d'une grammaire $G$.
-    Chaque nœud intermédiaire représente un symbole non-terminal de la grammaire G, tandis que les feuilles représentent les symboles terminaux de G
+    Chaque nœud intermédiaire représente un symbole non-terminal de la grammaire G, tandis que les feuilles représentent les symboles terminaux de $G$.
     Les liaisons entre les nœuds illustrent comment les symboles sont dérivés les uns des autres.
 
     L'arbre de dérivation est construit récursivement en suivant les règles de production de la grammaire.
@@ -51,16 +51,19 @@ De plus, cette seconde partie s'intéresse aussi à la définition des opératio
 
 \begin{definition}[Arbre]
     Formellement, un arbre $T$ est une paire $T = (D, l)$ où $D$ est le domaine de l'arbre (l'ensemble des positions) et $l$ est une fonction de labellisation
-    tel que $l : D \mapsto \Sigma \cup \{\lambda\}$.
-
+    tel que $l : D \to \Sigma \cup \{\lambda\}$.
     Le domaine $D$ d'un arbre est un sous ensemble de $\mathbb{N}^*$ qui respecte les propriétés suivantes :
     \begin{enumerate}
         \item $D$ est clos sur les préfixes, c'est-à-dire que si $u, u' \in \mathbb{N}^*$ et $u$ est un préfixe de $u'$ (noté $u \preceq u'$) et $u' \in D$, alors $u \in D$, et
         \item $\forall u, j \in \mathbb{N}$ $u.j \in D \implies \forall i \in \mathbb{N}$ tel que $0 \leq i \leq j$ $ u.i \in D$.
     \end{enumerate}
     Chaque élément de $D$ est appelé \emph{position}.
+    Pour un nœud $n$ à la position $p$, $|p|$ définit la longueur de la séquence, aussi appelée profondeur de $n$.
     La racine d'un arbre est à la position $\epsilon$ et est représenté par le symbole spécial $\lambda$ tel que $t(\epsilon) = \lambda$.
-    Un arbre vide est donc défini par  $T = (\epsilon, \langle \epsilon \to \lambda \rangle)$
+    Un arbre vide est donc défini par  $T = (\epsilon, \langle \epsilon \to \lambda \rangle)$.
+    Étant donné un nœud à la position $u.i$ le parent noté est le nœud à la position $u$ et les enfants sont les nœuds aux positions $u.i.j ~ \forall j \in \mathbb{N}$ tel que $u.i.j \in D$.
+    Un nœud $n$ à la position $p$ est un descendant d'un nœud $m$ la position $q$ si et seulement si $q$ est un préfixe de $p$ (noté $q \preceq p$).
+    Une feuille est un nœud en bas de l'arbre à une position $p$ tel que $\nexists p.i \in D ~ \forall i \in \mathbb{N}$, en d'autres termes, c'est un nœud qui n'a pas d'enfants.
 \end{definition}
 
 \begin{definition}[Sous arbre]
@@ -69,6 +72,7 @@ De plus, cette seconde partie s'intéresse aussi à la définition des opératio
         \item $D' = \{v \mid u.v \in D\}$ et
         \item $l' = \{(v, l(u.v)) \mid v \in D'\}$.
     \end{enumerate}
+    Soit un sous arbre $T$, on note $T' = P_i^T$ le $i$-éme sous arbre parent tel que $\exists v ~ T'|_v = T, |v| = i$.
 \end{definition}
 
 \begin{definition}[Haie]
@@ -93,10 +97,10 @@ De plus, cette seconde partie s'intéresse aussi à la définition des opératio
 
 
 \begin{example}[Règle de réécriture]
-    Soit un arbre $T$ et la règle de réécriture figure~\ref{fig:sch:pre:rewritting:ex}.
+    Soit un arbre $T$ et la règle de réécriture $rule(u.i)$ et la contrainte $|\sigma(x)| = i$ donnée figure~\ref{fig:sch:pre:rewritting:ex}.
     $U$ représente le nœud à la position $u$, $x \in V$ est une variable et $A \in \Sigma$ représente un label de sous arbre.
     La règle est applicable s'il existe un sous arbre $t = T|_u$ avec une substitution $\sigma$ tel que $\forall j, 0 < j < i$ : $t|_j = \sigma(T|_{u.j})$ et $l(u.i) = A$.
-    L'arbre de destination \gls{rhs} à une correspondance avec le modèle \gls{lhs}, ici intuitivement claire : $U \to U$ et $x \to x$.
+    L'arbre de destination \gls{rhs} à une correspondance avec le modèle \gls{lhs}, ici intuitivement claire : $U \mapsto U$ et $x \mapsto x$.
     En cas d'application de la règle, le sous arbre $A$ est supprimé de $T$.
 
     \begin{figure}[H]
@@ -125,7 +129,7 @@ De plus, cette seconde partie s'intéresse aussi à la définition des opératio
             \end{adjustbox}
             \caption{\glsfirst*{rhs}}
         \end{subfigure}
-        \caption{$rule(u.i)$ où $|\sigma(x)| = i$}
+        \caption{Exemple d'une règle de réécriture}
         \label{fig:sch:pre:rewritting:ex}
     \end{figure}
 \end{example}
