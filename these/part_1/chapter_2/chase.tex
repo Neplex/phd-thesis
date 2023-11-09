@@ -11,14 +11,14 @@ Une version incrémentale de l'algorithme consiste à considérer uniquement les
         \item $B(x, y) \implies C(y)$ \label{ex:update:chase:forward:c2}
     \end{enumerate}
 
-    L'insertion de l'ensemble $I = \{A(b), A(d)\}$ dans $\mathcal{D}$ implique l'application de la contrainte \ref{ex:update:chase:forward:c1} uniquement avec les instanciation $h_1 = \{x \mapsto b\}$ et $h_2 = \{x \mapsto c\}$.
-    L'instanciation $h = \{x \mapsto a\}$ n'a pas besoin d'etre calculé car $\mathcal{D}$ est déjà cohérente par rapport à $\mathbb{C}$.
+    L'insertion de l'ensemble $I = \{A(b), A(d)\}$ dans $\mathcal{D}$ implique l'application de la contrainte \ref{ex:update:chase:forward:c1} uniquement avec les instanciation $h_1 = \langle x \mapsto b \rangle$ et $h_2 = \langle x \mapsto c \rangle$.
+    L'instanciation $h = \langle x \mapsto a \rangle$ n'a pas besoin d'etre calculé car $\mathcal{D}$ est déjà cohérente par rapport à $\mathbb{C}$.
     A ce stade, il n'est pas non plus necessaire de verifier si \ref{ex:update:chase:forward:c2} est applicable.
     L'application de $h_1($\ref{ex:update:chase:forward:c1}$)$ génére un nouvel atome $B(a, N_1)$.
     Comme il existe déjà une instanciation plus spécifique dans la base : $B(a, b)$, ce nouvel atome n'a pas besoin d'etre ajouté.
     L'application de $h_2($\ref{ex:update:chase:forward:c1}$)$ génére un nouvel atome $B(d, N_1)$.
     Comme il n'existe pas dans $\mathcal{D}$, on l'ajoute et on recommence l'algo.
-    Avec l'insertion de $B(d, N_1)$, on declenche \ref{ex:update:chase:forward:c2} avec l'instanciation $h_3 = \{x \mapsto d, y \mapsto N_1\}$ qui genere a son tour l'atome $C(N_1)$.
+    Avec l'insertion de $B(d, N_1)$, on declenche \ref{ex:update:chase:forward:c2} avec l'instanciation $h_3 = \langle x \mapsto d, y \mapsto N_1 \rangle$ qui genere a son tour l'atome $C(N_1)$.
     Plus aucun atome ne peux etre généré et on obtient donc l'ensemble $\mathcal{D}' = \{A(a),$ $B(a, b),$ $B(c, b),$ $C(b), B(d, N_1), C(N_1)\}$.
 \end{example}
 
@@ -40,8 +40,8 @@ On fixe donc un degré maximal $\delta_{max}$ qui permet l'interruption du \gls{
         \item $B(x, y) \implies A(y, z)$ \label{ex:update:chase:infini:c4}
     \end{enumerate}
 
-    L'application de la regle \ref{ex:update:chase:infini:c3} avec l'instanciation $h_1 = \{x \mapsto a, y \mapsto b\}$ génére l'atome $B(b, N_1^0)$.
-    Ce dernier permet l'application de la contrainte \ref{ex:update:chase:infini:c3} avec l'instanciation $h_2 = \{x \mapsto b, y \mapsto N_1^0\}$ de qui génére l'atome $A(N_1^0, N_2^1)$, qui permet la génération de $B(N_2^1, N_3^2)$ via \ref{ex:update:chase:infini:c3}.
+    L'application de la regle \ref{ex:update:chase:infini:c3} avec l'instanciation $h_1 = \langle x \mapsto a, y \mapsto b \rangle$ génére l'atome $B(b, N_1^0)$.
+    Ce dernier permet l'application de la contrainte \ref{ex:update:chase:infini:c3} avec l'instanciation $h_2 = \langle x \mapsto b, y \mapsto N_1^0 \rangle$ de qui génére l'atome $A(N_1^0, N_2^1)$, qui permet la génération de $B(N_2^1, N_3^2)$ via \ref{ex:update:chase:infini:c3}.
     l est facile de voir que la génération des atomes est infinie.
     Cependant, comme le degrée de $N_3^2$ depasse le degrée maximal $\delta_{max}$ on arrete cette branche de la génération.
     Si d'autres régles peuvent étres appliquée on continue de la génération.

@@ -9,7 +9,7 @@ L'exemple \ref{ex:update:nulls-simp} montre cependant que le choix de $\nu$ n'es
 	En considérant l'ensemble non minimal $I = {P(a, N_1), P(N_1, N_2), P(a, b), P(b, c), P(a, N_3)}$, si l'ensemble $\nu = {N_1}$, alors seuls les atomes $P(a, N_1)$ et $P(N_1, N_2)$ sont à prendre en compte pour la simplification.
 	Cependant, aucune simplification n'existe en prenant uniquement en compte l'élément $N_1$, il est également nécessaire de considérer la valeur nulle $N_2$.
 	Pour parvenir à la simplification souhaitée de l'ensemble $I$, l'ensemble $\nu$ doit être élargi pour obtenir $\nu' = {N_1, N_2}$.
-	En utilisant $\nu'$, on peut établir un homomorphisme $h = {N_1 \mapsto b, N_2 \mapsto c, N_3 \mapsto N_3}$ qui assure la minimalité de l'ensemble $h(I) = {P(a, b), P(b, c), P(a, N_3)}$ par rapport à l'ensemble $\nu$.
+	En utilisant $\nu'$, on peut établir un homomorphisme $h = \langle N_1 \mapsto b, N_2 \mapsto c, N_3 \mapsto N_3 \rangle$ qui assure la minimalité de l'ensemble $h(I) = {P(a, b), P(b, c), P(a, N_3)}$ par rapport à l'ensemble $\nu$.
 
 	Il est important de noter que l'atome $P(a, N_3)$ ne fait pas l'objet d'une simplification, car l'élément $N_3$ ne figure pas dans l'ensemble $\nu'$ des valeurs nulles prises en considération.
 \end{example}

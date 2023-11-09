@@ -1,35 +1,91 @@
-L'organisation de données non structurées comme du texte présente des défis importants.
-Les bases de données sont des structures complexes dont l'apparence peut différer considérablement.
-Cependant, on retrouve toujours une structure intrinsèque composée des données nommées (ou attributs) organisé en groupe (tuples ou nœuds) eux même regrouper par type (table ou label).
-On identifie aussi certains groupes spéciaux qui connecte des groupes entre eux et qu'on appelle relations.
-C'est le fondement du \gls{mea} \cite{chenEntityrelationshipModelUnified1976}.
-Il en va de même pour les textes qui possèdent plusieurs structures.
-La grammaire du français ou de l'anglais définit comment les phrases doivent être construites.
-L'idée est de pouvoir permettre la transformation de la grammaire du texte vers une autre (celle du \gls{mea}).
+% L'organisation de données non structurées comme du texte présente des défis importants.
+% Les bases de données sont des structures complexes dont l'apparence peut différer considérablement.
+% Cependant, on retrouve toujours une structure intrinsèque composée des données nommées (ou attributs) organisé en groupe (tuples ou nœuds) eux même regrouper par type (table ou label).
+% On identifie aussi certains groupes spéciaux qui connecte des groupes entre eux et qu'on appelle relations.
+% C'est le fondement du \gls{mea} \cite{chenEntityrelationshipModelUnified1976}.
+% \cite{barretGenericAbstractionsData2021} se base sur le \gls{mea} pour identifier des connexions entre des jeux de données hétérogènes (XML, \gls{rdf}, etc).
+% Les auteurs introduisent la notion de \emph{sub-record} pour une donnée, de \emph{record} pour les groupements de données et de \emph{collections} sous forme d'ensemble de \emph{record}. Les jeux de données sont ainsi représenté comme des forets où chaque arbre relie des \emph{sub-record}, \emph{record} et \emph{collection} en respectant des contraintes spécifique : un \emph{record} ne peux avoir que des \emph{sub-record} comme enfants, une collection est hétérogène et ne peux donc pas contenir différents \emph{records}.
 
-\cite{barretGenericAbstractionsData2021} se base sur le \gls{mea} pour identifier des connexions entre des jeux de données hétérogènes.
-Les auteurs introduisent la notion de \emph{sub-record} pour une donnée, de \emph{record} pour les groupements de données et de collections, reliés entre eux sous forme d'arborescence.
-Dans ce modèle, un jeu de données forme donc un arbre.
-Chaque type de nœud est associé à une sémantique : un \emph{record} ne peux avoir que des \emph{sub-record} comme enfants, une collection est hétérogène et ne peux donc pas contenir différents \emph{records}.
+% Il en va de même pour les textes qui possèdent plusieurs structures.
+% La grammaire du français ou de l'anglais définit comment les phrases doivent être construites.
+% L'idée est de pouvoir permettre la transformation de la grammaire du texte vers une autre (celle du \gls{mea}).
 
-\begin{definition}[Structure de donnée universelle]
-    Si une instance $I$ est un arbre, ce dernier est reconnu par une grammaire $G_S$ qui est le schéma de l'instance.
-    Ici, on traitera $I$ comme un arbre de dérivation de $G_S$, la grammaire est donc une \gls{cfg} et non une grammaire d'arbre.
-    Cependant, un schéma n'est valide que s'il est de la forme \gls{mea} et qu'il respecte les règles sémantiques décrites dans \cite{barretGenericAbstractionsData2021}.
-    C'est-à-dire que l'on peut définir une méta-grammaire $G$ qui reconnait l'ensemble des grammaires de schéma valides.
-    $G$ est défini comme une méta-grammaire S-attribuée et est donnée figure~\ref{table:struct:meta} en utilisant la \gls{bnf}.
-    $\langle X_A \rangle$ est un méta-non-terminaux avec pour attributs l'ensemble $A$, $\textsc{eol}$ est le séparateur entre les règles de la grammaire de destination et on retrouve à droite de chaque règle de production l'ensemble de formule sémantique $\Phi$.
-    Les attributs sont définis comme suit :
-    \begin{itemize}
-        \item $name$, $grpName$, $relName$ sont des attributs qui prennent le nom d'une instance d'un non-terminal. Par exemple, pour le non-terminal $ENT$ on peut obtenir dans la grammaire de destination les instances $ENT_{person}$ et $ENT_{exam}$
-        \item $eL$ est un ensemble de nom d'entités
-        \item $gL$ est un ensemble de nom de groupes
-        \item $cgL$ est un ensemble de nom de collection de groupes
-        \item $rL$ est un ensemble de nom de relations
-        \item $crL$ est un ensemble de nom de collection de relations
-    \end{itemize}
-    Dans la méta-grammaires ces attributs servent (en plus de la validation des formules sémantiques) à garder une trace des règles de production qui ont été construite afin de vérifier que les grammaires produites sont valides, c.-à-d. que tout non-terminal qui apparait dans une règle de production est bien défini dans une autre règle.
-\end{definition}
+% \begin{definition}[Structure de donnée universelle]
+%     Si une instance $I$ est un arbre, ce dernier est reconnu par une grammaire $G_S$ qui est le schéma de l'instance.
+%     Ici, on traitera $I$ comme un arbre de dérivation de $G_S$, la grammaire est donc une \gls{cfg} et non une grammaire d'arbre.
+%     Cependant, un schéma n'est valide que s'il est de la forme \gls{mea} et qu'il respecte les règles sémantiques décrites dans \cite{barretGenericAbstractionsData2021}.
+%     C'est-à-dire que l'on peut définir une méta-grammaire $G$ qui reconnait l'ensemble des grammaires de schéma valides.
+%     $G$ est défini comme une méta-grammaire S-attribuée et est donnée figure~\ref{table:struct:meta} en utilisant la \gls{bnf}.
+%     $\langle X_A \rangle$ est un méta-non-terminaux avec pour attributs l'ensemble $A$, $\textsc{eol}$ est le séparateur entre les règles de la grammaire de destination et on retrouve à droite de chaque règle de production l'ensemble de formule sémantique $\Phi$.
+%     Les attributs sont définis comme suit :
+%     \begin{itemize}
+%         \item $name$, $grpName$, $relName$ sont des attributs qui prennent le nom d'une instance d'un non-terminal. Par exemple, pour le non-terminal $ENT$ on peut obtenir dans la grammaire de destination les instances $ENT_{person}$ et $ENT_{exam}$
+%         \item $eL$ est un ensemble de nom d'entités
+%         \item $gL$ est un ensemble de nom de groupes
+%         \item $cgL$ est un ensemble de nom de collection de groupes
+%         \item $rL$ est un ensemble de nom de relations
+%         \item $crL$ est un ensemble de nom de collection de relations
+%     \end{itemize}
+%     Dans la méta-grammaires ces attributs servent (en plus de la validation des formules sémantiques) à garder une trace des règles de production qui ont été construite afin de vérifier que les grammaires produites sont valides, c.-à-d. que tout non-terminal qui apparait dans une règle de production est bien défini dans une autre règle.
+% \end{definition}
+
+Ce chapitre propose de transformer des données textuelles en une instance de graphe (ou d'arbre) respectant une grammaire cible $\mathbb{G}$.
+La construction de cette grammaire cible implique un processus d'extraction de schémas, commençant par la transformation des phrases en arbres syntaxiques.
+Le processus consiste en plusieurs itérations et est résumé visuellement dans la Figure~\ref{fig:strcut:general}, où, sur l'axe vertical, à chaque étape $i$, nous considérons :
+\begin{itemize}
+    \item Une instance $I_i$ sous forme d'une forêt d'arbres syntaxiques enrichis.
+    \item Un arbre quotient $S_i$ construit à partir des arbres de $I_i$.
+    \item Une grammaire d'arbre $G_{S_i}$ pour les arbres dans $I_i$ dérivée de l'arbre quotient $S_i$.
+\end{itemize}
+
+L'axe horizontal de la figure~\ref{fig:strcut:general} représente la progression du processus de l'étape $i$ à l'étape $i+1$. Cette progression est basée sur le raisonnement suivant :
+\begin{enumerate}
+    \item Le processus commence par la transformation des phrases en arbres syntaxique, ce qui donne lieu à une instance désignée par $I_0$.
+    
+    \item Une seconde étape consiste à enrichir les arbres de l'instance $I_0$ en incorporant les connaissances extraites des phases précédentes. Il peut s'agir d'insérer des entités, des noms de relations ou d'autres informations pertinentes dans les arbres.
+
+    \item L'évolution de l'instance $I_i$ vers l'instance $I_{i+1}$ suit un processus de transformation qui comprend les étapes suivantes :
+    \begin{description}
+        \item[Regroupement et transformation] Au cours de cette étape, les branches de l'arbre sont regroupées ou transformées sur la base de mesures de similarité. Il peut s'agir de réorganiser la structure des arbres afin d'améliorer leur cohérence ou de les aligner plus efficacement sur la représentation souhaitée.
+    \end{description}
+
+    \item L'évolution de $G_i$ vers $G_{i+1}$ est déclenchée en vérifiant si la grammaire $G_i$ est conforme à la grammaire générale $\mathbb{G}$.
+    À l'étape $i$, si $G_i$ n'est pas conforme à $\mathbb{G}$, le processus se poursuit en transformant les structures des arbres de $I_i$ donnant lieu à l'instance $I_{i+1}$ qui engendre un nouveau graphe quotient $S_{i+1}$ et une nouvelle grammaire $G_{i+1}$.
+    Le processus se termine lorsque nous trouvons une grammaire qui satisfait $\mathbb{G}$.
+\end{enumerate}
+
+\begin{figure}
+    \centering
+    \begin{tabular}{llllllll|l}
+        Textual data & $\rightarrow$
+                     & $I_0$         & $\rightarrow$ & $ I_1$ & $\rightarrow$ & $ \dots$ & $I_t$    & Instances (trees)                   \\
+                     &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                        \\
+                     &               & $S_0$         &        & $S_1$         &          & $ \dots$ & $S_t$             & Quotient Graphs \\
+                     &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                        \\
+                     &               & $G_0$         &        & $G_1$         &          & $ \dots$ & $G$               & Grammars        \\
+                     &               & $\searrow$    &        & $\downarrow$  &          &          & $\swarrow$                          \\
+        \multicolumn{9}{c}{\fbox{Verification with respect to $\mathbb{G}$}}
+    \end{tabular}
+    \caption{\label{fig:strcut:general}}
+\end{figure}
+
+L'objectif de la grammaire $\mathbb{G}$ est d'établir des descriptions de données indépendantes des modèles de données spécifiques.
+Lorsqu'on considère une instance $I$, les définitions des concepts représentés par les non-terminaux dans $\mathbb{G}$ sont introduites par les spécifications suivantes appliquées aux arbres de $I$.
+
+\begin{description}
+    \item[Arbre d'entités] Un arbre de profondeur 1 dont la racine a un nom d'entité comme étiquette et dont les enfants sont des terminaux.
+
+    \item[Groupe] un arbre de profondeur 2 dont les enfants ne sont que des arbres d'entités.
+
+    \item[Relation] un arbre de profondeur 3 ayant exactement deux groupes avec des étiquettes distinctes comme enfants.
+
+    \item[Collection] un arbre de profondeur trois n'ayant pour enfants que des groupes équivalents ou un arbre de profondeur quatre n'ayant pour enfants que des relations équivalentes.
+\end{description}
+
+Ces concepts s'alignent sur l'approche présentée dans~\cite{barretGenericAbstractionsData2021}.
+Les arbres d'entités peuvent être assimilés au concept de \emph{sub-records} qui se réfèrent à une paire attribut-valeur.
+Dans l'instance résultante $I_t$, les groupes correspondent aux \emph{records}, alors que dans les grammaires précédentes $G_i$, ils servent de formats intermédiaires.
+Les collections dans le contexte actuel correspondent au concept de \emph{collections}.
 
 \begin{example}
     Étant donné un schéma définit par la grammaire $G_S$ suivante :
@@ -43,8 +99,8 @@ Chaque type de nœud est associé à une sémantique : un \emph{record} ne peux 
         ENT_2   & \to \langle data \rangle
     \end{align*}
 
-    L'arbre de dérivation de $G$ donnant $G_S$ est donné figure~\ref{table:struct:meta:ex}.
-    En bleu on note, pour chaque nœud, la valeur de chaque attribut en omettant, pour des raisons de visibilité, les attributs ayant pour valeur un ensemble vide.
+    L'arbre de dérivation de $\mathbb{G}$ donnant $G_S$ est donné figure~\ref{table:struct:meta:ex}.
+    En bleu on note, pour chaque nœud, la valeur de chaque attribut en omettant, pour des raisons de visibilité, $\gamma$ et les attributs ayant pour valeur un ensemble vide.
 \end{example}
 
 \begin{landscape}
@@ -63,19 +119,19 @@ Chaque type de nœud est associé à une sémantique : un \emph{record} ne peux 
                 % Rules list
                 \langle ruleList_{eL,gL,cgL,rL,crL}  \rangle & ::= \epsilon                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset] \\
                                                              & ~~ \mid ~ \langle entity_{name}          \rangle ~\textsc{eol}~ \langle ruleList_{eL',gL,cgL,rL,crL} \rangle & [name \notin eL'; eL \gets \{name\} \cup eL']                                                          \\
-                                                             & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle & [name \notin gL'; eL' \subseteq eL; gL \gets \{name\} \cup gL']                                        \\
-                                                             & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle & [name \notin rL'; gL' \subseteq gL; rL \gets \{name\} \cup rL']                                        \\
-                                                             & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle & [name \notin cgL'; grpName \in gL; cgL \gets \{name\} \cup cgL']                                       \\
-                                                             & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle & [name \notin crL'; relName \in rL; crL \gets \{name\} \cup crL']                                       \\[1em]
+                                                             & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle & [name \notin gL' \land eL' \subseteq eL; gL \gets \{name\} \cup gL']                                        \\
+                                                             & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle & [name \notin rL' \land gL' \subseteq gL; rL \gets \{name\} \cup rL']                                        \\
+                                                             & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle & [name \notin cgL' \land grpName \in gL; cgL \gets \{name\} \cup cgL']                                       \\
+                                                             & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle & [name \notin crL' \land relName \in rL; crL \gets \{name\} \cup crL']                                       \\[1em]
                 % Groups
                 \langle group_{name, eL} \rangle             & ::= GROUP_{name} \to \langle entList_{eL} \rangle                                                                                                                                                                     \\
                 \langle collGrp_{name,grpName} \rangle       & ::= COLL_{name} \to GROUP_{grpName}^+                                                                                                                                                                                 \\[1em]
                 % Relations
-                \langle relation_{name, gL} \rangle          & ::= REL_{name} \to GROUP_{name1} ~ GROUP_{name2}                                                             & [gL \gets \{name1, name2\}; name1 \neq name2]                                                          \\
+                \langle relation_{name, gL} \rangle          & ::= REL_{name} \to GROUP_{name1} ~ GROUP_{name2}                                                             & [name1 \neq name2; gL \gets \{name1, name2\}]                                                          \\
                 \langle collRel_{name,relName} \rangle       & ::= COLL_{name} \to REL_{relName}^+                                                                                                                                                                                   \\[1em]
                 % Entities
                 \langle entList_{eL} \rangle                 & ::= ENT_{name}                                                                                               & [eL \gets \{name\}]                                                                                    \\
-                                                             & ~~ \mid ~ ENT_{name} ~ \langle entList_{eL'} \rangle                                                         & [eL \gets \{name\} \cup eL'; name \notin eL']                                                          \\
+                                                             & ~~ \mid ~ ENT_{name} ~ \langle entList_{eL'} \rangle                                                         & [name \notin eL'; eL \gets \{name\} \cup eL']                                                          \\
                 \langle entity_{name} \rangle                & ::= ENT_{name} \to \langle data \rangle
             \end{align}}
     \end{adjustbox}
@@ -169,80 +225,12 @@ Chaque type de nœud est associé à une sémantique : un \emph{record} ne peux 
     \vspace*{\fill}
 \end{landscape}
 
-\subsection{Textes et arbres}
+\subsection{textes}
 
-Les textes possèdent une structure complexe, cependant il est possible de représenter un texte comme un arbre en utilisant une analyse syntaxique.
-Ils existent deux structures très utilisées dans la littérature :
-
-\begin{description}
-    \item[Arbre syntaxique]
-          (Figure~\ref{fig:struct:ex-tree:syx})
-          C'est l'arbre de dérivation de la grammaire du texte.
-          Il représente les relations syntaxiques (de proche en proche) entre les mots et les clauses et met en évidence la composition d'une phrase en sous partie.
-          Les feuilles de l'arbre sont les unités lexicales (les mots) et les nœuds intermédiaires représente les structures abstraites comme une phrase verbales ou un groupe nominal.
-          Chaque mot a pour parent un nœud représentant sa nature où \gls{pos} en anglais (nom, verbe, adjectif, etc).
-
-    \item[Arbre de dépendance]
-          (Figure~\ref{fig:struct:ex-tree:dep})
-          Cette représentation met en évidence des liens syntaxique direct entre les unités lexicales représentant une forme de sémantique.
-          Dans l'arbre de dépendance, chaque unité lexicale est un nœud de l'arbre et les arêtes sont labellisés par des relations syntaxiques comme sujet ou objet (entre un nom et un verbe), ou encore modifier entre un adjectif et un nom.
-          Cet arbre est souvent utilisé dans les taches d'extraction d'information pour récupérer une sémantique entre les mots notamment, car des liens peuvent exister entre des mots très éloignés ce qui est moins évidents dans un arbre syntaxique.
-\end{description}
-
-\begin{figure}[ht]
-    \centering
-    \begin{subfigure}{\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [S
-                    [NP
-                            [DT [la]]
-                            [NP,before computing xy={s/.average={s}{siblings}} [fréquence]]
-                            [NP [cardiaque]]
-                    ]
-                    [VP
-                            [VBD [était]]
-                            [PP
-                                    [IN [à]]
-                                    [NP
-                                            [CD [100]]
-                                            [NN [bpm]]
-                                    ]
-                            ]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Arbre syntaxique}
-        \label{fig:struct:ex-tree:syx}
-    \end{subfigure}
-    \begin{subfigure}{\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{dependency}
-                \begin{deptext}[column sep=2em]
-                    la \& fréquence \& cardiaque \& était \& à \& 100 \& b/min \\
-                \end{deptext}
-                \deproot{7}{root}
-                \depedge{2}{1}{det}
-                \depedge{2}{3}{amd}
-                \depedge{7}{4}{cop}
-                \depedge{7}{6}{nummod}
-                \depedge{6}{5}{case}
-                \depedge{7}{2}{nsubj}
-            \end{dependency}
-        \end{adjustbox}
-        \caption{Arbre de dépendance}
-        \label{fig:struct:ex-tree:dep}
-    \end{subfigure}
-    \caption[Comparaison entre l'arbre syntaxique et l'arbre de dépendance]{Comparaison entre l'arbre syntaxique (obtenu avec \gls{corenlp}) et l'arbre de dépendance (obtenu avec \gls{spacy}) pour la phrase \enquote{\textelp{} la fréquence cardiaque était à 100 b/min} issue du corpus CAS \cite{grabarCASFrenchCorpus2018}}
-    \label{fig:struct:ex-tree}
-\end{figure}
 
 Pour la structuration automatique du texte, l'arbre de syntaxe est plus adapté, car sa structure est plus proche de la grammaire de destination même si l'on perd une partie de la sémantique exprimée par l'arbre de dépendance.
 Les textes médicaux possèdent des phrases courtes et factuelles : les observations montrent que les éléments liés sémantiquement sont proches dans le texte \cite{savaryRelationExtractionClinical2022} ce qui mitige le manque de sémantique exprimé par l'arbre syntaxique.
+
 
 \subsubsection{Conjonctions de coordinations}
 
@@ -320,43 +308,67 @@ Pour réaliser la migration de l'instance d'une grammaire vers une autre il est 
 \end{definition}
 
 \begin{definition}[Quotient d'un arbre ordonné]
-    Étant donné un arbre ordonné $T = (D, l)$, le quotient de l'arbre est un arbre distinct noté $Q_T = (Q_D, Q_l)$ avec une fonction injective de projection $\pi : \mathbb{N}^* \to \mathcal{P}(D)$ où $\mathcal{P}(D)$ est l'ensemble des parties de $D$ (\emph{power set} en anglais, c.-à-d. l'ensemble des sous ensemble de $D$) qui respecte les propriétés suivantes :
+    Étant donné un arbre ordonné $T = (D, l)$, le quotient de l'arbre est un arbre distinct noté $Q_T = (Q_D, Q_l)$ avec une fonction injective de projection $\pi : (\mathbb{N})^* \to \mathcal{P}(D)$ où $\mathcal{P}(D)$ est l'ensemble des parties de $D$ (\emph{power set} en anglais, c.-à-d. l'ensemble des sous ensemble de $D$).
+    $\pi$ respecte les propriétés suivantes :
     \begin{enumerate}
         \item \label{struct:quotient-tree:prop1} $\forall u_Q \in Q_D ~ \exists V \in D / \equiv$ tel que $\pi(u_Q) = V$.
-        \item \label{struct:quotient-tree:prop2} $\forall u_Q \in Q_D ~ \exists v_Q \in Q_D$ tel que $v_Q \preceq u_Q \iff \exists u \in \pi(u_Q), v \in \pi(v_Q)$ tel que $v \preceq u$
+        \item \label{struct:quotient-tree:prop2} $\forall u_Q \in Q_D ~ \exists v_Q \in Q_D$ tel que $v_Q \preceq u_Q \iff \exists u \in \pi(u_Q), v \in \pi(v_Q)$ tel que $v \prec u$
     \end{enumerate}
     La propriété \ref{struct:quotient-tree:prop1} signifie que chaque nœud de $Q_T$ correspond à une partition de $T$ par la relation d'équivalence $\equiv$.
     De plus, il existe une arête entre deux nœuds de $Q_T$ si et seulement si, il existe une arête entre au moins une paire d'élément de chaque partition dans $T$ comme définit par la propriété \ref{struct:quotient-tree:prop2}.
+    La fonction de labellisation $Q_l$ est définie par : $\langle u \mapsto l(\pi(u)) \mid u \in Q_D \rangle$.
+    De plus, pour toute position $u_Q \in Q_D$ s'il existe un $v \in D$ tel que $|\{u \mid u \in \pi(u_Q), v \prec u\}| > 1$ alors $Q_l(u_Q) = Q_l(u_Q)^+$
 \end{definition}
 
-\begin{example}
-    \begin{figure}
+\begin{example}{Arbre quotient et grammaire}
+    \begin{figure}[H]
         \centering
-        \begin{tikzpicture}
-          % Equivalence classes
-          \node[draw, circle] (ABC) at (1, 1) {$\{A, B, C\}$};
-          \node[draw, circle] (DEF) at (1, 0) {$\{D, E, F\}$};
-        
-          % Edges between equivalence classes
-          \draw[->] (ABC) -- (DEF);
-          
-          % Original Graph (Overlay)
-          \begin{scope}[overlay]
-            % Vertices
-            \foreach \pos/\name in {{(0.5,1.7)/A}, {(1.5,1.7)/B}, {(2.5,1.7)/C}, {(0.5,0.7)/D}, {(1.5,0.7)/E}, {(2.5,0.7)/F}} {
-              \node[draw, circle] (\name) at \pos {$\name$};
-            }
-            % Edges
-            \foreach \source/\target in {A/B, B/C, D/E} {
-              \draw[->, overlay] (\source) -- (\target);
-            }
-          \end{scope}
-        \end{tikzpicture}
-        \caption{Superposition d'un arbre avec son quotient}
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=5em}
+                    [$\lambda$
+                        [$X$ [$a$] [$b$]]
+                        [$X$,before computing xy={s/.average={s}{siblings}} [$b$] [$c$]]
+                        [$Y$ [$a$]]
+                    ]
+                \end{forest}
+            \end{adjustbox}
+            \caption{Arbre $T$}
+            \label{fig:struct:quotient:ex:tree}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=20mm}
+                    [$\lambda$
+                        [$X^+$ [$a$] [$b$] [$c$]]
+                        [$Y$ [$a$]]
+                    ]
+                \end{forest}
+            \end{adjustbox}
+            \caption{Arbre quotient $Q_T$}
+            \label{fig:struct:quotient:ex:quotient}
+        \end{subfigure}
+        \caption{Exemple du quotient d'un arbre}
+        \label{fig:struct:quotient:ex}
     \end{figure}
+    Étant donné l'arbre quotient $Q_T$ donné par la relation d'équivalence sur les labels, il est possible de reconstruire la \gls{cfg} condensée $G_T$ reconnaissant $T$.
+    Pour chaque nœud à la position $u$ qui n'est pas une feuille, la grammaire est un ensemble de règles $Q_T|_u \to Q_T|_{u.0}, \dots Q_T|_{u.i}$.
+    On obtient donc la grammaire $G_T$ suivante :
+    \begin{align*}
+        \lambda &\to X^+ ~ Y\\
+        X &\to a ~ b ~ c\\
+        Y &\to a
+    \end{align*}
+
+    Il est à noté que l'on ne traite pas les attributs \emph{facultatifs} dans la grammaire de schéma bien qu'ils sont autorisé dans l'instance, ils seront traités comme des valeurs nulles.
 \end{example}
 
-Les arbres d'entités représentent l'information importante et sont donc la base de comparaison des sous arbres.
+Les arbres d'entités représentent l'information et sont donc la base de comparaison des sous arbres.
 La langue naturelle contient souvent de l'information implicite ou manquante, deux sous arbres peuvent contenir un ensemble différent d'arbres d'entités, mais quand même représenter le même objet.
 Par exemple, un traitement ne contient pas toujours une fréquence.
 De plus la langue naturelle est ambiguë et un même ensemble d'arbres d'entités peux représenter deux objets différents.
@@ -369,6 +381,7 @@ Afin de définir la relation d'équivalence nécessaire au calcul du quotient, n
 Une mesure de similarité est une fonction symétrique $f : D \times D \to [0,1]$ où $f(x, x) = 1$ pour tout $x \in D$.
 Notre similarité contextuelle, notée $sim_f(x, y)$, entre deux sous arbres enrichis $x$ et $y$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous arbre parent.
 Les poids sont inversement proportionnels à la distance entre le parent et le sous arbre de départ.
+L'idée sous-jacente est que plus un élément est distant d'un autre, moins il a de valeur dans son contexte.
 Plusieurs mesures $f$ de similarité peuvent être utilisés comme Jaccard, Levenshtein, Jaro, etc.
 La mesure $sim_f(x, y)$ est donné par l'équation~\ref{eq:struct:sim} où $D_{min}$ est la profondeur minimum entre les sous arbres $x$ et $y$ et $P^x_i$ (respectivement $P^y_i$) est le $i$-éme sous arbre parent de $x$ (respectivement $y$).
 
