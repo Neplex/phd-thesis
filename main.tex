@@ -5,7 +5,7 @@
 % Contact SCD : thelec@listes.univ-orleans.fr
 
 % Classe du document : book :
-\documentclass[a4paper,14pt,french]{book}
+\documentclass[a4paper,10pt,french]{extbook}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages :
@@ -15,7 +15,7 @@
 \usepackage{xspace}                  % Gestion des espaces
 \usepackage[pdftex]{graphicx}        % inclure des graphiques
 \usepackage{geometry}                % Définition des marges
-\usepackage[scaled]{uarial}          % Arial pour les pages de couv et 4ème
+% \usepackage[scaled]{uarial}          % Arial pour les pages de couv et 4ème
 \usepackage{babel}                   % Adaptation de LaTeX au français si thèse rédigée en français
 \usepackage[fixlanguage]{babelbib}
 \usepackage[autolanguage]{numprint}
@@ -90,7 +90,7 @@
 % Tikz
 \usetikzlibrary{
   automata, positioning, fit, tikzmark,
-  shapes.multipart, arrows.meta, quotes, graphs
+  shapes, shapes.multipart, arrows.meta, quotes, graphs
 }
 
 \tikzset{
@@ -144,6 +144,7 @@
 \theoremstyle{definition}
 \newtheorem{example}{Exemple}[section]
 \newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}{Proposition}[section]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % En tete et pied de page :
@@ -177,6 +178,7 @@
     Ennov, \textsc{France}\\
     ~\\
     \textit{nicolas.hiot@etu.univ-orleans.fr}\\
+    \textit{nhiot@ennov.com}\\
 }
 
 \title{

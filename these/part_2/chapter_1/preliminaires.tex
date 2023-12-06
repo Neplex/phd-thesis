@@ -9,19 +9,37 @@ Pour finir, cette section se termine par la définition des opérations de trans
 \subsection{Grammaires}
 
 \begin{definition}[\Glsentrylong{cfg}]
+    \label{def:struct:pre:cfg}
     Une \gls{cfg} est définie par un quadruplet $(N, T, R, S)$ où $N$ est un ensemble fini de symboles non-terminaux ; $T$ est un ensemble fini de symboles terminaux ; $R$ un ensemble fini de règles de production et $S \in N$ est le symbole initial.
     Une règle de production est définie par la forme $X \to \alpha$, avec $X \in N$ et $\alpha$ est une chaîne de symboles terminaux et non-terminaux.
 
     Nous introduisons la notion de \gls{cfg} condensée qui admet aussi des règles de production de la forme $X \to \alpha^+$ où $\alpha^+$ est une expression régulière qui répété une ou plusieurs fois la chaîne $\alpha$.
 \end{definition}
 
-\begin{definition}[Arbre de dérivation]
-    Un arbre de dérivation, arbre d'analyse ou arbre de syntaxe décrit une dérivation d'une grammaire $G$.
-    Chaque nœud intermédiaire représente un symbole non-terminal de la grammaire G, tandis que les feuilles représentent les symboles terminaux de $G$.
-    Les liaisons entre les nœuds illustrent comment les symboles sont dérivés les uns des autres.
+Un arbre de dérivation, également appelé arbre d'analyse ou arbre de syntaxe, décrit comment le symbole de départ d'une grammaire $G$ dérive un mot du langage.
+Si un non-terminal $U$ est associé à une règle de production $U \to X ~ Y ~ Z$, l'arbre de dérivation peut contenir un nœud interne étiqueté par $U$, comportant trois enfants, à savoir $X$, $Y$ et $Z$, disposés de gauche à droite.
 
-    L'arbre de dérivation est construit récursivement en suivant les règles de production de la grammaire.
-    Il commence avec un nœud racine qui correspond au symbole initial de la grammaire, puis à chaque niveau de l'arbre, les nœuds sont remplacés par des symboles conformément aux règles de production.
+\begin{center}
+    \begin{adjustbox}{max width=\linewidth}
+        \begin{forest}
+            [U [X][Y][Z]]
+        \end{forest}
+    \end{adjustbox}
+\end{center}
+
+Chaque nœud interne représente un symbole non-terminal de la grammaire $G$, tandis que les feuilles symbolisent les symboles terminaux de $G$.
+Les liaisons entre les nœuds illustrent la manière dont les symboles sont dérivés les uns des autres.
+La construction de l'arbre de dérivation s'effectue de manière récursive en suivant les règles de production de la grammaire. Elle débute avec un nœud racine correspondant au symbole initial de la grammaire, et à chaque niveau de l'arbre, les nœuds sont remplacés par des symboles conformément aux règles de production.
+
+\begin{definition}[Arbre de dérivation]
+    Étant donné une \gls{cfg} $G = (N, T, R, S)$, un arbre de dérivation de la grammaire est un arbre qui respecte les propriétés suivantes :
+    \begin{enumerate}
+        \item Le nœud racine de l'arbre est étiqueté par le symbole de départ $S$, noté $l(\epsilon) = S$ ;
+        \item Chaque feuille de l'arbre $f$ est étiquetée par un symbole terminal, c'est-à-dire que $l(f) \in T$ ;
+        \item Chaque nœud interne $n$ de l'arbre est étiqueté par un symbole non-terminal, c'est-à-dire que $l(n) \in N$ ;
+        \item Si $U$ est un non-terminal utilisé comme étiquette d'un nœud interne $n$ et $X_1, \dots, X_n$ sont les étiquettes des enfants de $n$ de gauche à droite, alors il existe une règle de production $U \to X_1 ~ \dots ~ X_n$ dans $R$.
+        Les étiquettes $X_1, \dots, X_n$ représentent une combinaison de symboles terminaux et non-terminaux.
+    \end{enumerate}
 \end{definition}
 
 \begin{definition}[Grammaire attribuée]
@@ -34,11 +52,11 @@ Pour finir, cette section se termine par la définition des opérations de trans
     $r$ est une règle de production de la forme $X_0 \to X_1, \dots, X_n$ où $n \ge 1$, $X_0 \in N$ et $X_i \in (N \cup T)$ pour $1 \le i \le n$.
     Une règle sémantique $\varphi_{a_j} \in \Phi_r$ est une fonction $\varphi_{a_j} : \bigtimes_{i = 1}^n V_{a_i} \to V_{a_j}$ où $a_j \in A_0(X_j)$ si $j = 0$, $a_j \in A_1(X_j)$ si $j > 0$ et $a_i \in A(X_i)$.
     En d'autres termes, chaque règle sémantique calcule la valeur d'un attribut de $X_j$ à partir des attributs des symboles $X_0, \dots, X_n$.
-
-    Les grammaires \emph{S-attribuées} sont des grammaires attribuées qui contiennent uniquement des attributs synthétisés.
-    Elles ont l'avantage d'êtres plus simple est plus facilement vérifiable en utilisant uniquement une propagation du bas vers le haut.
-    Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse sémantique bien que leur pouvoir d'expression soit réduit par rapport aux autres grammaires attribuées qui acceptent les attributs hérités.
 \end{definition}
+
+Les grammaires \emph{S-attribuées} sont des grammaires attribuées qui contiennent uniquement des attributs synthétisés.
+Elles ont l'avantage d'êtres plus simple est plus facilement vérifiable en utilisant uniquement une propagation du bas vers le haut.
+Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse sémantique bien que leur pouvoir d'expression soit réduit par rapport aux autres grammaires attribuées qui acceptent les attributs hérités.
 
 \begin{definition}[Méta-grammaire]
     Une méta-grammaire $G = (N, T, R, S)$ est une grammaire S-attribuée qui définit la syntaxe des règles de production d'un ensemble de \gls{cfg} condensées.
@@ -67,17 +85,17 @@ Pour finir, cette section se termine par la définition des opérations de trans
     La racine d'un arbre est à la position $\epsilon$ et est représenté par le symbole spécial $\lambda$ tel que $t(\epsilon) = \lambda$.
     Un arbre vide est donc défini par  $T = (\epsilon, \langle \epsilon \mapsto \lambda \rangle)$.
     Étant donné un nœud à la position $u.i$ on appelle \emph{parent} le nœud à la position $u$ et \emph {enfants} les nœuds aux positions $u.i.j ~ \forall j \in \mathbb{N}$ tel que $u.i.j \in D$.
-    Un nœud $n$ à la position $u$ est un \emph{descendant} d'un nœud $m$ la position $v$ si et seulement si $v$ est un préfixe de $u$ (noté $v \preceq u$), inversement $m$ est un \emph{ancêtre} de $n$.
+    Un nœud $n$ à la position $u$ est un \emph{descendant} d'un nœud $m$ la position $v$ si et seulement si $v$ est un préfixe direct de $u$ (noté $v \preceq u$) ou indirect (noté $v \preceq^* u$), inversement $m$ est un \emph{ancêtre} de $n$.
     On appelle \emph{feuille} un nœud à une position $u$ tel que $\nexists u.i \in D ~ \forall i \in \mathbb{N}$, en d'autres termes, c'est un nœud qui n'a pas d'enfants.
 \end{definition}
 
 \begin{definition}[Sous arbre]
     Étant donné un arbre $T = (D, l)$, un sous arbre de $T$ à la position $u \in D$ est noté $T|_u = (D', l')$ et respecte les propriétés suivantes :
     \begin{enumerate}
-        \item $D' \subseteq D$ tel que $\forall v \in D ~ u \preceq v$ et
+        \item $D' \subseteq D$ tel que $\forall v \in D' ~ u \preceq v$ et
         \item $l' = \langle v \mapsto l(v) \mid v \in D' \rangle $.
     \end{enumerate}
-    Soit un sous arbre $t$, on note $t' = P_i^t$ le $i$-éme sous arbre parent de $t$ tel que $\exists v ~ t'|_v = t, |v| = i$.
+    Soit un sous arbre $t = T|_u$, on note $t' = P_i^t$ le $i$-éme sous arbre parent de $t$ tel que $t' = T|_v$,  $u = vw$ et $|w| = i$.
 \end{definition}
 
 \subsection{Textes et arbres}
@@ -123,7 +141,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
                                     [IN [à]]
                                     [NP
                                             [CD [100]]
-                                            [NN [bpm]]
+                                            [NN [b/min]]
                                     ]
                             ]
                     ]
@@ -159,8 +177,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 \subsection{Réécriture d'arbres}
 
 \begin{definition}[Haie]
-    Une haie est définie comme une séquence d'arbres, qui peut éventuellement être vide, représentée sous la forme $h = [t_0, \dots , t_n]$.
-    $|h|$ représente le nombre d'arbres contenus dans cette haie, ici $|h| = n + 1$.
+    Une haie est définie comme une séquence d'arbres, qui peut éventuellement être vide, représentée sous la forme $h = [t_0, \dots , t_n]$ où $|h|$ représente le nombre d'arbres contenus dans cette haie (ici $|h| = n + 1$).
     Une substitution, notée $\sigma$, est une application bijective d'un ensemble de variables $V$ vers un ensemble de haies et d'un ensemble de labels vers un ensemble de sous arbres, étendue de manière homomorphique aux arbres.
 \end{definition}
 

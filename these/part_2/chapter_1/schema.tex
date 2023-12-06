@@ -29,6 +29,11 @@
 %     Dans la méta-grammaires ces attributs servent (en plus de la validation des formules sémantiques) à garder une trace des règles de production qui ont été construite afin de vérifier que les grammaires produites sont valides, c.-à-d. que tout non-terminal qui apparait dans une règle de production est bien défini dans une autre règle.
 % \end{definition}
 
+La section~\ref{} présente les différentes structuration possible du langage naturel.
+En ce qui concerne la structuration automatique du texte, l'utilisation des arbres de syntaxe parait plus appropriée étant donné leur ressemblance avec \gls{xml} (les données / mots sont les feuilles de l'arbre et la structure est portée par les nœuds intermédiaires).
+Bien que leur structure est plus conforme à la grammaire cible $\mathcal{G}$, cela entraîne une perte d'information par rapport à l'arbre de dépendance qui peut mettre en relation des éléments éloignés.
+Cependant, les textes médicaux se caractérisent par des phrases courtes et factuelles, où les observations démontrent que les éléments liés sémantiquement sont généralement proches dans le texte \cite{savaryRelationExtractionClinical2022}.
+
 Ce chapitre propose de transformer des données textuelles en une instance de graphe (ou d'arbre) respectant une grammaire cible $\mathbb{G}$.
 La construction de cette grammaire cible implique un processus d'extraction de schémas, commençant par la transformation des phrases en arbres syntaxiques.
 Le processus consiste en plusieurs itérations et est résumé visuellement dans la Figure~\ref{fig:strcut:general}, où, sur l'axe vertical, à chaque étape $i$, nous considérons :
@@ -41,17 +46,17 @@ Le processus consiste en plusieurs itérations et est résumé visuellement dans
 L'axe horizontal de la figure~\ref{fig:strcut:general} représente la progression du processus de l'étape $i$ à l'étape $i+1$. Cette progression est basée sur le raisonnement suivant :
 \begin{enumerate}
     \item Le processus commence par la transformation des phrases en arbres syntaxique, ce qui donne lieu à une instance désignée par $I_0$.
-    
+
     \item Une seconde étape consiste à enrichir les arbres de l'instance $I_0$ en incorporant les connaissances extraites des phases précédentes. Il peut s'agir d'insérer des entités, des noms de relations ou d'autres informations pertinentes dans les arbres.
 
     \item L'évolution de l'instance $I_i$ vers l'instance $I_{i+1}$ suit un processus de transformation qui comprend les étapes suivantes :
-    \begin{description}
-        \item[Regroupement et transformation] Au cours de cette étape, les branches de l'arbre sont regroupées ou transformées sur la base de mesures de similarité. Il peut s'agir de réorganiser la structure des arbres afin d'améliorer leur cohérence ou de les aligner plus efficacement sur la représentation souhaitée.
-    \end{description}
+          \begin{description}
+              \item[Regroupement et transformation] Au cours de cette étape, les branches de l'arbre sont regroupées ou transformées sur la base de mesures de similarité. Il peut s'agir de réorganiser la structure des arbres afin d'améliorer leur cohérence ou de les aligner plus efficacement sur la représentation souhaitée.
+          \end{description}
 
     \item L'évolution de $G_i$ vers $G_{i+1}$ est déclenchée en vérifiant si la grammaire $G_i$ est conforme à la grammaire générale $\mathbb{G}$.
-    À l'étape $i$, si $G_i$ n'est pas conforme à $\mathbb{G}$, le processus se poursuit en transformant les structures des arbres de $I_i$ donnant lieu à l'instance $I_{i+1}$ qui engendre un nouveau graphe quotient $S_{i+1}$ et une nouvelle grammaire $G_{i+1}$.
-    Le processus se termine lorsque nous trouvons une grammaire qui satisfait $\mathbb{G}$.
+          À l'étape $i$, si $G_i$ n'est pas conforme à $\mathbb{G}$, le processus se poursuit en transformant les structures des arbres de $I_i$ donnant lieu à l'instance $I_{i+1}$ qui engendre un nouveau graphe quotient $S_{i+1}$ et une nouvelle grammaire $G_{i+1}$.
+          Le processus se termine lorsque nous trouvons une grammaire qui satisfait $\mathbb{G}$.
 \end{enumerate}
 
 \begin{figure}
@@ -87,16 +92,47 @@ Les arbres d'entités peuvent être assimilés au concept de \emph{sub-records} 
 Dans l'instance résultante $I_t$, les groupes correspondent aux \emph{records}, alors que dans les grammaires précédentes $G_i$, ils servent de formats intermédiaires.
 Les collections dans le contexte actuel correspondent au concept de \emph{collections}.
 
+\begin{figure}[H]
+    \centering
+    \tikzstyle{flow-node} = [text centered, minimum height=2em, minimum width=5em, text width=5em, draw]
+    \tikzstyle{flow-start} = [rectangle, rounded corners, flow-node]
+    \tikzstyle{flow-process} = [rectangle, text centered, minimum height=2em, text width=10em, draw]
+    \tikzstyle{flow-data} = [trapezium, trapezium left angle=70, trapezium right angle=110, flow-node]
+    \tikzstyle{flow-decision} = [diamond, aspect=2.5, flow-node]
+    \tikzstyle{flow-arrow} = [thick, ->, >=latex, rounded corners]
+
+    \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
+        \begin{tikzpicture}[node distance=2em and 3em]
+            \node (start) [flow-start] {Debut};
+            \node (tal) [flow-data, below=of start] {Textes analysés};
+            \node (enriched) [flow-process, below=of tal] {Enrichissement des arbres};
+            \node (grammar) [flow-process, below=of enriched] {Extraction de la grammaire $G_i$};
+            \node (check) [flow-decision, below=of grammar] {$G_i = G_T$};
+            \node (end) [flow-start, left=of check] {Fin};
+            \node (equiv) [flow-process, below=of check] {Construction des classes equivalence};
+            \node (rewrite) [flow-process, below=of equiv] {Réécriture des arbres};
+
+            \draw [flow-arrow] (start) -- (tal);
+            \draw [flow-arrow] (tal) -- (enriched);
+            \draw [flow-arrow] (enriched) -- (grammar);
+            \draw [flow-arrow] (grammar) -- (check);
+            \draw [flow-arrow] (check) -- node[above] {Oui} (end);
+            \draw [flow-arrow] (check) -- node[left] {Non} (equiv);
+            \draw [flow-arrow] (equiv) -- (rewrite);
+            \draw [flow-arrow] (rewrite) |- + (3, -1) |- (grammar);
+        \end{tikzpicture}
+    \end{adjustbox}
+
+    \caption{Processus de structuration sous forme de diagramme de flux}
+\end{figure}
+
 \begin{example}
     Étant donné un schéma définit par la grammaire $G_S$ suivante :
     \begin{align*}
-        ROOT    & \to GROUP_A ~ COLL_1     \\
-        COLL_1  & \to REL_X^+              \\
-        REL_X   & \to GROUP_A ~ GROUP_B    \\
-        GROUP_A & \to ENT_1                \\
-        GROUP_B & \to ENT_1 ~ ENT_2        \\
-        ENT_1   & \to \langle data \rangle \\
-        ENT_2   & \to \langle data \rangle
+        ROOT    & \to GROUP_A ~ COLL_1                                          \\
+        COLL_1  & \to REL_X^+              & REL_X   & \to GROUP_A ~ GROUP_B    \\
+        GROUP_A & \to ENT_1                & GROUP_B & \to ENT_1 ~ ENT_2        \\
+        ENT_1   & \to \langle data \rangle & ENT_2   & \to \langle data \rangle
     \end{align*}
 
     L'arbre de dérivation de $\mathbb{G}$ donnant $G_S$ est donné figure~\ref{table:struct:meta:ex}.
@@ -119,10 +155,10 @@ Les collections dans le contexte actuel correspondent au concept de \emph{collec
                 % Rules list
                 \langle ruleList_{eL,gL,cgL,rL,crL}  \rangle & ::= \epsilon                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset] \\
                                                              & ~~ \mid ~ \langle entity_{name}          \rangle ~\textsc{eol}~ \langle ruleList_{eL',gL,cgL,rL,crL} \rangle & [name \notin eL'; eL \gets \{name\} \cup eL']                                                          \\
-                                                             & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle & [name \notin gL' \land eL' \subseteq eL; gL \gets \{name\} \cup gL']                                        \\
-                                                             & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle & [name \notin rL' \land gL' \subseteq gL; rL \gets \{name\} \cup rL']                                        \\
-                                                             & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle & [name \notin cgL' \land grpName \in gL; cgL \gets \{name\} \cup cgL']                                       \\
-                                                             & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle & [name \notin crL' \land relName \in rL; crL \gets \{name\} \cup crL']                                       \\[1em]
+                                                             & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle & [name \notin gL' \land eL' \subseteq eL; gL \gets \{name\} \cup gL']                                   \\
+                                                             & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle & [name \notin rL' \land gL' \subseteq gL; rL \gets \{name\} \cup rL']                                   \\
+                                                             & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle & [name \notin cgL' \land grpName \in gL; cgL \gets \{name\} \cup cgL']                                  \\
+                                                             & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle & [name \notin crL' \land relName \in rL; crL \gets \{name\} \cup crL']                                  \\[1em]
                 % Groups
                 \langle group_{name, eL} \rangle             & ::= GROUP_{name} \to \langle entList_{eL} \rangle                                                                                                                                                                     \\
                 \langle collGrp_{name,grpName} \rangle       & ::= COLL_{name} \to GROUP_{grpName}^+                                                                                                                                                                                 \\[1em]
@@ -145,79 +181,79 @@ Les collections dans le contexte actuel correspondent au concept de \emph{collec
         \begin{forest}
             for tree={align=center}
             [\huge{$\epsilon$}
-                [{\large{$\langle root \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}gL=\{A\}$}
+            [{\large{$\langle root \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}gL=\{A\}$}
                     [$ROOT$]
                     [$\to$,before computing xy={s/.average={s}{siblings}}]
                     [{\large{$\langle rootList \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}gL=\{A\}$}
-                        [$GROUP_A$]
-                        [{\large{$\langle rootList \rangle$}\\$\color{blue}crL=\{1\}$}
-                            [$COLL_1$]
-                            [\large{$\langle rootList \rangle$}
-                                [$\epsilon$]
+                            [$GROUP_A$]
+                            [{\large{$\langle rootList \rangle$}\\$\color{blue}crL=\{1\}$}
+                                    [$COLL_1$]
+                                    [\large{$\langle rootList \rangle$}
+                                        [$\epsilon$]
+                                    ]
                             ]
-                        ]
                     ]
-                ]
-                [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
-                [{\large{$\langle ruleList \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}rL=\{X\}$\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
+            ]
+            [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+            [{\large{$\langle ruleList \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}rL=\{X\}$\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
                     [{\large{$\langle collRel \rangle$}\\$\color{blue}name=1$\\$\color{blue}relName=X$}
-                        [$COLL_1$]
-                        [$\to$,before computing xy={s/.average={s}{siblings}}]
-                        [$REL_X^+$]
+                            [$COLL_1$]
+                            [$\to$,before computing xy={s/.average={s}{siblings}}]
+                            [$REL_X^+$]
                     ]
                     [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
                     [{\large{$\langle ruleList \rangle$}\\$\color{blue}rL=\{X\}$\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
-                        [{\large{$\langle relation \rangle$}\\$\color{blue}name=X$\\$\color{blue}gL=\{A, B\}$}
-                            [$REL_X$]
-                            [$\to$]
-                            [$GROUP_A$]
-                            [$GROUP_B$]
-                        ]
-                        [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
-                        [{\large{$\langle ruleList \rangle$}\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
-                            [{\large{$\langle group \rangle$}\\$\color{blue}name=A$\\$\color{blue}eL=\{1\}$}
-                                [$GROUP_A$]
-                                [$\to$,before computing xy={s/.average={s}{siblings}}]
-                                [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{1\}$}
-                                    [$ENT_1$]
-                                ]
+                            [{\large{$\langle relation \rangle$}\\$\color{blue}name=X$\\$\color{blue}gL=\{A, B\}$}
+                                    [$REL_X$]
+                                    [$\to$]
+                                    [$GROUP_A$]
+                                    [$GROUP_B$]
                             ]
                             [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
-                            [{\large{$\langle ruleList \rangle$}\\$\color{blue}gL=\{B\}$\\$\color{blue}eL=\{1, 2\}$}
-                                [{\large{$\langle group \rangle$}\\$\color{blue}name=B$\\$\color{blue}eL=\{1, 2\}$}
-                                    [$GROUP_B$]
-                                    [$\to$,before computing xy={s/.average={s}{siblings}}]
-                                    [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{1, 2\}$}
-                                        [$ENT_1$]
-                                        [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{2\}$}
-                                            [$ENT_2$]
-                                        ]
-                                    ]
-                                ]
-                                [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
-                                [{\large{$\langle ruleList \rangle$}\\$\color{blue}eL=\{1, 2\}$}
-                                    [{\large{$\langle ent \rangle$}\\$\color{blue}name=1$}
-                                        [$ENT_1$]
-                                        [$\to$]
-                                        [$\langle data \rangle$]
+                            [{\large{$\langle ruleList \rangle$}\\$\color{blue}gL=\{A, B\}$\\$\color{blue}eL=\{1, 2\}$}
+                                    [{\large{$\langle group \rangle$}\\$\color{blue}name=A$\\$\color{blue}eL=\{1\}$}
+                                            [$GROUP_A$]
+                                            [$\to$,before computing xy={s/.average={s}{siblings}}]
+                                            [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{1\}$}
+                                                    [$ENT_1$]
+                                            ]
                                     ]
                                     [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
-                                    [{\large{$\langle ruleList \rangle$}\\$\color{blue}eL=\{2\}$}
-                                        [{\large{$\langle ent \rangle$}\\$\color{blue}name=2$}
-                                            [$ENT_2$]
-                                            [$\to$]
-                                            [$\langle data \rangle$]
-                                        ]
-                                        [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
-                                        [\large{$\langle ruleList \rangle$}
-                                            [$\epsilon$]
-                                        ]
+                                    [{\large{$\langle ruleList \rangle$}\\$\color{blue}gL=\{B\}$\\$\color{blue}eL=\{1, 2\}$}
+                                            [{\large{$\langle group \rangle$}\\$\color{blue}name=B$\\$\color{blue}eL=\{1, 2\}$}
+                                                    [$GROUP_B$]
+                                                    [$\to$,before computing xy={s/.average={s}{siblings}}]
+                                                    [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{1, 2\}$}
+                                                            [$ENT_1$]
+                                                            [{\large{$\langle entList \rangle$}\\$\color{blue}eL=\{2\}$}
+                                                                    [$ENT_2$]
+                                                            ]
+                                                    ]
+                                            ]
+                                            [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                                            [{\large{$\langle ruleList \rangle$}\\$\color{blue}eL=\{1, 2\}$}
+                                                    [{\large{$\langle ent \rangle$}\\$\color{blue}name=1$}
+                                                            [$ENT_1$]
+                                                            [$\to$]
+                                                            [$\langle data \rangle$]
+                                                    ]
+                                                    [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                                                    [{\large{$\langle ruleList \rangle$}\\$\color{blue}eL=\{2\}$}
+                                                            [{\large{$\langle ent \rangle$}\\$\color{blue}name=2$}
+                                                                    [$ENT_2$]
+                                                                    [$\to$]
+                                                                    [$\langle data \rangle$]
+                                                            ]
+                                                            [\textsc{eol},before computing xy={s/.average={s}{siblings}}]
+                                                            [\large{$\langle ruleList \rangle$}
+                                                                [$\epsilon$]
+                                                            ]
+                                                    ]
+                                            ]
                                     ]
-                                ]
                             ]
-                        ]
                     ]
-                ]
+            ]
             ]
         \end{forest}
     \end{adjustbox}
@@ -225,18 +261,27 @@ Les collections dans le contexte actuel correspondent au concept de \emph{collec
     \vspace*{\fill}
 \end{landscape}
 
-\subsection{textes}
+\subsection{Préparation des textes}
 
-
-Pour la structuration automatique du texte, l'arbre de syntaxe est plus adapté, car sa structure est plus proche de la grammaire de destination même si l'on perd une partie de la sémantique exprimée par l'arbre de dépendance.
-Les textes médicaux possèdent des phrases courtes et factuelles : les observations montrent que les éléments liés sémantiquement sont proches dans le texte \cite{savaryRelationExtractionClinical2022} ce qui mitige le manque de sémantique exprimé par l'arbre syntaxique.
-
+Les arbres syntaxiques constituent la fondation de la structuration automatique de l'information.
+Plusieurs traitements sont nécessaires pour la préparation des textes à la suite de l'analyse syntaxique.
+L'objectif est de simplifier les arbres sur lesquels nous travaillons et d'incorporer les informations extraites, telles que les entités et les relations, au sein de l'arbre de syntaxe.
+Les entités représentent les unités d'information, les données, qui seront structurées en vue de leur enregistrement en base de données.
+Par conséquent, toute partie de l'arbre qui ne fait pas référence à une entité peut être éliminée, car elle n'est pas porteuse d'information.
+L'objectif final est d'obtenir des arbres contenant uniquement les entités hiérarchisées conformément à la structure de l'arbre de syntaxe.
 
 \subsubsection{Conjonctions de coordinations}
 
+La structure des arbres syntaxiques est dépendante de la langue étudiée.
+Plus particulièrement, on s'intéresse à la représentation des conjonctions de coordination, lesquelles se révèlent être d'excellents candidats pour la représentation des collections.
+La figure~\ref{fig:struct:conj} illustre la disparité structurelle entre le français (\ref{fig:struct:conj:fr}) et l'anglais (\ref{fig:struct:conj:en}).
+Le français est annoté avec une structure en profondeur, tandis que l'anglais présente une structure en arbre binaire.
+Ainsi, la structure de l'anglais se rapproche davantage de la représentation des collections, lesquels sont représentés par un sous-arbre où chaque enfant constitue un élément de la collection.
+Une première étape dans la préparation des textes implique par conséquent la transformation (pour le français) des conjonctions vers une structure, plus adaptée, en arbre binaire.
+
 \begin{figure}[ht]
     \centering
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}[b]{.45\textwidth}
         \centering
         \begin{adjustbox}{max width=\linewidth}
             \begin{forest}
@@ -260,7 +305,7 @@ Les textes médicaux possèdent des phrases courtes et factuelles : les observat
         \label{fig:struct:conj:fr}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}[b]{.45\textwidth}
         \centering
         \begin{adjustbox}{max width=\linewidth}
             \begin{forest}
@@ -289,35 +334,444 @@ Les textes médicaux possèdent des phrases courtes et factuelles : les observat
 
 \subsubsection{Enrichissement des arbres}
 
+L'intégration d'une entité dans un arbre syntaxique se concrétise par la création d'un nœud \emph{ENT}, auquel est attribué le type de l'entité (Personne, Pays, Maladie, etc.).
+Ce nœud agit en tant que parent englobant l'ensemble des mots qui composent l'entité, correspondant au nœud dont la position représente le plus grand préfixe commun à tous les termes de l'entité.
+Dans certaines situations, les entités peuvent être imbriquées, c'est-à-dire qu'elles peuvent être contenues dans une autre.
+Lorsqu'une entité $A$ englobe une entité $B$, dans l'arbre syntaxique, le nœud représentant l'entité $A$ est parent du nœud de l'entité $B$, ou occupe la même position que ce dernier.
+Cependant, cette structure est considérée comme invalide selon la grammaire $\mathbb{G}$, où il est spécifié que les nœuds entités ne peuvent pas avoir une entité comme parent.
+Pour s'aligner sur la métagrammaire, il a été choisi de représenter cette imbrication sous la forme d'une relation entre l'entité englobante et la liste des entités contenues.
+Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser cette relation et a comme enfants :
+\begin{enumerate*}[label=(\roman*)]
+\item l'arbre d'entité englobant, qui a pour feuille le texte complet couvert par l'entité, et
+\item un nœud \emph{EC\_NODE}, symbolisant la collection et possédant comme enfants l'ensemble des arbres d'entités contenues.
+\end{enumerate*}
+
+\begin{example}
+    Considérons l'arbre donné dans la figure~\ref{fig:struct:conj:en} ainsi que deux entités : \emph{renal ultrasound} et \emph{retrograde cystography}.
+    Pour la première entité, \emph{renal} se trouve à la position $01$ et \emph{ultrasound} à la position $02$.
+    Par conséquent, l'entité doit être insérée à la position $0$, qui représente le préfixe commun à \emph{renal} et \emph{ultrasound}.
+    Cependant, étant donné qu'un autre mot est également un descendant du nœud situé à la position $0$, cette position n'est pas valide.
+    Afin de remédier à cette situation, un nouveau nœud est ajouté à la position $01$, descendant de la position $0$ et recouvrant uniquement les mots \emph{renal} et \emph{ultrasound}.
+    Le résultat de cette opération d'enrichissement est illustré dans la figure~\ref{fig:struct:enrichissement:1} pour les deux entités.
+\end{example}
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{.37\textwidth}
+        \centering
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [S
+                    [NP
+                        [DT [The]]
+                        [NN [patient]]
+                    ]
+                    [VP
+                        [VBZ [takes]]
+                        [NP
+                            [NP 
+                                [CD [500]]
+                                [NN [mg]]
+                            ]
+                            [PP 
+                                [IN [of]]
+                                [NP [NN [Paracetamol]]]
+                            ]
+                        ]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre de syntaxe}
+        \label{fig:struct:enrichissement:1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.53\textwidth}
+        \centering
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [S
+                    [NP
+                        [DT [The]]
+                        [NN [\textbf{ENT\_PERSON} [patient]]]
+                    ]
+                    [VP
+                        [VBZ [takes]]
+                        [NP
+                            [NP [\textbf{ER\_NODE}
+                                [\textbf{ENT\_DOSAGE} [500 mg]]
+                                [\textbf{EC\_NODE}
+                                    [CD [\textbf{ENT\_VALUE} [500]]]
+                                    [NN [\textbf{ENT\_UNIT} [mg]]]
+                                ]
+                            ]]
+                            [PP 
+                                [IN [of]]
+                                [NP [NN [\textbf{ENT\_DRUG} [Paracetamol]]]]
+                            ]
+                        ]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre enrichie}
+        \label{fig:struct:enrichissement:2}
+    \end{subfigure}
+    \caption{Exemple d'enrichissement d'arbre de syntaxe}
+    \label{fig:struct:enrichissement}
+\end{figure}
+
+La procedure pour enrichir les arbres de syntaxe est donné par l'algorithme~\ref{algo:struct:insent}.
+
+\begin{algorithm}[H]
+    \caption{$\textsf{ins\_ent}(T = (D, t), TreeEnt)$}
+        \label{algo:struct:insent}
+
+    $u.b \gets u.x_0.x_1 \dots x_n$\;
+        \tcp{Check if $u.x_0$ has children not in the entity and should be left in place}
+        \If{$\sum_{i=1}^{n} (x_i) \neq 0$}{
+            $x' \gets x_0 + 1$\;
+        } \Else {
+            $x' \gets x_0$\;
+        }
+    $j \gets |L_{ent}| - 1$\;
+    $H \gets []$\;
+        \While{$j \geq 0$}{
+            $pos \gets L_{ent}[j]$\;
+            $H \gets H.\textsf{append}(T|_{pos})$\;
+            $\textsf{del\_elem}(X, pos)$\;
+            $j \gets j-1$\;
+        }
+    $\textsf{ins\_elem}(T, entityName, u.x')$\;
+    \For{$leaf \in H$}{
+        $\textsf{ins\_elem}(T, leaf, u.x'.0)$\;
+    }
+\end{algorithm}
+
 \subsubsection{Simplifications}
+
+La simplification des arbres conscite en la suppression de toute les branches qui ne continent pas une entité.
+Les structures redondantes, sont aussi supprimées.
+
+
+Cependant, cette structure est invalide, car les nœuds entités, qui représentent les données, doivent être les parents directs des feuilles (c'est-à-dire, les mots) de l'arbre syntaxique.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [COORD
+                    [NP
+                            [DT [a]]
+                            [ADJ,before computing xy={s/.average={s}{siblings}} [renal]]
+                            [NN [ultrasound]]
+                    ]
+                    [CCONJ,before computing xy={s/.average={s}{siblings}} [and]]
+                    [NP
+                            [DT [a]]
+                            [ADJ,before computing xy={s/.average={s}{siblings}} [retrograde]]
+                            [NN [cystography]]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre non simplifié}
+        \label{fig:struct:simplification:1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [COORD
+                    [NP
+                            [DT [a]]
+                            [ADJ,before computing xy={s/.average={s}{siblings}} [renal]]
+                            [NN [ultrasound]]
+                    ]
+                    [CCONJ,before computing xy={s/.average={s}{siblings}} [and]]
+                    [NP
+                            [DT [a]]
+                            [ADJ,before computing xy={s/.average={s}{siblings}} [retrograde]]
+                            [NN [cystography]]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre simplifié}
+        \label{fig:struct:simplification:2}
+    \end{subfigure}
+    \caption{Exemple de simplificiation d'un arbre}
+    \label{fig:struct:simplification}
+\end{figure}
+
+\subsection{Équivalence de sous arbres}
+
+Les arbres d'entités représentent l'information et sont donc la base de comparaison des sous arbres.
+La langue naturelle contient souvent de l'information implicite ou manquante, deux sous arbres peuvent contenir un ensemble différent d'arbres d'entités, mais quand même représenter le même objet.
+Par exemple, un traitement ne contient pas toujours une fréquence.
+De plus la langue naturelle est ambiguë et un même ensemble d'arbres d'entités peux représenter deux objets différents.
+L'ensemble seule des arbres d'entités présent dans chacun des sous arbres n'est donc pas suffisant pour déterminer leur équivalence et on doit aussi prendre en compte le contexte.
+Pour ce faire nous utilisons le concept d'équivalence régulière comme introduite par~\cite{whiteGraphSemigroupHomomorphisms1983} pour les graphes.
+L'idée est que deux sommets d'un graphe sont jugé équivalents si leur voisinage est équivalent.
+Par exemple, deux personnes peuvent être jugées équivalent (comme catégorie d'objet représenté, ici un patient) s'ils sont toutes les deux lié à des sommets équivalents comme une maladie, un traitement, etc sans pour autant que ce soit les mêmes nœuds.
+
+Afin de définir la relation d'équivalence, nous définissons une mesure de similarité entre deux sous arbres.
+On note $\mathbb{T}$ l'ensemble de tous les arbres et $\mathbb{ST}$ l'ensemble de tous les sous arbres.
+Une mesure de similarité est une fonction symétrique $f : \mathbb{ST} \times \mathbb{ST} \to [0,1]$ où $f(x, x) = 1$ pour tout $x \in \mathbb{ST}$.
+La similarité contextuelle d'arbres est notée $sim_f(x, y)$, entre deux sous arbres enrichis $x = T|_u$ et $y = T'|v$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous arbre parent.
+Les poids sont inversement proportionnels à la distance entre les sous arbre parents et les sous arbres $x$ et $y$.
+L'idée sous-jacente est que plus un sous arbre est distant d'un autre, moins il a de valeur dans son contexte.
+La mesure $sim_f(x, y)$ est donné par l'équation~\ref{eq:struct:sim} où $P^x_i$ (respectivement $P^y_i$) est le $i$-éme sous arbre parent de $x$ (respectivement $y$) et $depth_{min}$ est la profondeur minimum entre les sous arbres $x$ et $y$ tel que $depth_{min} = \min\{|u|, |v|\}$.
+
+\begin{equation}
+    sim_f(x, y) = \frac{\sum_{i=0}^{depth_{min}} \frac{1}{i + 1} \cdot f(P^x_i, P^y_i)}{\sum_{j=0}^{depth_{min}} \frac{1}{j + 1}} \label{eq:struct:sim}
+\end{equation}
+
+\begin{proposition}
+    Comme la fonction $sim_f$ est une moyenne pondérée de $f$ elle respecte alors ses propriétés :
+    $sim_f$ est symétrique, définie sur l'intervalle $[0, 1]$ et pour tout $x \in \mathbb{ST}$, $sim_f(x, x) = 1$.
+    \qed
+\end{proposition}
+
+Plusieurs mesures $f$ de similarité peuvent être utilisés comme Jaccard, Levenshtein, Jaro, etc.
+
+\begin{example}
+    % \todo{example deux sous arbres}
+\end{example}
+
+Avec cette mesure de similarité, il est possible de définir la relation de similarité entre deux sous arbres enrichis.
+On dira alors que deux sous arbres sont similaires si leur similarité est supérieure à un taux donné en paramètre.
+La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaque ensemble de données.
+
+\begin{definition}[Similarité de sous arbres]
+    \label{def:struct:sim}
+    Soit deux arbres enrichis $T_1$ et $T_2$ avec deux sous arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et un seuil noté $\tau \in [0, 1]$, on dit que $st_1$ et $st_2$ sont $\tau$-similaires, noté $st_1 \sim_\tau st_2$, si et seulement si $sim_f(st_1, st_2) \geq \tau$.
+\end{definition}
+
+\begin{proposition}
+    Pour tout $x$, on a $sim_f(x, x) = 1$ et $1 \ge \tau$ pour toute valeur possible de $\tau$, alors, on peut déduire que la relation de $\tau$-similarité est \emph{réflexive}.
+    De plus, si on a $x \sim_\tau y$, alors $f(x, y) \ge \tau$.
+    Comme la fonction $sim_f$ est symétrique ($f(x, y) = f(y, x)$) on a donc $f(y, x) \ge \tau$ et par extension $y \sim_\tau x$.
+    Nous pouvons conclure que la relation de $\tau$-similarité est \emph{symétrique}.
+    \qed
+\end{proposition}
+
+\begin{definition}[Equivalence de sous arbres]
+    \label{def:struct:equiv}
+    Étant donné deux arbres enrichis $T_1$ et $T_2$ avec deux sous arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et la relation de $\tau$-similarité définit précédemment (\ref{def:struct:sim}).
+    On définit la relation de $\tau$-équivalence entre $st_1$ et $st_2$ noté $st_1 \equiv_\tau st_2$ tel que $x$ est $\tau$-équivalent à $y$ si et seulement si $x$ est $\tau$-similaires à $y$ ou à au moins un des sous arbres $\tau$-équivalent à $y$.
+    La proposition est synthétisée par l'équation~\ref{eq:struct:equiv}.
+    \begin{equation}
+        (\forall x \in \mathbb{ST}, y \in \mathbb{ST}) ~ x \equiv_\tau y \iff x \sim_\tau y \lor (\exists z \in \mathbb{ST}) ~ x \equiv_\tau z \land y \equiv_\tau z \label{eq:struct:equiv}
+    \end{equation}
+\end{definition}
+
+\begin{proposition}
+    Soit $st_1$ un sous arbre enrichi.
+    La réflexivité de la $\tau$-équivalence découle directement de la réflexivité de celle de la $\tau$-similarité, car $st_1 \equiv_\tau st_1$ implique $st_1 \sim_\tau st_1$ qui est toujours vrais.
+    $st_1 \equiv_\tau z \land st_1 \equiv_\tau z$ est vrai pour $z = st_1$ étant donné que $st_1 \equiv_\tau st_1$ par hypothèse.
+    La $\tau$-équivalence est donc \emph{réflexive}.
+    Soit $st_1$ et $st_2$ deux sous arbres enrichis et supposons que $st_1 \equiv_\tau st_2$.
+    On a alors deux cas :
+    \begin{itemize}
+        \item  $st_1 \sim_\tau st_2$ : qui implique, par symétrie, $st_2 \sim_\tau st_1$ et donc  $st_2 \equiv_\tau st_1$.
+        \item $\exists z (st_1 \equiv_\tau z \land st_2 \equiv_\tau z)$ : qui peut se réécrire en $\exists z (st_2 \equiv_\tau z \land st_1 \equiv_\tau z)$ qui donne, par définition, $st_2 \equiv_\tau st_1$.
+    \end{itemize}
+    On peut donc en déduire que la $\tau$-équivalence est \emph{symétrique}.
+    Soit $st_1$, $st_2$ et $st_3$ trois sous arbres enrichis et supposons que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
+    Par symétrie, nous avons $st_1 \equiv_\tau st_2$ et $st_3 \equiv_\tau st_2$.
+    En utilisant la définition de la $\tau$-équivalence (\ref{eq:struct:equiv}), nous pouvons remplacer $z$ par $st_2$.
+    On obtient alors, par définition, $st_1 \equiv_\tau st_3$.
+    L'inverse est trivial et on peut conclure que $(st_1 \equiv_\tau st_2 \land st_2 \equiv_\tau st_3) \iff st_1 \equiv_\tau st_3$.
+    La $\tau$-équivalence est donc \emph{transitive}.
+    La $\tau$-équivalence respecte les trois propriétés d'une relation d'équivalence : \emph{réflexive}, \emph{symétrique} et \emph{transitive}.
+    % Supposons que $st_1 \equiv_\tau st_2$, on a donc $st_1 \sim_\tau st_2$ ou il existe un $z$ qui vérifie $st_1 \equiv_\tau z \implies st_2 \equiv_\tau z$.
+    % Dans le premier cas on peut déduire que $st_2 \sim_\tau st_1$ par réflectivité et par conséquent $st_2 \equiv_\tau st_1$.
+    % Dans le second cas, si on prend $z = st_1$, on obtient $st_1 \equiv_\tau st_1 \implies st_2 \sim_\tau st_1$.
+    % Or, $st_1 \equiv_\tau st_1$ est vrai par réflexivité et on obtient alors $st_2 \equiv_\tau st_1$
+    % On peut donc en déduire que $st_1 \equiv_\tau st_2 = st_2 \equiv_\tau st_1$ ce qui implique que la $\tau$-équivalence est \emph{symétrique}.
+    % Prenons l'hypothèse que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
+    % Cela signifie que $st_2 \sim_\tau st_3$ ou $st_2 \equiv_\tau z \implies st_3 \equiv_\tau z$.
+    % Or, comme $st_2 \equiv_\tau st_1$ par symétrie, en prenant $z = st_1$, on a $st_3 \equiv_\tau st_1$ et donc $st_1 \equiv_\tau st_3$ par symétrie.
+    % La $\tau$-équivalence est donc \emph{transitive}.
+    \qed
+\end{proposition}
+
+\begin{definition}[Classe d'equivalences]
+    On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
+    $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
+\end{definition}
+
+Le partitionnement d'un ensemble peut être calculé à l'aide d'un regroupement hiérarchique en lien simple et la mesure de similarité $sim_f$.
+\cite{carlssonCharacterizationStabilityConvergence2010} montre qu'un regroupement hiérarchique en lien simple correspond a partitionnement selon une relation d'équivalence.
+Le regroupement hiérarchique implique la construction d'une hiérarchie des éléments selon une mesure de similarité.
+Initialement, chaque individu forme une classe distincte.
+À chaque étape, les classes "proches" sont fusionnées deux à deux en fonction de la mesure de similarité (ou de disimilarité).
+Une hiérarchie est qualifiée "en lien simple" lorsque la similarité entre deux classes est évaluée comme étant le maximum de la similarité (ou le minimum de la dissimilarité) entre chaque paire d'éléments de ces classes respectives.
+Cette hiérarchie est fréquemment représentée graphiquement à l'aide d'un dendrogramme (cf. figure~\ref{fig:struct:quotient:dendrogramme}).
+Il s'agit d'un arbre binaire décrivant les fusions de classes, où les classes sont disposées sur l'axe des abscisses et l'axe des ordonnées représente la dissimilarité entre les classes (plus la valeur est élevée, plus les classes sont éloignées).
+
+Une classification par un taux $\tau$ consiste à fusionner des classes tant que la similarité demeure supérieure à $\tau$.
+Visuellement, il est possible de tracer une droite sur le dendrogramme et de conserver toutes les classes situées en dessous de cette droite.
+Dans la figure~\ref{fig:struct:quotient:dendrogramme}, en fixant $\tau = 0.3$, deux classes émergent, à savoir $\{a, b\}$ (en bleu) et $\{c, d, e\}$ (en orange).
+Si le seuil est augmenté à $\tau = 0.5$, trois classes distinctes apparaissent, à savoir $\{a\}$, $\{b\}$ et $\{c, d, e\}$.
+En continuant d'augmenter le seuil, par exemple à $\tau = 0.7$, quatre classes distinctes seraient obtenues, à savoir $\{a\}$, $\{b\}$, $\{c, d\}$ et $\{e\}$.
+
+\begin{figure}[H]
+    \centering
+    \begin{adjustbox}{max width=\linewidth}
+        \begin{tikzpicture}[sloped]
+            \node (a) at (-6,0) {a};
+            \node (b) at (-3,0) {b};
+            \node (c) at (-0.5,0) {c};
+            \node (d) at (0.5,0) {d};
+            \node (e) at (2,0) {e};
+            \node (ab) at (-4.5,3) {};
+            \node (cd) at (0,1) {};
+            \node (cde) at (1,2) {};
+            \node (all) at (-1.5,4.5) {};
+
+            \draw[thick, blue] (a) |- (ab.center);
+            \draw[thick, blue] (b) |- (ab.center);
+            \draw[thick, orange] (c) |- (cd.center);
+            \draw[thick, orange] (d) |- (cd.center);
+            \draw[thick, orange] (e) |- (cde.center);
+            \draw[thick, orange] (cd.center) |- (cde.center);
+            \draw[thick] (ab.center) |- (all.center);
+            \draw[thick] (cde.center) |- (all.center);
+
+            \draw[<-,latex-] (-10,0) -- node[above]{simlaritée} (-10,5);
+            \draw[->,-latex] (-9,0) -- node[above]{disimilarité} (-9,5);
+
+            \draw (-7,0) -- (-7,5);
+
+            \foreach \y in {0,1,2,3,4,5}
+            \draw[shift={(0,\y)},color=black] (-7,0) -- (-7.1,0);
+
+            \node[left] at (-7.1,0) {$1.0$} ;
+            \node[left] at (-7.1,1) {$0.8$} ;
+            \node[left] at (-7.1,2) {$0.6$} ;
+            \node[left] at (-7.1,3) {$0.4$} ;
+            \node[left] at (-7.1,4) {$0.2$} ;
+            \node[left] at (-7.1,5) {$0.0$} ;
+
+            \draw[dashed,color=gray] (-7,3.5) -- node[at end, right]{$\tau$} (2.5,3.5);
+            \draw[color=gray] (-7,3.5) -- (-7.1,3.5) node[left] {$0.3$};
+        \end{tikzpicture}
+    \end{adjustbox}
+    \label{fig:struct:quotient:dendrogramme}
+    \caption{Exemple de dendrogramme pour le partitionnement hiérarchique}
+\end{figure}
 
 \subsection{Récupération du schéma d'une instance}
 
 Pour réaliser la migration de l'instance d'une grammaire vers une autre il est indispensable de pouvoir récupérer la grammaire à partir de l'instance afin de pouvoir la vérifier à l'aide de la méta-grammaire $G$.
 Étant donné une instance $I$ reconnu par une grammaire $G_S$, il est possible de récupérer l'arbre de dérivation $S$ de la grammaire $G$ en calculant le quotient de $I$. \todo{$S$ n'est pas la dérivation de $G$}
 
-\begin{definition}[Quotient d'un graphe]
-    Étant donné un graphe $G = (V, E)$ où $V$ est l'ensemble des sommets du graphe et $E$ l'ensemble des arêtes de la forme $\{u, v\} \in E$ où $u, v \in V$.
-    Le quotient du graphe $G$ est un graphe distinct noté $Q_G = (Q_V, Q_E)$ qui respecte les propriétés suivantes :
-    \begin{enumerate}
-        \item \label{struct:quotient:prop1} $Q_V = V / \equiv$
-        \item \label{struct:quotient:prop2} $\{u_Q, v_Q\} \in Q_E \iff \exists u \in u_Q, v \in v_Q$ tel que $\{u, v\} \in V$
-    \end{enumerate}
-    La propriété \ref{struct:quotient:prop1} signifie que chaque sommet de $Q_G$ correspond à une partition de $G$ par la relation d'équivalence $\equiv$.
-    De plus, il existe une arête entre deux nœuds de $Q_G$ si et seulement si, il existe une arête entre au moins une paire d'élément de chaque partition dans $G$ comme définit par la propriété \ref{struct:quotient:prop2}.
+% \begin{definition}[Quotient d'un graphe]
+%     Étant donné un graphe $G = (V, E)$ où $V$ est l'ensemble des sommets du graphe et $E$ l'ensemble des arêtes de la forme $\{u, v\} \in E$ où $u, v \in V$.
+%     Le quotient du graphe $G$ est un graphe distinct noté $Q_G = (Q_V, Q_E)$ qui respecte les propriétés suivantes :
+%     \begin{enumerate}
+%         \item \label{struct:quotient:prop1} $Q_V = V / \equiv$
+%         \item \label{struct:quotient:prop2} $\{u_Q, v_Q\} \in Q_E \iff \exists u \in u_Q, v \in v_Q$ tel que $\{u, v\} \in V$
+%     \end{enumerate}
+%     La propriété \ref{struct:quotient:prop1} signifie que chaque sommet de $Q_G$ correspond à une partition de $G$ par la relation d'équivalence $\equiv$.
+%     De plus, il existe une arête entre deux nœuds de $Q_G$ si et seulement si, il existe une arête entre au moins une paire d'élément de chaque partition dans $G$ comme définit par la propriété \ref{struct:quotient:prop2}.
+% \end{definition}
+
+% \begin{definition}[Quotient d'un arbre ordonné]
+%     Étant donné un arbre ordonné $T = (D, l)$, le quotient de l'arbre est un arbre distinct noté $Q_T = (Q_D, Q_l)$ avec une fonction injective de projection $\pi : (\mathbb{N})^* \to \mathcal{P}(D)$ où $\mathcal{P}(D)$ est l'ensemble des parties de $D$ (\emph{power set} en anglais, c.-à-d. l'ensemble des sous ensemble de $D$).
+%     $\pi$ respecte les propriétés suivantes :
+%     \begin{enumerate}
+%         \item \label{struct:quotient-tree:prop1} $\forall u_Q \in Q_D ~ \exists V \in D / \equiv$ tel que $\pi(u_Q) = V$.
+%         \item \label{struct:quotient-tree:prop2} $\forall u_Q \in Q_D ~ \exists v_Q \in Q_D$ tel que $v_Q \preceq u_Q \iff \exists u \in \pi(u_Q), v \in \pi(v_Q)$ tel que $v \prec u$
+%     \end{enumerate}
+%     La propriété \ref{struct:quotient-tree:prop1} signifie que chaque nœud de $Q_T$ correspond à une partition de $T$ par la relation d'équivalence $\equiv$.
+%     De plus, il existe une arête entre deux nœuds de $Q_T$ si et seulement si, il existe une arête entre au moins une paire d'élément de chaque partition dans $T$ comme définit par la propriété \ref{struct:quotient-tree:prop2}.
+%     La fonction de labellisation $Q_l$ est définie par : $\langle u \mapsto l(\pi(u)) \mid u \in Q_D \rangle$.
+%     De plus, pour toute position $u_Q \in Q_D$ s'il existe un $v \in D$ tel que $|\{u \mid u \in \pi(u_Q), v \prec u\}| > 1$ alors $Q_l(u_Q) = Q_l(u_Q)^+$
+% \end{definition}
+
+Le quotient d'un graphe est une construction ou les nœuds sont regroupées en suivant une relation d'équivalences.
+Chaque nœud du graphe quotient représente alors une classe d'équivalence et il existe une arête entre deux nœuds s'il existe au moins une arête entre deux individus de chaque classe.
+Pour construire la grammaire à partir d'un arbre, on définit un nouveau quotient qui maintient la structure d'arbre (c.-à-d. sans cycles et sans nœuds ayant plusieurs parents).
+Le quotient est calculé à partir d'une relation d'équivalence sur les labels.
+Pour capturer la structure hiérarchique de ces classes et construire l'arbre quotient, nous introduisons la fonction \textsf{Succ}, qui permet d'obtenir les successeurs de chaque classe d'équivalence.
+
+\begin{definition}
+    \label{def:struct:quotient:succ}
+    Étant donné un arbre $T = (D, l)$ et une relation d'équivalence $R$ définie par $(\forall x \in D, y \in D) ~ x R y \iff l(x) = l(y)$.
+    Soit $D/R = \{C_0, \dots, C_n\}$ l'ensemble des classes d'équivalences de $T$, on définit la fonction \textsf{Succ} tel que :
+    \begin{equation}
+        \textsf{Succ}(C) = \{ C' \mid \exists u \in C, v \in C' \text{ tq. } u \prec v \}
+    \end{equation}
+    % \begin{equation}
+    %     \textsf{Succ}(C_i) = \begin{cases*}
+    %         \{ \epsilon \}                                                     & si $C_i    = \emptyset$ \\
+    %         \{ C_j \mid \exists u \in C_i, p \in C_j \text{ tq. } u \prec p \} & si $C_i \neq \emptyset$
+    %     \end{cases*}
+    % \end{equation}
 \end{definition}
 
+À l'aide de la fonction \textsf{Succ}, on définit la fonction \textsf{QDom} qui permet de construire le domaine de l'arbre quotient.
+$\textsf{QDom}(C, u)$ a pour objectif d'associer a chaque classe successeurs de $C$ une position relative $u.p$.
+Comme on souhaite maintenir la hiérarchie sous forme d'arbre, une classe d'équivalence peut avoir plusieurs positions dans l'arbre quotient si elle a plusieurs parents.
+L'arbre quotient est construit à partir de la fonction \textsf{QDom}.
+
 \begin{definition}[Quotient d'un arbre ordonné]
-    Étant donné un arbre ordonné $T = (D, l)$, le quotient de l'arbre est un arbre distinct noté $Q_T = (Q_D, Q_l)$ avec une fonction injective de projection $\pi : (\mathbb{N})^* \to \mathcal{P}(D)$ où $\mathcal{P}(D)$ est l'ensemble des parties de $D$ (\emph{power set} en anglais, c.-à-d. l'ensemble des sous ensemble de $D$).
-    $\pi$ respecte les propriétés suivantes :
-    \begin{enumerate}
-        \item \label{struct:quotient-tree:prop1} $\forall u_Q \in Q_D ~ \exists V \in D / \equiv$ tel que $\pi(u_Q) = V$.
-        \item \label{struct:quotient-tree:prop2} $\forall u_Q \in Q_D ~ \exists v_Q \in Q_D$ tel que $v_Q \preceq u_Q \iff \exists u \in \pi(u_Q), v \in \pi(v_Q)$ tel que $v \prec u$
-    \end{enumerate}
-    La propriété \ref{struct:quotient-tree:prop1} signifie que chaque nœud de $Q_T$ correspond à une partition de $T$ par la relation d'équivalence $\equiv$.
-    De plus, il existe une arête entre deux nœuds de $Q_T$ si et seulement si, il existe une arête entre au moins une paire d'élément de chaque partition dans $T$ comme définit par la propriété \ref{struct:quotient-tree:prop2}.
-    La fonction de labellisation $Q_l$ est définie par : $\langle u \mapsto l(\pi(u)) \mid u \in Q_D \rangle$.
-    De plus, pour toute position $u_Q \in Q_D$ s'il existe un $v \in D$ tel que $|\{u \mid u \in \pi(u_Q), v \prec u\}| > 1$ alors $Q_l(u_Q) = Q_l(u_Q)^+$
+    Étant donné un arbre $T = (D, l)$ et une relation d'équivalence $R$ définie par $(\forall x \in D, y \in D) ~ x R y \iff l(x) = l(y)$.
+    Soit $D/R = \{C_0, \dots, C_n\}$ l'ensemble des classes d'équivalences de $T$ et la fonction \textsf{Succ} donnée par la définition~\ref{def:struct:quotient:succ}.
+    On commence par définir la fonction \textsf{QDom} à l'aide de l'algorithme \ref{algo:struct:quotient:QDom}.
+    L'arbre quotient de $T$, noté $Q_T$ est construit à l'aide de la fonction \textsf{QDom} et sa construction est définie par l'algorithme~\ref{algo:struct:quotient:QT}.\\
+
+    \begin{algorithm}[H]
+        \caption{$\textsf{QDom}(C_i, u)$}
+        \label{algo:struct:quotient:QDom}
+        \SetKwFunction{succ}{Succ}
+
+        $S = \emptyset$\;
+        $p = 0$\;
+        \ForEach{$C_j \in \succ(C_i)$}{
+            $S = S \cup \{(C_j, u.p)\}$\;
+            $p = p+1$\;
+        }
+        \Return{$S$}
+    \end{algorithm}
+
+    \begin{algorithm}[H]
+        \caption{$Q_T(T = (D, l))$}
+        \label{algo:struct:quotient:QT}
+        \SetKwFunction{succ}{Succ}
+        \SetKwFunction{qdom}{QDom}
+
+        $Q_D \gets \{\epsilon\}$\;
+        $Q_l \gets \langle \epsilon \mapsto \lambda \rangle$\;
+
+        $classes \gets \{(\{\epsilon\}, \epsilon)\}$\;
+        \While{$classes \neq \emptyset$}{
+            \tcp{Prendre une classe d'équivalence et ajouter ses successeurs dans l'ensemble a traité}
+            $classes \gets classes - \{(C, u)\}$\;
+            $successeurs \gets \qdom(C, u)$\;
+            $classes \gets classes \cup successeurs$\;
+            \BlankLine
+            $Q_D = Q_D \cup \{u\}$\;
+            \tcp{Si un nœud a plusieurs successeurs on ajoute le symbole `${}^+$' au label}
+            \If{$\lvert\{v \mid \forall (C', v) \in successeurs \text{ tq. } u \prec v\}\rvert > 1$\label{algo:struct:quotient:QT:plus}}{
+                $Q_l(u) = l(u)~+~$`${}^+$'\;
+            } \Else {
+                $Q_l(u) = l(u)$\;
+            }
+        }
+
+        \Return{$Q_D, Q_l$}
+    \end{algorithm}
 \end{definition}
 
 \begin{example}{Arbre quotient et grammaire}
@@ -329,7 +783,7 @@ Pour réaliser la migration de l'instance d'une grammaire vers une autre il est 
                 \begin{forest}
                     for tree={s sep=5em}
                     [$\lambda$
-                        [$X$ [$a$] [$b$]]
+                    [$X$ [$a$] [$b$]]
                         [$X$,before computing xy={s/.average={s}{siblings}} [$b$] [$c$]]
                         [$Y$ [$a$]]
                     ]
@@ -345,7 +799,7 @@ Pour réaliser la migration de l'instance d'une grammaire vers une autre il est 
                 \begin{forest}
                     for tree={s sep=20mm}
                     [$\lambda$
-                        [$X^+$ [$a$] [$b$] [$c$]]
+                    [$X^+$ [$a$] [$b$] [$c$]]
                         [$Y$ [$a$]]
                     ]
                 \end{forest}
@@ -356,51 +810,41 @@ Pour réaliser la migration de l'instance d'une grammaire vers une autre il est 
         \caption{Exemple du quotient d'un arbre}
         \label{fig:struct:quotient:ex}
     \end{figure}
-    Étant donné l'arbre quotient $Q_T$ donné par la relation d'équivalence sur les labels, il est possible de reconstruire la \gls{cfg} condensée $G_T$ reconnaissant $T$.
+
+    Étant donné l'arbre $T = (D, l)$ donné en figure~\ref{fig:struct:quotient:ex:tree}.
+    La première étape de la construction de l'arbre quotient $Q_T$ commence par la récupération des classes d'équivalences de $D$ données par la relation $R$.
+    On obtient alors les classes suivantes :
+    \begin{align*}
+        C_\lambda & = \{\epsilon\} & C_X & = \{0, 1\}   & C_Y & = \{2\}  \\
+        C_a       & = \{00, 20\}   & C_b & = \{01, 10\} & C_c & = \{11\}
+    \end{align*}
+
+    La construction de $Q_T$ implique la récupération de la hiérarchie des ensembles équivalents.
+    L'algorithme commence par la classe $C_\lambda$ et parcours récursivement ses successeurs.
+    On a, pour chaque classe, les successeurs suivants :
+    \begin{align*}
+        \textsf{Succ}(C_\lambda) & = \{C_X, C_Y\} & \textsf{Succ}(C_X) & = \{C_a, C_b, C_c\} & \textsf{Succ}(C_Y) & = \{C_c\}   \\
+        \textsf{Succ}(C_a)       & = \emptyset    & \textsf{Succ}(C_b) & = \emptyset         & \textsf{Succ}(C_c) & = \emptyset
+    \end{align*}
+
+    À partir de la hiérarchie obtenue, on construit le domaine de l'arbre en associant, a chaque successeur, une position relative a son parent. On commence à la position $\epsilon$ où $\textsf{QDom}(C_\lambda, \epsilon) = \{(C_X, 0), (C_Y, 1)\}$ dans l'arbre $T$.
+    Finalement, on obtient la construction suivante :
+    \begin{align*}
+        \textsf{QDom}(C_X, 0)  & = \{(C_a, 00), (C_b, 01), (C_c, 02)\} & \textsf{QDom}(C_Y, 1)  & = \{(C_a, 10)\} \\
+        \textsf{QDom}(C_a, 00) & = \emptyset                           & \textsf{QDom}(C_a, 10) & = \emptyset     \\
+        \textsf{QDom}(C_b, 01) & = \emptyset                           & \textsf{QDom}(C_c, 02) & = \emptyset
+    \end{align*}
+
+    En construisant le domaine de $Q_T$ il est facile de se rendre compte que le nœud correspondant à la classe $C_a$ sera dupliqué dans l'arbre, car il est lié à deux positions : $00$ et $10$.
+    Avec le domaine construit par $QDom$ on peut construire l'arbre donné en figure~\ref{fig:struct:quotient:ex:quotient}.
+    Le nœud correspondant à la classe d'équivalence $C_X$ se voit attribué le symbole `${}^+$' signifiant que le symbole $X$ peut être répété plusieurs fois comme enfant de $\lambda$ (voir la définition~\ref{def:struct:pre:cfg} des \gls{cfg} condensée).
+    Cette information est déduite de l'ensemble des positions de $C_X = \{0, 1\}$ (ligne~\ref{algo:struct:quotient:QT:plus} de l'algorithme~\ref{algo:struct:quotient:QT}) où deux positions partages le même préfixe (ici, $\epsilon$).
+    À partir de l'arbre quotient $Q_T$ il est possible de reconstruire la \gls{cfg} condensée $G_T$ où $T$ est une dérivation partielle (c.-à-d. que certains symboles non-terminaux ne sont pas présent) de $G_T$.
     Pour chaque nœud à la position $u$ qui n'est pas une feuille, la grammaire est un ensemble de règles $Q_T|_u \to Q_T|_{u.0}, \dots Q_T|_{u.i}$.
     On obtient donc la grammaire $G_T$ suivante :
     \begin{align*}
-        \lambda &\to X^+ ~ Y\\
-        X &\to a ~ b ~ c\\
-        Y &\to a
+        \lambda & \to X^+ ~ Y & X & \to a ~ b ~ c & Y & \to a
     \end{align*}
 
-    Il est à noté que l'on ne traite pas les attributs \emph{facultatifs} dans la grammaire de schéma bien qu'ils sont autorisé dans l'instance, ils seront traités comme des valeurs nulles.
+    % Il est à noté que l'on ne traite pas les attributs \emph{facultatifs} dans la grammaire de schéma bien qu'ils sont autorisé dans l'instance, ils seront traités comme des valeurs nulles.
 \end{example}
-
-Les arbres d'entités représentent l'information et sont donc la base de comparaison des sous arbres.
-La langue naturelle contient souvent de l'information implicite ou manquante, deux sous arbres peuvent contenir un ensemble différent d'arbres d'entités, mais quand même représenter le même objet.
-Par exemple, un traitement ne contient pas toujours une fréquence.
-De plus la langue naturelle est ambiguë et un même ensemble d'arbres d'entités peux représenter deux objets différents.
-L'ensemble seule des arbres d'entités présent dans chacun des sous arbres n'est donc pas suffisant pour déterminer leur équivalence et on doit aussi prendre en compte le contexte.
-Pour ce faire nous utilisons le concept d'équivalence régulière comme introduite par~\cite{whiteGraphSemigroupHomomorphisms1983} pour les graphes.
-L'idée est que deux sommets d'un graphe sont jugé équivalents si leur voisinage est équivalent.
-Par exemple, deux personnes peuvent être jugées équivalent (comme catégorie d'objet représenté, ici un patient) s'ils sont toutes les deux lié à des sommets équivalents comme une maladie, un traitement, etc sans pour autant que ce soit les mêmes nœuds.
-
-Afin de définir la relation d'équivalence nécessaire au calcul du quotient, nous définissons une mesure de similarité entre deux sous arbres.
-Une mesure de similarité est une fonction symétrique $f : D \times D \to [0,1]$ où $f(x, x) = 1$ pour tout $x \in D$.
-Notre similarité contextuelle, notée $sim_f(x, y)$, entre deux sous arbres enrichis $x$ et $y$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous arbre parent.
-Les poids sont inversement proportionnels à la distance entre le parent et le sous arbre de départ.
-L'idée sous-jacente est que plus un élément est distant d'un autre, moins il a de valeur dans son contexte.
-Plusieurs mesures $f$ de similarité peuvent être utilisés comme Jaccard, Levenshtein, Jaro, etc.
-La mesure $sim_f(x, y)$ est donné par l'équation~\ref{eq:struct:sim} où $D_{min}$ est la profondeur minimum entre les sous arbres $x$ et $y$ et $P^x_i$ (respectivement $P^y_i$) est le $i$-éme sous arbre parent de $x$ (respectivement $y$).
-
-\begin{equation}
-    sim_f(x, y) = \frac{\sum_{i=1}^{D_{min}} \frac{1}{i} \cdot f(P^x_i, P^y_i)}{\sum_{j=1}^{D_{min}} \frac{1}{j}} \label{eq:struct:sim}
-\end{equation}
-
-\begin{definition}[Equivalence de sous arbres]
-    Étant donné deux arbres enrichis $T_1$ et $T_2$ et deux sous arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$.
-    On dit que $st_1$ et $st_2$ sont $\tau$-similaires, noté $st_1 \sim_\tau st_2$, si $sim_f(st_1, st_2) \geq \tau$. $\sim_\tau$ est une relation réflexive et symétrique.
-    La $\tau$-équivalence entre $st_1$ et $st_2$, noté $st_1 \equiv_\tau st_2$ est dérivé de la $\tau$-similarité. La relation $\equiv_\tau$ est réflexive, symétrique et transitive tel que :
-
-    \[
-        X \equiv_\tau Y \iff X \sim_\tau Z \mid \forall Z \equiv_\tau Y
-    \]
-
-    On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
-    $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
-    Le partitionnement d'un ensemble peut être calculé à l'aide d'un partitionnement hiérarchique en lien simple par $sim_f$ \cite{carlssonCharacterizationStabilityConvergence2010}.
-\end{definition}
-
-\todo{Explication succincte du partitionnement hiérarchique avec un exemple de dendrogramme}
