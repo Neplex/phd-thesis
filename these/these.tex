@@ -5,14 +5,14 @@
 \usefont{T1}{cmr}{m}{n}
 
 \frontmatter
-\section*{Remerciements}
-\lipsum[17-19]
+% \section*{Remerciements}
+% \lipsum[17-19]
 
-\vfill
+% \vfill
 
-\doclicenseThis
+% \doclicenseThis
 
-\newpage
+% \newpage
 
 \dominitoc
 \tableofcontents
@@ -78,7 +78,10 @@
 % Appendices
 \appendix
 \part{Annexes}
+\glsresetall
+\addtocontents{toc}{\protect\begin{adjustwidth}{1cm}{0cm}}
 \subfile{appendices}
+\addtocontents{toc}{\protect\end{adjustwidth}}
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \backmatter

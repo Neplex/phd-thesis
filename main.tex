@@ -10,8 +10,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages :
 \usepackage{etex}
+\usepackage[utf8]{inputenc}          % Attention encodage => UTF 8
 \usepackage[T1]{fontenc}             % Codage de caractères T1
-\usepackage[utf8x]{inputenc}         % Attention encodage => UTF 8 
+\usepackage{lmodern}
+
+\rmfamily
+
+% Declare that Latin Modern Roman (lmr) should take
+% its bold (b) and bold extended (bx) weight, and small capital (sc) shape, 
+% from the corresponding Computer Modern Roman (cmr) font, for the T1 font encoding.
+\DeclareFontShape{T1}{lmr}{b}{sc}{<->ssub*cmr/bx/sc}{}
+\DeclareFontShape{T1}{lmr}{bx}{sc}{<->ssub*cmr/bx/sc}{}
+
 \usepackage{xspace}                  % Gestion des espaces
 \usepackage[pdftex]{graphicx}        % inclure des graphiques
 \usepackage{geometry}                % Définition des marges
@@ -33,7 +43,7 @@
 \usepackage{makeidx}                 % Pour l'index
 \usepackage{graphicx}                % Pour inclure des figures
 \usepackage{subcaption}              % Sous-figure (ou sous-tableau)
-\usepackage{xcolor}
+\usepackage[svgnames]{xcolor}
 \usepackage{bookmark}
 \usepackage{hyperref}                % Lien hypertextes
 \usepackage{minitoc}                 % Produce a TOC for all chapters
@@ -58,13 +68,15 @@
 \usepackage{simplebnf}
 \usepackage{syntaxdi}
 \usepackage[inline]{enumitem}
-\usepackage[binary-units]{siunitx}
+\usepackage{siunitx}
 \usepackage[linesnumbered,ruled,vlined,boxed,frenchkw,onelanguage]{algorithm2e}
 \usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
 \usepackage{adjustbox}
 \usepackage{pdflscape}
 \usepackage{afterpage}
 \usepackage{capt-of}
+\usepackage{circledsteps}
+\usepackage{framed}
 
 \usepackage[acronym,shortcuts,translate=babel]{glossaries}
 
@@ -84,14 +96,30 @@
 % }
 
 % Algorithm2e
-\newcommand\commentStyle[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
-\SetCommentSty{commentStyle}
+\renewcommand{\CommentSty}[1]{\footnotesize\ttfamily\textcolor{Green}{#1}}
+\renewcommand{\KwSty}[1]{\textnormal{\textcolor{blue}{\bfseries #1}}\unskip}
+
+\makeatletter
+\def\@algocf@pre@ruled{\begin{shaded}}%
+\def\@algocf@post@ruled{\end{shaded}\relax}%
+\makeatother
+
+\colorlet{shadecolor}{WhiteSmoke}
 
 % Tikz
 \usetikzlibrary{
-  automata, positioning, fit, tikzmark,
-  shapes, shapes.multipart, arrows.meta, quotes, graphs
+  automata, graphs, positioning, fit, tikzmark,
+  shapes, shapes.multipart, arrows.meta, quotes
 }
+\usetikzmarklibrary{listings}
+
+% \drawBrace[xshift]{beginningNode}{endingNode}{comment}
+% This command draws a brace between two tikzmarks, to their right, no matter which
+% one is the rightmost, and includes a node midway the brace, to write the comment.
+\newcommand*{\drawBrace}[4][.5em]{%
+    \node[draw=none, fit={(#2) (#3)}] (rectg) {};
+    \draw [decoration={brace,amplitude=0.5em},decorate,thick] ([xshift=#1]rectg.north east) -- ([xshift=#1]rectg.south east) node[midway,right,xshift=1em]{#4};
+}%
 
 \tikzset{
   labeled node/.style={
@@ -128,16 +156,47 @@
 }
 
 % Listing
+\renewcommand{\lstlistingname}{Extrait de code}
+\renewcommand{\lstlistlistingname}{Liste des extraits de code}
+
 \lstset{
-	basicstyle=\fontfamily{cmss}\small,
-	numbers=left,
-    numberstyle=\small,
+  commentstyle=\color{Green},
+  keywordstyle=\color{blue}\bfseries,
+  stringstyle=\color{teal},
+  backgroundcolor=\color{WhiteSmoke},
+  numberstyle=\footnotesize\color{gray},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=true,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
 	stepnumber=1,
-	showstringspaces=false,
-	tabsize=2,
-	breaklines=true,
-	breakatwhitespace=true,
-	frame=single,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=lines
+}
+
+\lstdefinelanguage{cypher}{
+	morekeywords={
+		MATCH, OPTIONAL, WHERE, NOT, AND, OR, XOR, RETURN, DISTINCT, ORDER, BY,
+    ASC, ASCENDING, DESC, DESCENDING, UNWIND, AS, UNION, WITH, ALL, CREATE,
+    DELETE, DETACH, REMOVE, SET, MERGE, SET, SKIP, LIMIT, IN, CALL, CASE, WHEN, EXISTS,
+    INDEX, DROP, UNIQUE, CONSTRAINT, EXPLAIN, PROFILE, START, FOREACH, GROUP, HAVING},
+	sensitive=true,
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]{"},
+	literate=*
+	  {<<}{\color{instruction}\guillemotleft{}}{1}
+	  {>>}{\textcolor{instruction}{\guillemotright{}}\color{black}}{1}
+}
+
+\lstdefinelanguage{sparql}{
+	morekeywords={SELECT, DISTINCT, WHERE, OPTIONAL, FILTER, NOT, EXISTS, MINUS, sameTerm, bound},
 }
 
 % Theorems
@@ -152,6 +211,7 @@
 \fancyhead{}
 \fancyhead[L]{\rightmark}      % Cale à gauche le titre de la section courante en tete de page
 \fancyfoot[C]{\thepage}        % Centre le numero de page en pied de page
+\setlength{\headheight}{13pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Definition cmd :
@@ -172,19 +232,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Propriétés du document :
 \author{
-    \textbf{Nicolas HIOT}\\
-    ~\\ ~\\
-    Laboratoire d'Informatique Fondamentale d'Orléans (LIFO, EA 4022), \textsc{France}\\
-    Ennov, \textsc{France}\\
-    ~\\
-    \textit{nicolas.hiot@etu.univ-orleans.fr}\\
-    \textit{nhiot@ennov.com}\\
+  \textbf{Nicolas HIOT}\\
+  ~\\ ~\\
+  Laboratoire d'Informatique Fondamentale d'Orléans (LIFO, EA 4022), \textsc{France}\\
+  Ennov, \textsc{France}\\
+  ~\\
+  \textit{nicolas.hiot@etu.univ-orleans.fr}\\
+  \textit{nhiot@ennov.com}\\
 }
 
 \title{
-    \textbf{\huge TITRE de la thèse}
-    \\
-    Version 0
+  \textbf{\huge Construction automatique de bases de donnée pour le domaine médical}
+  \\
+  Version 0
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

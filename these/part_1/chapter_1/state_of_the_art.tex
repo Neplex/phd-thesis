@@ -1,48 +1,51 @@
-Assurer la validité, la cohérence et l'absence de redondance des données demeure un enjeu crucial et constitue un domaine de recherche actif. 
-Les recherches se concentrent principalement sur l'interrogation des données, la question de la mise à jour cohérente des bases de données reste complexe et d'une grande importance \cite{halfeldferrariUpdateRulesDatalog1998,scheweLimitationsRuleTriggering1998}.
-Certaines études récentes tentent d'apporter des solutions à cette problématique dans divers contextes.
-% Concernant les bases de données graphes, il est à noter qu'à la différence des bases de données relationnelles, elles ne disposent pas d'un schéma définissant des contraintes sur les données.
-Concernant les bases de données graphes, il convient de noter qu'à la différence des bases de données relationnelles, elles opèrent souvent sur l'hypothèse que les données ne sont pas structurées par un schéma préétabli ni soumises à des contraintes d'intégrité.
-Cependant, plusieurs efforts ont été déployés pour pallier cette limitation.
-Dans ce contexte, \cite{fanKeysGraphs2015} introduit le concept de clés pour les nœuds d'un graphe, permettant d'établir des équivalences semblables aux clés primaires dans le modèle relationnel.
-De la même manière, \cite{raadDetectionLiensIdentite2018} aborde la détection d'équivalences entre nœuds dans un graphe \gls{rdf}.
-Cette équivalence est déterminée en comparant les propriétés et les valeurs associées à chaque nœud.
-L'objectif est de préserver la cohérence des relations d'équivalence \textit{sameAs}.
-Dans un développement ultérieur, \cite{fanDependenciesGraphs2019} propose le concept de \glsfirst{graphEntityDependencies}, qui équivaut aux dépendances fonctionnelles appliquées aux graphes.
+Assurer la validité, la cohérence et l'absence de redondance des données demeure un enjeu crucial et constitue un domaine de recherche actif.
+La mise à jour contrôlée par un ensemble de contraintes est souvent négligée en faveur de l'efficacité, ce qui peut compromettre la validité des informations dans un cadre réglementaire.
+Cela peut aussi réduire la qualité des analyses effectuer sur les données qui est un facteur important pour le reporting et l'intelligence artificielle.
+Les recherches se concentrent principalement sur l'interrogation des données, tandis que la problématique de la mise à jour cohérente des bases de données reste complexe et d'une grande importance \cite{halfeldferrariUpdateRulesDatalog1998,scheweLimitationsRuleTriggering1998,linkArithmeticTheoryConsistency2002}.
+Des efforts récents ont été entrepris pour apporter des solutions à cette question dans divers contextes.
+Les propositions les plus récentes \cite{akhtarConstraintsRDF2011,flourisFormalFoundationsRDF2013,halfedferrariRDFUpdatesConstraints2017,halfeld-ferrariUpdatingRDFDatabases2017}, spécifiquement adaptées au monde RDF, examinent les contraintes d'un point de vue conventionnel sur les bases de données, contrairement à la sémantique standard du Web où les contraintes sont simplement des règles d'inférence \cite{lausenSPARQLingConstraintsRDF2008,gottlobOntologicalQueriesRewriting2011,patel-schneiderUsingDescriptionLogics2015}.
+
+Toutefois, la prise en compte de l'incomplétude des données dans des modèles non relationnels demeure limitée, comme indiqué par \cite{sirangeloRepresentingQueryingIncomplete2014}.
+Concernant les bases de données graphes, il convient de souligner une distinction fondamentale.
+À la différence des bases de données relationnelles, elles opèrent souvent sur l'hypothèse que les données ne sont pas structurées par un schéma préétabli ni soumises à des contraintes d'intégrité.
+Toutefois, plusieurs efforts ont été déployés pour pallier cette limitation.
+Dans ce contexte, \cite{fanKeysGraphs2015} introduit le concept de clés pour les nœuds d'un graphe, établissant ainsi des équivalences semblables aux clés primaires dans le modèle relationnel.
+De la même manière, \cite{raadDetectionLiensIdentite2018} aborde la détection d'équivalences entre nœuds dans un graphe \gls{rdf}, déterminant ces équivalences par la comparaison des propriétés et des valeurs associées à chaque nœud.
+L'objectif est de préserver la cohérence des relations d'équivalence \verb|sameAs|.
+Ultérieurement, \cite{fanDependenciesGraphs2019} propose le concept de \glsfirst{graphEntityDependencies}, équivalent aux dépendances fonctionnelles mais appliquées aux graphes.
 Ces concepts sont approfondis dans \cite{anglesPgkeysKeysProperty2021,bonifatiQueryingGraphs2018}, offrant ainsi une solide introduction à ce sujet.
-De même, \cite{maillotConsistencyEvaluationRDF2014} propose une mesure de cohérence sémantique entre un sous-graphe issu d'une base \gls{rdf} d'origine et un sous-graphe résultant d'une mise à jour.
+Par ailleurs, \cite{maillotConsistencyEvaluationRDF2014} propose une mesure de cohérence sémantique entre un sous-graphe issu d'une base \gls{rdf} d'origine et un sous-graphe résultant d'une mise à jour.
 L'idée sous-jacente est d'évaluer si une mise à jour contribue positivement à la cohérence globale de la base.
 \cite{flourisFormalFoundationsRDF2013} propose une modélisation de \gls{rdfs} en utilisant \gls{fol}.
-Ces travaux s'appuient sur une formalisation de la sémantique liée à \gls{rdfs} et définissent des règles d'intégrité qui garantissent la cohérence d'une base \gls{rdfs}.
+Ces travaux s'appuient sur une formalisation de la sémantique liée à \gls{rdfs} et définissent des règles d'intégrité visant à garantir la cohérence d'une base \gls{rdfs}.
 Cette approche introduit des symboles de prédicat (présenté dans la table~\ref{table:update:soa:rdfs}) pour traduire la nomenclature \gls{rdf} vers le formalisme logique.
 
 \begin{table}[ht]
     \centering
-    \begin{tabular}{|l|l|}
+    \begin{tabular}{|l|c|}
         \hline
         RDFS                                                       & Prédicats logiques \\
         \hline
-        $\langle x, \text{rdf:type}, \text{rdfs:Class} \rangle$    & $Cl(x)$            \\
-        $\langle x, \text{rdf:type}, \text{rdfs:Property} \rangle$ & $Pr(x)$            \\
-        $\langle x, \text{rdf:type}, \text{rdfs:Resource} \rangle$ & $Ind(x)$           \\
-        $\langle x, \text{rdf:type}, y \rangle$                    & $CI(x, y)$         \\
-        $\langle x, \text{rdf:subClassOf}, y \rangle$              & $CSub(x, y)$       \\
-        $\langle x, \text{rdf:subPropertyOf}, y \rangle$           & $PSub(x, y)$       \\
-        $\langle x, \text{rdf:domain}, y \rangle$                  & $Dom(x, y)$        \\
-        $\langle x, \text{rdf:range}, y \rangle$                   & $Rng(x, y)$        \\
+        $\langle x, \verb|rdf:type|, \verb|rdfs:Class| \rangle$    & $Cl(x)$            \\
+        $\langle x, \verb|rdf:type|, \verb|rdfs:Property| \rangle$ & $Pr(x)$            \\
+        $\langle x, \verb|rdf:type|, \verb|rdfs:Resource| \rangle$ & $Ind(x)$           \\
+        $\langle x, \verb|rdf:type|, y \rangle$                    & $CI(x, y)$         \\
+        $\langle x, \verb|rdf:subClassOf|, y \rangle$              & $CSub(x, y)$       \\
+        $\langle x, \verb|rdf:subPropertyOf|, y \rangle$           & $PSub(x, y)$       \\
+        $\langle x, \verb|rdf:domain|, y \rangle$                  & $Dom(x, y)$        \\
+        $\langle x, \verb|rdf:range|, y \rangle$                   & $Rng(x, y)$        \\
         \hline
     \end{tabular}
     \caption{Nomenclature des prédicats RDF/S en logique}
     \label{table:update:soa:rdfs}
 \end{table}
 
-% Plusieurs approches de mise à jour cohérentes sont proposées dans \cite{scheweTheoryConsistencyEnforcement1999,linkArithmeticTheoryConsistency2002,pichlerComplexityEvaluatingTuple2011,flourisFormalFoundationsRDF2013,goasdoueEfficientQueryAnswering2013,mahfoudhAdaptationOntologiesAvec2015,halfedferrariRDFUpdatesConstraints2017,chabinUsingGraphGrammar2019,chabinConsistentUpdatingDatabases2020}.
-Parmi les approches de mise à jour proposées dans la littérature, \cite{goasdoueEfficientQueryAnswering2013} porte l'attention sur les contraintes sémantiques de \gls{rdfs} uniquement au niveau de l'instance.
+Parmi les approches de mise à jour cohérente proposées dans la littérature, \cite{goasdoueEfficientQueryAnswering2013} porte l'attention sur les contraintes sémantiques de \gls{rdfs} uniquement au niveau de l'instance.
 D'autres travaux tels que \cite{halfedferrariRDFUpdatesConstraints2017} se fondent également sur les contraintes de \gls{rdfs}, mais ils se concentrent sur une forme simplifiée des \glspl{tgd}.
 Les approches présentées dans \cite{flourisFormalFoundationsRDF2013} et \cite{chabinUsingGraphGrammar2019} mettent en œuvre des contraintes sous la forme de \glspl{tgd}, définies par les utilisateurs.
 Les valeurs nulles, représentant des informations incomplètes, sont explorées dans les travaux de \cite{halfedferrariRDFUpdatesConstraints2017} et \cite{chabinUsingGraphGrammar2019}.
 D'autres aspects tels que l'évolution de schéma est abordé par \cite{flourisFormalFoundationsRDF2013} et \cite{goasdoueEfficientQueryAnswering2013}.
-\cite{mahfoudhAdaptationOntologiesAvec2015} et \cite{mahfoudhAlgebraicGraphTransformations2015} traite de l'évolution des ontologies \gls{owl} dans un contexte de monde ouvert (\acs{owa})
+\cite{mahfoudhAdaptationOntologiesAvec2015} et \cite{mahfoudhAlgebraicGraphTransformations2015} traitent de l'évolution des ontologies \gls{owl} dans un contexte de monde ouvert (\acs{owa}).
 Cependant, l'approche proposée dans ces travaux ne permet pas le calcul des propriétés transitives et l'utilisation du monde ouvert ne permet pas de garantir la préservation de toutes les contraintes établies.
 Enfin, \cite{chabinUsingGraphGrammar2019} se penche sur la sémantique de \gls{rdfs} et propose de donner la priorité aux mises à jour.
 Cela signifie que l'approche vise à modifier à la fois l'instance et le schéma pour accommoder les nouvelles informations de manière cohérente.
@@ -50,11 +53,8 @@ L'objectif de \cite{faginDataExchangeGetting2005}, \cite{gottlobComputingCoresDa
 Ils étudient aussi la complexité du calcul de cet ensemble minimal, le \gls{core}.
 
 La mise à jour de données incomplètes avec des valeurs nulles marquée reste un problème ouvert \cite{libkinIncompleteDataWhat2014,consoleCopingIncompleteData2020}.
-Cette problématique persiste en partie parce que les \glspl{sgbd} relationnels ne mettent pas en œuvre les modèles théoriques en raison d'un manque de consensus dans ce domaine \cite{zanioloDatabaseRelationsNull1984,faginSemanticsUpdatesDatabases1983,imielinskiIncompleteInformationRelational1984,abiteboulUpdateSemanticsIncomplete1985,reiterSoundSometimesComplete1986,faginUpdatingLogicalDatabases1986,winslettModelbasedApproachUpdating1988,winslettUpdatingLogicalDatabases1990,grahneProblemIncompleteInformation1991}.
-% Les \glspl{sgbd} graphes abordent cette problématique différemment et utilisent soit la notion de monde ouvert (\acs{owa}) pour \gls{rdf} soit de monde fermé (\acs{cwa}) pour \gls{neo4j} où toute propriété non renseignée est considérée comme une valeur nulle distincte.
-Peu d'exemples explorent l'incomplétude des données dans des modèles autres que relationnels, à l'instar de \cite{sirangeloRepresentingQueryingIncomplete2014}.
-Par ailleurs, de nombreux travaux ont tenté de définir la sémantique des valeurs nulles dans le contexte du modèle relationnel.
+Cette problématique persiste en partie parce que les \glspl{sgbd} relationnels ne mettent pas en œuvre les modèles théoriques en raison d'un manque de consensus dans ce domaine.
+De nombreux travaux ont tenté de définir la sémantique des valeurs nulles dans le contexte du modèle relationnel.
 Parmi ces travaux, \cite{imielinskiIncompleteInformationRelational1984} propose deux systèmes pour gérer les informations incomplètes.
 Le premier s'appuie sur les valeurs nulles du modèle relationnel de Codd~\cite{coddRelationalModelData1970}, tandis que le second traite des valeurs nulles marquées qui peuvent apparaître dans plusieurs tables.
-\cite{degiacomoDealingInconsistenciesIncompleteness2009,degiacomoPracticalUpdateManagement2017,chabinConsistentUpdatingDatabases2020} propose des méthodes pour la mise à jour.
-L'interrogation de bases de données incomplètes a également fait l'objet de recherches \cite{zanioloDatabaseRelationsNull1984,faginUpdatingLogicalDatabases1986,grahneProblemIncompleteInformation1991,bravoSemanticallyCorrectQuery2006,libkinSQLThreevaluedLogic2016,nikolaouQueryingIncompleteInformation2016,guagliardoCorrectnessSQLQueries2017}.
+Par ailleurs, bien que des bases solides ont été établies pour traiter l'incomplétude des bases de données relationnelles pour l'interrogation \cite{zanioloDatabaseRelationsNull1984,imielinskiIncompleteInformationRelational1984,faginUpdatingLogicalDatabases1986,reiterSoundSometimesComplete1986,grahneProblemIncompleteInformation1991,bravoSemanticallyCorrectQuery2006,libkinSQLThreevaluedLogic2016,nikolaouQueryingIncompleteInformation2016,guagliardoCorrectnessSQLQueries2017}, les mises à jour de bases de données incomplètes ont fait l'objet de beaucoup moins d'attention \cite{abiteboulUpdateSemanticsIncomplete1985,faginSemanticsUpdatesDatabases1983,winslettModelbasedApproachUpdating1988,winslettUpdatingLogicalDatabases1990,degiacomoDealingInconsistenciesIncompleteness2009,degiacomoPracticalUpdateManagement2017,chabinConsistentUpdatingDatabases2020}.

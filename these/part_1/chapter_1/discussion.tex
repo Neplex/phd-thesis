@@ -6,6 +6,14 @@ Il reste intéressant pour le calcul mode déconnecté et de petite base du a so
 Bien que \gls{setup} permette la gestion de différents schémas définit sous \gls{rdfs}, il ne permet pas d'ajouter des contraintes métiers.
 Définir de nouvelles contraintes impliquerait un travail conséquent et manuel pour leur traduction en règle de réécriture et la construction des effets de bords.
 
+\cite{fanDependenciesGraphs2019} constitue une avancée majeure dans la théorie des dépendances fonctionnelles pour les graphes, explorant en détail leur complexité.
+Contrairement à l'approche du \gls{setup}, cette méthode est adaptable, les dépendances fonctionnelles n'étant pas figées.
+Comme pour les approches basées sur la réécriture de graphe, l'approche reste couteuse, mais des algorithmes parallèles sont proposés pour le raisonnement sur les \gls{gfd}.
+Cependant, l'accent est mis sur la vérification des incohérences, sans fournir de solutions pour corriger les instances.
+La question de l'identité des nœuds dans le contexte de la correction soulève des défis, notamment si deux nœuds sont déclarés équivalent : garder un seul des nœuds ou les fusionner en gérant les propriétés incohérentes n'est pas trivial.
+Il peut être nécessaire de construire l'identité à partir des \gls{gfd} et des propriétés, de façon similaire aux clés primaires dans le modèle relationnel.
+Dans les graphes, la notion d'équivalence régulière \cite{everettRegularEquivalenceGeneral1994} montre bien la complexité de cette tâche.
+
 \cite{chabinConsistentUpdatingDatabases2020} introduit une sémantique formelle basée sur \gls{fol} pour mettre à jour des bases de données incomplètes contenant des valeurs nulles liées, en suivant les principes énoncés dans la sémantique de Reiter~\cite{reiterSoundSometimesComplete1986} (voir la section \ref{reiterSemantic} pour plus de détails).
 Cette approche de mise à jour est déterministe et exige le respect d'un ensemble de \glspl{tgd}.
 Les algorithmes présentés couvrent les opérations d'insertion et de suppression.
@@ -15,43 +23,46 @@ La procédure du \gls{chase} est utilisée pour garantir la cohérence avec un e
 Le processus de simplification vise à réduire les redondances en éliminant les valeurs nulles qui peuvent être instanciées sans rompre leurs liens.
 Il s'agit du calcul du \gls{core}~\cite{faginDataExchangeGetting2005}.
 Cette approche présente une flexibilité accrue par rapport à celle présentée dans \cite{chabinUsingGraphGrammar2019}, grâce à l'utilisation de \glspl{tgd}.
-
+Il convient de noter que l'utilisation de contraintes sous forme de \glspl{tgd} augmente l'expressivité, mais cela s'accompagne de difficultés nécessitant une procédure de poursuite pour calculer la sémantique et générer des effets secondaires lors des mises à jour, entraînant des insertions ou des suppressions supplémentaires pour maintenir la cohérence.
+Une étude sur la procédure du \gls{chase} a été publiée dans \cite{onetChaseProcedureIts2013} et une évaluation dans \cite{benediktBenchmarkingChase2017}.
 % Basée sur la sémantique énoncée par Reiter, cette approche présente une flexibilité accrue par rapport à celle présentée dans \cite{chabinUsingGraphGrammar2019}, grâce à l'utilisation de \glspl{tgd}.
 % Cette approche a été choisie pour guider les travaux présentés dans cette partie.
+
+\paragraph{}
 En travaillant avec des bases de données graphes, la proposition de mise à jour doit opérer en harmonie avec les \glspl{sgbd} tout en prenant en compte les contraintes propres à ces systèmes.
 Bien que les travaux exposés dans cette partie s'alignent sur la politique détaillée dans \cite{chabinConsistentUpdatingDatabases2020}, ils se distinguent par les éléments suivants :
 
-\begin{description}
+\begin{description}[wide=0pt]
     \item[Incrémentalité] ~
-    \begin{enumerate}
-        \item Le calcul des mises à jour se limite aux contraintes et aux données spécifiquement concernées.
-        En contraste avec la méthodologie présentée dans \cite{chabinConsistentUpdatingDatabases2020}, qui exige la vérification de l'ensemble de la base de données pour chaque mise à jour.
+          \begin{enumerate}
+              \item Le calcul des mises à jour se limite aux contraintes et aux données spécifiquement concernées.
+                    En contraste avec la méthodologie présentée dans \cite{chabinConsistentUpdatingDatabases2020}, qui exige la vérification de l'ensemble de la base de données pour chaque mise à jour.
 
-        \item La simplification des valeurs est guidée par les valeurs nulles pouvant potentiellement être simplifiées en raison de la mise à jour.
-        Cette approche diffère de celle de \cite{chabinConsistentUpdatingDatabases2020}, où la simplification prend en compte l'ensemble des valeurs nulles indépendamment de la mise à jour.
-    \end{enumerate}
+              \item La simplification des valeurs est guidée par les valeurs nulles pouvant potentiellement être simplifiées en raison de la mise à jour.
+                    Cette approche diffère de celle de \cite{chabinConsistentUpdatingDatabases2020}, où la simplification prend en compte l'ensemble des valeurs nulles indépendamment de la mise à jour.
+          \end{enumerate}
 
     \item[Requêtes] ~
-    \begin{enumerate}
-        \item La requête $Q_{chase}$ effectue une recherche dans la base de données pour trouver l'instanciation complète du corps partiellement instancié de la règle, en utilisant les constantes issue des atomes mis à jour.
+          \begin{enumerate}
+              \item La requête $Q_{chase}$ effectue une recherche dans la base de données pour trouver l'instanciation complète du corps partiellement instancié de la règle, en utilisant les constantes issue des atomes mis à jour.
 
-        \item La requête $Q_{bucket}$ récupère les valeurs nulles impactées par la mise à jour, permettant le calcul localisé du \gls{core}.
+              \item La requête $Q_{bucket}$ récupère les valeurs nulles impactées par la mise à jour, permettant le calcul localisé du \gls{core}.
 
-        \item La requête $Q_{core}$ recherche les homomorphismes des ensembles \textsc{LinkedNulls} obtenus via $Q_{bucket}$, guidant la simplification.
-    \end{enumerate}
+              \item La requête $Q_{core}$ recherche les homomorphismes des ensembles \textsc{LinkedNulls} obtenus via $Q_{bucket}$, guidant la simplification.
+          \end{enumerate}
 
     \item[SGBDs] ~
-    \begin{enumerate}
-        \item Bien que proposant une méthode pour les bases de données graphes, le modèle relationnelle est utilisé comme référence.
-        Chaque atome $R(A)$ est représenté par un tuple $A$ dans la table $R$.
-        Cependant, il est essentiel de noter que le processus le plus couteux consiste à extraire des groupes d'atomes connectés par des valeurs nulles.
-        Cette opération nécessite un balayage de l'ensemble des tables, étant donné que les valeurs nulles peuvent être liées à n'importe quel attribut d'une table, échappant ainsi à toute indexation.
+          \begin{enumerate}
+              \item Bien que proposant une méthode pour les bases de données graphes, le modèle relationnelle est utilisé comme référence.
+                    Chaque atome $R(A)$ est représenté par un tuple $A$ dans la table $R$.
+                    Cependant, il est essentiel de noter que le processus le plus couteux consiste à extraire des groupes d'atomes connectés par des valeurs nulles.
+                    Cette opération nécessite un balayage de l'ensemble des tables, étant donné que les valeurs nulles peuvent être liées à n'importe quel attribut d'une table, échappant ainsi à toute indexation.
 
-        \item Les \glspl{sgbd} pour les \glspl{lpg} partent généralement de l'hypothèse que les graphes sont complets, ce qui ne correspond pas à la réalité des données souvent incomplètes.
-        L'approche adoptée par \gls{neo4j}, qui considère les valeurs nulles comme des valeurs inexistantes, s'avère insuffisante pour traiter les valeurs nulles liées.
-        Pour résoudre ce problème, une nouvelle conception de base de données est proposée, traitant les valeurs nulles comme une forme de constante.
+              \item Les \glspl{sgbd} pour les \glspl{lpg} partent généralement de l'hypothèse que les graphes sont complets, ce qui ne correspond pas à la réalité des données souvent incomplètes.
+                    L'approche adoptée par \gls{neo4j}, qui considère les valeurs nulles comme des valeurs inexistantes, s'avère insuffisante pour traiter les valeurs nulles liées.
+                    Pour résoudre ce problème, une nouvelle conception de base de données est proposée, traitant les valeurs nulles comme une forme de constante.
 
-        \item La modélisation proposée permet une indexation des valeurs nulles, facilitant ainsi l'identification de tous les atomes directement ou indirectement liés à ces valeurs.
-        Cette approche simplifie grandement les opérations de manipulation des valeurs nulles impactées par une mise à jour pour le calcul du \gls{core}.
-    \end{enumerate}
+              \item La modélisation proposée permet une indexation des valeurs nulles, facilitant ainsi l'identification de tous les atomes directement ou indirectement liés à ces valeurs.
+                    Cette approche simplifie grandement les opérations de manipulation des valeurs nulles impactées par une mise à jour pour le calcul du \gls{core}.
+          \end{enumerate}
 \end{description}

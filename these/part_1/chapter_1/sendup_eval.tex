@@ -6,11 +6,11 @@ Par exemple, la règle $(\forall x,y) CI(x,y) \to Cl(y)$ exprime que pour qu'un 
 Pour modéliser ces règles de la sémantique, \cite{chabinUsingGraphGrammar2019} propose l'utilisation de la réécriture de graphes, illustrée par la figure~\ref{fig:gram_rule}.
 Les règles ne peuvent être appliquées que si leur application préserve la cohérence du graphe.
 
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{.3\textwidth}
         \centering
-        \begin{tikzpicture}[->,auto,node distance=2.5cm,thick,main node/.style={draw}]
+        \begin{tikzpicture}[->, -latex, auto, node distance=2.5cm, thick, main node/.style={draw}]
             \node[main node] (1) {Class: $A$};
             \node[main node] (2) [below of=1] {Prop: $A$};
             \node[main node] (3) [right of=1] {Ind: $A$};
@@ -23,7 +23,7 @@ Les règles ne peuvent être appliquées que si leur application préserve la co
     \end{subfigure}
     \begin{subfigure}[b]{.3\textwidth}
         \centering
-        \begin{tikzpicture}[->,auto,node distance=2.5cm,thick,main node/.style={draw}]
+        \begin{tikzpicture}[->, -latex, auto, node distance=2.5cm, thick, main node/.style={draw}]
             \node[main node] (2) {Class: $B$};
         \end{tikzpicture}
         \caption{\acs{lhs}}
@@ -31,9 +31,9 @@ Les règles ne peuvent être appliquées que si leur application préserve la co
     \end{subfigure}
     \begin{subfigure}[b]{.3\textwidth}
         \centering
-        \begin{tikzpicture}[->,auto,node distance=2.5cm,thick,main node/.style={draw}]
+        \begin{tikzpicture}[->, -latex, auto, node distance=2.5cm, thick, main node/.style={draw}]
             \node[main node] (1) {Class: $B$};
-            \node[main node] (2) [below of=1] {Ind: $A$};
+            \node[main node] (2) [above of=1] {Ind: $A$};
             \path[every node/.style={font=\sffamily\small}]
             (2) edge node {CI} (1);
         \end{tikzpicture}
@@ -44,7 +44,7 @@ Les règles ne peuvent être appliquées que si leur application préserve la co
     \label{fig:gram_rule}
 \end{figure}
 
-Les règles de réécriture sont des outils qui permettent de définir et de manipuler la structure des graphes en spécifiant comment graphe doit évolué selon certaines conditions.
+Les règles de réécriture sont des outils qui permettent de définir et de manipuler la structure des graphes en spécifiant comment graphe doit évoluer selon certaines conditions.
 Elles prennent la forme $\acs{lhs} \to \acs{rhs}$, où \gls{lhs} représente un motif dans le graphe et \gls{rhs} est le résultat de l'application de la règle.
 Pour effectuer la réécriture, un morphisme est défini entre \gls{lhs} et \gls{rhs}, indiquant comment la règle doit être appliquée.
 Par exemple, dans la figure~\ref{fig:gram_rule}, un morphisme existe sur la classe $B$.
@@ -60,25 +60,34 @@ Dans la figure~\ref{fig:gram_rule}, les \gls{nac}s sont utilisées pour éviter 
     Cette intervention, appelée \emph{effet de bord}, est une action préalable qui vise à modifier l'état du graphe de manière à permettre l'application de la règle de réécriture.
 \end{example}
 
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}{.4\textwidth}
         \centering
-        \begin{tikzpicture}[->,auto,node distance=2.5cm,thick,main node/.style={draw}]
-            \node[main node] (1) {Class: $A$};
-            \node[main node] (2) [below of=1] {Class: $B$};
-        \end{tikzpicture}
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{tikzpicture}[->, -latex, auto, node distance=2.5cm, thick, main node/.style={draw}]
+                \node[main node] (1) {Class: $A$};
+                \node[main node] (2) [below of=1] {Class: $B$};
+            \end{tikzpicture}
+        \end{adjustbox}
     \end{subfigure}
-    \raisebox{1.5cm}{\scalebox{1.5}{$\longrightarrow$}}
-    \begin{subfigure}[b]{.45\textwidth}
+    \hfill
+    \begin{subfigure}{.1\textwidth}
         \centering
-        \begin{tikzpicture}[->,auto,node distance=2.5cm,thick,main node/.style={draw}]
-            \node[main node] (1) [color=red] {Class: $A$};
-            \node[main node] (2) [right of=1, color=blue] {Ind: $A$};
-            \node[main node] (3) [below of=2] {Class: $B$};
-            \path[every node/.style={font=\sffamily\small}]
-            (2) edge [color=blue] node {CI} (3);
-        \end{tikzpicture}
+        \huge{$\Longrightarrow$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{tikzpicture}[->, -latex, auto, node distance=2.5cm, thick, main node/.style={draw}]
+                \node[main node] (1) [color=red] {Class: $A$};
+                \node[main node] (2) [right of=1, color=blue] {Ind: $A$};
+                \node[main node] (3) [below of=2] {Class: $B$};
+                \path[every node/.style={font=\sffamily\small}]
+                (2) edge [color=blue] node {CI} (3);
+            \end{tikzpicture}
+        \end{adjustbox}
     \end{subfigure}
     \caption{Application de la règle $CI(A,B)$}
     \label{fig:rule_ci}
@@ -91,15 +100,22 @@ Ce niveau peut être paramétré pour chaque utilisateur lui donnant ainsi certa
 Le niveau le plus élevé est autorisé à modifier le schéma et l'instance pour ajouter un fait.
 Un niveau moins élevé permet seulement de modifier l'instance tandis que le niveau le plus bas ne peut pas modifier la base et peut donc seulement ajouter ou supprimer un fait si la cohérence de la base est maintenue.
 
-\begin{figure}[ht]
-    \begin{align}
-        Cl(x)\\
-        Cl(y) \lor (y = Resource)\\
-        \neg CSub(y, x)\\
-        \forall~z CSub(y, z) \to CSub(x, z)\\
-        \forall~z CSub(z, x) \to CSub(z, y)\\
-        \forall~z_i CI(z_i, x) \to CI(z_i, y) \label{eq:rule_csub:ci}
-    \end{align}
+\begin{figure}[htb]
+    \begin{subfigure}{.45\textwidth}
+        \begin{align}
+            Cl(x)\\
+            Cl(y) \lor (y = Resource)\\
+            \neg CSub(y, x)
+        \end{align}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.4\textwidth}
+        \begin{align}
+            \forall z ~ CSub(y, z) \to CSub(x, z)\\
+            \forall z ~ CSub(z, x) \to CSub(z, y)\\
+            \forall z ~ CI(z, x) \to CI(z, y) \label{eq:rule_csub:ci}
+        \end{align}
+    \end{subfigure}
     \caption{Effets de bord pour l'ajout du fait $CSub(x, y)$}
     \label{eq:rule_csub}
 \end{figure}
@@ -116,21 +132,22 @@ Un niveau moins élevé permet seulement de modifier l'instance tandis que le ni
     La base avant et après application de la règle est un graphe \gls{rdfs} valide.
 \end{example}
 
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
-    \begin{tikzpicture}[->,auto,node distance=3cm,thick,main node/.style={draw}]
+    \begin{tikzpicture}[->, -latex, auto, node distance=3cm, thick, main node/.style={draw}]
         \node[main node] (1) {Ind: $I$};
         \node[main node] (2) [above of=1] {Class: $C_1$};
         \node[main node] (3) [right of=1, color=blue] {Class: $C_2$};
-        \node[main node] (4) [above of=3] {$Ressource$};
+        \node[main node] (4) [above of=3] {\emph{Ressource}};
         \path[every node/.style={font=\sffamily\small}]
         (1) edge node [left] {CI} (2)
         (1) edge [color=blue] node [below] {CI} (3)
         (1) edge node [left] {CI} (4)
         (2) edge node [above] {CSub} (4)
-        (2) edge [color=blue, distance=4cm, bend right=90] node [below] {CSub} (3)
+        (2) edge [color=blue, distance=4cm, bend right=90] node [below left] {CSub} (3)
         (3) edge [color=blue] node [right] {CSub} (4);
     \end{tikzpicture}
+    \vspace{-5em}
     \caption{Exemple de modification pour l'application d'une règle}
     \label{fig:app_rule}
 \end{figure}

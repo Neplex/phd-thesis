@@ -20,7 +20,8 @@ Le modèle de graphe doit mettre en avant ces relations entre les valeurs nulles
     \label{fig:schema-graph}
 \end{figure}
 
-\paragraph{Modèle}
+% \paragraph{Modèle}
+\paragraph{}
 Pour ce faire, on choisit le modèle dans lequel un atome $P(t_1, \dots, t_n)$ est représenté comme un arbre qui a pour racine un nœud \textit{Atome} lié à un ensemble de nœuds \textit{Élément} représentants les termes.
 Les \textit{Atomes} ont le label \textbf{:Atom} et une unique propriété représentant le symbole de prédicat.
 Les \textit{Éléments} ont le label \textbf{:Element} et une unique propriété représentant la valeur de l'élément.
@@ -30,7 +31,13 @@ Dans ce modèle Figure~\ref{fig:schema-graph} proche de la logique, le nœud rec
 $t_i$ représente les constantes et $t_j$ les valeurs nulles.
 Les notations en dessous des arcs représente leur cardinalité : chaque \textit{Élément} est connecté à au moins un \textit{Atom} alors qu'un \textit{Atom} peut ne pas avoir de termes.
 
-La figure~\ref{fig:update:db:runex} montre un extrait de l'instance présentée Figure~\ref{fig:runex:graph} (page~\pageref{fig:runex:graph}) suivant le modèle définit.
+\begin{align*}
+    \mathcal{D} = \{ & Patient(N_1, \text{homme}, 78), Exam(N_1, N_2, N_3, \text{01-01-01}), Parameter(N_3, \text{température}, N_4), \\
+                     & Reveal(N_3, \text{fièvre}), hasPatho(N_1, \text{cancer}), getTreatment(N_1, \text{résection}), forPatho(\text{résection}, \text{cancer}), \\
+                     & leadsTo(\text{cancer}, \text{métastase}), concernAna(\text{cancer}, \text{prostate}), Anatomie(\text{prostate}) \}
+\end{align*}
+
+La figure~\ref{fig:update:db:runex} montre un extrait de l'instance donnée en figure~\ref{fig:runex:graph} (page~\pageref{fig:runex:graph}) correspondant à l'ensemble de faits $\mathcal{D}$ et suivant le modèle définit.
 Ce modèle facilite la récupération des ensembles d'atomes liés ainsi que la recherche d'homomorphismes.
 En effet, une requête exprimée sous forme logique $Q(X) \gets \phi(X)$ se traduit par la recherche d'un sous graphe dans lequel les variables logiques deviennent naturellement les variables du motif.
 Cependant, dans ce modèle, les atomes sont représentés comme des arbres ce qui ne permet pas de récupérer un atome efficacement à cause du cout non négligeable de la reconnaissance de motifs.
@@ -70,7 +77,7 @@ Pour répondre au besoin, il faudrait un index hérité (l'arrête doit récupé
             \node[draw,below=of n8,ellipse]  (n9)  {$n_{ 9}$\\01-01-01};
             \node[draw,below=of a8,circle]   (n10) {$n_{10}$\\$N_3$};
             \node[draw,right=of n10]         (a9)  {$n_{29}$\\Reveal};
-            \node[draw,right=of a9,ellipse]  (n11) {$n_{11}$\\fiévre};
+            \node[draw,right=of a9,ellipse]  (n11) {$n_{11}$\\fièvre};
             \node[draw,below=of n10]         (a10) {$n_{30}$\\Parameter};
             \node[draw,left =of a10,ellipse] (n12) {$n_{12}$\\température};
             \node[draw,right=of a10,circle]  (n13) {$n_{13}$\\$N_4$};
@@ -116,18 +123,19 @@ Pour répondre au besoin, il faudrait un index hérité (l'arrête doit récupé
     \label{fig:update:db:runex}
 \end{figure}
 
-\paragraph{Optimisations}
+% \paragraph{Optimisations}
+\paragraph{}
 En complément du modèle, des redondances d'informations et des index sont donc introduits afin d'optimiser ces différentes opérations :
-\begin{itemize}[wide=0pt]
-    \item[Pour limiter le parcours des arêtes] :
+\begin{description}[wide=0pt]
+    \item[Limiter le parcours des arêtes] ~
         \begin{enumerate}
-            \item La liste ordonnée des termes comme propriété des nœuds \textit{Atomes} permettant de récupérer un atome complet depuis le noeud atome sans avoir à parcourir les arêtes (propriété $terms$ du noeud \textit{Atome} dans la figure~\ref{fig:schema-graph}) ;
+            \item La liste ordonnée des termes comme propriété des nœuds \textit{Atomes} permettant de récupérer un atome complet depuis le nœud atome sans avoir à parcourir les arêtes (propriété $terms$ du noeud \textit{Atome} dans la figure~\ref{fig:schema-graph}) ;
             \item Pour chaque arête, on lui associe comme type, le symbole de prédicat de l'\textit{Atome} associé (label $P$ dans la figure~\ref{fig:schema-graph}).
         \end{enumerate}
-    \item[Pour faciliter la récupération des nœuds] :
+    \item[Faciliter la récupération des nœuds] ~
         \begin{enumerate}
             \item Une contrainte d'unicité / index sur les nœuds \textit{Éléments} vérifiant la non-redondance des constantes et des valeurs nulles ;
-            \item Un index sur le symbole de prédicat des nœuds \textit{Atomes} ;
-            \item Une contrainte d'unicité / index sur le couple symbole/termes des nœuds \textit{Atomes} vérifiant la non-redondance des atomes.
+            \item Une contrainte d'unicité / index sur le couple symbole-termes des nœuds \textit{Atomes} vérifiant la non-redondance des atomes ;
+            \item Un index sur le symbole de prédicat des nœuds \textit{Atomes}.
         \end{enumerate}
-\end{itemize}
+\end{description}

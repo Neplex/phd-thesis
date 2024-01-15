@@ -183,20 +183,20 @@
 		      \end{tikzpicture}
 	      \end{center}
 
-	\item $\textsf{unnest\_ent}(T, u.i)$ where $|\sigma(x_0)| = i$\\
-	      \begin{center}
-		      \begin{tikzpicture}
-			      \Tree [.U $x_0$ [.ENT $z_0$ [.ENT$_0$  $y_0$ ] $z_1$  [.ENT$_1$  $y_1$ ] $\dots$  [.ENT$_n$  $y_n$ ] $z_{n+1}$  ]  $x_1$ ]
-		      \end{tikzpicture}
-		      {\Large$\rightarrow$}
-		      \begin{tikzpicture}
+	% \item $\textsf{unnest\_ent}(T, u.i)$ where $|\sigma(x_0)| = i$\\
+	    %   \begin{center}
+		%       \begin{tikzpicture}
+		% 	      \Tree [.U $x_0$ [.ENT $z_0$ [.ENT$_0$  $y_0$ ] $z_1$  [.ENT$_1$  $y_1$ ] $\dots$  [.ENT$_n$  $y_n$ ] $z_{n+1}$  ]  $x_1$ ]
+		%       \end{tikzpicture}
+		%       {\Large$\rightarrow$}
+		%       \begin{tikzpicture}
 
-			      \Tree [.U $x_0$ [.REL [.ENT $z_0$ $y_0$ $\dots $ $y_n$ $z_{n+1}$ ]
-							      [.NestedREL  [.ENT$_0$  $y_0$ ]   [.ENT$_1$  $y_1$ ] $\dots$  [.ENT$_n$  $y_n$ ]   ] ]  $x_1$ ]
+		% 	      \Tree [.U $x_0$ [.REL [.ENT $z_0$ $y_0$ $\dots $ $y_n$ $z_{n+1}$ ]
+		% 					      [.NestedREL  [.ENT$_0$  $y_0$ ]   [.ENT$_1$  $y_1$ ] $\dots$  [.ENT$_n$  $y_n$ ]   ] ]  $x_1$ ]
 
-			      %\Tree [.REL [.ENT $x$ $z_0$ \dots $z_n$ $y$ ] [.CHILDREN ENT$_0$ \dots ENT$_n$ ] ] ]
-		      \end{tikzpicture}
-	      \end{center}
+		% 	      %\Tree [.REL [.ENT $x$ $z_0$ \dots $z_n$ $y$ ] [.CHILDREN ENT$_0$ \dots ENT$_n$ ] ] ]
+		%       \end{tikzpicture}
+	    %   \end{center}
 \end{itemize}
 
 \FloatBarrier

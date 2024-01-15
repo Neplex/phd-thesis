@@ -5,11 +5,15 @@ Une version incrémentale de l'algorithme consiste à considérer uniquement les
 
 \begin{example}[Application de contraintes]
     \label{ex:update:chase:forward}
-    Si on considère l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:chase:forward:c1}, \ref{ex:update:chase:forward:c2}$\}$ et l'ensemble d'atomes $\mathcal{D} = \{A(a),$ $B(a, b),$ $B(c, b),$ $C(b)\}$.
-    \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
-        \item $A(x) \implies B(x, y)$ \label{ex:update:chase:forward:c1}
-        \item $B(x, y) \implies C(y)$ \label{ex:update:chase:forward:c2}
-    \end{enumerate}
+    Si on considère l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:chase:forward:c1}, \ref{ex:update:chase:forward:c2}$\}$ et l'ensemble d'atomes $\mathcal{D} = \{A(a),$ $B(a, b),$ $B(c, b),$ $C(b)\}$ avec :
+
+    \begin{multicols}{2}
+        \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
+            \centering
+            \item $A(x) \to B(x, y)$ \label{ex:update:chase:forward:c1}
+            \item $B(x, y) \to C(y)$ \label{ex:update:chase:forward:c2}
+        \end{enumerate}
+    \end{multicols}
 
     L'insertion de l'ensemble $I = \{A(b), A(d)\}$ dans $\mathcal{D}$ implique l'application de la contrainte \ref{ex:update:chase:forward:c1} uniquement avec les instanciation $h_1 = \langle x \mapsto b \rangle$ et $h_2 = \langle x \mapsto c \rangle$.
     L'instanciation $h = \langle x \mapsto a \rangle$ n'a pas besoin d'etre calculé car $\mathcal{D}$ est déjà cohérente par rapport à $\mathbb{C}$.
@@ -24,6 +28,7 @@ Une version incrémentale de l'algorithme consiste à considérer uniquement les
 
 % \paragraph{Cycles et génération infinie}
 \subsection{Cycles et génération infinie}
+\label{sec:update:chase:infini}
 Dans ces travaux, les \glspl{tgd} peuvent contenir des variables existentielles dans la tête qui génèreront de nouvelles valeurs nulles lors de leur application.
 Cela peux engendrer une génération infinie d'atomes si des cycles existent dans les contraintes.
 Il est important de s'assurer que cette opération termine.
@@ -34,50 +39,71 @@ On fixe donc un degré maximal $\delta_{max}$ qui permet l'interruption du \gls{
 
 \begin{example}[Génération infinie d'atomes]
     \label{ex:update:chase:infini}
-    Si on considère l'ensemble d'atomes $I = \{A(a, b)\}$ sur lequel on applique l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:chase:infini:c3}, \ref{ex:update:chase:infini:c4}$\}$ avec pour degrée maximal $\delta_{max} = 1$.
-    \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
-        \item $A(x, y) \implies B(y, z)$ \label{ex:update:chase:infini:c3}
-        \item $B(x, y) \implies A(y, z)$ \label{ex:update:chase:infini:c4}
-    \end{enumerate}
+    Si on considère l'ensemble d'atomes $I = \{A(a, b)\}$ sur lequel on applique l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:chase:infini:c1}, \ref{ex:update:chase:infini:c2}$\}$ avec pour degrée maximal $\delta_{max} = 1$.
+    \begin{multicols}{2}
+        \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
+            \centering
+            \item $A(x, y) \to B(y, z)$ \label{ex:update:chase:infini:c1}
+            \item $B(x, y) \to A(y, z)$ \label{ex:update:chase:infini:c2}
+        \end{enumerate}
+    \end{multicols}
 
-    L'application de la regle \ref{ex:update:chase:infini:c3} avec l'instanciation $h_1 = \langle x \mapsto a, y \mapsto b \rangle$ génére l'atome $B(b, N_1^0)$.
-    Ce dernier permet l'application de la contrainte \ref{ex:update:chase:infini:c3} avec l'instanciation $h_2 = \langle x \mapsto b, y \mapsto N_1^0 \rangle$ de qui génére l'atome $A(N_1^0, N_2^1)$, qui permet la génération de $B(N_2^1, N_3^2)$ via \ref{ex:update:chase:infini:c3}.
-    l est facile de voir que la génération des atomes est infinie.
+    L'application de la regle \ref{ex:update:chase:infini:c1} avec l'instanciation $h_1 = \langle x \mapsto a, y \mapsto b \rangle$ génére l'atome $B(b, N_1^0)$.
+    Ce dernier permet l'application de la contrainte \ref{ex:update:chase:infini:c1} avec l'instanciation $h_2 = \langle x \mapsto b, y \mapsto N_1^0 \rangle$ et qui génére l'atome $A(N_1^0, N_2^1)$, qui permet la génération de $B(N_2^1, N_3^2)$ via \ref{ex:update:chase:infini:c1}.
+    Il est facile de voir que la génération des atomes est infinie.
     Cependant, comme le degrée de $N_3^2$ depasse le degrée maximal $\delta_{max}$ on arrete cette branche de la génération.
-    Si d'autres régles peuvent étres appliquée on continue de la génération.
+    Si d'autres régles peuvent étres appliquées on continue la génération de ces derniéres.
     L'ensemble de resultat $I'$ est invalid car une valeur nulle dépasse le degrée maximal.
-    On verifira dans la suite que cet ensemble n'est pas simplifiable (et donc valide si la simplification supprime cette valeur nulle) avant de rejeté la mise à jour si ce n'est pas le cas.
+    On verifira dans la suite que cet ensemble n'est pas simplifiable (et donc valide si la simplification supprime la valeur nulle $N_3^2$) avant de rejeté la mise à jour si ce n'est pas le cas.
+\end{example}
+
+Si la valeur sélectionnée pour le paramètre $\delta_{max}$ est trop basse, il est possible que des mises à jour soient rejetées, alors qu'elles auraient été valides avec une valeur de $\delta_{max}$ plus grande suite a une simplification.
+
+\begin{example}[Choix de $\delta_{max}$]
+    \label{ex:update:chase:delta}
+    Etant donné l'ensemble $I_0 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0)\}$ et l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:chase:delta:c1}, \ref{ex:update:chase:delta:c2}$\}$.
+    \begin{multicols}{2}
+        \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
+            \centering
+            \item $A(x, y) \to B(y, z)$ \label{ex:update:chase:delta:c1}
+            \item $B(x, y) \to C(y, z)$ \label{ex:update:chase:delta:c2}
+        \end{enumerate}
+    \end{multicols}
+    Si $\delta_{max} = 0$, on obtient l'ensemble $I_1 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0),$ $B(N_1^0, N_2^1)\}$ qui est invalide et non-simplifiable.
+    En prenant une valeur plus élevée $\delta_{max} = 1$, on obtient l'ensemble $I_2 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0),$ $B(N_1^0, N_2^1),$ $C(N_2^1, N_3^2)\}$ qui est invalide mais simplifiable en $I'_2 = \{A(a, b),$ $B(b, c),$ $C(c, d)\}$ avec $h = \langle N_1 \mapsto b,$ $N_2 \mapsto c,$ $N_3 \mapsto d \rangle$ qui est un ensemble valide.
 \end{example}
 
 \subsection{Utilisation du graphe pour le Chase}
-La procédure incrémentale du \gls{chase} est définie dans l'algorithme~\ref{algo:update:chase:insert}.
-L'ensemble $ToIns$ represente les effet de bords de $I$ à ajouter dans $\mathcal{D}$ tel que si $\mathcal{D}' = \mathcal{D} \cup ToIns$ : $I \subseteq \mathcal{D}'$ et $\mathcal{D}' \vDash \mathbb{C}$.
-La boucle (ligne~\ref{algo:update:chase:insert:while}) est l'application du \gls{chase} incrémentale qui respecte les conditions suivantes:
-\begin{enumerate}[label=(\arabic*),ref=(\arabic*)]
-    \item Une contrainte $c \in \mathbb{C}$ est appliquée \textit{uniquement} si au moins un atome de son corps fait parti des effet de bords $ToIns$  \label{algo:update:chase:insert:c1} ;
-    \item Un atome est généré uniquement s'il ne depasse pas le degrée maximum \label{algo:update:chase:insert:c2} ;
-    \item Un atome est généré uniquement s'il n'existe pas, dans $\mathcal{D}$, un atome plus specifique ou equivalent \label{algo:update:chase:insert:c3}
+La procédure~\ref{algo:update:chase:insert} définie l'algorithme incrémentale du \gls{chase}.
+L'ensemble $ToIns$ représente les effets de bords de l'insertion de l'ensemble $I$ dans $\mathcal{D}$ tel que si $\mathcal{D}' = \mathcal{D} \cup ToIns$ : $I \subseteq \mathcal{D}'$ et $\mathcal{D}' \vDash \mathbb{C}$.
+La boucle (ligne~\ref{algo:update:chase:insert:while}) correspond à l'application du \gls{chase} incrémentale qui respecte les conditions suivantes:
+\begin{enumerate}[label=\textsf{\Circled{\arabic*}}]
+    \item Une contrainte $c \in \mathbb{C}$ est appliquée \emph{uniquement} si au moins un atome de son corps fait parti des effets de bords $ToIns$.
+          Cette condition vise à éviter le déclenchement inutile de règles ; \label{algo:update:chase:insert:c1}
+    \item Un atome est généré \emph{uniquement} s'il ne depasse pas le degrée maximum (voir section~\ref{sec:update:chase:infini}) ; \label{algo:update:chase:insert:c2}
+    \item Un atome est généré \emph{uniquement} s'il n'existe pas, dans $\mathcal{D}$, un atome plus spécifique ou équivalent.
+          Cette condition vise à prévenir la production d'atomes redondants, ce qui impliquerait une simplification ultérieure et réduit le nombre de générations nécessaires.
+          Elle a également une importance cruciale pour la terminaison du \gls{chase}, car elle permet d'éviter certains cycles de générations qui n'aurait pus étres simplifiés ultérieurement (voir l'exemple~\ref{ex:update:chase:delta}). \label{algo:update:chase:insert:c3}
 \end{enumerate}
 
-\begin{algorithm}[ht]
-    \caption{$\textsc{Chase4Insert}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$}
+\begin{procedure}[htb]
+    \caption{Chase4Insert($\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $I$)}
     \label{algo:update:chase:insert}
     $ToIns := I$ \;
     \While{\label{algo:update:chase:insert:while} il existe une contrainte $c \in \mathbb{C}$ et un $h$ tel que $h(body(c)) \in \mathcal{D}$ qui respecte :
-    \begin{enumerate}
-        \item[\ref{algo:update:chase:insert:c1}] $h(body(c)) \cap ToIns \neq \emptyset$
-        \item[\ref{algo:update:chase:insert:c2}] $\delta(h'(head(c))) \leq \delta_{\max}$ où $h' \supseteq h$ instancie les variables existentielles de $head(c)$ par des null
-        \item[\ref{algo:update:chase:insert:c3}] $\nexists h''$ tel que $h''(h'(head(c))) \in \mathcal{D} \cup ToIns$
-    \end{enumerate}
+        \begin{itemize}
+            \item[\normalfont\ref{algo:update:chase:insert:c1}] $h(body(c)) \cap ToIns \neq \emptyset$
+            \item[\normalfont\ref{algo:update:chase:insert:c2}] $\delta(h'(head(c))) \leq \delta_{\max}$ où $h' \supseteq h$ instancie les variables\\existentielles de la tete par de nouvelles valeurs nulles
+            \item[\normalfont\ref{algo:update:chase:insert:c3}] $\nexists h''$ tel que $h''(h'(head(c))) \in \mathcal{D} \cup ToIns$
+        \end{itemize}
     }{
         $ToIns := ToIns \cup \{h'(head(c))\}$ \;
     }
     \Return{$ToIns$} \;
-\end{algorithm}
+\end{procedure}
 
 \paragraph{\gls{cypher}}
-Etant donné une contrainte $c : L_1(\alpha_1), \dots, L_m(\alpha_m) \implies L_0(\alpha_0)$ où $\alpha$ est l'ensemble de taille $k_N$ des variables libres du corps de la contrainte.
-$\alpha_i \subseteq \alpha$ est un sous-ensemble, $\alpha|_i \in \alpha$ denote le nom de la $i$-éme variable libre, $k_C$ est le nombre de constantes distincte dans $c$ et $K = k_N + k_C$ est le nombre de terms distinct de $c$.
+Etant donné une contrainte $c : L_1(\alpha_1), \dots, L_m(\alpha_m) \implies L_0(\alpha_0)$ où $\alpha$ est l'ensemble des variables libres du corps de la contrainte, $\alpha^*$ est l'ensemble des variables substituées, $\alpha_i \subseteq \alpha$ est un sous-ensemble, $\alpha|_i \in \alpha$ denote le nom de la $i$-éme variable libre de $\alpha$ et $C$ est l'ensemble des constantes distincte dans $c$.
 La recherche de l'application de $c$ dans la base $\mathcal{D}$ se traduit par une requête $Q_{chase}^{[c]}(\mathcal{D})$ présentée figure~\ref{algo:update:chase:query} qui :
 \begin{enumerate*}[label=(\roman*)]
     \item verifie l'existance d'une instance dans $\mathcal{D}$ et
@@ -86,74 +112,162 @@ La recherche de l'application de $c$ dans la base $\mathcal{D}$ se traduit par u
 En \gls{fol}, cette requête s'ecrit $Q_{chase}^{[c]} \gets L_1(\alpha_1), \dots, L_m(\alpha_m), \lnot L_0(\alpha_0)$.
 L'idée est que si il existe un homomorphisme $h_t$ tel que $h_t(body(c)) \subseteq \mathcal{D}$ alors $Q_{chase}^{[c]}$ retourne une reponse non vide uniquement si pour toute extension $h_t'$ de $h_t$ : $h_t'(L_0(\alpha_0)) \notin \mathcal{D}$.
 
-La requête $Q_{chase}^{[c]}(\mathcal{D})$ commence par rechercher les instanciation de $sub(body(c))$ (ligne~\ref{query:update:chase:match}) où $sub$ est un homomorphisme tel que $sub(body(c)) \subseteq ToIns$.
-Intutivement on recherche les extension $sub'$ de la substitution $sub$ dans $\mathcal{D}$.
-Il s'agit d'une recherche d'homomorphisme comme decrite section~\ref{sec:update:db:homomorphisme}.
-Le \verb|WHERE|, ligne~\ref{query:update:chase:where}, permet de verifier l'instanciation du corps de la contrainte $c$ par rapport à la substitution $sub$.
-L'operateur \verb|NOT EXISTS|, ligne~\ref{query:update:chase:not-exist}, execute une sous-requête qui reutilise les variables introduite dans le premier \verb|MATCH|.
-Cette sous requête recherche les instanciation de $sub'(head(c))$ dans $\mathcal{D}$.
-Si la reponse de cette sous requête est vide, l'instanciation $sub'$ est retournée.
+La requête $Q_{chase}^{[c]}(\mathcal{D})$ commence par rechercher les instanciations de $sub(body(c))$ (ligne~\ref{query:update:chase:match}) où $sub$ est un homomorphisme tel que $sub(body(c)) \subseteq ToIns$.
+Intuitivement, on recherche les extension $sub'$ de la substitution $sub$ dans $\mathcal{D}$.
+% Il s'agit d'une recherche d'homomorphisme comme décrite dans la section~\ref{sec:update:db:homomorphisme}.
+Le \verb|WHERE|, ligne~\ref{query:update:chase:where}, permet de vérifier l'instanciation du corps de la contrainte $c$ par rapport à la substitution $sub$.
+Si la contrainte possède des constantes elles sont aussi vérifier dans cette clause.
+L'opérateur \verb|NOT EXISTS|, ligne~\ref{query:update:chase:not-exist}, exécute une sous-requête qui réutilise les variables introduites dans le premier \verb|MATCH|.
+Cette sous-requête recherche les instanciations de $sub'(head(c))$ dans $\mathcal{D}$ et permet de vérifier le critère~\ref{algo:update:chase:insert:c3}.
+Si la réponse de cette sous-requête est vide, l'instanciation $sub'$ est retournée.
 La requête retourne la substitution comme un mapping entre le nom des variables dans $c$ et leur instanciation.
+Les variables existentielles présentes dans la tête de la contrainte sont exclues de la clause \verb|RETURN|, et  engendreront la génération de nouvelles valeurs nulles lors de l'insertion de la tête dans l'ensemble $ToIns$ (cf. clause \ref{algo:update:chase:insert:c2}).
+Le degré de ces nouvelles valeurs nulles étant égal au degré maximal des valeurs nulles présentes dans le corps, augmenté de 1.
 
-\begin{figure}[ht]
-	\begin{lstlisting}[mathescape]
-UNWIND subs AS sub
-MATCH $(\forall i, 1 \leq i \leq m)$ ($a_i$:Atom {symbol: `$L_i$`}), $\label{query:update:chase:match}$
-      $(\forall i, 0 \leq i < k_N)$ ($a_i$)-[:`$L_i$` {rank: $j$}]->($e_i$:Element)
-WHERE $(\forall i, k_N \leq i \leq k_C)$ ($a_i$)-[:`$L_i$` {rank: $j$}]->($e_i$ {value: sub.$i$}:Element) $\label{query:update:chase:where}$
-AND NOT EXISTS { $\label{query:update:chase:not-exist}$
-      MATCH ($a$:Atom {symbol: `$L_0$`}), $(\forall i, 0 \leq i \leq |\alpha_0|)$ ($a_i$)-[:`$L_i$` {rank: $j$}]->($e_i$)
-} RETURN {$\alpha|_1$:$x_1$.value, $\alpha|_2$:$x_2$.value, $\dots$, $\alpha|_k$:$x_k$.value}
-	\end{lstlisting}
-	\caption{Format des requêtes $Q_{chase}$}
-    \label{algo:update:chase:query}
-\end{figure}
+\begin{lstlisting}[mathescape, name=qchase, language=cypher, caption=Format des requêtes $Q_{chase}$, label={algo:update:chase:query}, escapechar=!, float, floatplacement=htb]
+UNWIND $\$$subs AS sub
+MATCH $(\forall i, 1 \leq i \leq m)$ ($a_i$:Atom {symbol: "$L_i$"}), !\label{query:update:chase:match}!
+      $(\forall j, 0 \leq j < \lvert \alpha_i \rvert)$ ($a_i$)-[:`$L_i$` {rank: $j$}]->($\alpha_i|_j$:Element)
+WHERE $(\forall k \in C)$ $\alpha|_k$.value = $k$ AND $(\forall k \in \alpha^*)$ $\alpha|_k$.value = sub.$\alpha|_k$ !\label{query:update:chase:where}!
+AND NOT EXISTS { !\label{query:update:chase:not-exist}!
+      MATCH ($a$:Atom {symbol: "$L_0$"}),
+      $(\forall i, 0 \leq i \leq |\alpha_0|)$ ($a_i$)-[:`$L_i$` {rank: $j$}]->($e_i$)
+} RETURN DISTINCT {$(\forall k, 0 \leq k_N \leq \lvert \alpha \rvert)$ $\alpha|_k$:$x_k$.value}
+\end{lstlisting}
 
-\begin{example}[Execution de la requête]
+\begin{tikzpicture}[remember picture, overlay]
+    \node [right = .5em of pic cs:line-qchase-1-end, yshift=.4em] (sub) {\ref{algo:update:chase:insert:c1}};
+    \drawBrace{pic cs:line-qchase-2-end}{pic cs:line-qchase-4-end}{\ref{algo:update:chase:insert:c2}}
+    \drawBrace{pic cs:line-qchase-5-end}{pic cs:line-qchase-7-end}{\ref{algo:update:chase:insert:c3}}
+\end{tikzpicture}
+
+\begin{example}[\gls{chase}]
     \label{ex:update:chase:query}
+    Etant donné une contrainte $c : getTreatment(x, y),$ $forPatho(y, z) \to hasPatho(x, z)$.
+    En supposant l'insertion du fait $getTreatment(N_1, \text{résection})$, une étape du chase implique la construction de la requête suivante pour la contrainte $c$ : $Q_{chase}^{[c]} \gets getTreatment(N_1,$ $\text{résection}),$ $forPatho(\text{résection}, z),$ $\lnot hasPatho(N_1, z)$ qui se traduit par la requête \gls{cypher} suivante a l'aide du modèle donné figure~\ref{algo:update:chase:query} où $k_N = 1$ ($z$), $k_C = 2$ ($x$ et $y$) et $subs = \{\langle x \mapsto N_1, y \mapsto \text{résection} \rangle\}$.
 
+    \begin{lstlisting}[mathescape, language=cypher]
+UNWIND $\$$subs AS sub
+MATCH (a1:Atom {symbol: "getTreatment"}),
+      (a1)-[:getTreatment {rank: 0}]->($x$:Element),
+      (a1)-[:getTreatment {rank: 1}]->($y$:Element),
+      (a2:Atom {symbol: "forPatho"}),
+      (a2)-[:forPatho {rank: 0}]->($y$:Element),
+      (a2)-[:forPatho {rank: 1}]->($z$:Element)
+WHERE $x$.value = sub.$x$ AND $y$.value = sub.$y$
+AND NOT EXISTS {
+      MATCH (a:Atom {name: "hasPatho"}),
+      (a)-[:hasPatho {rank: 0}]->($x$:Element),
+      (a)-[:hasPatho {rank: 1}]->($z$:Element)
+} RETURN DISTINCT {"$x$":$x$.value, "$y$":$y$.value, "$z$":$z$.value} AS sub
+\end{lstlisting}
+
+    L'execution de cette requête sur le graphe d'instance donné figure~\ref{fig:update:db:runex} se traduit par l'exécution pas à pas suivante :
+    \begin{enumerate}[label=\emph{Etape~\arabic*},leftmargin=*]
+        \item L'opération \verb|UNWIND| débute en construisant une table d'instanciation à partir de la liste \verb|subs| fournie en paramètre.
+              \begin{center}
+                  \begin{tabular}{l}
+                      \hline
+                      \verb|sub|                        \\
+                      \hline
+                      $\{x: N_1, y: \text{résection}\}$ \\
+                      \hline
+                  \end{tabular}
+              \end{center}
+
+        \item La clause \verb|MATCH| permet la récupération du sous-graphe correspondant au corps de la contrainte pour chaque substitution \verb|sub|.
+              À ce stade, l'instanciation complète de toutes les variables du corps de la contrainte est obtenue.
+              \begin{center}
+                  \begin{tabular}{lccccc}
+                      \hline
+                      \verb|sub|                        & \verb|a1| & \verb|a2| & $x$     & $y$     & $z$     \\
+                      \hline
+                      $\{x: N_1, y: \text{résection}\}$ & $n_{22}$  & $n_{23}$  & $n_{1}$ & $n_{3}$ & $n_{2}$ \\
+                      \hline
+                  \end{tabular}
+              \end{center}
+
+        \item Par la suite, une sous-requête est exécutée afin de vérifier l'existence de la tête de la contrainte pour l'instanciation récupérée à l'étape précédente.
+              \begin{center}
+                  \begin{tabular}{lcccccc}
+                      \hline
+                      \verb|sub|                        & \verb|a1| & \verb|a2| & $x$     & $y$     & $z$     & \verb|a| \\
+                      \hline
+                      $\{x: N_1, y: \text{résection}\}$ & $n_{22}$  & $n_{23}$  & $n_{1}$ & $n_{3}$ & $n_{2}$ & $n_{21}$ \\
+                      \hline
+                  \end{tabular}
+              \end{center}
+              Ici, pour l'unique instanciation identifiée, la sous-requête n'est pas vide.
+              Cela indique qu'un atome satisfaisant la contrainte est déjà présent dans la base de données, et aucune autre opération n'est donc requise.
+              La requête $Q_{chase}^{[c]}$ renvoie alors un résultat vide.
+    \end{enumerate}
 \end{example}
 
 \subsection{Chase en arriére}
 Il peut arriver que la suppression d'un atome instancié $a$ rende la base de données incohérente lorsqu'il est une conséquence d'une contrainte $c$.
-C'est à dire que, pour toute contrainte $c$, s'il existe un homomorphisme $h$ tel que $h(head(c)) = a$ et une extension de $h$ noté $h'$ tel que $h'(body(c)) \subseteq \mathcal{D}$ alors la base ne respecte plus la contrainte $c$ et l'on doit regenerer la tête, que l'on veux supprimer, afin de maintenir la cohérence.
-L'idée du chase arriére est de supprimer recursivement les atomes $a' \in h'(body(c))$ qui interviennent dans le corps.
+C'est à dire que, pour toute contrainte $c$, s'il existe un homomorphisme $h$ tel que $h(head(c)) = a$ et une extension de $h$ noté $h'$ tel que $h'(body(c)) \subseteq \mathcal{D}$.
+Comme la base ne respecte plus la contrainte $c$ on doit regenerer la tête en utilisant le \gls{chase} afin de maintenir la cohérence.
+Cependant, il est possible que l'on regenere un atome que l'on veux supprimer.
+Dans ce cas on utilise le \gls{chase} en arriére pour supprimer recursivement les atomes qui interviennent dans le corps pour empecher le declenchement de la contraite.
 Pour éviter le non-déterminisme, il est supposé que l'atome à supprimer a été marqué du symbol `$-$' lors de la conception de la règle.
 
-Comme pour les insertions, l'algorithme \ref{algo:update:chase:delete} calcule, de manière incrémentale, les effets de bords.
+Comme pour les insertions, la procédure~\ref{algo:update:chase:delete} calcule, de manière incrémentale, les effets de bords.
 $ToDel$ represente l'ensemble des atomes à supprimer et $ToIns$ l'ensemble des nouveaux atomes à insérer.
 L'idée est de vérifier si $c$ génère un atome isomorphe à un atome en cours de suppression (ligne~\ref{algo:update:chase:delete:while}).
 Pour ce faire, on utilise la requête $Q_{chase}^{[c]}$ où l'on instancie la tête de la régle au lieu du corps.
 Si on génère un atome isomorphe à un atome dans $ToDel$, au moins un atome dans $h(body(c))$ doit être supprimé afin d'empêcher $c$ d'être déclenché.
 Cet atome est ensuite ajouté à l'ensemble des atomes à supprimer $ToDel$ (ligne~\ref{algo:update:chase:delete:delete1}).
 Lorque l'application de la régle donne un nouvel atome $a'$ non-isomorphe à $a$, il est inséré et peux a son tour declencher d'autre régles.
-Les effet de bords sont calculé à l'aide d'un \gls{chase} en avant (ligne~\ref{algo:update:chase:delete:chaseforward}) avec l'algorithme~\ref{algo:update:chase:insert} et stockés dans l'ensemble $NewToIns$.
-Ligne~\ref{algo:update:chase:delete:delta}, si les effets de bords contiennent un atome de $ToDel$ a supprimer et/ou que le degree maximal $\delta_{max}$ est depassé : l'application de la contrainte $c$ est invalide est l'atome à supprimer dans le coprs est ajouté à $ToDel$ (ligne~\ref{algo:update:chase:delete:delete2}).
+Les effet de bords sont calculé à l'aide d'un \gls{chase} en avant (ligne~\ref{algo:update:chase:delete:chaseforward}) avec la procédure~\ref{algo:update:chase:insert} et stockés dans l'ensemble $NewToIns$.
+Ligne~\ref{algo:update:chase:delete:delta}, si les effets de bords contiennent un atome de $ToDel$ a supprimer et/ou que le degree maximal $\delta_{max}$ est depassé : l'application de la contrainte $c$ est invalide et l'atome à supprimer dans le coprs est ajouté à $ToDel$ (ligne~\ref{algo:update:chase:delete:delete2}).
 Sinon, les nouveaux atomes sont ajoutés à $ToIns$ (ligne~\ref{algo:update:chase:delete:insert}).
 
-\begin{algorithm}[ht]
-	\caption{$\textsc{Chase4Delete}(\mathcal{D}, \mathbb{C}, \delta_{max}, del_{iso})$}
+\begin{procedure}[htb]
+    \caption{Chase4Delete($\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $del_{iso}$)}
     \label{algo:update:chase:delete}
-	$ToIns := \emptyset$
-    $ToDel := del_{iso}$ \;
-	\While{$\exists c \in \mathbb{C}$ et $h$ tel que $h(\text{head}(c)) \in ToDel$ et $h(\text{body}(c)) \subset (\mathcal{D} \setminus ToDel) \cup ToIns$ \label{algo:update:chase:delete:while}}{
-		\uIf{il existe $h'$ tel que $h'(\text{body}(c)) = h(\text{body}(c))$ et $h'(\text{head}(c))$ est isomorphe à $h(\text{head}(c))$ \label{algo:update:chase:delete:isomorphe}}{
-			$ToDel := ToDel \cup \{h'(\text{body}^-(c))\}$\;\label{algo:update:chase:delete:delete1}
-		}
-		\Else{
-			$NewToIns := \textsc{Chase4Insert}(\mathcal{D}, \mathbb{C}, \delta_{max}, ToIns \cup \{h'(\text{head}(c))\})$\label{algo:update:chase:delete:chaseforward}\;
-			\uIf{$NewToIns \cap ToDel = \emptyset$ et $\delta(N) < \delta_{max}$ pour tous les nulls $N$ dans $NewToIns$ \label{algo:update:chase:delete:delta}}{
-				$ToIns := ToIns \cup NewToIns$\;\label{algo:update:chase:delete:insert}
-			}
-			\Else{
-				$ToDel := ToDel \cup \{h'(\text{body}^-(c))\}$\;\label{algo:update:chase:delete:delete2}
-			}
-		}
-	}
-	\Return $ToDel, ToIns$
-\end{algorithm}
+    \SetKwFunction{head}{head}
+    \SetKwFunction{body}{body}
+    \SetKwFunction{bodyminus}{body$^-$}
+    \SetKwFunction{chaseIns}{\ref{algo:update:chase:insert}}
+
+    $ToIns \gets \emptyset$ \;
+    $ToDel \gets del_{iso}$ \;
+    \While{$\exists c \in \mathbb{C}$ et $h$ tel que $h(\head{c}) \in ToDel$ et $h(\body{c}) \subset (\mathcal{D} \setminus ToDel) \cup ToIns$ \label{algo:update:chase:delete:while}}{
+        \uIf{il existe $h'$ tel que $h'(\body{c}) = h(\body{c})$ et $h'(\head{c})$ est isomorphe à $h(\head{c})$ \label{algo:update:chase:delete:isomorphe}}{
+            $ToDel \gets ToDel \cup \{h'(\bodyminus{c})\}$ \label{algo:update:chase:delete:delete1}\;
+        }
+        \Else{
+            $NewToIns \gets$ \chaseIns{$\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $ToIns \cup \{h'(\head{c})$\}}\; \label{algo:update:chase:delete:chaseforward}
+            \uIf{$NewToIns \cap ToDel = \emptyset$ et $\delta(N) < \delta_{max}$ pour tous les nulls $N$ dans $NewToIns$ \label{algo:update:chase:delete:delta}}{
+                $ToIns \gets ToIns \cup NewToIns$\; \label{algo:update:chase:delete:insert}
+            }
+            \Else{
+                $ToDel \gets ToDel \cup \{h'(\bodyminus{c})\}$ \label{algo:update:chase:delete:delete2}\;
+            }
+        }
+    }
+    \Return $ToDel, ToIns$
+\end{procedure}
 
 \begin{example}[\gls{chase} en arriére]
     \label{ex:update:chase:backward}
+    Etant donné la contrainte $c_1 : getTreatment(x, y),$ $forPatho^-(y, z)$ $\to hasPatho(x, z)$.
+    En supposant la suppression du fait $hasPatho(N_1, \text{cancer})$, une étape du chase implique la construction de la requête suivante pour la contrainte $c_1$ : $Q_{chase}^{[c]} \gets getTreatment(N_1, y),$ $forPatho(y, \text{cancer}),$ $\lnot hasPatho(N_1, \text{cancer})$.
+    Cette requête se traduit en requête \gls{cypher} a l'aide du modèle présenté dans la figure~\ref{algo:update:chase:query} où $k_N = 1$ ($y$), $k_C = 2$ ($x$ et $z$), $h = \langle x \mapsto N_1, z \mapsto \text{cancer} \rangle$ et $subs = \{h\}$.
+    La procédure débute avec $ToIns = \emptyset$ et $ToDel = \{hasPatho(N_1, \text{cancer})\}$.
 
+    La première étape consiste à vérifier qu'aucune contrainte n'est plus satisfaite apres avoir supprimé l'atome.
+    Pour ce faire, on utilise la requête $Q_{chase}^{[c_1]}((\mathcal{D} \setminus ToDel) \cup ToIns)$ avec la paramètre $subs$.
+    On obtient une réponse non vide, indiquant que la contrainte n'est plus satisfaite, avec l'instanciation $h' = \langle x \mapsto N_1, y \mapsto \text{résection}, z \mapsto \text{cancer} \rangle$.
+    L'instanciation retournée de la tête, $h'(head(c))$, est isomorphe à $hasPatho(N_1, \text{cancer})$.
+    Par conséquent, il est nécessaire de supprimer l'un des éléments du corps de la règle pour assurer la cohérence tout en maintenant la suppression demandée.
+    Ici, l'atome marqué $forPatho(\text{résection}, \text{cancer})$ est supprimé.
+    Le symbol de prédicat $forPatho$ supprimé n'apparaît pas dans la tête d'une régle, signalant la fin de la procédure avec $ToIns = \emptyset$ et $ToDel = \{hasPatho(N_1, \text{cancer}),$ $forPatho(\text{résection}, \text{cancer})\}$.
+
+    Supposont maintenant l'ajout de la contrainte $c_2 : getTreatment(x, y),$ $\to forPatho(y, z)$.
+    Après la suppression du fait $forPatho(\text{résection}, \text{cancer})$, il est maintenant nécessaire de vérifier la contrainte $c_2$.
+    La requête $Q_{chase}^{[c_2]}((\mathcal{D} \setminus ToDel) \cup ToIns)$ retourne alors une instantiation $h''= \langle x \mapsto N_1, y \mapsto \text{résection}, z \mapsto N_4 \rangle$.
+    Comme $h''(head(c_2)) = forPatho(\text{résection}, N_4)$ n'est pas isomorphe à $forPatho(\text{résection}, \text{cancer})$, l'atome est ajouté, et un chase en avant est effectué pour calculer ses effets de bords.
+    Cela déclenche à nouveau la contrainte $c_1$ avec l'instanciation $\langle y \mapsto \text{résection}, z \mapsto N_4 \rangle$ produisant l'atome $hasPatho(N_1, N_4)$.
+    Comme le nouvel atome n'est pas isomorphe à un atome de $ToDel$ , et aucune autre contrainte n'est à vérifier, la procédure se termine avec $ToDel = \{hasPatho(N_1, \text{cancer}),$ $forPatho(\text{résection}, \text{cancer})\}$ et $ToIns = \{forPatho(\text{résection}, N_4),$ $hasPatho(N_1, N_4)\}$.
 \end{example}

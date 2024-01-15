@@ -11,7 +11,7 @@
         $i \gets i + 1$\;
         simp $\gets$ True\;
 
-        \tcp{Supprimer les neouds redondants}
+        \tcp{Supprimer les noeuds redondants}
         \lForAll{$p \in D_i$  tel que $t_i(p) \notin \{`ENT`, `LEAF`\}$}{
             \reduce{$T_i$, $p$, $\emptyset$}
         }

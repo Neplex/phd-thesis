@@ -13,6 +13,7 @@ Bien qu'il soit possible d'ajouter des contraintes supplémentaires lors de l'in
 Ainsi, lorsque la base contient une entrée pour une patiente nommée Lea souffrant de douleurs aux mains ($Pat(Lea)$ et $ SOSY(Lea,$ $\textit{douleur aux mains})$), pour étre cohérente, la base de données doit également inclure l'atome $PrescExam(Lea, N_1)$.
 Cet atome indique qu'un examen a été prescrit à Lea, même si le type d'examen n'est pas encore connu.
 
+\paragraph{}
 L'importance de pouvoir gérer l'incomplétude se révèle dans l'intégration d'informations provenant de sources textuelles.
 Dans ces travaux, l'incomplétude prend la forme de valeurs manquantes.
 Dans le contexte des textes, cela peut être dû à des valeurs non observées, à des omissions liées à une connaissance générale ou simplement à des erreurs d'extraction.
@@ -24,8 +25,7 @@ Ces valeurs inconnues peuvent alors étres représentées par des valeurs nulles
 Pour illustrer, prenons l'exemple d'une instance de base de données $\mathcal{D}_1= \{PrescExam(Lea, N_1),$ $ExamResult(Lea, N_1, N_2)\}$.
 Cette instance indique qu'un examen non spécifié, symbolisé par $N_1$, a été prescrit à Lea, et qu'un résultat inconnu, représenté par $N_2$, est associé.
 Ces valeurs nulles reflètent une information partielle et se conforment à l'approche du \gls{cwa} où toute information non presente est considéré comme fausse.
-
-Dans le contexte de l'\gls{owa}, la sémantique diffère : les valeurs inconnues sont simplement omises.% avec l'hypothèse sous-jacente que, si elles existent, elles sont disponibles quelque part.
+Dans le contexte de l'\gls{owa}, la sémantique diffère : les valeurs inconnues sont simplement omises. % avec l'hypothèse sous-jacente que, si elles existent, elles sont disponibles quelque part.
 La logique sous-jacente est à trois valeurs de verité, vrai, faux, ou inconnu si le fait est manquand dans la base.
 Les travaux présentés dans cette thèse se focalisent sur le \gls{cwa}, qui facilite l'analyse des données. %et permet de travailler en mode déconnecté.
 % En pratique, on peux imaginer que l'application du \gls{cwa} se limite à une partie spécifique des données (en particulier, les données privée inaccessibles à l'exterieur).
@@ -47,4 +47,4 @@ De plus, l'objectif est d'améliorer la création des ensembles d'atomes liés p
 
 \paragraph{Organisation de la partie}
 Pour commencer, la section~\ref{sec:update:pre} définit les preliminaires et las section~\ref{sec:update:soa} présente des travaux connexes et expose les distinctions entre l'approche préconisée ici et celle décrite dans \cite{chabinConsistentUpdatingDatabases2020}.
-Dans la suite, le chapitre~\ref{chp:update:algos} présente en détail l'approche proposée, tandis qu'une évaluation critique illustrant les avantages et les limites de l'exploitation des \glspl{sgbd} graphes est exposée dans le chapitre~\ref{chp:update:eval}, avant de conclure cette partie.
+Dans la suite, le chapitre~\ref{chp:update:algos} présente en détail l'approche proposée et une évaluation critique illustrant les avantages et les limites de l'exploitation des \glspl{sgbd} graphes est exposée dans la section~\ref{sec:update:evaluation}, avant de conclure cette partie.

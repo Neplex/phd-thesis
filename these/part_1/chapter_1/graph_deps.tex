@@ -1,0 +1,60 @@
+\cite{fanKeysGraphs2015,fanFunctionalDependenciesGraphs2016, fanDependenciesGraphs2019} sont une suite de travaux qui cherchent à définir des \glspl{gfd}.
+Dans le modèle relationnel, les dépendances fonctionnelles sont définies sur une relation pour un ensemble d'attributs.
+Pour les graphes, étant dépourvus de schéma, il est nécessaire de définir le périmètre des dépendances fonctionnelles.
+Les \glspl{gfd} doivent alors non seulement préciser la cohérence entre les valeurs des attributs, mais également détailler les structures topologiques qui les caractérisent et sont alors la combinaison :
+\begin{itemize}
+    \item d'une contrainte topologique, ou motif, sur le graphe qui définie la portée de la dépendance fonctionnelle et
+    \item d'une dépendance fonctionnelle sur les attributs.
+\end{itemize}
+
+Comme pour les langages d'interrogation de graphes (cf. \gls{cypher}), un motif est un graphe contenant un ensemble fini de variables pour les nœuds, les arêtes et les propriétés.
+Dans \cite{fanDependenciesGraphs2019}, un motif est défini comme un graphe dirigé $Q[\overline{x}] = (V_Q, E_Q, \lambda, \mu)$ où $V_Q$ est un ensemble fini de nœuds, $E_Q$ un ensemble fini d'arêtes, $\lambda : V_Q \cup E_Q \to L$ est une fonction partielle de labellisation, $\overline{x} \subset \textsc{var}$ est un ensemble de variables tel que $\lvert \overline{x} \rvert = \lvert V_Q \rvert$ ou $\lvert \overline{x} \rvert = \lvert E_Q \rvert$ et $\mu : \overline{x} \to V_Q \cup E_Q$ est une fonction bijective d'affectation de variables.
+La recherche du motif $Q$ dans un graphe attribué $G = (V, E, L, F_A)$ ($F_A(v)$ est l'ensemble des propriétés $A_i = a_i$ où $v.A_i$ est une propriété de $v$ et $a_i$ est une constante) consiste a retrouvé l'ensemble des homomorphismes $h$ de ces variables tel que le graphe $h(Q)$ sois un sous graphe de $G$.
+C'est-à-dire que pour chaque nœud $u \in V_Q$, $L_Q(u) = L(h(u))$ et pour chaque arête $e = (u, p, u')$ dans $Q$ il existe une arête $e' = (h(u), p, h(u'))$ dans $G$.
+
+Une \glspl{gfd} est alors définie comme un tuple $(Q[\overline{x}], X \to Y)$ où $Q[\overline{x}]$ est le motif qui définie la contrainte topologique (le sous graphe sur lequel la contrainte d'applique) et $X$ et $Y$ sont deux ensembles de contraintes sur les variables dans $\overline{x}$.
+Une contrainte peut être une des trois formes suivantes :
+\begin{itemize}
+    \item Une contrainte sur une valeur de propriété : $x.A = c$ ;
+    \item Une contrainte d'équivalence entre deux propriétés : $x.A = y.B$ ;
+    \item Une contrainte d'identité qui signifie que deux nœuds ou arêtes sont les mêmes : $id(x) = id(y)$.
+\end{itemize}
+Où $x, y \in \overline{x}$ sont des variables, $A$ et $B$ sont des propriétés de nœuds ou d'arêtes et $c$ est une constante.
+Les contraintes ont été étendues par la suite pour inclure des contraintes négatives avec un ensemble prédéfini de prédicats : $\neq, <, \le, >, \ge$.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{tikzpicture}[->, -latex, auto, on grid, node distance=2.5cm, thick, main node/.style={draw}]
+            \node[main node] (x) {Person: $x$};
+            \node[main node] (y) [below of=1] {Document: $y$};
+            \path[every node/.style={font=\sffamily\small}]
+            (x) edge node {AuthorOf} (y);
+        \end{tikzpicture}
+        \caption*{$Q_1 : y.type = ``thesis" \to x.status = ``PhD"$}
+        \label{fig:gfd:q1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{tikzpicture}[->, -latex, auto, on grid, node distance=3.5cm, thick, main node/.style={draw}]
+            \node[main node] (x) {Country: $x$};
+            \node[main node] (y) [below left of=1] {City: $y$};
+            \node[main node] (z) [below right of=1] {City: $z$};
+            \path[every node/.style={font=\sffamily\small}]
+            (y) edge node [left] {CapitalOf} (x)
+            (z) edge node [right] {CapitalOf} (x);
+        \end{tikzpicture}
+        \caption*{$Q_2: \emptyset \to id(y) = id(z)$}
+        \label{fig:gfd:q2}
+    \end{subfigure}
+    \caption{Exemple de dépendances fonctionnelles pour les graphes}
+    \label{fig:gfd}
+\end{figure}
+
+\begin{example}
+    La figure~\ref{fig:gfd} montre deux exemples de dépendance fonctionnelle.
+    $Q_1$ définie que tout auteur d'un document de type thèse est un doctorant.
+    $Q_2$ exprime le fait que si deux villes sont la capitale d'un même pays, alors elles sont equivalente.
+\end{example}

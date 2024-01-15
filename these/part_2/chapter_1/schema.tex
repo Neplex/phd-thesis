@@ -109,7 +109,7 @@ Les collections dans le contexte actuel correspondent au concept de \emph{collec
             \node (grammar) [flow-process, below=of enriched] {Extraction de la grammaire $G_i$};
             \node (check) [flow-decision, below=of grammar] {$G_i = G_T$};
             \node (end) [flow-start, left=of check] {Fin};
-            \node (equiv) [flow-process, below=of check] {Construction des classes equivalence};
+            \node (equiv) [flow-process, below=of check] {Construction des classes équivalence};
             \node (rewrite) [flow-process, below=of equiv] {Réécriture des arbres};
 
             \draw [flow-arrow] (start) -- (tal);
@@ -347,25 +347,40 @@ Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser ce
 \end{enumerate*}
 
 \begin{example}
-    Considérons l'arbre donné dans la figure~\ref{fig:struct:conj:en} ainsi que deux entités : \emph{renal ultrasound} et \emph{retrograde cystography}.
-    Pour la première entité, \emph{renal} se trouve à la position $01$ et \emph{ultrasound} à la position $02$.
-    Par conséquent, l'entité doit être insérée à la position $0$, qui représente le préfixe commun à \emph{renal} et \emph{ultrasound}.
-    Cependant, étant donné qu'un autre mot est également un descendant du nœud situé à la position $0$, cette position n'est pas valide.
-    Afin de remédier à cette situation, un nouveau nœud est ajouté à la position $01$, descendant de la position $0$ et recouvrant uniquement les mots \emph{renal} et \emph{ultrasound}.
-    Le résultat de cette opération d'enrichissement est illustré dans la figure~\ref{fig:struct:enrichissement:1} pour les deux entités.
+    Considérons l'arbre donné dans la figure~\ref{fig:struct:enrichissement:1} ainsi que les entités suivantes :
+    \begin{multicols}{3}
+        \begin{enumerate}
+            \item \enquote{John Smith} (Person)
+            \item \enquote{500 mg} (Dosage)
+            \item \enquote{500} (Value)
+            \item \enquote{mg} (Unit)
+            \item \enquote{Paracetamol} (Drug)
+        \end{enumerate}
+    \end{multicols}
+
+    Pour la première entité, \emph{John} est situé à la position $000$ et \emph{Smith} à la position $010$.
+    Le nœud représentant cette entité doit donc être inséré comme enfant du nœud à la position $0$, qui correspond au préfixe commun à \emph{John} et \emph{Smith}.
+    La seconde entité englobe les entités 3 et 4.
+    Par conséquent, il est nécessaire d'introduire la structure de relation précédemment présentée.
+    On introduit alors le nœud \emph{ER\_NODE} à la position de l'entité englobante.
+    Cette entité contient les mots \emph{500} à la position $11000$ et \emph{mg} à la position $11010$, et doit alors être inséré comme enfant du nœud \emph{NP} situé à la position $110$.
+    Sous le nœud \emph{ER\_NODE}, on ajoute l'entité \emph{dosage} et le nœud \emph{EC\_NODE}.
+    Sous le nœud \emph{EC\_NODE}, on conserve le sous-arbre qui était initialement positionné sous la position $110$.
+    Ensuite, le reste des entités peuvent être annotés de la même manière que la première entité.
+    Le résultat de cette opération d'enrichissement est illustré dans la figure~\ref{fig:struct:enrichissement:2}.
 \end{example}
 
 \begin{figure}[ht]
     \centering
-    \begin{subfigure}[b]{.37\textwidth}
+    \begin{subfigure}[b]{.35\textwidth}
         \centering
         \begin{adjustbox}{max width=\linewidth}
             \begin{forest}
                 where n children=0{tier=word}{}
                 [S
                     [NP
-                        [DT [The]]
-                        [NN [patient]]
+                        [NNP [John]]
+                        [NNP [Smith]]
                     ]
                     [VP
                         [VBZ [takes]]
@@ -376,7 +391,7 @@ Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser ce
                             ]
                             [PP 
                                 [IN [of]]
-                                [NP [NN [Paracetamol]]]
+                                [NPP [NN [Paracetamol]]]
                             ]
                         ]
                     ]
@@ -387,16 +402,16 @@ Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser ce
         \label{fig:struct:enrichissement:1}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{.53\textwidth}
+    \begin{subfigure}[b]{.55\textwidth}
         \centering
         \begin{adjustbox}{max width=\linewidth}
             \begin{forest}
                 where n children=0{tier=word}{}
                 [S
-                    [NP
-                        [DT [The]]
-                        [NN [\textbf{ENT\_PERSON} [patient]]]
-                    ]
+                    [NP [\textbf{ENT\_PERSON}
+                        [NNP [John]]
+                        [NNP [Smith]]
+                    ]]
                     [VP
                         [VBZ [takes]]
                         [NP
@@ -409,7 +424,7 @@ Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser ce
                             ]]
                             [PP 
                                 [IN [of]]
-                                [NP [NN [\textbf{ENT\_DRUG} [Paracetamol]]]]
+                                [NP [NNP [\textbf{ENT\_DRUG} [Paracetamol]]]]
                             ]
                         ]
                     ]
@@ -423,36 +438,99 @@ Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser ce
     \label{fig:struct:enrichissement}
 \end{figure}
 
-La procedure pour enrichir les arbres de syntaxe est donné par l'algorithme~\ref{algo:struct:insent}.
+La procédure pour enrichir les arbres de syntaxe est donné par l'algorithme~\ref{algo:struct:insent}.
+On commence par définir une opération d'édition qui permet de transformer les entités imbriquées en une structure de relation.
+
+\begin{figure}
+    \centering
+    \begin{adjustbox}{max width=\linewidth}
+        \begin{forest}
+            [U
+                [$x_0$]
+                [ENT
+                    [$z_0$]
+                    [ENT$_0$ [$y_0$]]
+                    [$z_1$]
+                    [$\dots$]
+                    [ENT$_n$ [$y_n$]]
+                    [$z_{n+1}$]
+                ]
+                [$x_1$]
+            ]
+          \end{forest}
+        {\Large$\rightarrow$}
+        \begin{forest}
+            [U
+                [$x_0$]
+                [ER\_NODE
+                    [ENT [$z_0$] [$y_0$] [$z_1$] $\dots $ [$y_n$] [$z_{n+1}$]]
+                    [EC\_NODE 
+                        [ENT$_0$  [$y_0$]]
+                        [$\dots$]
+                        [ENT$_n$ [$y_n$]]
+                    ]
+                ]
+                [$x_1$]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \caption{$\textsf{unnest\_ent}(T, u.i)$ where $|\sigma(x_0)| = i$}
+\end{figure}
 
 \begin{algorithm}[H]
     \caption{$\textsf{ins\_ent}(T = (D, t), TreeEnt)$}
         \label{algo:struct:insent}
 
     $u.b \gets u.x_0.x_1 \dots x_n$\;
-        \tcp{Check if $u.x_0$ has children not in the entity and should be left in place}
-        \If{$\sum_{i=1}^{n} (x_i) \neq 0$}{
-            $x' \gets x_0 + 1$\;
-        } \Else {
-            $x' \gets x_0$\;
-        }
+    \tcp{Check if $u.x_0$ has children not in the entity and should be left in place}
+    \uIf{$\sum_{i=1}^{n} (x_i) \neq 0$}{
+        $x' \gets x_0 + 1$\;
+    } \Else {
+        $x' \gets x_0$\;
+    }
     $j \gets |L_{ent}| - 1$\;
     $H \gets []$\;
-        \While{$j \geq 0$}{
-            $pos \gets L_{ent}[j]$\;
-            $H \gets H.\textsf{append}(T|_{pos})$\;
-            $\textsf{del\_elem}(X, pos)$\;
-            $j \gets j-1$\;
-        }
+    \While{$j \geq 0$}{
+        $pos \gets L_{ent}[j]$\;
+        $H \gets H.\textsf{append}(T|_{pos})$\;
+        $\textsf{del\_elem}(X, pos)$\;
+        $j \gets j-1$\;
+    }
     $\textsf{ins\_elem}(T, entityName, u.x')$\;
     \For{$leaf \in H$}{
         $\textsf{ins\_elem}(T, leaf, u.x'.0)$\;
     }
 \end{algorithm}
 
+\begin{algorithm}[H]
+	\caption{$\textsf{ins\_ent\_list}(T = (D, t), L_{TreeEnt}, L_{Rels})$}
+    \ForEach{$p \in D$}{
+        $\textsf{fix\_coord}(T, p)$\;
+        $\textsf{fix\_conj}(T, p)$\;
+    }
+    
+    Trier $L_{TreeEnt}$ par longueur ($|TreeEnt|$), le plus long en premier\;
+    
+    \ForEach{$TreeEnt \in L_{TreeEnt}$}{
+        $\textsf{ins\_ent}(T, TreeEnt)$\;
+    }
+    
+    \ForEach{$(entPos_1, entPos_2, rel) \in L_{Rels}$}{
+        $\textsf{ins\_rel}(T, entPos_1, entPos_2, rel)$\;
+    }
+
+    \ForEach{$p \in D$ tq. $\textsf{height}(p) = 1$ and $l(p) \neq \textsf{ENT}$}{
+        $\textsf{del\_elem}(T, l)$\;
+    }
+    
+    \ForEach{$p \in D$}{
+        $\textsf{reduce}(T, p, \emptyset)$\;
+    }
+\end{algorithm}
+
 \subsubsection{Simplifications}
 
-La simplification des arbres conscite en la suppression de toute les branches qui ne continent pas une entité.
+La simplification des arbres consiste en la suppression de toutes les branches qui ne continent pas une entité.
 Les structures redondantes, sont aussi supprimées.
 
 
@@ -582,7 +660,7 @@ La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaq
     On a alors deux cas :
     \begin{itemize}
         \item  $st_1 \sim_\tau st_2$ : qui implique, par symétrie, $st_2 \sim_\tau st_1$ et donc  $st_2 \equiv_\tau st_1$.
-        \item $\exists z (st_1 \equiv_\tau z \land st_2 \equiv_\tau z)$ : qui peut se réécrire en $\exists z (st_2 \equiv_\tau z \land st_1 \equiv_\tau z)$ qui donne, par définition, $st_2 \equiv_\tau st_1$.
+        \item $\exists z (st_1 \equiv_\tau z \land st_2 \equiv_\tau z)$ : qui peut se réécrire en $\exists z (st_2 \equiv_\tau z \land st_1 \equiv_\tau z)$ et qui donne, par définition, $st_2 \equiv_\tau st_1$.
     \end{itemize}
     On peut donc en déduire que la $\tau$-équivalence est \emph{symétrique}.
     Soit $st_1$, $st_2$ et $st_3$ trois sous arbres enrichis et supposons que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
@@ -604,7 +682,7 @@ La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaq
     \qed
 \end{proposition}
 
-\begin{definition}[Classe d'equivalences]
+\begin{definition}[Classe d'équivalences]
     On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
     $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
 \end{definition}
@@ -666,8 +744,8 @@ En continuant d'augmenter le seuil, par exemple à $\tau = 0.7$, quatre classes 
             \draw[color=gray] (-7,3.5) -- (-7.1,3.5) node[left] {$0.3$};
         \end{tikzpicture}
     \end{adjustbox}
-    \label{fig:struct:quotient:dendrogramme}
     \caption{Exemple de dendrogramme pour le partitionnement hiérarchique}
+    \label{fig:struct:quotient:dendrogramme}
 \end{figure}
 
 \subsection{Récupération du schéma d'une instance}
@@ -763,7 +841,7 @@ L'arbre quotient est construit à partir de la fonction \textsf{QDom}.
             \BlankLine
             $Q_D = Q_D \cup \{u\}$\;
             \tcp{Si un nœud a plusieurs successeurs on ajoute le symbole `${}^+$' au label}
-            \If{$\lvert\{v \mid \forall (C', v) \in successeurs \text{ tq. } u \prec v\}\rvert > 1$\label{algo:struct:quotient:QT:plus}}{
+            \uIf{$\lvert\{v \mid \forall (C', v) \in successeurs$ tq. $u \prec v\}\rvert > 1$\label{algo:struct:quotient:QT:plus}}{
                 $Q_l(u) = l(u)~+~$`${}^+$'\;
             } \Else {
                 $Q_l(u) = l(u)$\;

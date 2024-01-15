@@ -1,0 +1,37 @@
+Les outils d'analyse des données deviennent essentiels dans différents domaines d'application et leur qualité repose sur la cohérence des données.
+Les travaux présentés dans cette partie visent à améliorer la maintenance cohérente des bases de données incomplètes en proposant des routines incrémentales en amont des systèmes de gestion de base de données qui donne priorité à la mise à jour.
+Ils étendent les travaux antérieurs de \cite{chabinConsistentUpdatingDatabases2020}, qui proposaient une méthode en mémoire et nécessitant de recalculer l'ensemble de la base.
+Cest travaux utilisent la sémantique évoquée dans \cite{reiterSoundSometimesComplete1986} pour les données inconnues afin d'aborder le problème du maintien de la cohérence d'un point de vue logique.
+Il est possible de rencontrer des valeurs nulles dans les réponses aux requêtes, ce qui implique que, pour le moment, rien dans notre base de données ne nous permet de fournir leur instanciation.
+Elles peuvent également indiquer une connexion avec d'autres données.
+
+Afin de pouvoir traiter les applications à grande échelle, nous devons viser des solutions efficaces de traitement des données~\cite{sirangeloRepresentingQueryingIncomplete2014}, en mettant les solutions incrémentales sur le devant de la scène, en particulier lorsque l'on travaille avec de nouveaux modèles de données (comme c'est le cas dans le contexte XML~\cite{bouchouUpdatesIncrementalValidation2003,abraoIncrementalConstraintChecking2004,balminIncrementalValidationXML2004}).
+Dans le contexte des bases de données de graphes, l'approche de \cite{fanIncrementalizingGraphAlgorithms2021} propose une méthode pour "incrémentaliser" les algorithmes de graphes abstraits dans un modèle de point fixe.
+Comme nous l'avons vu précédemment, nous pouvons résumer notre méthode par l'expression suivante
+$\mathcal{D}' = core_{|NullBucket}(upd_{|U}((\mathcal{D}\diamondsuit U))$ où $U$ est l'ensemble des mises à jour requises par l'utilisateur.
+Cet ensemble est \emph{augmenté} par le biais d'un processus d'inférence qui génère des effets secondaires.
+La proposition présentée dans~\cite{fanIncrementalizingGraphAlgorithms2021} nécessite un ensemble \emph{complet} de mises à jour en entrée.
+En d'autres termes, notre opération de point fixe implique des changements dans l'ensemble des mises à jour, alors que dans~\cite{fanIncrementalizingGraphAlgorithms2021}, l'ensemble des mises à jour est fixe.
+Leur objectif est de calculer de manière incrémentale de nouvelles réponses sur un graphe mis à jour et non de mettre à jour le graphe de manière incrémentale.
+Comme le calcul de \gls{core} n'est pas un point fixe, il n'entre pas dans le champ d'application de~\cite{fanIncrementalizingGraphAlgorithms2021}.
+
+Dans la littérature, il est courant de limiter l'expressivité des contraintes pour éviter une génération infinie lors du \gls{chase}.
+L'utilisation de $\delta_{max}$ dans ces travaux permet de traiter des contraintes sous forme de \glspl{tgd} sans en réduire leur pouvoir d'expressivité.
+En outre, nous utilisons des simplifications pour maintenir l'instance de la base de données aussi petite que possible et pour éviter la présence de valeurs nulles redondante, c.-à-d. que la maintenance de la base de données consiste à conserver son \gls{core} (qui suit les idées de~\cite{faginDataExchangeGetting2005}) dont la mise en œuvre est assurée par une routine de simplification exécutée en association avec des routines de mise à jour.
+
+\paragraph{}
+L'approche a été implémentée et étudiée dans le cadre d'un modèle de base de données graphe et dans le cadre du modèle traditionnel de base de données relationnelle.
+Les résultats des expériences soulèvent des questions sur la représentation des valeurs nulles dans une base de données de graphes.
+En effet, ces travaux sont aussi un pas vers la mise à jour incrémentale attribuée aux graphes avec des données incomplètes.
+Il illustre l'impact de la conception des schémas de graphes sur les requêtes et, par conséquent, sur les performances d'une approche de mise à jour incrémentale qui repose sur deux requêtes principales : l'une qui recherche les valeurs nulles liées et l'autre qui recherche les atomes redondants ayant besoin d'être simplifiés.
+Le modèle de graphe de propriété joue un rôle de plus en plus important aujourd'hui, la gestion des valeurs nulles dans un tel modèle est liée à la définition du schéma et aux questions d'optimisation des requêtes qui doivent être explorées plus avant.
+Notre schéma de graphe est conçu pour optimiser la recherche des valeurs nulles liées qui est une opération couteuse dans le modèle relationnel et bien qu'anticipé, les performances du \gls{chase} dans le modèle graphe rendent son utilisation inappropriée pour de la modification en temps réel.
+Cela s'explique en partie par l'éclatement des atomes comme des sous graphes qui rend difficile l'exploration de ces derniers.
+
+Une approche plus conventionnelle pour représenter les graphes de propriétés pourrait être envisagée, en particulier si l'on parvient à résoudre la problématique de l'identité dans les graphes, une question explorée par \cite{fanDependenciesGraphs2019}.
+Il est aussi possible d'optimiser le schéma : des techniques visant à réduire la transversalité des arêtes sont mises en œuvre dans \cite{alotaibiPropertyGraphSchema2021}.
+Une alternative consiste aussi à exploiter la multidimensionalité des graphes en superposant plusieurs représentations.
+L'adoption d'un modèle de base de données hybride, tel que suggéré par \cite{hassanGRFusionGraphsFirstClass2018}, pourrait également être envisagée, à condition qu'il offre la flexibilité nécessaire pour gérer diverses représentations des données dans chaque modèle.
+Pour finir, une piste intéressante serait d'explorer l'adaptation des index utilisés dans les bases de données graphes pour les bases de données relationnelles.
+Cependant, le défi réside dans la capacité à maintenir ces représentations de manière efficace.
+Dans ce contexte, notre approche incrémentale se positionne comme un outil précieux, étant conçue pour être indépendante du modèle de données.

@@ -7,7 +7,7 @@ Ainsi, la nouvelle instance de base de données est définie comme $\mathcal{D}'
 
 \subsection{Insertion}
 \label{sec:update:insert}
-L'algorithme~\ref{algo:update:insert} décrit la procédure pour l'insertion d'un ensemble d'atomes instanciés $I$ dans l'instance de la base de données $\mathcal{D}$ selon l'ensemble de contraintes $\mathbb{C}$.
+On définit la procédure~\ref{algo:update:insert} qui permet l'insertion d'un ensemble d'atomes instanciés $I$ dans l'instance de la base de données $\mathcal{D}$ selon l'ensemble de contraintes $\mathbb{C}$ de façon incrémentale.
 Cette procédure commence par calculer les effets de bords résultant de l'insertion de l'ensemble $I$ d'atomes instanciés dans $\mathcal{D}$, en utilisant le mécanisme du \gls{chase} (ligne~\ref{algo:update:insert:chase}).
 Le \gls{core} de l'ensemble $\mathcal{D} \cup ToIns$ est ensuite calculé (ligne~\ref{algo:update:insert:core}) en prenant en compte uniquement :
 \begin{enumerate*}[label=(\alph*)]
@@ -21,48 +21,103 @@ Si $\delta(N) \geq \delta{\max}$, l'insertion est refusée et $\mathcal{D}$ rest
 Dans l'algorithme~\ref{algo:update:insert}, une vérification est effectuée pour s'assurer que toutes les valeurs nulles dans l'instance simplifiée ont un degré inférieur à $\delta_{\max}$ (vérification via $Q_{degree}$, ligne~\ref{algo:update:insert:testNull}).
 Si cette condition est satisfaite, les degrés des valeurs nulles sont remis à 0 (via $Q_{\delta}$, ligne~\ref{algo:update:insert:setDegree}), et $\mathcal{D}'$ est retournée comme instance modifiée.
 
-\begin{algorithm}[ht]
-    \caption{$\textsc{Insert}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$}
+\begin{procedure}[ht]
+    \caption{Insert($\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $I$)}
     \label{algo:update:insert}
-    $ToIns := \textsc{Chase4Insert}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$ \label{algo:update:insert:chase} \;
-    $NullBucket := \{N_j \mid N_j \text{ est une valeur nulle obtenue par } Q_{bucket}(\mathcal{D} \cup ToIns)\}$ \label{algo:update:insert:bucket} \;
-    $\mathcal{D}' := \textsc{Simplify}(\mathcal{D} \cup ToIns, NullBucket)$ \label{algo:update:insert:core} \;
-    \uIf{$Q_{degree}(\mathcal{D}')_{[NullBucket,\delta_{max}]}$ \label{algo:update:insert:testNull}}{
-        $Q_{\delta}(\mathcal{D}')_{[NullBucket,0]}$ \label{algo:update:insert:setDegree} \;
-        \Return $\mathcal{D}'$ \;
+    \SetKwFunction{simplify}{\ref{algo:update:core}}
+    \SetKwFunction{chaseIns}{\ref{algo:update:chase:insert}}
+
+    $ToIns \gets$ \chaseIns{$\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $I$} \label{algo:update:insert:chase} \;
+    $NullBucket \gets \{N_j \mid N_j$ est une valeur nulle obtenue par $Q_{bucket}(\mathcal{D} \cup ToIns)\}$ \label{algo:update:insert:bucket} \;
+    $\mathcal{D}' \gets$ \simplify{$\mathcal{D} \cup ToIns$, $NullBucket$} \label{algo:update:insert:core} \;
+    \uIf{$Q_{degree}^{[NullBucket,\delta_{max}]}(\mathcal{D}')$ \label{algo:update:insert:testNull}}{
+    \tcp{L'insertion est valide, on remet la profondeur des valeurs nulles a 0}
+    $Q_{\delta}^{[NullBucket,0]}(\mathcal{D}')$ \label{algo:update:insert:setDegree} \;
+    \Return $\mathcal{D}'$ \;
     }
     \Else{
+        \tcp{L'insertion n'est pas possible sans générer trop de valeurs nulles.\\Elle est refusée et on annule la modification}
         \Return $\mathcal{D}$ \;
     }
-\end{algorithm}
+\end{procedure}
 
 \begin{example}
+    Soit l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:insert:c1}, \ref{ex:update:insert:c2}, \ref{ex:update:insert:c3}, \ref{ex:update:insert:c4}, \ref{ex:update:insert:c5}, \ref{ex:update:insert:c6}$\}$, $\delta_{max} = 3$ et l'instance $\mathcal{D}$ donné figure~\ref{fig:update:db:runex} (page~\pageref{fig:update:db:runex}).
 
+    \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
+        \item $getTreatment(x, y), forPatho^-(y, z) \to hasPatho(x, z)$ \label{ex:update:insert:c1}
+        \item $Exam(x, y, z, u) \to Reveal(z, v)$ \label{ex:update:insert:c2}
+        \item $Exam(x, y, z, u) \to Patient(x, v, w)$ \label{ex:update:insert:c3}
+        \item $getTreatment(x, y) \to forPatho(y, z)$ \label{ex:update:insert:c4}
+        \item $getTreatment(x, y) \to Patient(x, v, w)$ \label{ex:update:insert:c5}
+        \item $hasPatho(x, y) \to Patient(x, v, w)$ \label{ex:update:insert:c6}
+    \end{enumerate}
+
+    En exécutant la procédure~\ref{algo:update:insert} pour l'insertion de l'ensemble $I = \{ Exam(N_1, N_5, E_1, \text{01-01-01}),$ $Parameter(\text{température}, 38),$ $Reveal(E_1, \text{fièvre}) \}$.
+    Durant le \gls{chase} à la ligne~\ref{algo:update:insert:chase}, la contrainte \ref{ex:update:insert:c3} est déclenchée et produit l'atome $Patient(N_1, N_6^1, N_7^1)$.
+    On obtient alors $ToIns = \{ Exam(N_1, N_5^0, E_1, \text{01-01-01}),$ $Parameter(\text{température}, 38),$ $Reveal(E_1, \text{fièvre}),$ $Patient(N_1, N_6^1, N_7^1) \}$.
+
+    Pour calculer le \gls{core} de $\mathcal{D} \cup ToIns$, la procédure commence par calculer l'ensemble $NullBucket$ à la ligne \ref{algo:update:insert:bucket} en utilisant la requête $Q_{bucket}$.
+    On obtient l'ensemble suivant de valeurs nulles à vérifier $NullBucket = \{N_1, N_2, N_3, N_4, N_5, N_6, N_7\}$.
+    On récupère à la fois les valeurs nulles nouvellement crées et les valeurs nulles potentiellement simplifiables.
+    La procédure~\ref{algo:update:core} (ligne~\ref{algo:update:insert:core}) simplifie l'instance en $\mathcal{D}'$.
+
+    \begin{align*}
+        \mathcal{D} = \{ & Patient(N_1, \text{homme}, 78), Exam(N_1, N_5, E_1, \text{01-01-01}), Parameter(E_1, \text{température}, 38),                             \\
+                         & Reveal(E_1, \text{fièvre}), hasPatho(N_1, \text{cancer}), getTreatment(N_1, \text{résection}), forPatho(\text{résection}, \text{cancer}), \\
+                         & leadsTo(\text{cancer}, \text{métastase}), concernAna(\text{cancer}, \text{prostate}), Anatomie(\text{prostate}) \}
+    \end{align*}
+
+    Étant donné qu'aucune valeur nulle ne dépasse le degré maximum (ligne~\ref{algo:update:insert:testNull}), la nouvelle instance est validée.
+    Il est à noté que comme le dégréé des valeurs nulles n'est utilisé que durant le \gls{chase}, il est remis à $0$ à la ligne~\ref{algo:update:insert:setDegree} avant de retourner l'instance modifiée.
 \end{example}
 
 \subsection{Suppression}
 \label{sec:update:delete}
-L'algorithme~\ref{algo:update:delete} détaille la méthode incrémentale pour effectuer la suppression d'un ensemble d'atomes instanciés $I$ dans une instance de base de donnée $\mathcal{D}$.
-À la ligne~\ref{del:iso}, la requête $Q_{Iso}$ récupère tous les atomes de $\mathcal{D}$ isomorphes à un atome de l'ensemble $I$.
-Par exemple, si $I = {P(a, N_1)}$ et $\mathcal{D}1= {P(a, N_5)}$, la requête $Q{Iso}$ renverrait ${P(a, N_5)}$.
-À la ligne~\ref{del:chase}, la fonction \textsc{Chase4Delete} est utilisée pour calculer de manière incrémentale les effets secondaires.
+La procédure~\ref{algo:update:delete} effectue la suppression d'un ensemble d'atomes instanciés $I$ dans une instance de base de donnée $\mathcal{D}$ de façon incrémentale.
+À la ligne~\ref{algo:update:delete:iso}, la requête $Q_{Iso}$ récupère tous les atomes de $\mathcal{D}$ isomorphes à un atome de l'ensemble $I$.
+Par exemple, si $I = {P(a, N_1)}$ et $\mathcal{D}1= {P(a, N_5)}$, la requête $Q_{Iso}$ renverrait ${P(a, N_5)}$.
+À la ligne~\ref{algo:update:delete:chase}, la procédure~\ref{algo:update:chase:delete} est utilisée pour calculer de manière incrémentale les effets secondaires.
 Cette fonction génère deux ensembles d'atomes, $ToDel$ et $ToIns$, représentant respectivement les atomes à supprimer et à insérer comme effets secondaires.
-Une fois que ces effets secondaires ont été appliqués à $\mathcal{D}$ pour obtenir $\mathcal{D}'$ (ligne~\ref{del:buildInstance}), la nouvelle instance est simplifiée de manière similaire à l'insertion, en calculant le \gls{core}.
-Les nullités impactées sont générées à la ligne~\ref{del:bucket}, et l'instance simplifiée est calculée à la ligne~\ref{del:core}.
+Une fois que ces effets secondaires ont été appliqués à $\mathcal{D}$ pour obtenir $\mathcal{D}'$ (ligne~\ref{algo:update:delete:buildInstance}), la nouvelle instance est simplifiée de manière similaire à l'insertion, en calculant le \gls{core}.
+Les nullités impactées sont générées à la ligne~\ref{algo:update:delete:bucket}, et l'instance simplifiée est calculée à la ligne~\ref{algo:update:delete:core}.
 Contrairement aux insertions, les suppressions ne sont jamais rejetées : la procédure est garantie de se terminer, produisant au pire des cas une instance vide.
-Ceci est assuré par la procédure de \textsc{Chase4Delete}, qui marquera les nouveaux atomes générés dépassant le dégréé de nullité maximum $\delta_{max}$ comme étant à supprimer, garantissant ainsi la terminaison de la procédure.
+Ceci est assuré par la procédure~\ref{algo:update:chase:delete}, qui marquera les nouveaux atomes générés dépassant le dégréé de nullité maximum $\delta_{max}$ comme étant à supprimer, garantissant ainsi la terminaison de la procédure.
 
-\begin{algorithm}[ht]
-    \caption{$\textsc{Delete}(\mathcal{D}, \mathbb{C}, \delta_{max}, I)$}
+\begin{procedure}[ht]
+    \caption{Delete($\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $I$)}
     \label{algo:update:delete}
-    $del_{iso} := Q_{iso}^{[I]}(\mathcal{D})$ \;
-    $ToDel, ToIns := \textsc{Chase4Delete} (\mathcal{D}, \mathbb{C}, \delta_{max}, del_{iso})$\;
-    $\mathcal{D}' := (\mathcal{D} \cup ToIns) \setminus ToDel$ \;
-    $NullBucket := \{N_j \mid N_j \text{ est une valeur nulle obtenue par } q_{bucket}(\mathcal{D}')_{[ToIns \cup ToDel]}\}$ \;
-    $\mathcal{D}' := \textsc{Simplify}(\mathcal{D}', NullBucket)$ \;
+    \SetKwFunction{simplify}{\ref{algo:update:core}}
+    \SetKwFunction{chaseDel}{\ref{algo:update:chase:delete}}
+
+    $del_{iso} \gets Q_{iso}^{[I]}(\mathcal{D})$ \label{algo:update:delete:iso} \;
+    $ToDel, ToIns \gets$ \chaseDel{$\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $del_{iso}$} \label{algo:update:delete:chase} \;
+    $\mathcal{D}' \gets (\mathcal{D} \cup ToIns) \setminus ToDel$ \label{algo:update:delete:buildInstance} \;
+    $NullBucket \gets \{N_j \mid N_j$ est une valeur nulle obtenue par $Q_{bucket}^{[ToIns \cup ToDel]}(\mathcal{D}')\}$ \label{algo:update:delete:bucket} \;
+    $\mathcal{D}' \gets$ \simplify{$\mathcal{D}'$, $NullBucket$} \label{algo:update:delete:core} \;
+    $Q_{\delta}^{[NullBucket,0]}(\mathcal{D}')$ \label{algo:update:delete:setDegree} \;
     \Return $\mathcal{D}'$
-\end{algorithm}
+\end{procedure}
 
 \begin{example}
+    Soit l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:insert:c1}, \ref{ex:update:insert:c2}, \ref{ex:update:insert:c3}, \ref{ex:update:insert:c4}, \ref{ex:update:insert:c5}, \ref{ex:update:insert:c6}$\}$ définie dans la section~\ref{sec:update:insert}, $\delta_{max} = 3$ et l'instance $\mathcal{D}$ donné figure~\ref{fig:update:db:runex} (page~\pageref{fig:update:db:runex}).
 
+    En exécutant la procédure~\ref{algo:update:delete} pour la suppression de l'ensemble $I = \{ hasPatho(N_5, \text{cancer}) \}$.
+    La première étape à la ligne~\ref{algo:update:delete:iso} est de récupérer l'ensemble des atomes isomorphes à la suppression (ici on cherche à supprimer toutes les instances de $hasPatho$ pour la pathologie cancer).
+    On obtient alors $el_{iso} = \{ hasPatho(N_1, \text{cancer}) \}$.
+    Le \gls{chase} à la ligne~\ref{algo:update:delete:chase} commence par déclencher la contrainte \ref{ex:update:insert:c1} ajoute la suppression de l'atome $forPatho(\text{résection}, \text{cancer})$.
+    Cette suppression entraine le déclenchement de la contrainte \ref{ex:update:insert:c4} qui produit l'atome $forPatho(\text{résection}, N_6^1)$ puis $hasPatho(N_1, N_6^1)$ via la contrainte \ref{ex:update:insert:c1}.
+    On obtient alors $ToDel = \{ hasPatho(N_1, \text{cancer}),$ $forPatho(\text{résection}, \text{cancer}) \}$ et $ToIns = \{ forPatho(\text{résection}, N_6^1),$ $hasPatho(N_1, N_6^1) \}$.
+
+    Pour calculer le \gls{core} de $(\mathcal{D} \setminus ToDel) \cup ToIns$, la procédure commence par calculer l'ensemble $NullBucket$ à la ligne \ref{algo:update:delete:bucket} en utilisant la requête $Q_{bucket}$.
+    On obtient l'ensemble suivant de valeurs nulles à vérifier $NullBucket = \{N_1, N_2, N_3, N_4, N_6\}$.
+    La procédure~\ref{algo:update:core} (ligne~\ref{algo:update:delete:core}) simplifie l'instance en $\mathcal{D}'$.
+
+    \begin{align*}
+        \mathcal{D} = \{ & Patient(N_1, \text{homme}, 78), Exam(N_1, N_2, N_3, \text{01-01-01}), Parameter(N_3, \text{température}, N_4),        \\
+                         & Reveal(N_3, \text{fièvre}), hasPatho(N_1, N_6), getTreatment(N_1, \text{résection}), forPatho(\text{résection}, N_6), \\
+                         & leadsTo(\text{cancer}, \text{métastase}), concernAna(\text{cancer}, \text{prostate}), Anatomie(\text{prostate}) \}
+    \end{align*}
+
+    L'instance est retournée après remise à zéro du degré des valeurs nulles (ligne~\ref{algo:update:delete:setDegree}).
 \end{example}

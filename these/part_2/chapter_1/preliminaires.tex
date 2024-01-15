@@ -122,7 +122,7 @@ Ces arbres sont obtenus à l'aide d'apprentissages automatiques entrainés à pa
 L'ensemble des labels utilisés dépend des corpus utilisés et de la langue.
 Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependencies.org/}} est un guide d'annotation très répandu.
 
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \begin{subfigure}{\textwidth}
         \centering
@@ -202,7 +202,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
     L'arbre de destination \gls{rhs} à une correspondance avec le modèle \gls{lhs}, ici intuitivement claire : $U \mapsto U$ et $x \mapsto x$.
     En cas d'application de la règle, le sous arbre $A$ est supprimé de $T$.
 
-    \begin{figure}[H]
+    \begin{figure}[htb]
         \centering
         \begin{subfigure}{0.4\textwidth}
             \centering
@@ -217,7 +217,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
         \hfill
         \begin{subfigure}{0.1\textwidth}
             \centering
-            \huge{$\Rightarrow$}
+            \huge{$\longrightarrow$}
         \end{subfigure}
         \hfill
         \begin{subfigure}{0.4\textwidth}
@@ -237,7 +237,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
     Si on considère l'arbre $T$ donné figure~\ref{fig:sch:pre:rewritting:ex:origin}, avec l'application de la règle $rule(0.2)$, où $u=0$ et $i=2$, on obtient $\sigma(x) = [A, B]$.
     Le résultat de l'application et l'arbre figure~\ref{fig:sch:pre:rewritting:ex:target}.
 
-    \begin{figure}[H]
+    \begin{figure}[htb]
         \centering
         \begin{subfigure}{0.4\textwidth}
             \centering
@@ -253,7 +253,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
         \hfill
         \begin{subfigure}{0.1\textwidth}
             \centering
-            \huge{$\Rightarrow$}
+            \huge{$\Longrightarrow$}
         \end{subfigure}
         \hfill
         \begin{subfigure}{0.4\textwidth}
@@ -267,7 +267,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
             \caption{Arbre réécrit}
             \label{fig:sch:pre:rewritting:ex:target}
         \end{subfigure}
-        \caption{Exemple d'une règle de réécriture}
+        \caption{Exemple d'application d'une règle de réécriture}
         \label{fig:sch:pre:rewritting:ex}
     \end{figure}
 \end{example}
