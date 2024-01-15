@@ -133,13 +133,14 @@ AND NOT EXISTS { !\label{query:update:chase:not-exist}!
       MATCH ($a$:Atom {symbol: "$L_0$"}),
       $(\forall i, 0 \leq i \leq |\alpha_0|)$ ($a_i$)-[:`$L_i$` {rank: $j$}]->($e_i$)
 } RETURN DISTINCT {$(\forall k, 0 \leq k_N \leq \lvert \alpha \rvert)$ $\alpha|_k$:$x_k$.value}
-\end{lstlisting}
-
-\begin{tikzpicture}[remember picture, overlay]
+!\begin{tikzpicture}[remember picture, overlay]
     \node [right = .5em of pic cs:line-qchase-1-end, yshift=.4em] (sub) {\ref{algo:update:chase:insert:c1}};
     \drawBrace{pic cs:line-qchase-2-end}{pic cs:line-qchase-4-end}{\ref{algo:update:chase:insert:c2}}
     \drawBrace{pic cs:line-qchase-5-end}{pic cs:line-qchase-7-end}{\ref{algo:update:chase:insert:c3}}
-\end{tikzpicture}
+\end{tikzpicture}!
+\end{lstlisting}
+
+\FloatBarrier
 
 \begin{example}[\gls{chase}]
     \label{ex:update:chase:query}
