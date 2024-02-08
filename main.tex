@@ -7,12 +7,16 @@
 % Classe du document : book :
 \documentclass[a4paper,10pt,french]{extbook}
 
+\pdfinclusioncopyfonts=1
+\pdfgentounicode=1
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages :
 \usepackage{etex}
 \usepackage[utf8]{inputenc}          % Attention encodage => UTF 8
 \usepackage[T1]{fontenc}             % Codage de caractères T1
 \usepackage{lmodern}
+\usepackage{cmap}
 
 \rmfamily
 
@@ -77,10 +81,9 @@
 \usepackage{capt-of}
 \usepackage{circledsteps}
 \usepackage{framed}
-
 \usepackage[acronym,shortcuts,translate=babel]{glossaries}
-
 \usepackage[type={CC},modifier={by-nc-nd},lang=french,version={4.0}]{doclicense}
+\usepackage{hyperxmp}
 
 % Bib
 \selectbiblanguage{french}
@@ -200,10 +203,15 @@
 }
 
 % Theorems
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}[section]
+
 \theoremstyle{definition}
 \newtheorem{example}{Exemple}[section]
 \newtheorem{definition}{Definition}[section]
-\newtheorem{proposition}{Proposition}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remarque}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % En tete et pied de page :
@@ -246,6 +254,30 @@
   \\
   Version 0
 }
+
+\hypersetup{
+  unicode,
+  breaklinks,
+  bookmarksopen,
+  pdfapart=2,
+  pdfaconformance=B,
+  pdflicenseurl={https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr},
+  pdfauthor={Nicolas HIOT},
+  pdfcontactaddress={419 Av. de France},
+  pdfcontactpostcode={75013},
+  pdfcontactcity={Paris},
+  pdfcontactcountry={France},
+  pdfcontactemail={nhiot@ennov.com},
+  pdftitle={Construction automatique de bases de donnée pour le domaine m\'edical},
+  pdfsubtitle={Int\'egration de texte et maintien de la coh\'erence},
+  pdfpubstatus={AO},
+}
+
+%\XMPLangAlt{en}{
+%  pdflicenseurl={https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en},
+%  pdftitle={Automated construction of databases for the medical domain},
+%  pdfsubtitle={Integrating text and maintaining consistency},
+%}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Page de garde :

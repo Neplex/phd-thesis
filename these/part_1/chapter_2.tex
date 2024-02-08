@@ -1,3 +1,11 @@
+Ce chapitre est consacré à la description de notre méthode de mise à jour incrémentale sur des bases de données graphes.
+Il débute par la liste des contributions (section~\ref{sec:update:contrib}) et continue sur la modélisation de la base (section~\ref{sec:update:db}) pour ensuite présenter nos solutions incrémentales pour réduire la redondance (section~\ref{sec:update:simplify}) et calculer les effets de bord (section~\ref{sec:update:chase}).
+Après la présentation des procédures d'insertion et de suppression (section~\ref{sec:update:update}), nous présenterons des résultats expérimentaux (section~\ref{sec:update:evaluation}) en comparant une implémentation sur un \gls{sgbd} relationnel avant de conclure le chapitre (section~\ref{sec:update:conclusion}).
+
+\section{Contributions}
+\label{sec:update:contrib}
+\subfile{chapter_2/contributions}
+
 \section{Modélisation de la base de données sous Neo4J}
 \label{sec:update:db}
 \subfile{chapter_2/graph_design}

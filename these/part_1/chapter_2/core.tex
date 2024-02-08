@@ -1,15 +1,15 @@
 Comme expliqué dans la section~\ref{sec:update:pre:db}, une base de données $\mathcal{D}$ doit être minimale, c.-à-d. égale à son \gls{core} afin d'éviter la redondance des données.
 La minimalité doit être maintenue à chaque mise à jour et de façon incrémentale.
-Pour ce faire, des algorithmes incrémentaux sont proposé avec pour objectif de recalculer le \gls{core}  de la base uniquement en fonction des valeurs nulles impacté par la mise à jour.
+Pour ce faire, des algorithmes incrémentaux sont proposés avec pour objectif de recalculer le \gls{core}  de la base uniquement en fonction des valeurs nulles impactées par la mise à jour.
 Formellement, étant donné un ensemble d'atomes $I$ et un ensemble de valeurs nulles $\nu$ existant dans $I$, on recherche un homomorphisme $h$ tel que : pour toutes valeurs nulles $N \notin \nu$, $h(N) = N$, $h(I)$ est minimal et $h(I) \subseteq I$.
-L'exemple \ref{ex:update:nulls-simp} montre cependant que le choix de $\nu$ n'est pas arbitraire.
+L'exemple suivant montre cependant que le choix de $\nu$ n'est pas arbitraire.
 
 \begin{example}
 	\label{ex:update:nulls-simp}
-	En considérant l'ensemble non minimal $I = \{P(a, N_1),$ $P(N_1, N_2),$ $P(a, b),$ $P(b, c),$ $P(a, N_3)\}$, si l'ensemble $\nu = {N_1}$, alors seuls les atomes $P(a, N_1)$ et $P(N_1, N_2)$ sont à prendre en compte pour la simplification.
+	En considérant l'ensemble non minimal $I = \{P(a, N_1),$ $P(N_1, N_2),$ $P(a, b),$ $P(b, c),$ $P(a, N_3)\}$, si l'ensemble $\nu = \{N_1\}$, alors seuls les atomes $P(a, N_1)$ et $P(N_1, N_2)$ sont à prendre en compte pour la simplification.
 	Cependant, aucune simplification n'existe en prenant uniquement en compte l'élément $N_1$, il est également nécessaire de considérer la valeur nulle $N_2$.
-	Pour parvenir à la simplification souhaitée de l'ensemble $I$, l'ensemble $\nu$ doit être élargi pour obtenir $\nu' = {N_1, N_2}$.
-	En utilisant $\nu'$, on peut établir un homomorphisme $h = \langle N_1 \mapsto b, N_2 \mapsto c, N_3 \mapsto N_3 \rangle$ qui assure la minimalité de l'ensemble $h(I) = {P(a, b), P(b, c), P(a, N_3)}$ par rapport à l'ensemble $\nu$.
+	Pour parvenir à la simplification souhaitée de l'ensemble $I$, l'ensemble $\nu$ doit être élargi pour obtenir $\nu' = \{N_1, N_2\}$.
+	En utilisant $\nu'$, on peut établir un homomorphisme $h = \langle N_1 \mapsto b, N_2 \mapsto c, N_3 \mapsto N_3 \rangle$ qui assure la minimalité de l'ensemble $h(I) = \{P(a, b), P(b, c), P(a, N_3)\}$ par rapport à l'ensemble $\nu$.
 	Il est important de noter que l'atome $P(a, N_3)$ ne fait pas l'objet d'une simplification, car l'élément $N_3$ ne figure pas dans l'ensemble $\nu'$ des valeurs nulles prises en considération.
 \end{example}
 
@@ -30,15 +30,17 @@ Cet ensemble est la limite de la séquence $(\textsf{LinkedNull}^k_{I,N})_{k \ge
 % \end{align}
 
 \begin{proposition}
-	Il est facile de voir que pour tout $k \geq 0$, $\textsf{LinkedNull}^k_{I,N} \subseteq \textsf{LinkedNull}^{k+1}_{I,N}$ et que $\textsf{LinkedNull}^k_{I,N} \subseteq I$.
+	\label{prop:update:core:linkednulls}
+	Pour tout $k \geq 0$, $\textsf{LinkedNull}^k_{I,N} \subseteq \textsf{LinkedNull}^{k+1}_{I,N}$ et $\textsf{LinkedNull}^k_{I,N} \subseteq I$.
 	La séquence $(\textsf{LinkedNull}^k_{I,N})_{k \ge 0}$ est donc monotone et bornée par $I$.
-	Comme $I$ est fini, la séquence à une unique limite qui est un sous-ensemble de $I$ noté $\textsf{LinkedNull}_{I,N}$.
-	La redondance peut donc être uniquement vérifiée sur l'ensemble d'atomes défini par $\bigcup_{N \in \nu_0}\textsf{LinkedNull}_{I,N}$ et l'ensemble $\nu$ de valeurs nulles dans cet ensemble.
+	Comme $I$ est fini, la séquence a une unique limite qui est un sous-ensemble de $I$ noté $\textsf{LinkedNull}_{I,N}$.
 \end{proposition}
+
+La proposition~\ref{prop:update:core:linkednulls} montre que la redondance peut être uniquement vérifiée sur l'ensemble d'atomes défini par $\bigcup_{N \in \nu_0}\textsf{LinkedNull}_{I,N}$ et l'ensemble $\nu$ de valeurs nulles dans cet ensemble.
 
 % \paragraph{\gls{cypher}}
 \subsection{Requête sur le graphe}
-L'ensemble $\textsf{LinkedNull}_{\mathcal{D}}$ (où $\mathcal{D}$ est la base de données) est calculé à l'aide de la requête \gls{cypher} figure~\ref{fig:update:core:query}.
+L'ensemble $\textsf{LinkedNull}_{\mathcal{D}}$ (où $\mathcal{D}$ est la base de données) est calculé à l'aide de la requête \gls{cypher} présenté dans l'extrait~\ref{fig:update:core:query}.
 Il s'agit d'une requête paramétrée, reconnaissable par la présence d'une variable préfixé du symbole \verb|$|.
 L'opérateur \verb|UNWIND| (ligne~\ref{fig:update:core:query:unwind}) permet de convertir une variable de type liste en une table de résultat.
 Le \verb|MATCH| (ligne~\ref{fig:update:core:query:match}) recherche, dans le graphe, les homomorphismes du motif décrit.
@@ -67,7 +69,7 @@ Les ensembles de nœuds sont séparés (ligne~\ref{fig:update:core:query:with}) 
 L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requête chaque atome associé à l'ensemble des valeurs nulles auquel ils sont attachés.
 
 \begin{example}
-	Dans le graphe d'instance donné figure~\ref{fig:update:db:runex}, la récupération de l'ensemble $\textsf{LinkedNull}_{\mathcal{D}, N_1}$ en utilisant la requête figure~\ref{fig:update:core:query} se traduit par l'exécution pas à pas suivante :
+	Dans le graphe d'instance donné dans la Figure~\ref{fig:update:db:runex}, la récupération de l'ensemble $\textsf{LinkedNull}_{\mathcal{D}, N_1}$ en utilisant la requête de l'extrait~\ref{fig:update:core:query} se traduit par l'exécution pas à pas suivante :
 	\begin{enumerate}[label=\emph{Etape~\arabic*},leftmargin=*]
 		\item L'opération \verb|MATCH WHERE| ligne~\ref{fig:update:core:query:match} retourne la table d'instanciation suivante de tous les chemins \verb|pathP| partant de $N_1$ de taille maximale 6 (car 3 valeurs nulles sont présentes dans l'instance) ne contenant que des valeurs nulles et des atomes.
 		      \begin{center}
@@ -77,10 +79,11 @@ L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requ�
 				      \hline
 				      $n_{1}$              & $n_{21}$       & $[n_{1}, r_{1}, n_{21}]$                                                  \\
 				      $n_{1}$              & $n_{22}$       & $[n_{1}, r_{3}, n_{22}]$                                                  \\
-				      $n_{1}$              & $n_{26}$       & $[n_{1}, r_{11}, n_{21}]$                                                 \\
+				      $n_{1}$              & $n_{26}$       & $[n_{1}, r_{11}, n_{26}]$                                                 \\
 				      $n_{1}$              & $n_{28}$       & $[n_{1}, r_{15}, n_{28}]$                                                 \\
 				      $n_{1}$              & $n_{8}$        & $[n_{1}, r_{15}, n_{28}, r_{16}, n_{8}]$                                  \\
 				      $n_{1}$              & $n_{10}$       & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}]$                                 \\
+				      $n_{1}$              & $n_{29}$       & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}, r_{19}, n_{29}]$                                 \\
 				      $n_{1}$              & $n_{30}$       & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}, r_{21}, n_{30}]$                 \\
 				      $n_{1}$              & $n_{13}$       & $[n_{1}, r_{15}, n_{28}, r_{18}, n_{10}, r_{21}, n_{30}, r_{23}, n_{13}]$ \\
 				      \hline
@@ -111,7 +114,7 @@ L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requ�
 		      \end{center}
 
 		\item Pour finir on retourne l'ensemble des atomes associé à l'ensemble \textsf{LinkedNull} auquel ils appartiennent.
-		      L'opérateur \verb|UNWIND| transpose la liste \verb|linkedNulls| en lignes de la table dupliquant les autres attributs pour chaque entrée.
+		      L'opérateur \verb|UNWIND| transpose la liste \verb|linkedAtoms| en lignes de la table dupliquant les autres attributs de la table d'origine pour chaque entrée (ici, \verb|linkedNulls|).
 		      \begin{center}
 			      \begin{tabular}{lll}
 				      \hline
@@ -131,14 +134,15 @@ L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requ�
 
 % \paragraph{Simplification}
 \subsection{Simplification}
-La procédure pour éliminer la redondance sur un ensemble d'atomes $I$ en fonction d'un ensemble de valeurs nulles $\nu_0$ est donné par la procédure~\ref{algo:update:core}.
-Ligne~\ref{algo:update:core:pset}, les ensembles d'atomes, liée par des valeurs nulles et qui contiennent au moins une valeur nulle présente dans $\nu_0$, sont calculés.
-L'ensemble des valeurs nulles de $PSet$ est donc l'ensemble $\nu$.
+La procédure pour éliminer la redondance sur un ensemble d'atomes $I$ en fonction d'un ensemble de valeurs nulles $\nu_0$ est donné par la procédure~\ref{algo:update:core} (page~\pageref{algo:update:core}).
+À la ligne~\ref{algo:update:core:pset}, les ensembles d'atomes, liée par des valeurs nulles et qui contiennent au moins une valeur nulle présente dans $\nu_0$, sont calculés.
+% L'ensemble des valeurs nulles de $PSet$ est donc l'ensemble $\nu$.
 À la ligne~\ref{algo:update:core:qcore}, pour chaque ensemble d'atomes $P$, on construit la requête $Q_{core}(X) \gets \phi(X)$ où $\phi$ est l'ensemble des atomes de $P$ dans lequel chaque valeur nulle $N_i$ est remplacé par la variable correspondante $x_i$.
-En d'autres termes, la requête $Q_{core}$ retourne l'ensemble des homomorphismes sur les valeurs nulles de $P$.
+La requête $Q_{core}$ retourne l'ensemble des homomorphismes sur les valeurs nulles de $P$.
 Si plusieurs homomorphismes sont retournés par la requête, cela signifie qu'il existe plusieurs instanciations possibles de $P$ et qu'il faut le simplifier, car $P$ est redondant.
 Dans ce cas, il faut choisir l'instanciation (ou homomorphisme) la \textit{plus spécifique} (ligne~\ref{algo:update:core:mostspecific}) et supprimer les atomes redondants (ligne~\ref{algo:update:core:select}).
 Si l'on ne prend pas l'instanciation la \textit{plus spécifique} il faudra la simplifier à nouveau.
+La situation est illustrée par l'exemple suivant.
 
 \begin{procedure}[htb]
 	\caption{Simplify($I$, $\nu_0$)}
@@ -156,9 +160,26 @@ Si l'on ne prend pas l'instanciation la \textit{plus spécifique} il faudra la s
 	\Return $I$\;
 \end{procedure}
 
+\begin{example}
+	\label{ex:update:core:tableau}
+	En prenant comme exemple l'instance $I = \{B(N_1, N_2), B(a, N_2), B(a, b), C(N_2, N_2),$ $C(N_2, N_3), C(a, b)\}$, avec $P = {B(N_1, N_2), B(a, N_2), C(N_2, N_2), C(N_2, N_3)}$ pour $P \in \textsf{LinkedNull}_{I,N_1}$.
+	On commence par la construction de la requête $Q_{core}^{[P]}(I) \gets B(x_1, x_2), B(a, x_2), C(x_2, x_2), C(x_2, x_3)$, dont les réponses sont présentées dans la table $H_P$ suivante :
+
+	\begin{center}
+		\begin{tabular}{c|ccc}
+			$H_P$ & $x_1$ & $x_2$ & $x_3$ \\
+			\hline
+			$h_1$ & $N_1$ & $N_2$ & $N_3$ \\
+			$h_2$ & $N_1$ & $N_2$ & $N_2$ \\
+			$h_3$ & $a$   & $N_2$ & $N_3$ \\
+			$h_4$ & $a$   & $N_2$ & $N_2$ \\
+		\end{tabular}
+	\end{center}
+\end{example}
+
 Étant donné deux homomorphismes $h_1$ et $h_2$ sur le même alphabet $\Sigma$ : $h_1$ est dit \textit{moins spécifique} que $h_2$, noté $h_1 \prec h_2$, s'il existe un homomorphisme $h$ sur $\Sigma$ tel que $h \circ h_1 = h_2$ (c.-à-d. qu'il existe une transformation de $h_1$ vers $h_2$ nommée $h$).
-$p$ est le nombre de valeurs nulles $N_j$ distinctes dans $P = \textsf{LinkedNull}_{I,N}$ et $q$ est le nombre d'homomorphismes $h_i$ retournés par la requête $Q_core$ avec $h_1$ étant l'identité de $P$.
-En particulier, il est important de noter qu'il peut exister plusieurs homomorphismes plus spécifiques.
+Soit, $p$ le nombre de valeurs nulles $N_j$ distinctes dans $P = \textsf{LinkedNull}_{I,N}$ et $q$ le nombre d'homomorphismes $h_i$ retournés par la requête $Q_{core}$ avec $h_1$ étant l'identité de $P$.
+Il est important de noter qu'il peut exister plusieurs homomorphismes plus spécifiques.
 Le choix n'est pas important et il suffit de récupérer l'un des homomorphismes les plus spécifiques.
 Pour trouver un des homomorphismes le plus spécifique sur $P$, on construit la table $H_P$ de $p$ colonnes et $q$ lignes où $H_P[i, j] = h_i(N_j)$.
 Dans la table $H_P$, $h_i \preceq h_{i'}$ si et seulement si, pour tout $j$ :
@@ -174,25 +195,11 @@ De plus, il est montré dans \cite{chabinIncrementalConsistentUpdating2023} que 
 
 \begin{enumerate}
 	\item $h_i$ est idempotent, c.-à-d. que $h_i \circ h_i = h_i$ ;
-	\item $h_i$ possède le nombre maximum de constantes ou de valeurs nulles extérieur à $P$ et possède le moins de valeurs nulles différentes.
+	\item $h_i$ possède le nombre maximum de constantes ou de valeurs nulles extérieures à $P$ et possède le moins de valeurs nulles différentes.
 \end{enumerate}
 
 \begin{example}
-	En prenant comme example l'instance $I = \{B(N_1, N_2), B(a, N_2), B(a, b), C(N_2, N_2),$ $C(N_2, N_3), C(a, b)\}$, avec $P = {B(N_1, N_2), B(a, N_2), C(N_2, N_2), C(N_2, N_3)}$ pour $P \in \textsf{LinkedNull}_{I,N_1}$.
-	On commence par la construction de la requête $Q_{core}^{[P]}(I) \gets B(x_1, x_2), B(a, x_2), C(x_2, x_2), C(x_2, x_3)$, dont les réponses sont présentées dans la table $H_P$ suivante :
-
-	\begin{center}
-		\begin{tabular}{c|ccc}
-			$H_P$ & $x_1$ & $x_2$ & $x_3$ \\
-			\hline
-			$h_1$ & $N_1$ & $N_2$ & $N_3$ \\
-			$h_2$ & $N_1$ & $N_2$ & $N_2$ \\
-			$h_3$ & $a$   & $N_2$ & $N_3$ \\
-			$h_4$ & $a$   & $N_2$ & $N_2$ \\
-		\end{tabular}
-	\end{center}
-
-	L'homomorphisme $h_1$ représente l'identité de $P$ et est toujours retourné par la requête $Q_{core}$.
+	En considérant la table $H_P$ de l'exemple~\ref{ex:update:core:tableau}, l'homomorphisme $h_1$ représente l'identité de $P$ et est toujours retourné par la requête $Q_{core}$.
 	En se servant de cette table, il est possible de déterminer les relations suivantes :
 
 	\begin{itemize}

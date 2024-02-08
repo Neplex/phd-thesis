@@ -1,4 +1,4 @@
-La proposition de mise à jour incrémentale sur des bases de données graphes est implémentée sur le gestionnaire de base de données graphes \gls{neo4j} en définissant un ensemble de requêtes \gls{cypher}.
+La proposition de mise à jour incrémentale sur des bases de données graphe est implémentée sur le gestionnaire de base de données graphe \gls{neo4j} en définissant un ensemble de requêtes \gls{cypher}.
 La maintenance décrite dans \cite{chabinConsistentUpdatingDatabases2020} relève un cout important pour la récupération des atomes liés par des valeurs nulles (le calcul de l'ensemble \textsc{LinkedNull}).
 L'utilisation de base de données graphe ajoute une possibilité d'optimisation de cette opération.
 Le modèle de graphe doit mettre en avant ces relations entre les valeurs nulles et faciliter la recherche des homomorphismes.
@@ -22,36 +22,77 @@ Le modèle de graphe doit mettre en avant ces relations entre les valeurs nulles
 
 % \paragraph{Modèle}
 \paragraph{}
-Pour ce faire, on choisit le modèle dans lequel un atome $P(t_1, \dots, t_n)$ est représenté comme un arbre qui a pour racine un nœud \textit{Atome} lié à un ensemble de nœuds \textit{Élément} représentants les termes.
-Les \textit{Atomes} ont le label \textbf{:Atom} et une unique propriété représentant le symbole de prédicat.
-Les \textit{Éléments} ont le label \textbf{:Element} et une unique propriété représentant la valeur de l'élément.
+Pour ce faire, on choisit le modèle dans lequel un atome $P(t_1, \dots, t_n)$ est représenté comme un arbre (Figure~\ref{fig:schema-graph}) qui a pour racine un nœud \textit{Atome} lié à un ensemble de nœuds \textit{Élément} représentants les termes.
+Les \textit{Atomes} ont le label \textbf{:Atom} et une unique propriété \emph{symbol} représentant le symbole de prédicat.
+Les \textit{Éléments} ont le label \textbf{:Element} et une unique propriété \emph{value} représentant la valeur de l'élément.
 On leur ajoute aussi un label \textbf{:Constant} ou \textbf{:Null} respectivement s'il s'agit d'une constante ou d'une valeur nulle.
 Les \textit{Atomes} sont connectés aux \textit{Éléments} par une relation qui a pour unique propriété le rang auquel apparait l'élément dans l'atome.
-Dans ce modèle Figure~\ref{fig:schema-graph} proche de la logique, le nœud rectangulaire représente l'\textit{Atome} et les nœuds circulaires les \textit{Éléments}.
+Dans cette modélisation (Figure~\ref{fig:schema-graph}) proche de la logique, le nœud rectangulaire représente l'\textit{Atome} et les nœuds circulaires les \textit{Éléments}.
 $t_i$ représente les constantes et $t_j$ les valeurs nulles.
 Les notations en dessous des arcs représente leur cardinalité : chaque \textit{Élément} est connecté à au moins un \textit{Atom} alors qu'un \textit{Atom} peut ne pas avoir de termes.
 
-\begin{align*}
-    \mathcal{D} = \{ & Patient(N_1, \text{homme}, 78), Exam(N_1, N_2, N_3, \text{01-01-01}), Parameter(N_3, \text{température}, N_4), \\
-                     & Reveal(N_3, \text{fièvre}), hasPatho(N_1, \text{cancer}), getTreatment(N_1, \text{résection}), forPatho(\text{résection}, \text{cancer}), \\
-                     & leadsTo(\text{cancer}, \text{métastase}), concernAna(\text{cancer}, \text{prostate}), Anatomie(\text{prostate}) \}
-\end{align*}
 
-La figure~\ref{fig:update:db:runex} montre un extrait de l'instance donnée en figure~\ref{fig:runex:graph} (page~\pageref{fig:runex:graph}) correspondant à l'ensemble de faits $\mathcal{D}$ et suivant le modèle définit.
-Ce modèle facilite la récupération des ensembles d'atomes liés ainsi que la recherche d'homomorphismes.
+Cette modélisation facilite la récupération des ensembles d'atomes liés ainsi que la recherche d'homomorphismes.
 En effet, une requête exprimée sous forme logique $Q(X) \gets \phi(X)$ se traduit par la recherche d'un sous graphe dans lequel les variables logiques deviennent naturellement les variables du motif.
-Cependant, dans ce modèle, les atomes sont représentés comme des arbres ce qui ne permet pas de récupérer un atome efficacement à cause du cout non négligeable de la reconnaissance de motifs.
+Rechercher l'ensemble des atomes où $N_1$ est un terme revient à suivre, dans le sens inverse, l'ensemble des arcs qui arrivent à $N_1$.
+Cependant, dans ce modèle, les atomes sont représentés comme des arbres ce qui rend non négligeable le cout de la reconnaissance de motifs.
 Cette récupération est importante, car elle permet de reconstruire les atomes sous forme logique afin d'être utilisés dans nos procédures locales.
 Dans \gls{neo4j}, la reconnaissance de motifs est réalisée par un parcours du graphe.
 Étant donné un nœud \textit{Élément} $e$, la récupération des nœuds \textit{Atomes} contenant $e$ et ayant $P$ pour symbole de prédicat, implique de :
-\begin{enumerate*}
+
+\begin{enumerate}
     \item parcourir l'ensemble des arêtes de $e$
     \item pour chaque arête, récupérer le nœud associé
     \item pour chaque nœud, vérifier la valeur de la propriété représentant le symbole de prédicat
-\end{enumerate*}
+\end{enumerate}
+
 Si un nœud \textit{Élément} se retrouve lié a beaucoup de nœud \textit{Atomes} (c.-à-d. qu'il possède un grand nombre d'arêtes) alors, cette opération peut devenir couteuse.
-Malheureusement, ceci ne peut pas être résolu par l'utilisation d'un index car, aujourd'hui, \gls{neo4j} permet uniquement la création d'index globaux permettant de récupérer, par exemple, l'ensemble des \textit{Atomes} ayant le $P$ pour symbole de prédicat.
-Pour répondre au besoin, il faudrait un index hérité (l'arrête doit récupérer le symbole de prédicat du nœud \textit{Atome} associé) et local à un nœud (récupérer le sous ensemble correspondant de l'index global).
+Malheureusement, ceci ne peut pas être résolu par l'utilisation d'un index permettant de parcourir uniquement les arcs nécessaires car, aujourd'hui, \gls{neo4j} permet uniquement la création d'index globaux (au graphe) permettant de récupérer, par exemple, l'ensemble des \textit{Atomes} ayant $P$ pour symbole de prédicat.
+Pour répondre au besoin, il faudrait un index local à chaque nœud (récupérer le sous ensemble correspondant de l'index global) et qui hériterais des attributs des éléments connectés (l'arrête doit récupérer le symbole de prédicat du nœud \textit{Atome} associé).
+
+% \paragraph{Optimisations}
+\paragraph{}
+Dans ce contexte, des redondances d'informations et des index sont introduits afin d'optimiser ces différentes opérations :
+\begin{description}[wide=0pt]
+    \item[Limiter le parcours des arêtes] ~
+        \begin{enumerate}
+            \item La liste ordonnée des termes comme propriété des nœuds \textit{Atomes} permettant de récupérer un atome complet depuis le nœud atome sans avoir à parcourir les arêtes (propriété $terms$ du noeud \textit{Atome} dans la figure~\ref{fig:schema-graph}) ;
+            \item Pour chaque arête, on lui associe comme type, le symbole de prédicat de l'\textit{Atome} associé (label $P$ dans la figure~\ref{fig:schema-graph}).
+        \end{enumerate}
+    \item[Faciliter la récupération des nœuds] ~
+        \begin{enumerate}
+            \item Une contrainte d'unicité / index sur les nœuds \textit{Éléments} vérifiant la non-redondance des constantes et des valeurs nulles ;
+            \item Une contrainte d'unicité / index sur le couple symbole-termes des nœuds \textit{Atomes} vérifiant la non-redondance des atomes ;
+            \item Un index sur le symbole de prédicat des nœuds \textit{Atomes}.
+        \end{enumerate}
+\end{description}
+
+\begin{example}
+    Soit l'ensemble d'atomes suivants extrait de l'instance donnée en figure~\ref{fig:runex:graph} :
+    \begin{align*}
+        \mathcal{D} = \{ & Patient(N_1, \text{homme}, 78), Exam(N_1, N_2, N_3, \text{01-01-01}), Parameter(N_3, \text{température}, N_4), \\
+                        & Reveal(N_3, \text{fièvre}), hasPatho(N_1, \text{cancer}), getTreatment(N_1, \text{résection}), Anatomie(\text{prostate}), \\
+                        & forPatho(\text{résection}, \text{cancer}), leadsTo(\text{cancer}, \text{métastase}), concernAna(\text{cancer}, \text{prostate}) \}
+    \end{align*}
+
+    En utilisant la modélisation présentée précédemment, l'atome $Patient(N_1, \text{homme}, 78)$ est alors représenté par le graphe de propriétés suivant où le nœud $n_26$ représente l'atome et les nœuds $n_1$, $n_6$ et $n_7$ représente ces termes.
+    La figure~\ref{fig:update:db:runex} montre une vue complète de l'instance $\mathcal{D}$.
+
+    \begin{center}
+        \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=4cm and 6cm,on grid,every text node part/.style={align=center}]
+            \node[draw]                     (a6)  {\\\textbf{:Atom}\\id: $n_{26}$\\symbol: Patient\\terms: $[n_{1}, n_{6}, n_{7}]$};
+            \node[draw,left=of a6,circle]   (n1)  {\textbf{:Element}\\\textbf{:Null}\\id: $n_{ 1}$\\value: $N_1$};
+            \node[draw,below=of a6,circle]  (n6)  {\textbf{:Element}\\\textbf{:Constant}\\id: $n_{ 6}$\\value: homme};
+            \node[draw,right=of a6,circle]  (n7)  {\textbf{:Element}\\\textbf{:Constant}\\id: $n_{ 7}$\\value: 78};
+    
+            \path
+            (a6) edge [] node[above] {\textbf{:Patient}} node[below] {id: $r_{11}$\\rank: 0} (n1)
+            (a6) edge [] node[right] {\textbf{:Patient}} node[left] {id: $r_{12}$\\rank: 1} (n6)
+            (a6) edge [] node[above] {\textbf{:Patient}} node[below] {id: $r_{13}$\\rank: 2} (n7)
+            ;
+        \end{tikzpicture}
+    \end{center}
+\end{example}
 
 \begin{figure}[htb]
     \small
@@ -119,25 +160,8 @@ Pour répondre au besoin, il faudrait un index hérité (l'arrête doit récupé
             ;
         \end{tikzpicture}
     \end{adjustbox}
-    \caption[Extrait de l'instance de la base de données Graphe]{Extrait de l'instance de la base de données Graphe. Les nœuds ellipse représentent les \textit{Éléments} et les rectangles les \textit{Atomes}. Les labels et les propriétés d'optimisation ne sont pas affichés}
+    \caption[Instance $\mathcal{D}$ représentée par un graphe de propriétés]{Instance $\mathcal{D}$ représentée par un graphe de propriétés. Les nœuds ellipse représentent les \textit{Éléments} et les rectangles les \textit{Atomes}. Les labels et les propriétés d'optimisation ne sont pas affichés}
     \label{fig:update:db:runex}
 \end{figure}
-
-% \paragraph{Optimisations}
-\paragraph{}
-En complément du modèle, des redondances d'informations et des index sont donc introduits afin d'optimiser ces différentes opérations :
-\begin{description}[wide=0pt]
-    \item[Limiter le parcours des arêtes] ~
-        \begin{enumerate}
-            \item La liste ordonnée des termes comme propriété des nœuds \textit{Atomes} permettant de récupérer un atome complet depuis le nœud atome sans avoir à parcourir les arêtes (propriété $terms$ du noeud \textit{Atome} dans la figure~\ref{fig:schema-graph}) ;
-            \item Pour chaque arête, on lui associe comme type, le symbole de prédicat de l'\textit{Atome} associé (label $P$ dans la figure~\ref{fig:schema-graph}).
-        \end{enumerate}
-    \item[Faciliter la récupération des nœuds] ~
-        \begin{enumerate}
-            \item Une contrainte d'unicité / index sur les nœuds \textit{Éléments} vérifiant la non-redondance des constantes et des valeurs nulles ;
-            \item Une contrainte d'unicité / index sur le couple symbole-termes des nœuds \textit{Atomes} vérifiant la non-redondance des atomes ;
-            \item Un index sur le symbole de prédicat des nœuds \textit{Atomes}.
-        \end{enumerate}
-\end{description}
 
 \FloatBarrier

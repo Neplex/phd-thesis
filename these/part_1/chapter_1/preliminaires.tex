@@ -1,5 +1,5 @@
 Cette section constitue une vue d'ensemble des concepts et des notions fondamentales qui serviront de base aux chapitres suivants.
-Dans un premier temps une définition de la \glsfirst{fol} ainsi que les concepts de contraintes et de règles dans ce contexte seront présentés.
+Dans un premier temps, nous présentons un rappel de certains concepts de la \glsreset{fol}\gls{fol} ainsi que la définition des contraintes et des règles dans ce contexte.
 Par la suite, nous aborderons les bases de données en adoptant le formalisme \gls{fol} (se référer à~\cite{abiteboulFoundationsDatabases1995} pour plus d'informations sur cet aspect) et offrirons une brève introduction aux bases de données graphes.
 
 \subsection{Logique du premier ordre}
@@ -14,8 +14,8 @@ Par la suite, nous aborderons les bases de données en adoptant le formalisme \g
 % Ces dernières consistent en des règles visant à spécifier les relations et la signification associée aux prédicats.
 % Par exemple, la contrainte exprimée par la règle $\forall x~auteur(x) \implies \exists y~ecrit(x,y)$ signifie que pour chaque individu $x$ considéré comme auteur ($auteur(x)$) dans l'ensemble de fait, celui-ci doit également contenir au moins une œuvre $y$ écrite par cet auteur ($ecrit(x,y)$).
 
-En \glsfirst{fol}, l'information est représentée par un ensemble d'atomes.
-Formellement, on utilise comme alphabet :
+En \gls{fol}, l'information est représentée par un ensemble d'atomes.
+Dans cette thèse, on utilise l'alphabet $\mathcal{A}$ qui est composé par :
 \begin{itemize}
     \item un ensemble de prédicats $P, Q, R, \dots$
     \item un ensemble de variables $x, y, z, \dots$
@@ -26,144 +26,83 @@ Formellement, on utilise comme alphabet :
 \end{itemize}
 
 \begin{definition}[Atome]
-Avec cet alphabet, on définit un atome $P(t_1, \dots, t_n)$ où $P$ est le symbole de prédicat d'arité $n$ et $t_1, \dots, t_n$ sont les termes.
+À partir de l'alphabet $\mathcal{A}$, on définit une formule atomique (ou atome) $P(t_1, \dots, t_n)$ où $P$ est le symbole de prédicat d'arité $n$ et $t_1, \dots, t_n$ sont les termes.
 Les prédicats représentent les relations entre les termes qui peuvent être des variables, des constantes ou des valeurs nulles.
 Un fait est un atome composé exclusivement de constantes, tandis qu'un atome instancié est un atome ne contenant aucune variable.
 Étant donné un atome instancié $A$, $null(A)$ représente l'ensemble des valeurs nulles de $A$.
+\end{definition}
 
 Par exemple, le fait $auteur(Alice)$ comprend le symbole de prédicat $auteur$ d'arité $1$ et la constante $Alice$.
 Si l'on suppose que chaque symbole de prédicat détient une signification (ici, intuitivement claire), ce fait indique que $Alice$ est un auteur.
-\end{definition}
 
 \begin{definition}[Homomorphisme]
 Un homomorphisme $h$ entre deux ensembles d'atomes $A$ et $B$ est une application surjective des termes de $A$ vers les termes de $B$, telle que :
 \begin{enumerate*}[label=(\roman*)]
-    \item si, $h(t) = t$, alors $t$ est une constante
+    \item si, $t$ est une constante, alors $h(t) = t$ ;
     \item si, $P(t_1, \dots, t_n) \in A$, alors $P(h(t_1), \dots, h(t_n)) \in B$.
 \end{enumerate*}
 S'il existe un homomorphisme inverse $h^-$ tel que $h^-(h(t)) = t$ alors ont dit que $A$ est \emph{isomorphe} à $B$.
 \end{definition}
 
 \begin{definition}[Simplication]
-$\Phi$ est l'ensemble de toutes les formules $\phi$, existentiellement quantifiées, de la forme $(\exists X)(\varphi_1(X_1) \land \dots \land \varphi_n(X_n))$ où $X$ est l'ensemble des variables et $\varphi_i(X_i)$ est une formule atomique dont $X_i \subset X$ représente l'ensemble des variables libres.
-$atoms(\phi)$ est l'ensemble des formules atomique de $\phi$.
+Soit $\phi$ une formule existentiellement quantifiée de la forme $(\exists X)(\varphi_1(X_1) \land \dots \land \varphi_n(X_n))$ où $X$ est l'ensemble des variables, $\varphi_i(X_i)$ est une formule atomique et $X_i \subset X$ représente l'ensemble des variables libres dans $\varphi_i$.
+$atoms(\phi)$ est l'ensemble des formules atomique de $\phi$ et $\Phi$ est l'ensemble de toutes les formules $\phi$.
 Un modèle $M$ d'une formule $\phi$ est l'ensemble des faits qui ont un homomorphisme de $atoms(\phi)$ vers $M$.
 Étant donné deux formules $\phi_1$ et $\phi_2$ : $\phi_1 \implies \phi_2$ si tout modèle de $\phi_1$ est un modèle de $\phi_2$.
 $\phi_1$ et $\phi_2$ sont \emph{équivalents}, noté $\phi_1 \iff \phi_2$, si et seulement si $\phi_1 \implies \phi_2$ et $\phi_2 \implies \phi_1$.
 $\phi_1$ et \emph{plus simple que} $\phi_2$, noté $\phi_1 \sqsubseteq \phi_2$ si $\phi_1 \iff \phi_2$ et $atoms(\phi_1) \subseteq atoms(\phi_2)$.
 Une simplification $\phi_1$ de $\phi_2$ est \emph{minimale} si $\phi_1 \sqsubseteq \phi_2$ et qu'il n'existe pas de $\phi_1'$ tel que $\phi_1' \sqsubset \phi_1$.
+\end{definition}
 
 Par exemple, étant donné la formule $\phi = (\exists x, y)(P(a, x) \land P(a, y))$, les formules $(\exists x)(P(a, x))$ et $(\exists y)(P(a, y))$ sont équivalentes et sont toutes deux une simplification de $\phi$.
 De plus, \cite{chabinConsistentUpdatingDatabases2020} démontre que si $\phi_1$ et $\phi_2$ sont deux simplifications minimales d'une même formule $\phi$ alors les ensembles $atoms(\phi_1)$ et $atoms(\phi_2)$ sont isomorphes.
-La simplification minimale d'une formule $\phi$ est appelé le \gls{core} et s'écrit $core(\phi)$.
+
+\begin{definition}[Core]
+    Une simplification minimale d'une formule $\phi$ est appelé le \gls{core} et s'écrit $core(\phi)$.
 \end{definition}
 
 \subsection{Base de données}
 \label{sec:update:pre:db}
 
 \begin{definition}[Instance]
-L'\emph{instance} d'une base de données $\mathcal{D}$ peut être définie comme la Skolémisation d'une formule $\phi$, représentant un ensemble minimal d'atomes instanciés, pour lequel $core(\phi) = \phi$.
+L'\emph{instance} d'une base de données $\mathcal{D}$ est définie comme la Skolémisation d'une formule $\phi$, représentant un ensemble minimal d'atomes instanciés, pour lequel $core(\phi) = \phi$.
 La Skolémisation d'une formule $\phi$, notée $Sk(\phi)$, revient à substituer l'ensemble des variables par des constantes ou des valeurs nulles, tout en éliminant chaque occurrence du quantificateur existentiel.
 \end{definition}
 
 \begin{definition}[Requête]
-Une \emph{requête} effectuée sur une base de données est une formule logique de la forme $(\forall X)(Q(X) \gets \phi(X))$, où $X$ représente l'ensemble des variables libres de $\phi$.
+Une \emph{requête} est une formule logique de la forme $(\forall X)(Q(X) \gets \phi(X))$, où $X$ représente l'ensemble des variables libres de $\phi$.
 La réponse à une requête effectuée sur une base de données $\mathcal{D}$ correspond à l'ensemble des homomorphismes $h$ tels que $h(\phi(X)) \subseteq \mathcal{D}$.
 \end{definition}
 
 \begin{definition}[Contrainte]
-Une \emph{contrainte} (ou règle) sur une base de données est une dépendance génératrice de n-uplets, également appelée \glsfirst{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
-Plus simplement écrit $body(X, Y) \to head(X, Z)$, où $X$, $Y$ et $Z$ représentent des ensembles de variables, $body(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
+Une \emph{contrainte} (ou règle) sur une base de données est une dépendance génératrice de n-uplets, également appelée \glsreset{tgd}\gls{tgd} en anglais, de la forme $(\forall X, Y)(body(X, Y) \to (\exists Z)head(X, Z))$.
+Plus simplement, nous écrivons $body(X, Y) \to head(X, Z)$, où $X$, $Y$ et $Z$ représentent des ensembles de variables, $body(X, Y)$ est un ensemble d'atomes et $head(X, Z)$ est un atome.
 Une contrainte $c$ est dite satisfaite par un ensemble $I$ d'atomes instanciés, noté $I \vDash c$ si pour tout homomorphisme $h$ tel que $h(body(c)) \subseteq I$ il existe un homomorphisme $h'$ tel que $h'(body(c)) = h(body(c))$ et $h'(head(c)) \in I$.
-Intuitivement, cela signifie que pour qu'une contrainte soit satisfaite, pour toute instanciation du corps présente dans la base de données, la tête correspondante doit aussi être présente dans la base.
 Une instance $I$ d'une base de données est dites \emph{cohérente} vis-à-vis d'un ensemble de contraintes $\mathbb{C}$, noté $I \vDash \mathbb{C}$ si pour toute contrainte $c$ dans $\mathbb{C}$, $I \vDash c$.
-
-Par exemple, la contrainte exprimée par la règle $\forall x~auteur(x) \to \exists y~ecrit(x,y)$ signifie que pour chaque individu $x$ considéré comme auteur ($auteur(x)$) dans l'ensemble de fait, celui-ci doit également contenir au moins une œuvre $y$ écrite par cet auteur ($ecrit(x,y)$).
-Dans ce contexte, l'ensemble $I_1 = \{auteur(Alice)\}$ n'est pas \emph{cohérent} contrairement aux ensemble $I_2 = \{auteur(Alice), ecrit(Alice, N_1)\}$, $I_3 = \emptyset$ et $I_4 = \{ecrit(Alice, N_1)\}$.
 \end{definition}
+
+Intuitivement, une contrainte est satisfaite si pour toute instanciation du corps présente dans la base de données, la tête correspondante doit aussi être présente dans la base.
+Par exemple, la contrainte exprimée par la règle $\forall x~auteur(x) \to \exists y~ecrit(x,y)$ signifie que pour chaque individu $x$ considéré comme auteur ($auteur(x)$) dans l'ensemble de fait, celui-ci doit également contenir au moins une œuvre $y$ écrite par cet auteur ($ecrit(x,y)$).
+Dans ce contexte, l'ensemble $I_1 = \{auteur(Alice)\}$ n'est pas \emph{cohérent} contrairement aux ensembles $I_2 = \{auteur(\text{Alice}), ecrit(\text{Alice}, \text{Pays des merveilles})\}$, $I_3 = \emptyset$ et $I_4 = \{ecrit(Alice, N_1)\}$.
 
 \subsection{Base de données graphes}
 \label{sec:update:pre:graph}
 
-Dans cette section, nous visons à fournir une introduction concise aux bases de données de graphes.
+Dans cette section, nous visons à fournir une introduction concise aux bases de données graphes.
 \cite{pokornyGraphDatabasesTheir2015} offre une vue d'ensemble des avantages et des inconvénients de ce type de bases de données.
-Lorsque nous évoquons les bases de données de graphes, nous pouvons identifier deux grandes familles (une comparaison visuelle de ces bases est donné en figure~\ref{fig:update:pre:graph}) :
+Lorsque nous évoquons les bases de données graphes, nous pouvons identifier deux grandes familles :
 \begin{description}
     \item[Les bases de triplets] Notamment représentées par le modèle \gls{rdf} développé par le \gls{w3c}.
           Ces bases enregistrent des triplets sous la forme $\langle x, P, y \rangle$, où chaque triplet représente un atome $P(x, y)$ et est constitué de trois éléments : $x$, le sujet représenté par l'\gls{uri} d'une ressource (un nœud), $P$ est un symbole de prédicat, et $y$, l'objet, peut être soit un \gls{uri}, soit un littéral (une valeur de propriétés).
           \acs{rdf} est interrogé en utilisant le langage \gls{sparql}.
 
-    \item[Les Graphes de Propriétés] Aussi connus sous le nom de \glsfirst{lpg} en anglais, sont des bases de données composées de nœuds reliés par des arcs. Les deux sont labellisés et peuvent contenir des propriétés.
+    \item[Les Graphes de Propriétés] Aussi connus sous le nom de \glsreset{lpg}\gls{lpg} en anglais, sont des bases de données composées de nœuds reliés par des arcs. Les deux sont labellisés et peuvent contenir des propriétés (ou attributs).
           Parmi les \gls{sgbd} de ce type, \gls{neo4j} est l'un des plus populaires.
           Notamment, \gls{neo4j} est à l'origine du langage de requête \gls{cypher}, qui sert de fondation au nouveau langage du standard \gls{iso} : \gls{gql}, actuellement en cours de développement.
 \end{description}
 
 \begin{figure}[p]
     \begin{minipage}[][\textheight][c]{\textwidth}
-        \begin{subfigure}[t]{\linewidth}
-            \centering
-            \begin{adjustbox}{width=\linewidth, max height=.25\textheight}
-                \centering
-                \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 7cm,on grid]
-                    \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
-                    \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
-                    \node[labeled node, right=of sosy] (person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
-                    \node[labeled node, right=of person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
-                    \node[labeled node, below=of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
-                    \node[labeled node, left=of result] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
-                    \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
-
-                    \path
-                    (person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
-                    (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
-                    (person) edge node[labeled edge, anchor=center] {PassExam} (exam)
-                    (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
-                    (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
-                    (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
-                \end{tikzpicture}
-            \end{adjustbox}
-            \caption{Instance sous forme de graphe de propriétés}
-            \label{fig:update:pre:graph:prop}
-        \end{subfigure}
-        \vfill
-        \begin{subfigure}{\linewidth}
-            \centering
-            \begin{adjustbox}{width=\linewidth, max height=.40\textheight}
-                \centering
-                \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 6cm,on grid]
-                    \node[draw] (eyes) {\emph{both eyes}};
-                    \node[draw, below=of eyes] (sosy) {\emph{blurring of vision}};
-                    \node[draw, right=of sosy] (symptom) {Symptom};
-                    \node[draw, below=of sosy] (patient) {\emph{unknown}};
-                    \node[draw, below=of patient] (person) {Person};
-                    \node[draw, right=of person] (age) {\emph{55-60}};
-                    \node[draw, align=center, right=of symptom] (result) {\emph{numerous circular}\\\emph{to oval fleck-like}};
-                    \node[draw, below=of result] (exam) {\emph{slit-lamp}};
-                    \node[draw, below=of exam] (examination) {Examination};
-                    \node[draw, right=of eyes] (stroma) {\emph{corneal stroma}};
-                    \node[draw, right=of stroma] (membrane) {\emph{descemet membrane}};
-                    \node[draw, above=of stroma] (anatomy) {Anatomy};
-
-                    \path
-                    (eyes) edge node[anchor=center, fill=white] {hasType} (anatomy)
-                    (sosy) edge node[anchor=center, fill=white] {hasType} (symptom)
-                    (sosy) edge node[anchor=center, fill=white] {concernsAnat} (eyes)
-                    (patient) edge node[anchor=center, fill=white] {hasType} (person)
-                    (patient) edge node[anchor=center, fill=white] {hasAge} (age)
-                    (patient) edge node[anchor=center, fill=white] {hasSym} (sosy)
-                    (patient) edge node[anchor=center, fill=white] {passExam} (exam)
-                    (exam) edge node[anchor=center, fill=white] {hasType} (examination)
-                    (exam) edge node[anchor=center, fill=white] {givesRes} (result)
-                    (result) edge node[anchor=center, fill=white] {hasType} (symptom)
-                    (result) edge node[anchor=center, fill=white] {concernsAnat} (stroma)
-                    (result) edge node[anchor=center, fill=white] {concernsAnat} (membrane)
-                    (stroma) edge node[anchor=center, fill=white] {hasType} (anatomy)
-                    (membrane) edge node[anchor=center, fill=white] {hasType} (anatomy);
-                \end{tikzpicture}
-            \end{adjustbox}
-            \caption{Instance sous forme de graphe RDF (la propriété \emph{name} est directement affiché dans le nœud individu pour des raisons de lisibilité)}
-        \end{subfigure}
-        \vfill
         \begin{subfigure}{\linewidth}
             \centering
             \begin{adjustbox}{varwidth=\linewidth, max height=.2\textheight}
@@ -247,13 +186,83 @@ Lorsque nous évoquons les bases de données de graphes, nous pouvons identifier
                 \end{tabular}
             \end{adjustbox}
             \caption{Instance au format relationnel}
+            \label{fig:update:pre:graph:rel}
+        \end{subfigure}
+        \vfill
+        \begin{subfigure}{\linewidth}
+            \centering
+            \begin{adjustbox}{width=\linewidth, max height=.40\textheight}
+                \centering
+                \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 6cm,on grid]
+                    \node[draw] (eyes) {\emph{both eyes}};
+                    \node[draw, below=of eyes] (sosy) {\emph{blurring of vision}};
+                    \node[draw, right=of sosy] (symptom) {Symptom};
+                    \node[draw, below=of sosy] (patient) {\emph{unknown}};
+                    \node[draw, below=of patient] (person) {Person};
+                    \node[draw, right=of person] (age) {\emph{55-60}};
+                    \node[draw, align=center, right=of symptom] (result) {\emph{numerous circular}\\\emph{to oval fleck-like}};
+                    \node[draw, below=of result] (exam) {\emph{slit-lamp}};
+                    \node[draw, below=of exam] (examination) {Examination};
+                    \node[draw, right=of eyes] (stroma) {\emph{corneal stroma}};
+                    \node[draw, right=of stroma] (membrane) {\emph{descemet membrane}};
+                    \node[draw, above=of stroma] (anatomy) {Anatomy};
+
+                    \path
+                    (eyes) edge node[anchor=center, fill=white] {hasType} (anatomy)
+                    (sosy) edge node[anchor=center, fill=white] {hasType} (symptom)
+                    (sosy) edge node[anchor=center, fill=white] {concernsAnat} (eyes)
+                    (patient) edge node[anchor=center, fill=white] {hasType} (person)
+                    (patient) edge node[anchor=center, fill=white] {hasAge} (age)
+                    (patient) edge node[anchor=center, fill=white] {hasSym} (sosy)
+                    (patient) edge node[anchor=center, fill=white] {passExam} (exam)
+                    (exam) edge node[anchor=center, fill=white] {hasType} (examination)
+                    (exam) edge node[anchor=center, fill=white] {givesRes} (result)
+                    (result) edge node[anchor=center, fill=white] {hasType} (symptom)
+                    (result) edge node[anchor=center, fill=white] {concernsAnat} (stroma)
+                    (result) edge node[anchor=center, fill=white] {concernsAnat} (membrane)
+                    (stroma) edge node[anchor=center, fill=white] {hasType} (anatomy)
+                    (membrane) edge node[anchor=center, fill=white] {hasType} (anatomy);
+                \end{tikzpicture}
+            \end{adjustbox}
+            \caption{Instance sous forme de graphe RDF (la propriété \emph{name} est directement affiché dans le nœud individu pour des raisons de lisibilité)}
+            \label{fig:update:pre:graph:rdf}
+        \end{subfigure}
+        \vfill
+        \begin{subfigure}[t]{\linewidth}
+            \centering
+            \begin{adjustbox}{width=\linewidth, max height=.25\textheight}
+                \centering
+                \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 7cm,on grid]
+                    \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
+                    \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
+                    \node[labeled node, right=of sosy] (person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
+                    \node[labeled node, right=of person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
+                    \node[labeled node, below=of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
+                    \node[labeled node, left=of result] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
+                    \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
+
+                    \path
+                    (person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
+                    (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
+                    (person) edge node[labeled edge, anchor=center] {PassExam} (exam)
+                    (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
+                    (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
+                    (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
+                \end{tikzpicture}
+            \end{adjustbox}
+            \caption{Instance sous forme de graphe de propriétés}
+            \label{fig:update:pre:graph:prop}
         \end{subfigure}
         \caption{Exemple d'instance d'une base de donnée graphe et son équivalent en relationnel}
         \label{fig:update:pre:graph}
     \end{minipage}
 \end{figure}
 
-Les bases de données graphes sont spécialement conçues pour simplifier l'interrogation de la structure des données.
+La figure~\ref{fig:update:pre:graph} offre une comparaison visuelle de ces différents types de bases.
+La figure~\ref{fig:update:pre:graph:rel} présente l'instance d'une base de donnée relationnelle.
+Cette même instance est représentée dans la figure~\ref{fig:update:pre:graph:rdf} sous la forme d'un graphe \gls{rdf} (où seule des nœuds et des arcs sont présents).
+La figure~\ref{fig:update:pre:graph:prop} représente l'instance sous la forme d'un graphe de propriétés où les nœuds et les arcs peuvent contenir des attributs.
+Les bases de données graphes sont spécialement conçues pour simplifier les requêtes sur la topologie du graphe.
 Le modèle de la base de données (ou schéma, pour faire une analogie avec le modèle relationnel, bien qu'aucune règle structurelle ne soit imposée) est étroitement lié aux types de requêtes envisagées.
 Dans le cadre de \gls{neo4j}, par exemple, les nœuds peuvent être étiquetés avec une ou plusieurs étiquettes, appelées \emph{labels}, tandis que les relations ne peuvent en porter qu'une, dénommée \emph{type} (si plusieurs étiquettes sont nécessaires pour une relation, cette dernière sera dupliquée).
 
@@ -274,9 +283,8 @@ Les requêtes sont formulées comme une séquence d'opérations, où le résulta
 Même si les requêtes portent sur des graphes, les résultats des opérations sont toujours une table d'affectation des variables (avec autant de colonnes que de variables et autant de lignes que de réponses).
 
 \begin{example}
-    En considérant l'instance de base de donnée graphe représentée dans figure~\ref{fig:update:pre:graph:prop}, la récupération de l'ensemble de l'ensemble des noms de partie du corps (\emph{Anatomy}) présents dans l'instance s'écrit, en \gls{cypher} : \verb|MATCH (x:Anatomy) RETURN x.name| ;
-    Le \verb|MATCH| recherche le motif \verb|(x:Anatomy)|.
-    Les parenthèses représentent un nœud, \verb|x| est le nom de la variable pour ce nœud et \verb|:Anatomy| indique que l'on cherche uniquement les nœuds qui ont l'étiquette \emph{Anatomy}.
+    En considérant l'instance de base de donnée graphe représentée dans figure~\ref{fig:update:pre:graph:prop}, la récupération de l'ensemble des noms de partie du corps (\emph{Anatomy}) présents dans l'instance s'écrit, en \gls{cypher} : \verb|MATCH (x:Anatomy) RETURN x.name|.
+    Le \verb|MATCH| recherche le motif \verb|(x:Anatomy)| où les parenthèses représentent un nœud, \verb|x| est le nom de la variable pour ce nœud et \verb|:Anatomy| indique que l'on cherche uniquement les nœuds qui ont l'étiquette (ou label) \emph{Anatomy}.
     L'opération \verb|RETURN| termine la requête et renvoie la table d'instanciation suivante :
 
     \begin{center}
@@ -289,7 +297,7 @@ Même si les requêtes portent sur des graphes, les résultats des opérations s
         \end{tabular}
     \end{center}
 
-    La requête \verb|MATCH (x:Examination)-[y:GivesRes]->() RETURN x, y| retourne l'ensemble des nœuds labellisés \emph{Examination} qui sont dans une relation y ayant le type \emph{GivesRes} representé par \verb|-[y:GivesRes]->|.
+    La requête \verb|MATCH (x:Examination)-[y:GivesRes]->() RETURN x, y| retourne l'ensemble des nœuds labellisés \emph{Examination} qui sont dans une relation y ayant le type \emph{GivesRes} représenté par \verb|-[y:GivesRes]->|.
     Ici, la relation est dirigée indiquant que l'on cherche uniquement les nœuds \emph{Examination} qui sont source de la relation.
     Le nœud de destination de la relation n'a aucune contrainte et est donc représenté uniquement par \verb|()|.
     Le langage \gls{cypher} permet également de construire des requêtes récursives.
@@ -298,5 +306,6 @@ Même si les requêtes portent sur des graphes, les résultats des opérations s
     La requête est toujours assurée de se terminer, car \gls{neo4j} ne permet pas de traverser la même arête à plusieurs reprises pour un même motif.
     L'opération \verb|COLLECT(DISTINCT y)| permet de regrouper les instanciations de la variable \verb|y| en fonction des autres variables (équivalent à l'opération \verb|group by| en \gls{sql}), ici \verb|x|, en évitant les doublons (\verb|DISTINCT|).
     L'ensemble est retourné sous forme d'une liste.
-    \gls{neo4j} autorise les types complexes dans les requêtes, mais aussi comme valeur de propriété.
+    \gls{neo4j} autorise l'utilisation de structure de données (liste, dictionnaire, etc) comme variables dans les requêtes, mais aussi comme valeur de propriété.
+    Il s'agit d'une différence importante avec le modèle relationnel et les graphes \gls{rdf} qui autorises uniquement des types simples (chaine de caractères, entier, etc).
 \end{example}

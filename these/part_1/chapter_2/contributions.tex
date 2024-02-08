@@ -1,0 +1,28 @@
+En travaillant avec des bases de données graphes, la proposition de mise à jour doit opérer en harmonie avec les \glspl{sgbd} tout en prenant en compte les contraintes propres à ces systèmes.
+Bien que les travaux exposés dans cette thèse s'alignent sur la politique détaillée dans \cite{chabinConsistentUpdatingDatabases2020}, ils se distinguent par les éléments suivants :
+
+\begin{description}[wide=0pt]
+    \item[Conception de la base de données] ~
+          \begin{enumerate}
+              \item Les \glspl{sgbd} pour les \glspl{lpg} partent généralement de l'hypothèse que les graphes sont complets, ce qui ne correspond pas à la réalité des données souvent incomplètes.
+                    L'approche adoptée par \gls{neo4j}, qui considère les valeurs nulles comme des valeurs inexistantes, s'avère insuffisante pour traiter les valeurs nulles liées.
+                    Pour résoudre ce problème, une nouvelle conception de base de données est proposée, traitant les valeurs nulles comme une forme de constante.
+
+              \item Notre modélisation vise à éliminer des problèmes d'efficacité constatés lors d'une implémentation sur un \gls{sgbd} relationnel.
+                    Pour cela, la modélisation proposée permet une indexation des valeurs nulles, facilitant ainsi l'identification de tous les atomes directement ou indirectement liés à ces valeurs.
+                    Cette approche simplifie grandement les opérations de manipulation des valeurs nulles impactées par une mise à jour pour le calcul du \gls{core}.
+
+              \item Mise en place de requêtes capables d'identifier les parties du graphe de données concernées par la procédure de mise à jour cohérente.
+                    Notamment pour le calcul du \gls{chase} et du \gls{core}.
+                    Ces requêtes sont rendues efficaces par les choix de conceptions de la base de données.
+          \end{enumerate}
+
+    \item[Approche incrémentale] ~
+          \begin{enumerate}
+              \item Le calcul des mises à jour se limite aux contraintes et aux données spécifiquement concernées.
+                    En contraste avec la méthodologie présentée dans \cite{chabinConsistentUpdatingDatabases2020}, qui exige la vérification de l'ensemble de la base de données pour chaque mise à jour.
+
+              \item La simplification des valeurs est guidée par les valeurs nulles pouvant potentiellement être simplifiées en raison de la mise à jour.
+                    Cette approche diffère de celle de \cite{chabinConsistentUpdatingDatabases2020}, où la simplification prend en compte l'ensemble des valeurs nulles indépendamment de la mise à jour.
+          \end{enumerate}
+\end{description}
