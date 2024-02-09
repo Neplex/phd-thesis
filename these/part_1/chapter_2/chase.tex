@@ -61,22 +61,22 @@ Dans la suite, avant de rejeter une mise à jour $I$, a cause d'un degré trop �
 Si la simplification de $I'$ engendre un ensemble $I''$ où les valeurs nulles "invalides" ont été supprimées, alors $I''$ peut être considéré et la mise à jour acceptée.
 Si $I''$ reste invalide malgré la simplification, alors la mise à jour devra être rejetée.
 
-Si la valeur sélectionnée pour le paramètre $\delta_{max}$ est trop basse, il est possible que des mises à jour soient rejetées, alors qu'elles auraient été valides avec une valeur de $\delta_{max}$ plus grande suite a une simplification.
+% Si la valeur sélectionnée pour le paramètre $\delta_{max}$ est trop basse, il est possible que des mises à jour soient rejetées, alors qu'elles auraient été valides avec une valeur de $\delta_{max}$ plus grande suite a une simplification.
 
-\begin{example}[Choix de $\delta_{max}$]
-    \label{ex:update:chase:delta}
-    \todo[inline]{Update this broken example}
-    Etant donné l'ensemble $I_0 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0)\}$ et l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:chase:delta:c1}, \ref{ex:update:chase:delta:c2}$\}$.
-    \begin{multicols}{2}
-        \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
-            \centering
-            \item $A(x, y) \to B(y, z)$ \label{ex:update:chase:delta:c1}
-            \item $B(x, y) \to C(y, z)$ \label{ex:update:chase:delta:c2}
-        \end{enumerate}
-    \end{multicols}
-    Si $\delta_{max} = 0$, on obtient l'ensemble $I_1 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0),$ $B(N_1^0, N_2^1)\}$ qui est invalide et non-simplifiable.
-    En prenant une valeur plus élevée $\delta_{max} = 1$, on obtient l'ensemble $I_2 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0),$ $B(N_1^0, N_2^1),$ $C(N_2^1, N_3^2)\}$ qui est invalide mais simplifiable en $I'_2 = \{A(a, b),$ $B(b, c),$ $C(c, d)\}$ avec $h = \langle N_1 \mapsto b,$ $N_2 \mapsto c,$ $N_3 \mapsto d \rangle$ qui est un ensemble valide.
-\end{example}
+% \begin{example}[Choix de $\delta_{max}$]
+%     \label{ex:update:chase:delta}
+%     \todo[inline]{Update this broken example}
+%     Etant donné l'ensemble $I_0 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0)\}$ et l'ensemble de contraintes $\mathbb{C} = \{$\ref{ex:update:chase:delta:c1}, \ref{ex:update:chase:delta:c2}$\}$.
+%     \begin{multicols}{2}
+%         \begin{enumerate}[label=\textbf{$c_\arabic*$ :},ref=$c_\arabic*$]
+%             \centering
+%             \item $A(x, y) \to B(y, z)$ \label{ex:update:chase:delta:c1}
+%             \item $B(x, y) \to C(y, z)$ \label{ex:update:chase:delta:c2}
+%         \end{enumerate}
+%     \end{multicols}
+%     Si $\delta_{max} = 0$, on obtient l'ensemble $I_1 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0),$ $B(N_1^0, N_2^1)\}$ qui est invalide et non-simplifiable.
+%     En prenant une valeur plus élevée $\delta_{max} = 1$, on obtient l'ensemble $I_2 = \{A(a, b),$ $B(b, c),$ $C(c, d),$ $A(a, N_1^0),$ $B(N_1^0, N_2^1),$ $C(N_2^1, N_3^2)\}$ qui est invalide mais simplifiable en $I'_2 = \{A(a, b),$ $B(b, c),$ $C(c, d)\}$ avec $h = \langle N_1 \mapsto b,$ $N_2 \mapsto c,$ $N_3 \mapsto d \rangle$ qui est un ensemble valide.
+% \end{example}
 
 \subsection{Utilisation du graphe pour le Chase}
 La procédure~\ref{algo:update:chase:insert} définie l'algorithme incrémentale du \gls{chase}.

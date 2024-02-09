@@ -1,8 +1,8 @@
-Cette section a pour objectif de définir les concepts fondamentaux qui seront utilisés dans la suite de ce chapitre et se décompose en quatres parties distinctes.
-La première partie se focalise sur la définition des grammaires formelles.
+Cette section a pour objectif de définir les concepts fondamentaux qui seront utilisés dans la suite de ce chapitre et se décompose en quatre parties distinctes.
+La première partie se focalise sur la notion de grammaire.
 Une grammaire permet de définir un langage en utilisant un ensemble de règles de production qui dérivent les mots du langage sur un alphabet donné.
 La seconde partie de cette section s'attarde sur les arbres, qui sont des structures de données hiérarchiques.
-Chaque nœud d'un arbre, à l'exception de la racine, est lié à un nœud parent et zéro ou plusieurs nœuds enfants.
+% Chaque nœud d'un arbre, à l'exception de la racine, est lié à un nœud parent et zéro ou plusieurs nœuds enfants.
 Dans une troisième partie, nous montrerons comment les arbres jouent un rôle important dans la représentation des structures linguistiques.
 Pour finir, cette section se termine par la définition des opérations de transformations et d'éditions appliquées aux arbres.
 
@@ -10,23 +10,25 @@ Pour finir, cette section se termine par la définition des opérations de trans
 
 \begin{definition}[\Glsentrylong{cfg}]
     \label{def:struct:pre:cfg}
-    Une \gls{cfg} est définie par un quadruplet $(N, T, R, S)$ où $N$ est un ensemble fini de symboles non-terminaux ; $T$ est un ensemble fini de symboles terminaux ; $R$ un ensemble fini de règles de production et $S \in N$ est le symbole initial.
+    Une \glsreset{cfg}\gls{cfg} est définie par un quadruplet $(N, T, R, S)$ où $N$ est un ensemble fini de symboles non-terminaux ; $T$ est un ensemble fini de symboles terminaux ; $R$ un ensemble fini de règles de production et $S \in N$ est le symbole initial.
     Une règle de production est définie par la forme $X \to \alpha$, avec $X \in N$ et $\alpha$ est une chaîne de symboles terminaux et non-terminaux.
 
     Nous introduisons la notion de \gls{cfg} condensée qui admet aussi des règles de production de la forme $X \to \alpha^+$ où $\alpha^+$ est une expression régulière qui répété une ou plusieurs fois la chaîne $\alpha$.
 \end{definition}
 
-Un arbre de dérivation, également appelé arbre d'analyse ou arbre de syntaxe, décrit comment le symbole de départ d'une grammaire $G$ dérive un mot du langage.
-Si un non-terminal $U$ est associé à une règle de production $U \to X ~ Y ~ Z$, l'arbre de dérivation peut contenir un nœud interne étiqueté par $U$, comportant trois enfants, à savoir $X$, $Y$ et $Z$, disposés de gauche à droite.
-
-\begin{center}
+\begin{wrapfigure}[14]{r}{.3\textwidth}
+    \centering
     \begin{adjustbox}{max width=\linewidth}
         \begin{forest}
-            [U [X][Y][Z]]
+            [\dots [U [X [\dots]][Y [\dots]][Z [\dots]]]]
         \end{forest}
     \end{adjustbox}
-\end{center}
+    \caption{Extrait d'un arbre de dérivation pour la règle de production $U \to X ~ Y ~ Z$}
+    \label{fig:struct:ex-deriv}
+\end{wrapfigure}
 
+Un arbre de dérivation, également appelé arbre d'analyse ou arbre de syntaxe, décrit comment le symbole de départ d'une grammaire $G$ dérive un mot du langage.
+Si un non-terminal $U$ est associé à une règle de production $U \to X ~ Y ~ Z$, l'arbre de dérivation peut contenir un nœud interne étiqueté par $U$, comportant trois enfants, à savoir $X$, $Y$ et $Z$, disposés de gauche à droite comme représenté dans la figure~\ref{fig:struct:ex-deriv}.
 Chaque nœud interne représente un symbole non-terminal de la grammaire $G$, tandis que les feuilles symbolisent les symboles terminaux de $G$.
 Les liaisons entre les nœuds illustrent la manière dont les symboles sont dérivés les uns des autres.
 La construction de l'arbre de dérivation s'effectue de manière récursive en suivant les règles de production de la grammaire. Elle débute avec un nœud racine correspondant au symbole initial de la grammaire, et à chaque niveau de l'arbre, les nœuds sont remplacés par des symboles conformément aux règles de production.
@@ -38,31 +40,115 @@ La construction de l'arbre de dérivation s'effectue de manière récursive en s
         \item Chaque feuille de l'arbre $f$ est étiquetée par un symbole terminal, c'est-à-dire que $l(f) \in T$ ;
         \item Chaque nœud interne $n$ de l'arbre est étiqueté par un symbole non-terminal, c'est-à-dire que $l(n) \in N$ ;
         \item Si $U$ est un non-terminal utilisé comme étiquette d'un nœud interne $n$ et $X_1, \dots, X_n$ sont les étiquettes des enfants de $n$ de gauche à droite, alors il existe une règle de production $U \to X_1 ~ \dots ~ X_n$ dans $R$.
-        Les étiquettes $X_1, \dots, X_n$ représentent une combinaison de symboles terminaux et non-terminaux.
+              Les étiquettes $X_1, \dots, X_n$ représentent une combinaison de symboles terminaux et non-terminaux.
     \end{enumerate}
 \end{definition}
 
+\begin{example}
+    \label{ex:struct:cfg}
+    Soit la grammaire $G = (\{P\}, \{0,1\}, R, P)$ où $R$ est l'ensemble de règles de productions ci-dessous et qui produit des nombres binaires.
+    La figure~\ref{fig:struct:parsetree} montre un arbre de dérivation pour $0011$.
+    \begin{align*}
+        P & \to 0 & P & \to 1 & P & \to P~0 & P & \to P~1
+    \end{align*}
+\end{example}
+
+\begin{figure}[htb]
+    \begin{subfigure}[t]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [P, for tree={calign=last, s sep=2em}
+                    [P
+                            [P
+                                    [P
+                                            [0]
+                                    ]
+                                    [0]
+                            ]
+                            [1]
+                    ]
+                    [1]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre de dérivation pour la grammaire $G$ définie dans l'exemple~\ref{ex:struct:cfg}}
+        \label{fig:struct:parsetree}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [{P ($val=3$)}, for tree={calign=last, s sep=2em}
+                    [{P ($val=1$)}
+                            [{P ($val=0$)}
+                                    [{P ($val=0$)}
+                                            [0]
+                                    ]
+                                    [0]
+                            ]
+                            [1]
+                    ]
+                    [1]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre de dérivation pour la grammaire $G'$ définie dans l'exemple~\ref{ex:struct:cfg-attr} avec les valeurs de l'attribut synthétisé $val$}
+        \label{fig:struct:parsetree-attr}
+    \end{subfigure}
+    \caption{Exemple de dérivation d'une grammaire pour le nombre $0011$}
+\end{figure}
+
+Le principe des grammaires attribuées peut se résumer de la manière suivante : nous considérons une grammaire hors contexte.
+À chacun de ses non-terminaux, on attache deux ensembles de symboles :
+\begin{enumerate*}[label=(\arabic*)]
+    \item les attributs synthétisés, qui transmettent l'information depuis les feuilles d'un arbre de dérivation jusqu'à la racine et
+    \item les attributs hérités, qui transportent l'information en sens inverse.
+\end{enumerate*}
+À chaque production, nous associons un ensemble de règles sémantiques qui spécifient comment calculer les attributs de sortie ; c'est-à-dire les attributs synthétisés du non-terminal membre gauche de la production et les attributs hérités des non-terminaux du membre droit de la production, en fonction des attributs d'entrée de la production (les autres attributs).
+La définition suivante formalise cette notion.
+
 \begin{definition}[Grammaire attribuée]
-    Une grammaire attribuée \cite{knuthSemanticsContextfreeLanguages1968}, ou grammaire avec attributs, est une \gls{cfg} $G = (N, T, R, S)$ à laquelle on ajoute, pour chaque règle de production $r \in R$ un ensemble de règles sémantiques noté $\Phi_r$ et pour chaque symbole $X \in (N \cup T)$ on associe un ensemble fini d'attributs $A(X)$ constitué de deux ensembles distincts d'attributs :
+    Une grammaire attribuée \cite{knuthSemanticsContextfreeLanguages1968}, ou grammaire avec attributs, est une \gls{cfg} $G = (N, T, R, S)$ à laquelle on ajoute, pour chaque règle de production $r \in R$ un ensemble de règles sémantiques noté $\Phi_r$ et pour chaque symbole $X \in (N \cup T)$ on associe un ensemble fini d'attributs $A(X)$ constitué de deux ensembles disjoints d'attributs :
     \begin{itemize}
-        \item $A_0(X)$ pour les attributs synthétisés où $\forall X \in T ~ A_0(X) = \emptyset$
-        \item $A_1(X)$ pour les attributs hérités où, pour le symbole initial $S$, $A_1(S) = \emptyset$
+        \item $A_\uparrow(X)$ pour les attributs synthétisés où $\forall X \in T ~ A_\uparrow(X) = \emptyset$
+        \item $A_\downarrow(X)$ pour les attributs hérités où, pour le symbole initial $S$, $A_\downarrow(S) = \emptyset$
     \end{itemize}
     Chaque attribut $a \in A(X)$ possède un ensemble (potentiellement infini) de valeurs possibles $V_a$ duquel une valeur est sélectionnée pour chaque apparition de $X$ dans l'arbre de dérivation.
     $r$ est une règle de production de la forme $X_0 \to X_1, \dots, X_n$ où $n \ge 1$, $X_0 \in N$ et $X_i \in (N \cup T)$ pour $1 \le i \le n$.
-    Une règle sémantique $\varphi_{a_j} \in \Phi_r$ est une fonction $\varphi_{a_j} : \bigtimes_{i = 1}^n V_{a_i} \to V_{a_j}$ où $a_j \in A_0(X_j)$ si $j = 0$, $a_j \in A_1(X_j)$ si $j > 0$ et $a_i \in A(X_i)$.
-    En d'autres termes, chaque règle sémantique calcule la valeur d'un attribut de $X_j$ à partir des attributs des symboles $X_0, \dots, X_n$.
+    Une règle sémantique $\varphi_{a_j} \in \Phi_r$ est une fonction $\varphi_{a_j} : \bigtimes_{i = 1}^n V_{a_i} \to V_{a_j}$ où $a_j \in A_\uparrow(X_j)$ si $j = 0$, $a_j \in A_\downarrow(X_j)$ si $j > 0$ et $a_i \in A(X_i)$.
+    En d'autres termes, une règle sémantique sur $r: X_0 \to X_1, \dots, X_n$ est de la forme $a_0 \gets \varphi(a_1, \dots, a_k)$ et calcule la valeur d'un attribut de $X_j$ à partir des attributs des symboles $X_0, \dots, X_n$.
+    Si $a_0$ est un attribut de $X_0$, c'est un attribut synthétisé.
+    Si $a_0$ est un attribut de $X_j$ ($1 \leq j \leq n$), c'est un attribut hérité.
 \end{definition}
 
+\begin{example}
+    \label{ex:struct:cfg-attr}
+    Soit la grammaire attribuée $G'$ construite à partir de $G$ (exemple~\ref{ex:struct:cfg}).
+    La grammaire $G'$ associe la valeur décimale à un nombre binaire.
+    Cela est formalisé par les règles de production suivantes en associant un attribut synthétisé $val$ au non terminal $P$ et en fournissant des règles pour calculer la valeur de l'attribut $val$ par rapport à la valeur de l'attribut $val'$ précédemment calculé et associé au côté droit de la règle de production.
+    Dans les règles de production, les attributs sont indiqués en indice et les règles sémantiques sont présentées, entre crochet, à droite de la règle de production.
+    La figure~\ref{fig:struct:parsetree-attr} montre, pour chaque niveau, la valeur calculé de l'attribut $val$ pour $0011$.
+    \begin{align*}
+        P_{val} & \to 0 & [val \gets 0] \\
+        P_{val} & \to 1 & [val \gets 1] \\
+        P_{val} & \to P_{val'}~0 & [val \gets 2 * val'] \\
+        P_{val} & \to P_{val'}~1 & [val \gets 2 * val' + 1]
+    \end{align*}
+\end{example}
+
 Les grammaires \emph{S-attribuées} sont des grammaires attribuées qui contiennent uniquement des attributs synthétisés.
-Elles ont l'avantage d'êtres plus simple est plus facilement vérifiable en utilisant uniquement une propagation du bas vers le haut.
+Elles ont l'avantage d'être plus simple et plus facilement vérifiable en utilisant uniquement une propagation du bas vers le haut.
 Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse sémantique bien que leur pouvoir d'expression soit réduit par rapport aux autres grammaires attribuées qui acceptent les attributs hérités.
 
 \begin{definition}[Méta-grammaire]
-    Une méta-grammaire $G = (N, T, R, S)$ est une grammaire S-attribuée qui définit la syntaxe des règles de production d'un ensemble de \gls{cfg} condensées.
+    Une méta-grammaire $\mathbb{G} = (N, T, R, S)$ est une grammaire S-attribuée qui définit la syntaxe des règles de production d'un ensemble de \gls{cfg} condensées.
     $N$ est l'ensemble fini de méta-non-terminaux, $T$ l'ensemble fini de méta-terminaux, $R$ l'ensemble fini des règles de productions et $S \in N$ le symbole initial.
     On définit l'attribut spécial $\gamma$ qui permet de vérifier à chaque niveau de l'arbre de dérivation que la dérivation produit bien une \gls{cfg} condensées valide.
-    Si $S_\gamma = \top$, alors la dérivation de $G$ est considéré valide, inversement, si $S_\gamma = \bot$ la dérivation de $G$ est considéré invalide.
+    Si $S_\gamma = \top$, alors la dérivation de $\mathbb{G}$ est considérée valide, inversement, si $S_\gamma = \bot$ la dérivation de $\mathbb{G}$ est considérée invalide.
     On distingue alors deux types de règles sémantiques dans une règle de production $r \in R$ :
     \begin{itemize}
         \item Les règles de la forme $a \gets \alpha$ où $a$ est l'attribut qui est évalué et $\alpha$ est une formule sur les attributs dans $r$ ;
@@ -74,17 +160,18 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
 \subsection{Arbres}
 
 \begin{definition}[Arbre ordonné]
-    Formellement, un arbre $T$ est une paire $T = (D, l)$ où $D$ est le domaine de l'arbre (l'ensemble des positions) et $l$ est une fonction de labellisation telle que $l : D \to \Sigma \cup \{\lambda\}$ où $\Sigma$ est l'ensemble des labels de l'arbre et $\lambda$ un symbole spécial.
+    \label{def:struct:tree}
+    Formellement, un arbre $T$ est une paire $T = (D, l)$ où $D$ est le domaine de l'arbre et $l$ est une fonction de d'étiquetage telle que $l : D \to \Sigma \cup \{\lambda\}$ où $\Sigma$ est l'ensemble des labels de l'arbre et $\lambda$ un symbole spécial.
     Le domaine $D$ d'un arbre est un sous ensemble de $(\mathbb{N})^*$ (c.-à-d. un ensemble de séquence d'entier de la forme $x.y.z$) qui respecte les propriétés suivantes :
     \begin{enumerate}
         \item $D$ est clos sur les préfixes, c'est-à-dire que pour $u, u' \in (\mathbb{N})^*$ si $u$ est un préfixe de $u'$ (noté $u \preceq u'$) et $u' \in D$, alors $u \in D$, et
         \item Pour tout $u, j \in \mathbb{N}$ si $u.j \in D$ alors $\forall i \in \mathbb{N}$ tel que $0 \leq i \leq j ~ u.i \in D$.
     \end{enumerate}
     Chaque élément de $D$ est appelé \emph{position}.
-    Pour un nœud $n$ à la position $p$, $|p|$ définit la longueur de la séquence, aussi appelée profondeur de $n$.
-    La racine d'un arbre est à la position $\epsilon$ et est représenté par le symbole spécial $\lambda$ tel que $t(\epsilon) = \lambda$.
+    Pour un nœud $n$ à la position $p$, $|p|$ définit la longueur de la séquence, aussi appelée \emph{profondeur} de $n$.
+    La racine d'un arbre est à la position $\epsilon$ et est représenté par le symbole spécial $\lambda$ tel que $l(\epsilon) = \lambda$.
     Un arbre vide est donc défini par  $T = (\epsilon, \langle \epsilon \mapsto \lambda \rangle)$.
-    Étant donné un nœud à la position $u.i$ on appelle \emph{parent} le nœud à la position $u$ et \emph {enfants} les nœuds aux positions $u.i.j ~ \forall j \in \mathbb{N}$ tel que $u.i.j \in D$.
+    Étant donné un nœud à la position $u.i$ on appelle \emph{parent} le nœud à la position $u$ et \emph{enfants} les nœuds aux positions $u.i.j ~ \forall j \in \mathbb{N}$ tel que $u.i.j \in D$.
     Un nœud $n$ à la position $u$ est un \emph{descendant} d'un nœud $m$ la position $v$ si et seulement si $v$ est un préfixe direct de $u$ (noté $v \preceq u$) ou indirect (noté $v \preceq^* u$), inversement $m$ est un \emph{ancêtre} de $n$.
     On appelle \emph{feuille} un nœud à une position $u$ tel que $\nexists u.i \in D ~ \forall i \in \mathbb{N}$, en d'autres termes, c'est un nœud qui n'a pas d'enfants.
 \end{definition}
@@ -98,18 +185,42 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
     Soit un sous arbre $t = T|_u$, on note $t' = P_i^t$ le $i$-éme sous arbre parent de $t$ tel que $t' = T|_v$,  $u = vw$ et $|w| = i$.
 \end{definition}
 
+La figure~\ref{fig:struct:tree-ex} illustre un arbre $T = (D, l)$ ordonné où $D=\{\epsilon, 0, 1, 1.0, 1.1\}$.
+Dans la figure, les positions sont représentées entre parenthèses.
+Nous avons par exemple $l(0) = child1$.
+$T|_{1} = (D', l')$ est un sous-arbre de $T$.
+Remarquez que $T|_{1} $ n'est pas un arbre, car $D'= \{1, 1.0, 1.1\}$ ne respecte pas les conditions requises (définition~\ref{def:struct:tree}).
+
+\begin{figure}[htb]
+    \centering
+    \begin{adjustbox}{max width=\linewidth}
+        \begin{forest}
+            for tree={s sep=5em}
+            [{parent ($\epsilon$)}
+                    [{child1 ($0$)}]
+                    [{child2 ($1$)}
+                            [{grandchild1 ($1.0$)}]
+                            [{grandchild2 ($1.1$)}]
+                    ]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \caption{Exemple d'un arbre ordonné}
+    \label{fig:struct:tree-ex}
+\end{figure}
+
 \subsection{Textes et arbres}
 
-Les textes possèdent une structure complexe, cependant il est possible de représenter un texte comme un arbre en utilisant une analyse syntaxique.
-Ils existent deux structures très utilisées dans la littérature :
+Les textes possèdent une structure complexe, cependant il est possible de les représenter comme des arbres.
+Il existe deux structures très utilisées dans la littérature :
 
 \begin{description}
     \item[Arbre syntaxique]
           (Figure~\ref{fig:struct:ex-tree:syx})
           Aussi appelé arbre en constituant, c'est l'arbre de dérivation de la grammaire du texte.
           Il représente les relations syntaxiques (de proche en proche) entre les mots et les clauses et met en évidence la composition d'une phrase en sous parties.
-          Les feuilles de l'arbre sont les unités lexicales (les mots) et les nœuds intermédiaires représente les structures abstraites comme une phrase verbales ou un groupe nominal.
-          Chaque mot a pour parent un nœud représentant sa nature où \gls{pos} en anglais (nom, verbe, adjectif, etc).
+          Les feuilles de l'arbre sont les unités lexicales (les mots) et les nœuds intermédiaires représente les structures abstraites comme une phrase verbale (VP) ou un groupe nominal (NP).
+          Chaque mot a pour parent un nœud représentant sa nature où \gls{pos} en anglais : nom (NN), verbe (VBD), adjectif (ADJ), déterminent (DT), etc.
 
     \item[Arbre de dépendance]
           (Figure~\ref{fig:struct:ex-tree:dep})
@@ -196,7 +307,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 \end{definition}
 
 \begin{example}[Règle de réécriture]
-    Étant donné une règle de réécriture $rule(u.i)$ et une contrainte $|\sigma(x)| = i$ donnée figure~\ref{fig:sch:pre:rewritting:ex-rule}.
+    Étant donné la règle de réécriture $rule(u.i)$ et la contrainte $|\sigma(x)| = i$ donnée figure~\ref{fig:sch:pre:rewritting:ex-rule}.
     $U$ représente le nœud à la position $u$ de l'arbre cible, $x \in V$ est une variable et $A \in \Sigma$ représente un label de sous arbre.
     La règle est applicable sur un arbre $T$ s'il existe un sous arbre $t = T|_u$ avec une substitution $\sigma$ tel que $\sigma(x) = [t|_0, \dots, t|_i]$ et $l(u.i) = A$.
     L'arbre de destination \gls{rhs} à une correspondance avec le modèle \gls{lhs}, ici intuitivement claire : $U \mapsto U$ et $x \mapsto x$.
@@ -234,7 +345,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
         \label{fig:sch:pre:rewritting:ex-rule}
     \end{figure}
 
-    Si on considère l'arbre $T$ donné figure~\ref{fig:sch:pre:rewritting:ex:origin}, avec l'application de la règle $rule(0.2)$, où $u=0$ et $i=2$, on obtient $\sigma(x) = [A, B]$.
+    Si on considère l'arbre $T$ donné figure~\ref{fig:sch:pre:rewritting:ex:origin}, avec l'application de la règle $rule(0.2)$, où $u=0$ et $i=2$, on obtient $\sigma(x) = [C, B]$.
     Le résultat de l'application et l'arbre figure~\ref{fig:sch:pre:rewritting:ex:target}.
 
     \begin{figure}[htb]

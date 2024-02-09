@@ -1,0 +1,309 @@
+\selectlanguage{english}
+
+To explain our method for computing the most specific homomorphism $h_m$ we introduce the notion of $P$-homomorphism.
+
+\begin{definition}
+    Given $I$ a set of instantiated atoms and $N$ a null occurring in $I$, let $P=\textsf{LinkedNull}_{I,N}$.
+    A $P$-homomorphism is a homomorphism $h$ such that $h(I) \subseteq I$ and for every null $N'$ in $null(I) \setminus null(P)$, $h(N')=N'$.
+    $I$ is said to be $P$-reducible if there exists a $P$-homomorphism $h$ such that $h(I)$ is a strict subset of $I$.
+\end{definition}
+
+In the following proposition, given a set $I$ of instantiated atoms and a null $N$ in $\nu_0$, we use the following notation:
+\begin{itemize}
+    \item $P$ denotes the set of atoms $\textsf{LinkedNull}_{I,N}$, and $null(P)=\{N_1, \ldots N_p\}$ denotes the set of nulls occurring in $P$;
+
+    \item $q_{core}(I)$ is the answer to $q_{core}$ computed against $I$.
+          That is, $q_{core}(I)$ is the set $\{h_1, \ldots, h_q\}$ of all possible $P$-homomor\-phisms defined over $null(P)$.
+          We suppose that $h_1$ is the identity, i.e. for every $j=1,\ldots,p$, $h_1(N_j)=N_j$;
+
+    \item $H_P$ denotes the table with $p$ columns and $q$ rows such that $H_P[i,j] = h_i(N_j)$.
+
+    \item Given a set of atoms $Q$, we denote by $cons\_null(Q)$ the set of all symbols $\sigma$ such that $\sigma$ is a constant or a null \emph{not} in $null(Q)$.
+\end{itemize}
+
+We recall that given two homomorphisms $h_1$ and $h_2$ over the same set of symbols $\Sigma$, $h_1$ is said to be \emph{less specific than} $h_2$, denoted by $h_1 \preceq h_2$, if there exists a homomorphism $h$ over $\Sigma$ such that $h \circ h_{1}=h_2$.
+Using these notations, the following proposition holds.
+
+\begin{proposition}
+    \label{prop:spec}
+    Given $h_i$ and $h_{i'}$ in $q_{core}(I)$, $h_i \preceq h_{i'}$ holds if and only if, for every $j=1, \dots, p$, we have:
+    \begin{enumerate}
+        \item If $H_P[i,j]$ is in $cons\_null(P)$, then $H_P[i,j] = H_P[i',j]$;
+        \item If $H_P[i,j]$ is a null $N$ in $null(P)$, then for every $j' \ne j$ such that $H_P[i,j] = H_P[i,j']$ it holds that $H_P[i',j] = H_P[i',j']$.
+    \end{enumerate}
+\end{proposition}
+
+\begin{proof}
+    Let us first assume that $h_i \preceq h_{i'}$ holds.
+    In this case, there exists $h$ such that $h \circ h_{i} = h_{i'}$.
+    If $N_j$ is such that $h_i(N_j)$ is a constant or a null not in $null(P)$, then for every $P$-homomorphism $h_P$, $h_P(h_{i}(N_j))= h_{i}(N_j)$.
+    Hence, $h_{i'}(N_j)= h \circ h_{i}(N_j) = h_{i}(N_j)$, which shows item (1).
+    If $j$ and $j'$ are such that $h_i(N_j)= h_i(N_{j'})$, then $h_{i'}(N_j)= h_{i'}(N_{j'})$ also holds, showing item (2).
+
+    Conversely, assume that for $h_i$ and $h_{i'}$, items (1) and (2) hold.
+    Let $h$ be defined for every $j = 1, \ldots, p$ as follows: if there exists $N_k$ such that $h_i(N_k)=N_j$ then $h(N_j) = h_{i'}(N_k)$, otherwise $h(N_j)=N_j$.
+    We first notice that $h$ is well-defined.
+    Indeed, if $k$ and $k'$ are such that $h_i(N_k)=h_i(N_{k'})$, then we have two expressions defining $h(N_j)$, namely $h(N_j) = h_{i'}(N_k)$ and $h(N_j) = h_{i'}(N_{k'})$.
+    However, by item (2) we have $h_{i'}(N_k)=h_{i'}(N_{k'})$, and thus, these two expressions yield the same value.
+    We now prove that $h_{i} \preceq h_{i'}$, that is, that for every $k = 1, \ldots, p$, then $h_{i'}(N_k)=h(h_{i}(N_k))$.
+    If $h_i(N_k)$ is not in $null(P)$, then, we have $h_i(N_k)=h_{i'}(N_k)=N_k$, and by construction of $h$ we also have $h(N_K)=N_k$.
+    Therefore, $h_{i'}(N_k)=h(h_{i}(N_k))=N_k$.
+    On the other hand, if $h_i(N_k)=N_j$, by definition of $h$, we have $h_{i'}(N_k)=h(N_j)$.
+    Hence, $h_{i'}(N_k)=h(N_j)=h(h_i(N_k))$.
+    Since for every $k = 1, \ldots, p$, we have $h_{i'}(N_k)=h(N_j)=h(h_i(N_k))$, it follows that $h_i \preceq h_{i'}$, and the proof is complete.
+\end{proof}
+
+\begin{example}\label{ex:most-spec}
+    {\rm
+        Let $I=\{B(N_1,N_2),$ $B(N_2,N_1),$ $C(N_1,a),$ $C(N_2,a),$ $C(N_3,a)\}$ and $\nu_0=\{N_1\}$.
+
+        In this case, $P=\{\{B(N_1,N_2),$ $B(N_2,N_1),$ $C(N_1,a),$ $C(N_2,a)\}\}$ and thus $null(P)=\{N_1, N_2\}$ and $cons\_null(P)=\{a, N_3\}$.
+        This implies that $P$-homomorphisms should \emph{not} change $N_3$, or in other words, $N_3$ should be treated as constant.
+        The query $q_{core}$ is thus written as follows:
+
+        $q_{core}: ans(x_1,x_2) \leftarrow B(x_1,x_2),B(x_2,x_1),C(x_1,a),C(x_2,a)$
+
+        \smallskip\noindent
+        and the table $H_P$ representing the answer $q_{core}(I)$ is shown below.
+
+        \begin{center}
+            \begin{tabular}{c|cc}
+                $H_P$ & $x_1$  & $x_2$ \\ \hline
+                1     & $N_1 $ & $N_2$ \\
+                2     & $N_2 $ & $N_1$ \\
+            \end{tabular}
+        \end{center}
+
+        $H_P$ has 2 columns (because $null(P)$ contains two nulls), and 2 rows due to two answers in $q_{core}(I)$.
+        It is easy to see that $h_1 \preceq h_2$, and $h_2 \preceq h_1$ meaning that there is no advantage in trying to simplify the database instance in this case.
+        Indeed, we have $h_1(I) = I$, where $h_1$ is the identity.
+
+        We have $h_2(I) = I$ as well, although $h_2 $ is not the identity.
+        Remark that $h_2$ does not satisfy $h_2 = h_2 \circ h_2$ (i.e. $h_2$ is not idempotent) because $h_2(h_2(N_1))=h_2(N_2)=N_1$, whereas $h_2(N_1)=N_2$.
+        As will be seen shortly, detecting such homomorphisms allows for computational optimizations.
+        \hfill$\Box$}
+\end{example}
+
+The following corollary shows how to find one most specific homomorphism, based on Proposition~\ref{prop:spec}.
+To state the corollary, we use the following notation for $i=1, \ldots,q$:
+\begin{itemize}
+    \item
+          $\gamma_i$ is the number of nulls $N$ in $null(P)$ such that $h_i(N)$ is in $cons\_null(P)$;
+    \item
+          $\mu_i=\{k \in \{1, \ldots, q\}~|~(\forall j=1, \ldots, p) (h_i(N_j) \in cons\_null(P) \Rightarrow h_k(N_j) = h_i(N_j))\}$;
+    \item
+          $\pi_i$ is the number of distinct nulls in $null(P)$ in the set $h_i(null(P))$.
+\end{itemize}
+
+Intuitively speaking, considering that $H_P$ is the tableau,  then $\gamma_i$ is the number of columns that, at row $i$, contain a symbol in $cons\_null(P)$.
+On the other hand, $\mu_i$ is the set of all rows in $H_P$ containing the same symbols of $cons\_null(P)$ in the same columns as row $i$ does (i.e., if $h_i(N_j) = c$ then $h_k(N_j)=c$).
+Then $\pi_i$ is the number of distinct nulls in $nulls(P)$ occurring in row $i$.
+
+The corollary below formalizes the following informal remarks:
+\begin{enumerate}
+    \item If $h_i \ne h_i \circ h_i$, then $h_i$ cannot be one of the most specific homomorphisms, because in this case, $h_i \prec h_i \circ h_i$.
+          For instance, in Example~\ref{ex:most-spec}, we have $h_2 \neq h_2 \circ h_2$.
+
+    \item Most specific homomorphisms are among the rows of $H_P$ with the largest number of symbols in $cons\_null(P)$.
+
+          Indeed, let $h_i$ and $h_j$ be such that row $i$ contains strictly more symbols in $cons\_null(P)$ than row $j$ and $h_i \prec h_j$.
+          Then, there exists $h$ such that $h \circ h_i = h_j$, and so, if $N$ in $null(P)$ is such that $h_i(N)$ is in $cons\_null(P)$, we have $h(h_i(N))=h_i(N)$, and so $h_i(N)=h_j(N)$.
+
+          Thus, row $j$ has at least as many symbols in $cons\_null(P)$ as row $i$, which implies a contradiction.
+          Hence, for every $N$ in $null(P)$, $h_i(N)$ is also in $null(P)$, in which case rows $i$ and $j$ have no symbols in $cons\_null(P)$, which is another contradiction.
+
+    \item Considering one of the rows defined just above, say row $i$, among all rows having the same symbols in $cons\_null(P)$ in the same columns as row $i$, we argue that a row with as few distinct nulls in $null(P)$ defines one most specific homomorphism.
+\end{enumerate}
+
+\begin{corollary}
+    \label{coro: spec}
+    Given $I$ and $P$ as above, denoting by $\{h_1, \ldots, h_q\}$ the set $q_{core}(I)$, the following holds:
+    \begin{enumerate}
+        \item If $h_i$ is one of the most specific $P$-homomorphisms in $q_{core}(I)$ then $h_i$ is idempotent, that is, $h_i \circ h_i = h_i$.
+
+        \item $h_{i}$ is one of the most specific $P$-homomorphisms in $q_{core}(I)$ if :
+              \begin{enumerate*}%[label={(\alpha*)}]
+                  \item $\gamma_i = \max_{1 \leq j\leq q}(\gamma_j)$, and
+                  \item $\pi_i = \min_{k\in \mu_i}(\pi_k)$.
+              \end{enumerate*}
+    \end{enumerate}
+\end{corollary}
+
+\begin{proof}
+    First, Proposition~\ref{prop:spec} implies that $h_i \preceq h_i \circ h_i$ holds for every $h_i$.
+    Moreover, as $h_i$ is a $P$-homomorphism, we have $h_i(I) \subseteq I$.
+    Thus, $h_i \circ h_i(I) \subseteq I$, which implies that $h_i \circ h_i$ is a $P$-homomorphism as well.
+    The proof of item (1) is therefore complete.
+
+    Assume that $h_i$ satisfies (2) and let $h_k$ be a $P$-homomorphism such that $h_i \preceq h_k$.
+    By Proposition~\ref{prop:spec}, if $h_i(N_j)$ is in $cons\_null(P)$, then $h_i(N_j)=h_k(N_j)$.
+    Therefore, $\gamma_i \leq \gamma_k$, and as $\gamma_k \leq \gamma_i$, this implies $\gamma_i = \gamma_k$.
+    Thus, $k$ is in $\mu_i$, which implies that $h_i(N_j)$ is in $null(P)$ if and only if so is $h_k(N_j)$.
+    By Proposition~\ref{prop:spec}, if $j$ and $j'$ are such that $h_i(N_j)=h_i(N_{j'})$ then we also have $h_k(N_j)=h_k(N_{j'})$.
+    It therefore follows that fewer nulls in $null(P)$ occur for $h_k$, that is $\pi_k \leq \pi_i$.
+    As $\pi_i \leq \pi_k$ must hold, we obtain that $\pi_i = \pi_k$, meaning that $h_i$ and $h_k$ are equal up to a null renaming.
+    The proof is therefore complete.
+\end{proof}
+
+\begin{procedure}[htb]
+    % \caption{ChooseMostSpecific($q_{core}(I)$)}
+    \label{mostspecific}
+
+    % \Input{$q_{core}(I)$}
+    % \Output{$h_m$, the homomorphism defined by $H_P[row\_spec]$}
+
+    Build $H_P$ as explained in Proposition~\ref{prop:spec}\;
+    $row\_max := 1$ ; $count\_max := 0$ ; $i := 2$\;
+    \For{$i = 2$ \KwTo $q$}{
+    $idemPot := \text{true}$\;
+    $count\_curr := 0$ ; $j := 1$\;
+    \While{$idemPot = \text{true}$ and $j \leq p$}{
+    \If{$H_P[i,j]$ is in $cons\_null(P)$}{
+    $count\_curr := count\_curr + 1$\;
+    }
+    \Else{
+    Let $N_k = H_P[i,j]$ \tcp*{$N_k$ is in $null(P)$}
+    \If{$H_P[i,k] \ne N_k$}{
+    $idemPot := \text{false}$ \tcp*{$h_i$ is not idem-potent}
+    Mark row $H_P[i]$\;
+    }
+    }
+    $j := j + 1$\;
+    }
+    \If{$idemPot = \text{true}$}{
+        \If{$count\_curr > count\_max$}{
+            $row\_max := i$\;
+            $count\_max := count\_curr$\;
+        }
+    }
+    }
+    $row\_spec := row\_max$\;
+    Let $count\_min$ be the number of distinct nulls in $null(P)$ occurring in $H_P[row\_max]$\;
+    \For{$i = 2$ \KwTo $q$}{
+    \If{row $H_P[i]$ is not marked and $i \neq row\_max$}{
+    $match := \text{true}$ ; $j := 1$\;
+    \While{$match = \text{true}$ and $j \leq p$}{
+    \If{$H_P[row\_max,j]$ is in $cons\_null(P)$ and $H_P[row\_max,j] \neq H_P[i,j]$}{
+    $match := \text{false}$\;
+    }
+    $j := j + 1$\;
+    }
+    \If{$match = \text{true}$}{
+    Let $count\_null$ be the number of distinct nulls in $null(P)$ occurring in $H_P[i]$\;
+    \If{$count\_null < count\_min$}{
+        $row\_spec := i$\;
+        $count\_min := count\_null$\;
+    }
+    }
+    }
+    }
+    \Return{$h_m$, the homomorphism defined by $H_P[row\_spec]$}\;
+\end{procedure}
+
+As a consequence, finding a most specific $P$-homomorphism in $q_{core}(I)$ amounts to $(i)$ discard any row not defining an idem-potent homomorphism and $(ii)$ among the remaining rows, identify one homomorphism satisfying item 2 of Corollary~\ref{coro: spec}.
+Algorithm~\ref{mostspecific} shows how to compute such a most specific homomorphism, and we notice that this does \emph{not} require data access.
+To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
+
+\begin{example}
+    \label{ex:most-spec-DL}
+    We first consider the context of Example~\ref{ex:most-spec}, where $I=\{B(N_1,N_2),$ $B(N_2,N_1),$ $C(N_1,a),$ $C(N_2,a),$ $C(N_3,a)\}$ and
+    $P=\{B(N_1,N_2),$ $B(N_2,N_1),$ $C(N_1,a),$ $C(N_2,a)\}$.
+
+    In this case, $null(P)=\{N_1, N_2\}$, $cons\_null(P)=\{N_3\}$, and the associated table $H_P$ has been shown already.
+    Applying Algorithm~\ref{mostspecific} based on the table $H_P$, the following computations are achieved.
+
+    The first loop line~\ref{line:loop1-spec} aims at marking rows defining non-idempotent $P$-homomorphisms (that is, such that $h \circ h \ne h$) and mean-while to find one unmarked row with as many symbols in $cons\_null(P)$ as possible, in reference to Corollary~\ref{coro: spec}(2).
+    These computations return the following:
+    \begin{itemize}
+        \item When processing row $2$ of $H_P$, we have $H_P[2,1]=N_2$ where $N_2$ is in $null(P)$, and $H_P[i,2]=N_1$.
+              Since $N_1 \ne N_2$, $idemPot$ is set to ${\tt false}$ and row $2$ is marked on line~\ref{line:non-idem}.
+
+        \item Since there is no other row to process, the loop line~\ref{line:loop1-spec} returns $row\_max = 1$ and $count\_curr =0$.
+    \end{itemize}
+    Hence, Algorithm~\ref{mostspecific} returns $row\_spec=1$ and so, $h_m$ is defined by $h_m(N_1)=N_1$ and $h_m(N_2)=N_2$.
+    In other words, $I$ is not simplified, which is indeed the expected result.
+
+    We now illustrate further Algorithm~\ref{mostspecific}, using two more sophisticated cases.
+    First, let $\nu_0=\{N_1\}$ and $I_1=\{B(N_1, N_2),$ $B(a, N_2),$ $B(a,N_3),$ $B(N_4,N_3),$ $C(N_2,N_2),$ $C(N_3,N_3)\}$.
+    In this case, $\textsf{LinkedNull}_{I,N_1}=\{N_1,N_2\}$ and thus, $PSet = \{P\}$ where $P=\{B(N_1, N_2),$ $B(a,N_2),$ $C(N_2,N_2)\}$.
+    \[
+        q_{core}:ans(x_1,x_2) \leftarrow B(x_1, x_2), B(a,x_2),C(x_2,x_2)
+    \]
+    Moreover, the query $q_{core}$ below, is generated and its answer against $I_1$, $q_{core}(I_1)$, is defined in the following table $H^1_P$:
+
+    \begin{center}
+        \begin{tabular}{c|cc}
+            $H_P^1$ & $x_1$  & $x_2$  \\ \hline
+            1       & $N_1 $ & $N_2$  \\
+            2       & $a$    & $N_2$  \\
+            3       & $a$    & $ N_3$ \\
+            4       & $N_4$  & $ N_3$ \\
+        \end{tabular}
+    \end{center}
+
+    $H_P^1$ has 2 columns and 4 rows due to four possible answers in $q_{core}(I_1)$.
+    Moreover, $h_1 \preceq h_2$, $h_2 \preceq h_3$ and $h_2 \preceq h_4$.
+    Notice that $h_3$ and $h_4$ are not comparable because $a, N_3$ and $N_4$ are in $cons\_null(P)$.
+    Applying Algorithm~\ref{mostspecific} based on the table $H_P^1$, the first loop line~\ref{line:loop1-spec} achieves the following:
+    \begin{itemize}
+        \item
+              No row is marked as non-idempotent on line~\ref{line:non-idem}.
+              This is so because for every $i=1, \ldots, 4$, and every $j=1,2$, if $H^1_P[i,j]=N_k$ where $N_k$ is $N_1$ or $N_2$, $H^1_P[i,k]=N_k$.
+        \item Regarding the value of $count\_curr$, the computed value is $0$ for the first row, $1$ for row $2$, and $2$ for rows $3$ and $4$ (because $a, N_3$ and $N_4$ are in $cons\_null(P)$).
+              Thus, applying the test line~\ref{test:count-max}, $count\_curr$ to set to $2$, and on line~\ref{assing:row-max}, $row\_max$ is set to $3$.
+              Indeed, although for row $4$, we have $count\_curr = 2$, the test line~\ref{test:count-max} fails, and thus the value of $row\_max$ is not changed.
+              Then, $row\_spec$ is set to $3$ on line~\ref{assign:row-spec1} and $cont\_min$ is set to $0$ on line~\ref{assing:row-min}.
+    \end{itemize}
+    Therefore, processing the loop line~\ref{line:loop2-spec} yields no change and Algorithm~\ref{mostspecific} returns $h_m$ defined by $h_m(N_1)=a$ and $h_m(N_2)=N_3$, in which case, $h_m(I_1)=\{B(a, N_3), B(N_4,N_3), C(N_3,N_3)\}$, which is not redundant, when considering $N_3$ and $N_4$ as particular `constants'.
+
+    As a more sophisticated illustration of Algorithm~\ref{mostspecific}, let $\nu_0=\{N_1\}$ and $I_2= \{B(N_1, N_2),$ $B(a, N_2),$ $C(N_2,N_2),$ $C(N_2,N_3)\}$.
+    Here, $\textsf{LinkedNull}_{I,N_1}=\{N_1,N_2, N_3\}$ and thus, $PSet = \{P\}$ where $P=\{B(N_1, N_2),$ $B(a,N_2),$ $C(N_2,N_2),$ $C(N_2,N_3)\}$.
+    \[
+        q_{core}:ans(x_1,x_2,x_3) \leftarrow B(x_1, x_2), B(a,x_2),C(x_2,x_2),C(x_2,x_3)
+    \]
+    Moreover, the query $q_{core}$ below, is generated and $q_{core}(I_2)$, is defined in the following table $H^2_P$:
+
+    \begin{center}
+        \begin{tabular}{c|ccc}
+            $H_P^2$ & $x_1$  & $x_2$ & $x_3$ \\ \hline
+            1       & $N_1 $ & $N_2$ & $N_3$ \\
+            2       & $N_1$  & $N_2$ & $N_2$ \\
+            3       & $a$    & $N_2$ & $N_3$ \\
+            4       & $a$    & $N_2$ & $N_2$ \\
+        \end{tabular}
+    \end{center}
+    $H_P^2$ has 3 columns and 4 rows due to four possible answers in $q_{core}(I_2)$.
+    Moreover,
+    $h_1 \prec h_2$, $h_1 \prec h_3$, $h_2 \prec h_4$ and $h_3 \prec h_4$.
+    Applying Algorithm~\ref{mostspecific} based on the table $H_P^2$, the loop line~\ref{line:loop1-spec} achieves the following:
+    \begin{itemize}
+        \item
+              As above, no row is marked as non-idempotent on line~\ref{line:non-idem}.
+              This is so because for $i=1, \ldots, 4$, and $j=1,2,3$, if $H^2_P[i,j]=N_k$ where $N_k$ is $N_1$, $N_2$ or $N_3$, $H^2_P[i,k]=N_k$.
+        \item
+              As above, on line~\ref{assing:row-max}, $row\_max$ is set to $3$ and thus, $row\_spec$ is set to $3$ on line~\ref{assign:row-spec1}.
+              Here, $count\_min$ is set to $2$ on line~\ref{assing:row-min} because $N_2$ and $N_3$ are in $null(P)$.
+    \end{itemize}
+    When processing the loop line~\ref{line:loop2-spec}, the only row to be considered is row $4$, for which $match$ is {\tt true}, thus implying that the test on line~\ref{line:test-match} succeeds.
+    Since for row $4$, the value of $count\_null$ is $1$ (because row $4$ contains the only null $N_2$), the value of $row\_spec$ is set to $4$, line~\ref{assign:row-spec}.
+    Hence, Algorithm~\ref{mostspecific} returns $h_m$ defined by $h_m(N_1)=a$, $h_m(N_2)=N_2$ and $h_m(N_3)=N_2$.
+    In this case,  $h_m(I_2)=\{B(a, N_2), C(N_2,N_2)\}$, which is not redundant.
+\end{example}
+
+% Homomorphisms have been used in database theory during the last decades, in the field of query optimization \cite{ahoEfficientOptimizationClass1979,chandraOptimalImplementationConjunctive1977} (we refer to \cite{abiteboulFoundationsDatabases1995} for an overview).
+% We notice in this respect that, in \cite{ahoEfficientOptimizationClass1979}, a partial pre-ordering between homomorphisms is defined using the same criteria as in Proposition~\ref{prop:spec}, showing that our approach to simplification is closely related to the field of query optimization.
+
+% Roughly, in our approach, we compare all the answers ($h_1, \dots h_q$) for $q_{core}$ and chose one ($h_m$) among the most specific ones
+% (which are incomparable).
+% From another point of view, if we consider queries $Q_1$, $Q_2$, $\dots$, $Q_q$ as the instantiations of $q_{core}$ by $h_1, \dots h_q$, respectively, then $h_m$ is a homomorphism such that $h_m(body (Q_i)) = body (Q)$ for all $Q \subseteq Q_i$.
+% Actually, our simplification technique is based on tableau optimization, as done in \cite{ahoEfficientOptimizationClass1979} for query optimization, where the sets of variables and of distinguished variables are, respectively, called, in our approach, the $null(P)$ and $cons\_null$.
+% However, the contexts and the expectations in our approach are fundamentally different from those summarized in~\cite{abiteboulFoundationsDatabases1995}.
+
+% Indeed:
+% \begin{itemize}
+%     \item
+%           In \cite{abiteboulFoundationsDatabases1995}, the tableau is built up from the query \emph{body}, whereas in our approach, the tableau is built up from the answer to a given query.
+%     \item
+%           Our approach generates \emph{one} most specific homomorphism, whereas the approach shown in \cite{abiteboulFoundationsDatabases1995} aims at discarding all non most specific.
+% \end{itemize}
+% As a result, the problem we deal with can be seen as \emph{more specific} than the general case considered in \cite{abiteboulFoundationsDatabases1995, ahoEfficientOptimizationClass1979}, thus resulting in a specific algorithm.

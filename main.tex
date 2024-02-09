@@ -5,7 +5,7 @@
 % Contact SCD : thelec@listes.univ-orleans.fr
 
 % Classe du document : book :
-\documentclass[a4paper,10pt,french]{extbook}
+\documentclass[a4paper,10pt,english,french]{extbook}
 
 \pdfinclusioncopyfonts=1
 \pdfgentounicode=1
@@ -47,6 +47,7 @@
 \usepackage{makeidx}                 % Pour l'index
 \usepackage{graphicx}                % Pour inclure des figures
 \usepackage{subcaption}              % Sous-figure (ou sous-tableau)
+\usepackage{wrapfig}
 \usepackage[svgnames]{xcolor}
 \usepackage{bookmark}
 \usepackage{hyperref}                % Lien hypertextes
@@ -205,6 +206,7 @@
 % Theorems
 \theoremstyle{plain}
 \newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
 
 \theoremstyle{definition}
 \newtheorem{example}{Exemple}[section]
