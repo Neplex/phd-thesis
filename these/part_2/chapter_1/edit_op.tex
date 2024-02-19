@@ -10,111 +10,7 @@
 \end{table}
 
 
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[U
-				[$x$]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-			[U
-				[$x$]
-				[A]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{ins\_elem}(T, A, u.i)$ where $A \in N, |\sigma(x)| = i$}
-	\label{fig:sch:op:insElem}
-\end{figure}
 
-
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-			[T]
-			\end{forest}
-		\end{adjustbox}
-		\caption{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[ROOT]
-			\end{forest}
-		\end{adjustbox}
-		\caption{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{del\_elem}(T, \epsilon)$}
-	\label{fig:sch:op:insElem}
-\end{figure}
-
-
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-			[U
-				[$x$]
-				[A]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[U
-				[$x$]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{del\_elem}(T, u.i)$ où $|\sigma(x)| = i$ si $|\sigma(x)| + |\sigma(y)| \neq 0$, sinon $\textsf{del\_elem}(X, u)$}
-	\label{fig:sch:op:insElem}
-\end{figure}
 
 
 
@@ -146,42 +42,9 @@
 	% 	      \item If $|\sigma(x)| + |\sigma(y)| = 0$ $\textsf{del\_elem}(X, u)$
 	%       \end{itemize}
 
-	\item $\textsf{fix\_coord}(T, u.i)$ where $|\sigma(x)| = i$, $|\sigma(x_{coord})| = 1$, $|\sigma(x_{cconj})| = 1$, $t(\sigma(x_{coord}) = `COORD`$ and $t(\sigma(x_{cconj})) = `CCONJ`$\\
-	      \begin{center}
-		      \begin{tikzpicture}
-			      \Tree [.U $x$ [.$y_1$ $y_2$ [.$x_{coord}$ $x_{cconj}$ $y_3$ ] ] $z$ ]
-		      \end{tikzpicture}
-		      {\Large$\rightarrow$}
-		      \begin{tikzpicture}
-			      \Tree [.U $x$ [.CONJ [.$y_1$ $y_2$ ] $y_3$ ] $z$ ]
-		      \end{tikzpicture}
-	      \end{center}
 
-	\item $\textsf{fix\_conj}(T, u.i)$ where $t(\sigma(conj_1)) = `CONJ`$, $t(\sigma(conj_2)) = `CONJ`$ and $|\sigma(conj_2)| = 1$\\
-	      \begin{center}
-		      \begin{tikzpicture}
-			      \Tree [.U $x$ [.$conj_1$ $y_1$ [.$conj_2$ $y_2$ ] $y_3$ ] $z$ ]
-		      \end{tikzpicture}
-		      {\Large$\rightarrow$}
-		      \begin{tikzpicture}
-			      \Tree [.U $x$ [.CONJ $y_1$ $y_2$ $y_3$ ] $z$ ]
-		      \end{tikzpicture}
-	      \end{center}
 	      % \item $\textsf{reduce}(X, u.i, S_{labels})$ where $|\sigma(x)| = i$, $|\sigma(y_1)| = 1$\\if $S_{label} = \emptyset$ then $|\sigma(y_2)| = 1$\\if $S_{label} \neq \emptyset$ then $X(u.i) \notin S_{labels})$\\
-	\item $\textsf{reduce}(T, u.i, S_{labels})$ where $|\sigma(x)| = i$, $|\sigma(y_1)| = 1$ and
-	      \begin{itemize}
-		      \item $|\sigma(y_2)| = 1$ when $S_{label} = \emptyset$
-		      \item $t(u.i) \notin S_{labels}$ when $S_{label} \neq \emptyset$
-	      \end{itemize}
-	      \begin{center}
-		      \begin{tikzpicture}
-			      \Tree [.U $x$ [.$y_1$ $y_2$ ] $z$ ]
-		      \end{tikzpicture}
-		      {\Large$\rightarrow$}
-		      \begin{tikzpicture}
-			      \Tree [.U $x$ $y_2$ $z$ ]
-		      \end{tikzpicture}
-	      \end{center}
+	
 
 	% \item $\textsf{unnest\_ent}(T, u.i)$ where $|\sigma(x_0)| = i$\\
 	    %   \begin{center}
@@ -214,7 +77,7 @@ Let
 \end{itemize}
 
 % \begin{algorithm}[!htb]
-% 	\caption{$\textsf{ins\_ent}(T = (D, t), TreeEnt)$}
+% 	\caption{$\textsf{ins\_ent}(T = (D, l), TreeEnt)$}
 % 	\begin{algorithmic}[1]
 % 		\STATE Let $u.b = u.x_0. x_1 \dots x_n$
 % 		\COMMENT{Check if $u.x_0$ have children not in the entity and should be left in place}
@@ -246,7 +109,7 @@ Let
 % \end{algorithm}
 
 % \begin{algorithm}[!htb]
-% 	\caption{$\textsf{ins\_ent\_list}(T = (D, t), L_{TreeEnt}, L_{Rels})$}
+% 	\caption{$\textsf{ins\_ent\_list}(T = (D, l), L_{TreeEnt}, L_{Rels})$}
 % 	\begin{algorithmic}[1]
 % 		% Fix coordinations in french to look like collections
 % 		\FORALL {$p \in D$}

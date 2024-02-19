@@ -59,12 +59,10 @@ Using these notations, the following proposition holds.
 
         In this case, $P=\{\{B(N_1,N_2),$ $B(N_2,N_1),$ $C(N_1,a),$ $C(N_2,a)\}\}$ and thus $null(P)=\{N_1, N_2\}$ and $cons\_null(P)=\{a, N_3\}$.
         This implies that $P$-homomorphisms should \emph{not} change $N_3$, or in other words, $N_3$ should be treated as constant.
-        The query $q_{core}$ is thus written as follows:
-
-        $q_{core}: ans(x_1,x_2) \leftarrow B(x_1,x_2),B(x_2,x_1),C(x_1,a),C(x_2,a)$
-
-        \smallskip\noindent
-        and the table $H_P$ representing the answer $q_{core}(I)$ is shown below.
+        The query $q_{core}$ is thus written as follows, and the table $H_P$ representing the answer $q_{core}(I)$ is shown below :
+        \[
+            q_{core}: ans(x_1,x_2) \leftarrow B(x_1,x_2), B(x_2,x_1), C(x_1,a), C(x_2,a)
+        \]
 
         \begin{center}
             \begin{tabular}{c|cc}
@@ -146,63 +144,66 @@ The corollary below formalizes the following informal remarks:
 \end{proof}
 
 \begin{procedure}[htb]
-    % \caption{ChooseMostSpecific($q_{core}(I)$)}
-    \label{mostspecific}
+    \caption{ChooseMostSpecific($H_P$)}
+    \label{algo:update:mostspecific}
 
     % \Input{$q_{core}(I)$}
     % \Output{$h_m$, the homomorphism defined by $H_P[row\_spec]$}
 
-    Build $H_P$ as explained in Proposition~\ref{prop:spec}\;
-    $row\_max := 1$ ; $count\_max := 0$ ; $i := 2$\;
-    \For{$i = 2$ \KwTo $q$}{
-    $idemPot := \text{true}$\;
-    $count\_curr := 0$ ; $j := 1$\;
-    \While{$idemPot = \text{true}$ and $j \leq p$}{
-    \If{$H_P[i,j]$ is in $cons\_null(P)$}{
-    $count\_curr := count\_curr + 1$\;
-    }
-    \Else{
-    Let $N_k = H_P[i,j]$ \tcp*{$N_k$ is in $null(P)$}
-    \If{$H_P[i,k] \ne N_k$}{
-    $idemPot := \text{false}$ \tcp*{$h_i$ is not idem-potent}
-    Mark row $H_P[i]$\;
-    }
-    }
-    $j := j + 1$\;
-    }
-    \If{$idemPot = \text{true}$}{
-        \If{$count\_curr > count\_max$}{
-            $row\_max := i$\;
-            $count\_max := count\_curr$\;
+    %Build $H_P$ as explained in Proposition~\ref{prop:spec}\;
+    $row\_max \gets 1$ \; $count\_max \gets 0$ \; $i \gets 2$\;
+    \ForAll{$i = 2$ \KwTo $q$\label{line:loop1-spec}}{
+        $idemPot \gets \texttt{true}$\;
+        $count\_curr \gets 0$ ; $j \gets 1$\;
+        \While{$idemPot = \texttt{true}$ and $j \leq p$}{
+            \eIf{$H_P[i,j]$ is in $cons\_null(P)$}{
+                $count\_curr \gets count\_curr + 1$\;
+            }{
+                Let $N_k = H_P[i,j]$ \tcp*{$N_k$ is in $null(P)$}
+                \If{$H_P[i,k] \ne N_k$}{
+                    $idemPot \gets \texttt{false}$ \tcp*{$h_i$ is not idem-potent}
+                    Mark row $H_P[i]$\label{line:non-idem}\;
+                }
+            }
+            $j \gets j + 1$\;
+        }
+        \If{$idemPot = \texttt{true}$}{
+            \If{$count\_curr > count\_max$\label{test:count-max}}{
+                $row\_max \gets i$\label{assing:row-max}\;
+                $count\_max \gets count\_curr$\;
+            }
         }
     }
+    $row\_spec \gets row\_max$\label{assign:row-spec1}\;
+    Let $count\_min$ be the number of distinct nulls in $null(P)$ occurring in $H_P[row\_max]$\label{assing:row-min}\;
+    \For{$i = 2$ \KwTo $q$\label{line:loop2-spec}}{
+        \If{row $H_P[i]$ is not marked and $i \neq row\_max$}{
+            $match \gets \texttt{true}$ ; $j \gets 1$\;
+            \While{$match = \texttt{true}$ and $j \leq p$}{
+                \If{$H_P[row\_max,j]$ is in $cons\_null(P)$ and $H_P[row\_max,j] \neq H_P[i,j]$}{
+                    $match \gets \texttt{false}$\;
+                }
+                $j \gets j + 1$\;
+            }
+            \If{$match = \texttt{true}$\label{line:test-match}}{
+                Let $count\_null$ be the number of distinct nulls in $null(P)$ occurring in $H_P[i]$\;
+                \If{$count\_null < count\_min$}{
+                    $row\_spec \gets i$\label{assign:row-spec}\;
+                    $count\_min \gets count\_null$\;
+                }
+            }
+        }
     }
-    $row\_spec := row\_max$\;
-    Let $count\_min$ be the number of distinct nulls in $null(P)$ occurring in $H_P[row\_max]$\;
-    \For{$i = 2$ \KwTo $q$}{
-    \If{row $H_P[i]$ is not marked and $i \neq row\_max$}{
-    $match := \text{true}$ ; $j := 1$\;
-    \While{$match = \text{true}$ and $j \leq p$}{
-    \If{$H_P[row\_max,j]$ is in $cons\_null(P)$ and $H_P[row\_max,j] \neq H_P[i,j]$}{
-    $match := \text{false}$\;
-    }
-    $j := j + 1$\;
-    }
-    \If{$match = \text{true}$}{
-    Let $count\_null$ be the number of distinct nulls in $null(P)$ occurring in $H_P[i]$\;
-    \If{$count\_null < count\_min$}{
-        $row\_spec := i$\;
-        $count\_min := count\_null$\;
-    }
-    }
-    }
-    }
-    \Return{$h_m$, the homomorphism defined by $H_P[row\_spec]$}\;
+    \Return $h_m$, the homomorphism defined by $H_P[row\_spec]$ \;
 \end{procedure}
 
-As a consequence, finding a most specific $P$-homomorphism in $q_{core}(I)$ amounts to $(i)$ discard any row not defining an idem-potent homomorphism and $(ii)$ among the remaining rows, identify one homomorphism satisfying item 2 of Corollary~\ref{coro: spec}.
-Algorithm~\ref{mostspecific} shows how to compute such a most specific homomorphism, and we notice that this does \emph{not} require data access.
-To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
+As a consequence, finding a most specific $P$-homomorphism in $q_{core}(I)$ amounts to
+\begin{enumerate*}[label=(\roman*)]
+    \item discard any row not defining an idem-potent homomorphism and
+    \item among the remaining rows, identify one homomorphism satisfying item 2 of Corollary~\ref{coro: spec}.
+\end{enumerate*}
+Procedure~\ref{algo:update:mostspecific} shows how to compute such a most specific homomorphism, and we notice that this does \emph{not} require data access.
+To end the section, we illustrate the procedure~\ref{algo:update:mostspecific} as follows.
 
 \begin{example}
     \label{ex:most-spec-DL}
@@ -210,7 +211,7 @@ To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
     $P=\{B(N_1,N_2),$ $B(N_2,N_1),$ $C(N_1,a),$ $C(N_2,a)\}$.
 
     In this case, $null(P)=\{N_1, N_2\}$, $cons\_null(P)=\{N_3\}$, and the associated table $H_P$ has been shown already.
-    Applying Algorithm~\ref{mostspecific} based on the table $H_P$, the following computations are achieved.
+    Applying the procedure~\ref{algo:update:mostspecific} based on the table $H_P$, the following computations are achieved.
 
     The first loop line~\ref{line:loop1-spec} aims at marking rows defining non-idempotent $P$-homomorphisms (that is, such that $h \circ h \ne h$) and mean-while to find one unmarked row with as many symbols in $cons\_null(P)$ as possible, in reference to Corollary~\ref{coro: spec}(2).
     These computations return the following:
@@ -220,16 +221,16 @@ To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
 
         \item Since there is no other row to process, the loop line~\ref{line:loop1-spec} returns $row\_max = 1$ and $count\_curr =0$.
     \end{itemize}
-    Hence, Algorithm~\ref{mostspecific} returns $row\_spec=1$ and so, $h_m$ is defined by $h_m(N_1)=N_1$ and $h_m(N_2)=N_2$.
+    Hence, \ref{algo:update:mostspecific} returns $row\_spec=1$ and so, $h_m$ is defined by $h_m(N_1)=N_1$ and $h_m(N_2)=N_2$.
     In other words, $I$ is not simplified, which is indeed the expected result.
 
-    We now illustrate further Algorithm~\ref{mostspecific}, using two more sophisticated cases.
+    We now illustrate further the procedure~\ref{algo:update:mostspecific}, using two more sophisticated cases.
     First, let $\nu_0=\{N_1\}$ and $I_1=\{B(N_1, N_2),$ $B(a, N_2),$ $B(a,N_3),$ $B(N_4,N_3),$ $C(N_2,N_2),$ $C(N_3,N_3)\}$.
     In this case, $\textsf{LinkedNull}_{I,N_1}=\{N_1,N_2\}$ and thus, $PSet = \{P\}$ where $P=\{B(N_1, N_2),$ $B(a,N_2),$ $C(N_2,N_2)\}$.
+    Moreover, the query $q_{core}$ below, is generated and its answer against $I_1$, $q_{core}(I_1)$, is defined in the following table $H^1_P$:
     \[
         q_{core}:ans(x_1,x_2) \leftarrow B(x_1, x_2), B(a,x_2),C(x_2,x_2)
     \]
-    Moreover, the query $q_{core}$ below, is generated and its answer against $I_1$, $q_{core}(I_1)$, is defined in the following table $H^1_P$:
 
     \begin{center}
         \begin{tabular}{c|cc}
@@ -244,7 +245,7 @@ To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
     $H_P^1$ has 2 columns and 4 rows due to four possible answers in $q_{core}(I_1)$.
     Moreover, $h_1 \preceq h_2$, $h_2 \preceq h_3$ and $h_2 \preceq h_4$.
     Notice that $h_3$ and $h_4$ are not comparable because $a, N_3$ and $N_4$ are in $cons\_null(P)$.
-    Applying Algorithm~\ref{mostspecific} based on the table $H_P^1$, the first loop line~\ref{line:loop1-spec} achieves the following:
+    Applying the procedure~\ref{algo:update:mostspecific} based on the table $H_P^1$, the first loop line~\ref{line:loop1-spec} achieves the following:
     \begin{itemize}
         \item
               No row is marked as non-idempotent on line~\ref{line:non-idem}.
@@ -254,14 +255,14 @@ To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
               Indeed, although for row $4$, we have $count\_curr = 2$, the test line~\ref{test:count-max} fails, and thus the value of $row\_max$ is not changed.
               Then, $row\_spec$ is set to $3$ on line~\ref{assign:row-spec1} and $cont\_min$ is set to $0$ on line~\ref{assing:row-min}.
     \end{itemize}
-    Therefore, processing the loop line~\ref{line:loop2-spec} yields no change and Algorithm~\ref{mostspecific} returns $h_m$ defined by $h_m(N_1)=a$ and $h_m(N_2)=N_3$, in which case, $h_m(I_1)=\{B(a, N_3), B(N_4,N_3), C(N_3,N_3)\}$, which is not redundant, when considering $N_3$ and $N_4$ as particular `constants'.
+    Therefore, processing the loop line~\ref{line:loop2-spec} yields no change and the procedure~\ref{algo:update:mostspecific} returns $h_m$ defined by $h_m(N_1)=a$ and $h_m(N_2)=N_3$, in which case, $h_m(I_1)=\{B(a, N_3), B(N_4,N_3), C(N_3,N_3)\}$, which is not redundant, when considering $N_3$ and $N_4$ as particular `constants'.
 
-    As a more sophisticated illustration of Algorithm~\ref{mostspecific}, let $\nu_0=\{N_1\}$ and $I_2= \{B(N_1, N_2),$ $B(a, N_2),$ $C(N_2,N_2),$ $C(N_2,N_3)\}$.
+    As a more sophisticated illustration of \ref{algo:update:mostspecific}, let $\nu_0=\{N_1\}$ and $I_2= \{B(N_1, N_2),$ $B(a, N_2),$ $C(N_2,N_2),$ $C(N_2,N_3)\}$.
     Here, $\textsf{LinkedNull}_{I,N_1}=\{N_1,N_2, N_3\}$ and thus, $PSet = \{P\}$ where $P=\{B(N_1, N_2),$ $B(a,N_2),$ $C(N_2,N_2),$ $C(N_2,N_3)\}$.
+    Moreover, the query $q_{core}$ below, is generated and $q_{core}(I_2)$, is defined in the following table $H^2_P$:
     \[
         q_{core}:ans(x_1,x_2,x_3) \leftarrow B(x_1, x_2), B(a,x_2),C(x_2,x_2),C(x_2,x_3)
     \]
-    Moreover, the query $q_{core}$ below, is generated and $q_{core}(I_2)$, is defined in the following table $H^2_P$:
 
     \begin{center}
         \begin{tabular}{c|ccc}
@@ -275,7 +276,7 @@ To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
     $H_P^2$ has 3 columns and 4 rows due to four possible answers in $q_{core}(I_2)$.
     Moreover,
     $h_1 \prec h_2$, $h_1 \prec h_3$, $h_2 \prec h_4$ and $h_3 \prec h_4$.
-    Applying Algorithm~\ref{mostspecific} based on the table $H_P^2$, the loop line~\ref{line:loop1-spec} achieves the following:
+    Applying the procedure~\ref{algo:update:mostspecific} based on the table $H_P^2$, the loop line~\ref{line:loop1-spec} achieves the following:
     \begin{itemize}
         \item
               As above, no row is marked as non-idempotent on line~\ref{line:non-idem}.
@@ -286,7 +287,7 @@ To end the section, we illustrate Algorithm~\ref{mostspecific} as follows.
     \end{itemize}
     When processing the loop line~\ref{line:loop2-spec}, the only row to be considered is row $4$, for which $match$ is {\tt true}, thus implying that the test on line~\ref{line:test-match} succeeds.
     Since for row $4$, the value of $count\_null$ is $1$ (because row $4$ contains the only null $N_2$), the value of $row\_spec$ is set to $4$, line~\ref{assign:row-spec}.
-    Hence, Algorithm~\ref{mostspecific} returns $h_m$ defined by $h_m(N_1)=a$, $h_m(N_2)=N_2$ and $h_m(N_3)=N_2$.
+    Hence, \ref{algo:update:mostspecific} returns $h_m$ defined by $h_m(N_1)=a$, $h_m(N_2)=N_2$ and $h_m(N_3)=N_2$.
     In this case,  $h_m(I_2)=\{B(a, N_2), C(N_2,N_2)\}$, which is not redundant.
 \end{example}
 

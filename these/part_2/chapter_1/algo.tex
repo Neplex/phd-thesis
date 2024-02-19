@@ -1,5 +1,5 @@
 \begin{algorithm}[H]
-    \caption{$\textsf{ALGO}(T = (D, t), epochs, \tau, minSupport)$}
+    \caption{$\textsf{ALGO}(T = (D, l), epochs, \tau, minSupport)$}
     \SetKwFunction{reduce}{reduce}
     \SetKwFunction{findGroups}{findGroups}
     \SetKwFunction{findSubgroups}{findSubgroups}
@@ -63,13 +63,13 @@
 \subsection{Opérations de structuration}
 
 \begin{algorithm}
-    \caption{$\textsf{findGroups}(T = (D, t), \tau, minSupport)$}
+    \caption{$\textsf{findGroups}(T = (D, l), \tau, minSupport)$}
     \SetKwFunction{findSTwithMinLeavesTree}{findSTwithMinLeavesTree}
     \SetKwFunction{insElem}{ins\_elem}
     \SetKwFunction{delElem}{del\_elem}
     \SetKwFunction{leaves}{leaves}
 
-    \tcp{Identifier les clusters de sous arbres equivalent et garder uniquement les fréquents}
+    \tcp{Identifier les clusters de sous-arbres equivalent et garder uniquement les fréquents}
     $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/\equiv_\tau, |equiv\_pos| \ge minSupport\}$\;
     $k \gets 0$\;
 
@@ -96,7 +96,7 @@
 % \nh{Something is not great here, in findSubgroups. We mixed a set of positions with a set of labels. The set contains trees but the combinaition should not allow a label to appear multiple times}
 
 \begin{algorithm}
-    \caption{$\textsf{findSubgroups}(T = (D, t), minSupport)$}
+    \caption{$\textsf{findSubgroups}(T = (D, l), minSupport)$}
     \SetKwData{groupFound}{groupFound}
     \SetKwData{st}{st}
 
@@ -149,7 +149,7 @@
 \end{algorithm}
 
 \begin{algorithm}
-    \caption{$\textsf{mergeGroups}(T = (D, t), minSupport)$}
+    \caption{$\textsf{mergeGroups}(T = (D, l), minSupport)$}
     \SetKwData{groupFound}{groupFound}
     \SetKwData{st}{st}
 
@@ -209,7 +209,7 @@
 \end{algorithm}
 
 \begin{algorithm}
-    \caption{$\textsf{findRelationship}(T = (D, t), minSupport)$}
+    \caption{$\textsf{findRelationship}(T = (D, l), minSupport)$}
     \SetKwData{relationshipFound}{relationshipFound}
     \SetKwData{splitColl}{splitColl}
     \SetKwData{st}{st}
@@ -250,7 +250,7 @@
 \end{algorithm}
 
 \begin{algorithm}
-    \caption{findCollections($T = (D, t), \text{minSupport}$)}
+    \caption{findCollections($T = (D, l), \text{minSupport}$)}
     \SetKwData{collectionFound}{collectionFound}
     \SetKwData{subSet}{subSet}
     \SetKwData{subPos}{subPos}

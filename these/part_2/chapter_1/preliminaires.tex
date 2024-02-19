@@ -4,7 +4,7 @@ Une grammaire permet de définir un langage en utilisant un ensemble de règles 
 La seconde partie de cette section s'attarde sur les arbres, qui sont des structures de données hiérarchiques.
 % Chaque nœud d'un arbre, à l'exception de la racine, est lié à un nœud parent et zéro ou plusieurs nœuds enfants.
 Dans une troisième partie, nous montrerons comment les arbres jouent un rôle important dans la représentation des structures linguistiques.
-Pour finir, cette section se termine par la définition des opérations de transformations et d'éditions appliquées aux arbres.
+Cette section se termine par la définition des opérations de transformations et d'éditions appliquées aux arbres.
 
 \subsection{Grammaires}
 
@@ -112,7 +112,7 @@ Le principe des grammaires attribuées peut se résumer de la manière suivante 
 La définition suivante formalise cette notion.
 
 \begin{definition}[Grammaire attribuée]
-    Une grammaire attribuée \cite{knuthSemanticsContextfreeLanguages1968}, ou grammaire avec attributs, est une \gls{cfg} $G = (N, T, R, S)$ à laquelle on ajoute, pour chaque règle de production $r \in R$ un ensemble de règles sémantiques noté $\Phi_r$ et pour chaque symbole $X \in (N \cup T)$ on associe un ensemble fini d'attributs $A(X)$ constitué de deux ensembles disjoints d'attributs :
+    Une grammaire attribuée \cite{knuthSemanticsContextfreeLanguages1968}, ou grammaire avec attributs, est une \gls{cfg} $G = (N, T, R, S)$ à laquelle on ajoute, pour chaque règle de production $r \in R$ un ensemble de règles sémantiques noté $\Phi_r$ et pour chaque symbole $X \in (N \cup T)$ on associe un ensemble fini d'attributs $A(X)$ constitué de deux sous-ensembles disjoints d'attributs :
     \begin{itemize}
         \item $A_\uparrow(X)$ pour les attributs synthétisés où $\forall X \in T ~ A_\uparrow(X) = \emptyset$
         \item $A_\downarrow(X)$ pour les attributs hérités où, pour le symbole initial $S$, $A_\downarrow(S) = \emptyset$
@@ -286,10 +286,11 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 \end{figure}
 
 \subsection{Réécriture d'arbres}
+\label{sec:struct:pre:tree-rewritting}
 
 \begin{definition}[Haie]
     Une haie est définie comme une séquence d'arbres, qui peut éventuellement être vide, représentée sous la forme $h = [t_0, \dots , t_n]$ où $|h|$ représente le nombre d'arbres contenus dans cette haie (ici $|h| = n + 1$).
-    Une substitution, notée $\sigma$, est une application bijective d'un ensemble de variables $V$ vers un ensemble de haies et d'un ensemble de labels vers un ensemble de sous arbres, étendue de manière homomorphique aux arbres.
+    Une substitution, notée $\sigma$, est une application bijective d'un ensemble de variables $V$ vers un ensemble de haies et d'un ensemble de labels vers un ensemble de sousarbres, étendue de manière homomorphique aux arbres.
 \end{definition}
 
 \begin{definition}[Règle de réécriture]
@@ -315,7 +316,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 
     \begin{figure}[htb]
         \centering
-        \begin{subfigure}{0.4\textwidth}
+        \begin{subfigure}[c]{0.4\textwidth}
             \centering
             \begin{adjustbox}{valign=c, max width=\textwidth}
                 \begin{forest}
@@ -323,15 +324,15 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
                     [$U$ [$x$] [$A$]]
                 \end{forest}
             \end{adjustbox}
-            \caption{\glsfirst*{lhs}}
+            \caption*{\glsfirst*{lhs}}
         \end{subfigure}
         \hfill
-        \begin{subfigure}{0.1\textwidth}
+        \begin{subfigure}[c]{0.1\textwidth}
             \centering
             \huge{$\longrightarrow$}
         \end{subfigure}
         \hfill
-        \begin{subfigure}{0.4\textwidth}
+        \begin{subfigure}[c]{0.4\textwidth}
             \centering
             \begin{adjustbox}{valign=c, max width=\textwidth}
                 \begin{forest}
@@ -339,7 +340,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
                     [$U$ [$x$]]
                 \end{forest}
             \end{adjustbox}
-            \caption{\glsfirst*{rhs}}
+            \caption*{\glsfirst*{rhs}}
         \end{subfigure}
         \caption{Exemple d'une règle de réécriture}
         \label{fig:sch:pre:rewritting:ex-rule}
@@ -350,7 +351,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 
     \begin{figure}[htb]
         \centering
-        \begin{subfigure}{0.4\textwidth}
+        \begin{subfigure}[c]{0.4\textwidth}
             \centering
             \begin{adjustbox}{valign=c, max width=\textwidth}
                 \begin{forest}
@@ -362,12 +363,12 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
             \label{fig:sch:pre:rewritting:ex:origin}
         \end{subfigure}
         \hfill
-        \begin{subfigure}{0.1\textwidth}
+        \begin{subfigure}[c]{0.1\textwidth}
             \centering
             \huge{$\Longrightarrow$}
         \end{subfigure}
         \hfill
-        \begin{subfigure}{0.4\textwidth}
+        \begin{subfigure}[c]{0.4\textwidth}
             \centering
             \begin{adjustbox}{valign=c, max width=\textwidth}
                 \begin{forest}

@@ -34,7 +34,7 @@
 % Bien que leur structure est plus conforme à la grammaire cible $\mathcal{G}$, cela entraîne une perte d'information par rapport à l'arbre de dépendance qui peut mettre en relation des éléments éloignés.
 % Cependant, les textes médicaux se caractérisent par des phrases courtes et factuelles, où les observations démontrent que les éléments liés sémantiquement sont généralement proches dans le texte \cite{savaryRelationExtractionClinical2022}.
 
-Dans cette thèse nous de transformer des données textuelles en une instance de graphe (ou d'arbre) respectant une grammaire cible $G$.
+Dans cette thèse notre objectif est de transformer des données textuelles en une instance de graphe (ou d'arbre) respectant une grammaire cible $G$.
 La construction de cette grammaire cible implique un processus d'extraction de schémas, commençant par la transformation des phrases en arbres syntaxiques.
 Le processus consiste en plusieurs itérations et est résumé visuellement dans la Figure~\ref{fig:struct:general}, où, sur l'axe vertical, à chaque étape $i$, nous considérons :
 \begin{itemize}
@@ -49,7 +49,7 @@ L'axe horizontal de la figure~\ref{fig:struct:general} représente la progressio
 \begin{description}
     \item[Initialisation] Le processus commence par la transformation des phrases en arbres syntaxique, ce qui donne lieu à une instance désignée par $I_0$.
 
-    \item[Enrichissement] Une seconde étape consiste à enrichir les arbres de l'instance $I_0$ en incorporant les connaissances extraites des phases précédentes.
+    \item[Enrichissement] Une seconde étape consiste à enrichir les arbres de l'instance $I_0$ en incorporant les informations extraites par une analyse du texte.
           Il peut s'agir d'insérer des entités, des noms de relations ou d'autres informations pertinentes dans les arbres.
 
     \item[Évolutions successives] :
@@ -99,44 +99,44 @@ Les arbres d'entités peuvent être assimilés au concept de \emph{sub-records} 
 Dans $I_t$, l'instance finale de la figure~\ref{fig:struct:general}, les groupes correspondent aux \emph{records} de~\cite{barretGenericAbstractionsData2021}, alors que dans les grammaires $G_i$ (obtenues dans le processus de construction de $G$ de la figure~\ref{fig:struct:general}), ils servent de formats intermédiaires.
 Le concept \textit{collection} est identique à celui introduit dans~\cite{barretGenericAbstractionsData2021}.
 
-\subsection{Méta-grammaire}
-
+%\subsection{Méta-grammaire}
+\paragraph{Méta-grammaire}
 La table~\ref{table:struct:meta} présente notre méta-grammaire $\mathbb{G}$.
 Il s'agit d'une grammaire attribuée qui définit tous les schémas (ou les structurations) valides pour nos données.
-Il est important de rappeler qu'ici, un schéma de base de données est représenté par une grammaire hors contexte.
-Dans cette méta-grammaire $\mathbb{G}$ les méta-non-terminaux sont représentés par des termes entre $\langle \cdot \rangle$.
-Les règles sémantiques sont présentées dans la partie droite de la table~\ref{table:struct:meta} entre crochets.
+Il est important de rappeler qu'ici un schéma de base de données est représenté par une grammaire hors contexte.
+Dans cette méta-grammaire $\mathbb{G}$ les méta-non-terminaux sont représentés par des termes entre chevrons $\langle \cdot \rangle$.
+Les règles sémantiques sont présentées dans la partie droite de la table~\ref{table:struct:meta}, entre crochets $[ \cdot ]$.
 
 \begin{landscape}
     \centering
     \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
         \parbox{\linewidth}{\begin{align}
-                \epsilon                                    & ::= \langle root_{eL',gL',cgL',rL',crL'} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL} \rangle  & [eL' \subseteq eL; gL' \subseteq gL; cgL' \subseteq cgL; rL' \subseteq rL; crL' \subseteq crL]       \label{meta:start} \\
-                \langle root_{eL,gL,cgL,rL,crL} \rangle     & ::= ROOT \to \langle rootList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                                                               \\[1em]
+                \epsilon                                    & ::= \langle root_{eL',gL',cgL',rL',crL'} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                       & [eL' \subseteq eL; gL' \subseteq gL; cgL' \subseteq cgL; rL' \subseteq rL; crL' \subseteq crL]                    \label{meta:start}      \\
+                \langle root_{eL,gL,cgL,rL,crL} \rangle     & ::= ROOT \to \langle rootList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                                              \label{meta:root}       \\[1em]
                 % Root list
-                \langle rootList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]                  \\
-                                                            & ~~ \mid ~ ENT_{name}  ~ \langle rootList_{eL',gL,cgL,rL,crL} \rangle                                         & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                           \\
-                                                            & ~~ \mid ~ GROUP_{name} ~ \langle rootList_{eL,gL',cgL,rL,crL} \rangle                                        & [name \notin gL'; gL \gets \{name\} \cup gL']                                                                           \\
-                                                            & ~~ \mid ~ REL_{name}  ~ \langle rootList_{eL,gL,cgL,rL',crL} \rangle                                         & [name \notin rL'; rL \gets \{name\} \cup rL']                                                                           \\
-                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL',rL,crL} \rangle                                         & [name \notin cgL'; cgL \gets \{name\} \cup cgL']                                                                        \\
-                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL,rL,crL'} \rangle                                         & [name \notin crL'; crL \gets \{name\} \cup crL']                                                                        \\[1em]
+                \langle rootList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                                                                                                                                                      & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]            \label{meta:rootList:1} \\
+                                                            & ~~ \mid ~ ENT_{name}  ~ \langle rootList_{eL',gL,cgL,rL,crL} \rangle                                                                                                                                                                              & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:rootList:2} \\
+                                                            & ~~ \mid ~ GROUP_{name} ~ \langle rootList_{eL,gL',cgL,rL,crL} \rangle                                                                                                                                                                             & [name \notin gL'; gL \gets \{name\} \cup gL']                                                                     \label{meta:rootList:3} \\
+                                                            & ~~ \mid ~ REL_{name}  ~ \langle rootList_{eL,gL,cgL,rL',crL} \rangle                                                                                                                                                                              & [name \notin rL'; rL \gets \{name\} \cup rL']                                                                     \label{meta:rootList:4} \\
+                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL',rL,crL} \rangle                                                                                                                                                                              & [name \notin cgL'; cgL \gets \{name\} \cup cgL']                                                                  \label{meta:rootList:5} \\
+                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL,rL,crL'} \rangle                                                                                                                                                                              & [name \notin crL'; crL \gets \{name\} \cup crL']                                                                  \label{meta:rootList:6} \\[1em]
                 % Rules list
-                \langle ruleList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]                  \\
-                                                            & ~~ \mid ~ \langle entity_{name}     \rangle ~\textsc{eol}~ \langle ruleList_{eL',gL,cgL,rL,crL} \rangle      & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                           \\
-                                                            & ~~ \mid ~ \langle group_{name, eL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle    & [name \notin gL' \land eL' \subseteq eL; gL \gets \{name\} \cup gL']                                                    \\
-                                                            & ~~ \mid ~ \langle relation_{name, gL'}  \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle  & [name \notin rL' \land gL' \subseteq gL; rL \gets \{name\} \cup rL']                                                    \\
-                                                            & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle & [name \notin cgL' \land grpName \in gL; cgL \gets \{name\} \cup cgL']                                                   \\
-                                                            & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle & [name \notin crL' \land relName \in rL; crL \gets \{name\} \cup crL']                                                   \\[1em]
+                \langle ruleList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                                                                                                                                                      & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]            \label{meta:ruleList:1} \\
+                                                            & ~~ \mid ~ \langle entity_{name}          \rangle ~\textsc{eol}~ \langle ruleList_{eL',gL,cgL,rL,crL} \rangle                                                                                                                                      & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:ruleList:2} \\
+                                                            & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle                                                                                                                                      & [name \notin gL' \land eL' \subseteq eL; gL \gets \{name\} \cup gL']                                              \label{meta:ruleList:3} \\
+                                                            & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle                                                                                                                                      & [name \notin rL' \land gL' \subseteq gL; rL \gets \{name\} \cup rL']                                              \label{meta:ruleList:4} \\
+                                                            & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle                                                                                                                                      & [name \notin cgL' \land grpName \in gL; cgL \gets \{name\} \cup cgL']                                             \label{meta:ruleList:5} \\
+                                                            & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle                                                                                                                                      & [name \notin crL' \land relName \in rL; crL \gets \{name\} \cup crL']                                             \label{meta:ruleList:6} \\[1em]
                 % Groups
-                \langle group_{name, eL} \rangle            & ::= GROUP_{name} \to \langle entList_{eL} \rangle                                                                                                                                                                                      \\
-                \langle collGrp_{name,grpName} \rangle      & ::= COLL_{name} \to GROUP_{grpName}^+                                                                                                                                                                                                  \\[1em]
+                \langle group_{name, eL} \rangle            & ::= GROUP_{name} \to \langle entList_{eL} \rangle                                                                                                                                                                                                                                                                                                                     \label{meta:group}      \\
+                \langle collGrp_{name,grpName} \rangle      & ::= COLL_{name} \to GROUP_{grpName}^+                                                                                                                                                                                                                                                                                                                                 \label{meta:collGroup}  \\[1em]
                 % Relations
-                \langle relation_{name, gL} \rangle         & ::= REL_{name} \to GROUP_{name1} ~ GROUP_{name2}                                                             & [name1 \neq name2; gL \gets \{name1, name2\}]                                                                           \\
-                \langle collRel_{name,relName} \rangle      & ::= COLL_{name} \to REL_{relName}^+                                                                                                                                                                                                    \\[1em]
+                \langle relation_{name, gL} \rangle         & ::= REL_{name} \to GROUP_{name1} ~ GROUP_{name2}                                                                                                                                                                                                  & [name1 \neq name2; gL \gets \{name1, name2\}]                                                                     \label{meta:rel}        \\
+                \langle collRel_{name,relName} \rangle      & ::= COLL_{name} \to REL_{relName}^+                                                                                                                                                                                                                                                                                                                                   \label{meta:collRel}    \\[1em]
                 % Entities
-                \langle entList_{eL} \rangle                & ::= ENT_{name}                                                                                               & [eL \gets \{name\}]                                                                                                     \\
-                                                            & ~~ \mid ~ ENT_{name} ~ \langle entList_{eL'} \rangle                                                         & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                           \\
-                \langle entity_{name} \rangle               & ::= ENT_{name} \to \langle data \rangle
+                \langle entList_{eL} \rangle                & ::= ENT_{name}                                                                                                                                                                                                                                    & [eL \gets \{name\}]                                                                                               \label{meta:entList:1}  \\
+                                                            & ~~ \mid ~ ENT_{name} ~ \langle entList_{eL'} \rangle                                                                                                                                                                                              & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:entList:2}  \\
+                \langle entity_{name} \rangle               & ::= ENT_{name} \to \langle data \rangle \label{meta:entity}
             \end{align}}
     \end{adjustbox}
     \captionof{table}[Méta-grammaire S-attribuée $\mathbb{G}$ au format \glsname*{bnf}]{Méta-grammaire S-attribuée $\mathbb{G}$ au format \glsname*{bnf}. Cette grammaire définit des grammaires qui seront vues comme des schémas de base de donnée \label{table:struct:meta}}
@@ -230,20 +230,21 @@ Les règles sémantiques sont présentées dans la partie droite de la table~\re
 \end{landscape}
 
 La première méta-règle de production de $\mathbb{G}$ (\ref{meta:start}) indique que la grammaire cible $G$ est définie par une règle initiale suivie par une liste de règles, éventuellement vide.
-La règle initiale engendrée par $\mathbb{G}$ contient le symbole \emph{ROOT} (non-terminal initial de $G$) du côté gauche.
-Son côté droit est défini par les méta-règles \ref{} (4.3) - (4.8) qui spécifie la construction d'une série de non-terminaux de $G$.
+La règle initiale engendrée par $\mathbb{G}$ (méta-règle~\ref{meta:root}) contient le symbole \emph{ROOT} (non-terminal initial de $G$) du côté gauche.
+Son côté droit est défini par les méta-règles \ref{meta:rootList:1}-\ref{meta:rootList:6} qui spécifie la construction d'une série de non-terminaux de $G$.
 Ces non-terminaux sont préfixés par \emph{ENT}, \emph{GROUP}, \emph{REL} and \emph{COLL}, représentant, respectivement, des entités, des groupes d'entités, des relations entre des groupes et de collections de groupes ou des relations.
 Pour distinguer chaque structuration spécifique à une grammaire $G$, ces préfixes sont suivis par un identifiant ($name$).
 
-Dans l'exemple~\ref{ex:struct:meta}, la règle de production $ROOT \rightarrow GROUP_A ~ COLL_1$ est obtenue par l'application de la méta-règle (4.1), suivie de (4.2).
-Cela nous donne $ROOT \rightarrow \langle rootList \rangle$ dans $G$.
+Dans l'exemple~\ref{ex:struct:meta} ci-dessous, la règle de production $ROOT \rightarrow GROUP_A ~ COLL_1$ est obtenue par l'application de la méta-règle~\ref{meta:start}, suivie de \ref{meta:root}.
+Ce qui nous donne $ROOT \rightarrow \langle rootList \rangle$.
 Le côté droit de cette règle est un méta-non-terminal.
-Dans la suite, il est spécifié par l'application de la méta-règle (4.5) qui engendre $ROOT \rightarrow GROUP_A ~ \langle rootList \rangle$, puis (4.8) nous donne $ROOT \rightarrow GROUP_A COLL_1 \langle rootList \rangle$ et (4.3) produit $ROOT \rightarrow GROUP_A COLL_1  $.
-Voir la figure~\ref{4.6} avec l'arbre de dérivation.
-
-La méta-règle  (4.9) -(4.14) permet de définir une liste de règles. En effet, le méta-non-terminal $\langle ruleList \rangle$ a déjà été utilisé dans (4.1).
+Dans la suite, il est spécifié par l'application de la méta-règle \ref{meta:rootList:3} qui engendre $ROOT \rightarrow GROUP_A ~ \langle rootList \rangle$, puis \ref{meta:rootList:6} nous donne $ROOT \rightarrow GROUP_A ~ COLL_1 ~ \langle rootList \rangle$ et \ref{meta:rootList:1} produit $ROOT \rightarrow GROUP_A ~ COLL_1$.
+Voir la figure~\ref{table:struct:meta:ex} avec l'arbre de dérivation.
+Les méta-règles~\ref{meta:ruleList:1}-\ref{meta:ruleList:6} permettent de définir un ensemble de règles.
+En effet, le méta-non-terminal $\langle ruleList \rangle$ a déjà été utilisé dans \ref{meta:start}.
 Chaque règle produite permet de définir un non-terminal de $G$.
-Dans notre exemple, nous avons $GROUP_A \rightarrow  \langle entList \rangle$ et ensuite $GROUP_A \rightarrow  \langle ENT_1 \rangle$.
+Dans la suite, nous verrons que les règles sémantiques poseront des contraintes, obligeant que chaque non-terminal de notre grammaire cible $G$ soit définit afin de construire une grammaire valide.
+Dans notre exemple, nous avons $GROUP_A \rightarrow  \langle entList \rangle$ et ensuite $GROUP_A \rightarrow ENT_1$.
 
 Les attributs de $\mathbb{G}$ sont synthétisés et représentent des listes de noms ($name$) utilisés comme identificateur :
 \begin{itemize}
@@ -256,17 +257,18 @@ Les attributs de $\mathbb{G}$ sont synthétisés et représentent des listes de 
 
 Leur initialisation commence du bas vers le haut.
 Les règles syntaxiques permettent, notamment de vérifier qu'un nom est unique.
-Par exemple, lors de l'application de la méta-règle (4/19)-(4.20), la liste $eL$ reçoit des noms d'entité qui sont uniques.
+Par exemple, lors de l'application de la méta-règle \ref{meta:entList:1}-\ref{meta:entList:2}, la liste $eL$ reçoit des noms d'entité qui sont uniques.
 Cela est aussi le cas pour toutes les autres listes : l'unicité du nom d'un nouveau non-terminal est assurée par les règles sémantiques.
 
 Il est également essentiel de noter que ces règles sémantiques garantissent que chaque non-terminal apparaissant du côté droit d'une règle de production de la grammaire $G$ doit avoir une règle le définissant.
-Par exemple, lors de l'application de la méta-règle (4.1), tous les éléments de la liste $gL'$ doivent être présents dans $gL$.
-Dans l'exemple de la figure~\ref{}, si $gL' = {A}$ et $gL = {A, B}$, le non-terminal $GROUP_A$ présent dans la règle $ROOT \rightarrow GROUP_A ~ COLL_1$ à gauche de l'arbre de dérivation (voir figure~\ref{}) est défini par la règle $GROUP_A \rightarrow ENT_1$, comme illustré dans la partie droite de cet arbre de dérivation (voir figure~\ref{}).
+Par exemple, lors de l'application de la méta-règle \ref{meta:start}, tous les éléments de la liste $gL'$ doivent être présents dans $gL$.
+Dans l'exemple de la figure~\ref{table:struct:meta:ex}, si $gL' = {A}$ et $gL = {A, B}$, le non-terminal $GROUP_A$ présent dans la règle $ROOT \rightarrow GROUP_A ~ COLL_1$ à gauche de l'arbre de dérivation (voir figure~\ref{table:struct:meta:ex}) est défini par la règle $GROUP_A \rightarrow ENT_1$, comme illustré dans la partie droite de cet arbre de dérivation (voir figure~\ref{table:struct:meta:ex}).
 
 \begin{example}
     \label{ex:struct:meta}
     La figure~\ref{table:struct:meta:ex} illustre la dérivation de la grammaire $G$ via la méta-grammaire $\mathbb{G}$.
     En bleu on note, pour chaque nœud, la valeur de chaque attribut en omettant, pour des raisons de visibilité, $\gamma$ et les attributs ayant pour valeur un ensemble vide.
+    Les règles de production de la grammaire $G$ sont les suivantes :
     \begin{align*}
         ROOT    & \to GROUP_A ~ COLL_1                                          \\
         COLL_1  & \to REL_X^+              & REL_X   & \to GROUP_A ~ GROUP_B    \\
@@ -275,706 +277,4 @@ Dans l'exemple de la figure~\ref{}, si $gL' = {A}$ et $gL = {A, B}$, le non-term
     \end{align*}
 \end{example}
 
-\begin{figure}[H]
-    \centering
-    \tikzstyle{flow-node} = [text centered, minimum height=2em, minimum width=5em, text width=5em, draw]
-    \tikzstyle{flow-start} = [rectangle, rounded corners, flow-node]
-    \tikzstyle{flow-process} = [rectangle, text centered, minimum height=2em, text width=10em, draw]
-    \tikzstyle{flow-data} = [trapezium, trapezium left angle=70, trapezium right angle=110, flow-node]
-    \tikzstyle{flow-decision} = [diamond, aspect=2.5, flow-node]
-    \tikzstyle{flow-arrow} = [thick, ->, >=latex, rounded corners]
-
-    \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
-        \begin{tikzpicture}[node distance=2em and 3em]
-            \node (start) [flow-start] {Debut};
-            \node (tal) [flow-data, below=of start] {Textes analysés};
-            \node (enriched) [flow-process, below=of tal] {Enrichissement des arbres};
-            \node (grammar) [flow-process, below=of enriched] {Extraction de la grammaire $G_i$};
-            \node (check) [flow-decision, below=of grammar] {$G_i = G_T$};
-            \node (end) [flow-start, left=of check] {Fin};
-            \node (equiv) [flow-process, below=of check] {Construction des classes équivalence};
-            \node (rewrite) [flow-process, below=of equiv] {Réécriture des arbres};
-
-            \draw [flow-arrow] (start) -- (tal);
-            \draw [flow-arrow] (tal) -- (enriched);
-            \draw [flow-arrow] (enriched) -- (grammar);
-            \draw [flow-arrow] (grammar) -- (check);
-            \draw [flow-arrow] (check) -- node[above] {Oui} (end);
-            \draw [flow-arrow] (check) -- node[left] {Non} (equiv);
-            \draw [flow-arrow] (equiv) -- (rewrite);
-            \draw [flow-arrow] (rewrite) |- + (3, -1) |- (grammar);
-        \end{tikzpicture}
-    \end{adjustbox}
-
-    \caption{Processus de structuration sous forme de diagramme de flux}
-    \label{fig:struct:flow}
-\end{figure}
-
-La figure~\ref{fig:struct:flow} illustre, à l'aide d'un diagramme de flux, les différentes étapes requises pour structurer les données textuelles, c'est-à-dire pour obtenir une grammaire représentant le schéma de nos données.
-Dans la suite de cette section, nous suivrons ce diagramme pour expliquer ces différentes étapes.
-
-\subsection{Préparation des textes}
-
-Les arbres syntaxiques constituent la fondation de la structuration automatique de l'information.
-Plusieurs traitements sont nécessaires pour la préparation des textes à la suite de l'analyse syntaxique.
-L'objectif est de simplifier les arbres sur lesquels nous travaillons et d'incorporer les informations extraites, telles que les entités et les relations, au sein de l'arbre de syntaxe.
-Les entités représentent les unités d'information, les données, qui seront structurées en vue de leur enregistrement en base de données.
-Par conséquent, toute partie de l'arbre qui ne fait pas référence à une entité peut être éliminée, car elle n'est pas porteuse d'information.
-L'objectif final est d'obtenir des arbres contenant uniquement les entités hiérarchisées conformément à la structure de l'arbre de syntaxe.
-
-\subsubsection{Conjonctions de coordinations}
-
-La structure des arbres syntaxiques est dépendante de la langue étudiée.
-Plus particulièrement, on s'intéresse à la représentation des conjonctions de coordination, lesquelles se révèlent être d'excellents candidats pour la représentation des collections.
-La figure~\ref{fig:struct:conj} illustre la disparité structurelle entre le français (\ref{fig:struct:conj:fr}) et l'anglais (\ref{fig:struct:conj:en}).
-Le français est annoté avec une structure en profondeur, tandis que l'anglais présente une structure en arbre binaire.
-Ainsi, la structure de l'anglais se rapproche davantage de la représentation des collections, lesquels sont représentés par un sous-arbre où chaque enfant constitue un élément de la collection.
-Une première étape dans la préparation des textes implique par conséquent la transformation (pour le français) des conjonctions vers une structure, plus adaptée, en arbre binaire.
-
-\begin{figure}[ht]
-    \centering
-    \begin{subfigure}[b]{.45\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [NP
-                    [DT [une]]
-                    [NN [echographie]]
-                    [ADJ [renale]]
-                    [COORD
-                            [CCONJ [et]]
-                            [NP
-                                    [DT [une]]
-                                    [NN,before computing xy={s/.average={s}{siblings}} [cystographie]]
-                                    [ADJ [retrograde]]
-                            ]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Conjonction en français}
-        \label{fig:struct:conj:fr}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{.45\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [COORD
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [renal]]
-                            [NN [ultrasound]]
-                    ]
-                    [CCONJ,before computing xy={s/.average={s}{siblings}} [and]]
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [retrograde]]
-                            [NN [cystography]]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Conjonction en anglais}
-        \label{fig:struct:conj:en}
-    \end{subfigure}
-    \caption{Comparaison entre les conjonctions en français et en anglais}
-    \label{fig:struct:conj}
-\end{figure}
-
-\subsubsection{Enrichissement des arbres}
-
-L'intégration d'une entité dans un arbre syntaxique se concrétise par la création d'un nœud \emph{ENT}, auquel est attribué le type de l'entité (Personne, Pays, Maladie, etc.).
-Ce nœud agit en tant que parent englobant l'ensemble des mots qui composent l'entité, correspondant au nœud dont la position représente le plus grand préfixe commun à tous les termes de l'entité.
-Dans certaines situations, les entités peuvent être imbriquées, c'est-à-dire qu'elles peuvent être contenues dans une autre.
-Lorsqu'une entité $A$ englobe une entité $B$, dans l'arbre syntaxique, le nœud représentant l'entité $A$ est parent du nœud de l'entité $B$, ou occupe la même position que ce dernier.
-Cependant, cette structure est considérée comme invalide selon la grammaire $\mathbb{G}$, où il est spécifié que les nœuds entités ne peuvent pas avoir une entité comme parent.
-Pour s'aligner sur la métagrammaire, il a été choisi de représenter cette imbrication sous la forme d'une relation entre l'entité englobante et la liste des entités contenues.
-Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser cette relation et a comme enfants :
-\begin{enumerate*}[label=(\roman*)]
-    \item l'arbre d'entité englobant, qui a pour feuille le texte complet couvert par l'entité, et
-    \item un nœud \emph{EC\_NODE}, symbolisant la collection et possédant comme enfants l'ensemble des arbres d'entités contenues.
-\end{enumerate*}
-
-\begin{example}
-    Considérons l'arbre donné dans la figure~\ref{fig:struct:enrichissement:1} ainsi que les entités suivantes :
-    \begin{multicols}{3}
-        \begin{enumerate}
-            \item \enquote{John Smith} (Person)
-            \item \enquote{500 mg} (Dosage)
-            \item \enquote{500} (Value)
-            \item \enquote{mg} (Unit)
-            \item \enquote{Paracetamol} (Drug)
-        \end{enumerate}
-    \end{multicols}
-
-    Pour la première entité, \emph{John} est situé à la position $000$ et \emph{Smith} à la position $010$.
-    Le nœud représentant cette entité doit donc être inséré comme enfant du nœud à la position $0$, qui correspond au préfixe commun à \emph{John} et \emph{Smith}.
-    La seconde entité englobe les entités 3 et 4.
-    Par conséquent, il est nécessaire d'introduire la structure de relation précédemment présentée.
-    On introduit alors le nœud \emph{ER\_NODE} à la position de l'entité englobante.
-    Cette entité contient les mots \emph{500} à la position $11000$ et \emph{mg} à la position $11010$, et doit alors être inséré comme enfant du nœud \emph{NP} situé à la position $110$.
-    Sous le nœud \emph{ER\_NODE}, on ajoute l'entité \emph{dosage} et le nœud \emph{EC\_NODE}.
-    Sous le nœud \emph{EC\_NODE}, on conserve le sous-arbre qui était initialement positionné sous la position $110$.
-    Ensuite, le reste des entités peuvent être annotés de la même manière que la première entité.
-    Le résultat de cette opération d'enrichissement est illustré dans la figure~\ref{fig:struct:enrichissement:2}.
-\end{example}
-
-\begin{figure}[ht]
-    \centering
-    \begin{subfigure}[b]{.35\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [S
-                    [NP
-                            [NNP [John]]
-                            [NNP [Smith]]
-                    ]
-                    [VP
-                            [VBZ [takes]]
-                            [NP
-                                    [NP
-                                            [CD [500]]
-                                            [NN [mg]]
-                                    ]
-                                    [PP
-                                            [IN [of]]
-                                            [NPP [NN [Paracetamol]]]
-                                    ]
-                            ]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Arbre de syntaxe}
-        \label{fig:struct:enrichissement:1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{.55\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [S
-                    [NP [\textbf{ENT\_PERSON}
-                                [NNP [John]]
-                                [NNP [Smith]]
-                            ]]
-                    [VP
-                            [VBZ [takes]]
-                            [NP
-                                    [NP [\textbf{ER\_NODE}
-                                                [\textbf{ENT\_DOSAGE} [500 mg]]
-                                                [\textbf{EC\_NODE}
-                                                    [CD [\textbf{ENT\_VALUE} [500]]]
-                                                    [NN [\textbf{ENT\_UNIT} [mg]]]
-                                                ]
-                                            ]]
-                                    [PP
-                                            [IN [of]]
-                                            [NP [NNP [\textbf{ENT\_DRUG} [Paracetamol]]]]
-                                    ]
-                            ]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Arbre enrichie}
-        \label{fig:struct:enrichissement:2}
-    \end{subfigure}
-    \caption{Exemple d'enrichissement d'arbre de syntaxe}
-    \label{fig:struct:enrichissement}
-\end{figure}
-
-La procédure pour enrichir les arbres de syntaxe est donné par l'algorithme~\ref{algo:struct:insent}.
-On commence par définir une opération d'édition qui permet de transformer les entités imbriquées en une structure de relation.
-
-\begin{figure}
-    \centering
-    \begin{adjustbox}{max width=\linewidth}
-        \begin{forest}
-            [U
-                    [$x_0$]
-                    [ENT
-                            [$z_0$]
-                            [ENT$_0$ [$y_0$]]
-                            [$z_1$]
-                            [$\dots$]
-                            [ENT$_n$ [$y_n$]]
-                            [$z_{n+1}$]
-                    ]
-                    [$x_1$]
-            ]
-        \end{forest}
-        {\Large$\rightarrow$}
-        \begin{forest}
-            [U
-                    [$x_0$]
-                    [ER\_NODE
-                        [ENT [$z_0$] [$y_0$] [$z_1$] $\dots $ [$y_n$] [$z_{n+1}$]]
-                        [EC\_NODE
-                            [ENT$_0$ [$y_0$]]
-                            [$\dots$]
-                            [ENT$_n$ [$y_n$]]
-                        ]
-                    ]
-                    [$x_1$]
-            ]
-        \end{forest}
-    \end{adjustbox}
-    \caption{$\textsf{unnest\_ent}(T, u.i)$ where $|\sigma(x_0)| = i$}
-\end{figure}
-
-\begin{algorithm}[H]
-    \caption{$\textsf{ins\_ent}(T = (D, t), TreeEnt)$}
-        \label{algo:struct:insent}
-
-    $u.b \gets u.x_0.x_1 \dots x_n$\;
-        \tcp{Check if $u.x_0$ has children not in the entity and should be left in place}
-        \uIf{$\sum_{i=1}^{n} (x_i) \neq 0$}{
-            $x' \gets x_0 + 1$\;
-        } \Else {
-            $x' \gets x_0$\;
-        }
-    $j \gets |L_{ent}| - 1$\;
-    $H \gets []$\;
-        \While{$j \geq 0$}{
-            $pos \gets L_{ent}[j]$\;
-            $H \gets H.\textsf{append}(T|_{pos})$\;
-            $\textsf{del\_elem}(X, pos)$\;
-            $j \gets j-1$\;
-        }
-    $\textsf{ins\_elem}(T, entityName, u.x')$\;
-    \For{$leaf \in H$}{
-        $\textsf{ins\_elem}(T, leaf, u.x'.0)$\;
-    }
-\end{algorithm}
-
-\begin{algorithm}[H]
-    \caption{$\textsf{ins\_ent\_list}(T = (D, t), L_{TreeEnt}, L_{Rels})$}
-        \ForEach{$p \in D$}{
-            $\textsf{fix\_coord}(T, p)$\;
-            $\textsf{fix\_conj}(T, p)$\;
-        }
-
-        Trier $L_{TreeEnt}$ par longueur ($|TreeEnt|$), le plus long en premier\;
-
-    \ForEach{$TreeEnt \in L_{TreeEnt}$}{
-        $\textsf{ins\_ent}(T, TreeEnt)$\;
-    }
-
-    \ForEach{$(entPos_1, entPos_2, rel) \in L_{Rels}$}{
-        $\textsf{ins\_rel}(T, entPos_1, entPos_2, rel)$\;
-    }
-
-    \ForEach{$p \in D$ tq. $\textsf{height}(p) = 1$ and $l(p) \neq \textsf{ENT}$}{
-        $\textsf{del\_elem}(T, l)$\;
-    }
-
-    \ForEach{$p \in D$}{
-        $\textsf{reduce}(T, p, \emptyset)$\;
-    }
-\end{algorithm}
-
-\subsubsection{Simplifications}
-
-La simplification des arbres consiste en la suppression de toutes les branches qui ne continent pas une entité.
-Les structures redondantes, sont aussi supprimées.
-
-
-Cependant, cette structure est invalide, car les nœuds entités, qui représentent les données, doivent être les parents directs des feuilles (c'est-à-dire, les mots) de l'arbre syntaxique.
-
-\begin{figure}[ht]
-    \centering
-    \begin{subfigure}[b]{.45\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [COORD
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [renal]]
-                            [NN [ultrasound]]
-                    ]
-                    [CCONJ,before computing xy={s/.average={s}{siblings}} [and]]
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [retrograde]]
-                            [NN [cystography]]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Arbre non simplifié}
-        \label{fig:struct:simplification:1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{.45\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [COORD
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [renal]]
-                            [NN [ultrasound]]
-                    ]
-                    [CCONJ,before computing xy={s/.average={s}{siblings}} [and]]
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [retrograde]]
-                            [NN [cystography]]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Arbre simplifié}
-        \label{fig:struct:simplification:2}
-    \end{subfigure}
-    \caption{Exemple de simplificiation d'un arbre}
-    \label{fig:struct:simplification}
-\end{figure}
-
-\subsection{Équivalence de sous arbres}
-
-Les arbres d'entités représentent l'information et sont donc la base de comparaison des sous arbres.
-La langue naturelle contient souvent de l'information implicite ou manquante, deux sous arbres peuvent contenir un ensemble différent d'arbres d'entités, mais quand même représenter le même objet.
-Par exemple, un traitement ne contient pas toujours une fréquence.
-De plus la langue naturelle est ambiguë et un même ensemble d'arbres d'entités peux représenter deux objets différents.
-L'ensemble seule des arbres d'entités présent dans chacun des sous arbres n'est donc pas suffisant pour déterminer leur équivalence et on doit aussi prendre en compte le contexte.
-Pour ce faire nous utilisons le concept d'équivalence régulière comme introduite par~\cite{whiteGraphSemigroupHomomorphisms1983} pour les graphes.
-L'idée est que deux sommets d'un graphe sont jugé équivalents si leur voisinage est équivalent.
-Par exemple, deux personnes peuvent être jugées équivalent (comme catégorie d'objet représenté, ici un patient) s'ils sont toutes les deux lié à des sommets équivalents comme une maladie, un traitement, etc sans pour autant que ce soit les mêmes nœuds.
-
-Afin de définir la relation d'équivalence, nous définissons une mesure de similarité entre deux sous arbres.
-On note $\mathbb{T}$ l'ensemble de tous les arbres et $\mathbb{ST}$ l'ensemble de tous les sous arbres.
-Une mesure de similarité est une fonction symétrique $f : \mathbb{ST} \times \mathbb{ST} \to [0,1]$ où $f(x, x) = 1$ pour tout $x \in \mathbb{ST}$.
-La similarité contextuelle d'arbres est notée $sim_f(x, y)$, entre deux sous arbres enrichis $x = T|_u$ et $y = T'|v$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous arbre parent.
-Les poids sont inversement proportionnels à la distance entre les sous arbre parents et les sous arbres $x$ et $y$.
-L'idée sous-jacente est que plus un sous arbre est distant d'un autre, moins il a de valeur dans son contexte.
-La mesure $sim_f(x, y)$ est donné par l'équation~\ref{eq:struct:sim} où $P^x_i$ (respectivement $P^y_i$) est le $i$-éme sous arbre parent de $x$ (respectivement $y$) et $depth_{min}$ est la profondeur minimum entre les sous arbres $x$ et $y$ tel que $depth_{min} = \min\{|u|, |v|\}$.
-
-\begin{equation}
-    sim_f(x, y) = \frac{\sum_{i=0}^{depth_{min}} \frac{1}{i + 1} \cdot f(P^x_i, P^y_i)}{\sum_{j=0}^{depth_{min}} \frac{1}{j + 1}} \label{eq:struct:sim}
-\end{equation}
-
-\begin{proposition}
-    Comme la fonction $sim_f$ est une moyenne pondérée de $f$ elle respecte alors ses propriétés :
-    $sim_f$ est symétrique, définie sur l'intervalle $[0, 1]$ et pour tout $x \in \mathbb{ST}$, $sim_f(x, x) = 1$.
-    \qed
-\end{proposition}
-
-Plusieurs mesures $f$ de similarité peuvent être utilisés comme Jaccard, Levenshtein, Jaro, etc.
-
-\begin{example}
-    % \todo{example deux sous arbres}
-\end{example}
-
-Avec cette mesure de similarité, il est possible de définir la relation de similarité entre deux sous arbres enrichis.
-On dira alors que deux sous arbres sont similaires si leur similarité est supérieure à un taux donné en paramètre.
-La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaque ensemble de données.
-
-\begin{definition}[Similarité de sous arbres]
-    \label{def:struct:sim}
-    Soit deux arbres enrichis $T_1$ et $T_2$ avec deux sous arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et un seuil noté $\tau \in [0, 1]$, on dit que $st_1$ et $st_2$ sont $\tau$-similaires, noté $st_1 \sim_\tau st_2$, si et seulement si $sim_f(st_1, st_2) \geq \tau$.
-\end{definition}
-
-\begin{proposition}
-    Pour tout $x$, on a $sim_f(x, x) = 1$ et $1 \ge \tau$ pour toute valeur possible de $\tau$, alors, on peut déduire que la relation de $\tau$-similarité est \emph{réflexive}.
-    De plus, si on a $x \sim_\tau y$, alors $f(x, y) \ge \tau$.
-    Comme la fonction $sim_f$ est symétrique ($f(x, y) = f(y, x)$) on a donc $f(y, x) \ge \tau$ et par extension $y \sim_\tau x$.
-    Nous pouvons conclure que la relation de $\tau$-similarité est \emph{symétrique}.
-    \qed
-\end{proposition}
-
-\begin{definition}[Equivalence de sous arbres]
-    \label{def:struct:equiv}
-    Étant donné deux arbres enrichis $T_1$ et $T_2$ avec deux sous arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et la relation de $\tau$-similarité définit précédemment (\ref{def:struct:sim}).
-    On définit la relation de $\tau$-équivalence entre $st_1$ et $st_2$ noté $st_1 \equiv_\tau st_2$ tel que $x$ est $\tau$-équivalent à $y$ si et seulement si $x$ est $\tau$-similaires à $y$ ou à au moins un des sous arbres $\tau$-équivalent à $y$.
-    La proposition est synthétisée par l'équation~\ref{eq:struct:equiv}.
-    \begin{equation}
-        (\forall x \in \mathbb{ST}, y \in \mathbb{ST}) ~ x \equiv_\tau y \iff x \sim_\tau y \lor (\exists z \in \mathbb{ST}) ~ x \equiv_\tau z \land y \equiv_\tau z \label{eq:struct:equiv}
-    \end{equation}
-\end{definition}
-
-\begin{proposition}
-    Soit $st_1$ un sous arbre enrichi.
-    La réflexivité de la $\tau$-équivalence découle directement de la réflexivité de celle de la $\tau$-similarité, car $st_1 \equiv_\tau st_1$ implique $st_1 \sim_\tau st_1$ qui est toujours vrais.
-    $st_1 \equiv_\tau z \land st_1 \equiv_\tau z$ est vrai pour $z = st_1$ étant donné que $st_1 \equiv_\tau st_1$ par hypothèse.
-    La $\tau$-équivalence est donc \emph{réflexive}.
-    Soit $st_1$ et $st_2$ deux sous arbres enrichis et supposons que $st_1 \equiv_\tau st_2$.
-    On a alors deux cas :
-    \begin{itemize}
-        \item $st_1 \sim_\tau st_2$ : qui implique, par symétrie, $st_2 \sim_\tau st_1$ et donc $st_2 \equiv_\tau st_1$.
-        \item $\exists z (st_1 \equiv_\tau z \land st_2 \equiv_\tau z)$ : qui peut se réécrire en $\exists z (st_2 \equiv_\tau z \land st_1 \equiv_\tau z)$ et qui donne, par définition, $st_2 \equiv_\tau st_1$.
-    \end{itemize}
-    On peut donc en déduire que la $\tau$-équivalence est \emph{symétrique}.
-    Soit $st_1$, $st_2$ et $st_3$ trois sous arbres enrichis et supposons que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
-    Par symétrie, nous avons $st_1 \equiv_\tau st_2$ et $st_3 \equiv_\tau st_2$.
-    En utilisant la définition de la $\tau$-équivalence (\ref{eq:struct:equiv}), nous pouvons remplacer $z$ par $st_2$.
-    On obtient alors, par définition, $st_1 \equiv_\tau st_3$.
-    L'inverse est trivial et on peut conclure que $(st_1 \equiv_\tau st_2 \land st_2 \equiv_\tau st_3) \iff st_1 \equiv_\tau st_3$.
-    La $\tau$-équivalence est donc \emph{transitive}.
-    La $\tau$-équivalence respecte les trois propriétés d'une relation d'équivalence : \emph{réflexive}, \emph{symétrique} et \emph{transitive}.
-    % Supposons que $st_1 \equiv_\tau st_2$, on a donc $st_1 \sim_\tau st_2$ ou il existe un $z$ qui vérifie $st_1 \equiv_\tau z \implies st_2 \equiv_\tau z$.
-    % Dans le premier cas on peut déduire que $st_2 \sim_\tau st_1$ par réflectivité et par conséquent $st_2 \equiv_\tau st_1$.
-    % Dans le second cas, si on prend $z = st_1$, on obtient $st_1 \equiv_\tau st_1 \implies st_2 \sim_\tau st_1$.
-    % Or, $st_1 \equiv_\tau st_1$ est vrai par réflexivité et on obtient alors $st_2 \equiv_\tau st_1$
-    % On peut donc en déduire que $st_1 \equiv_\tau st_2 = st_2 \equiv_\tau st_1$ ce qui implique que la $\tau$-équivalence est \emph{symétrique}.
-    % Prenons l'hypothèse que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
-    % Cela signifie que $st_2 \sim_\tau st_3$ ou $st_2 \equiv_\tau z \implies st_3 \equiv_\tau z$.
-    % Or, comme $st_2 \equiv_\tau st_1$ par symétrie, en prenant $z = st_1$, on a $st_3 \equiv_\tau st_1$ et donc $st_1 \equiv_\tau st_3$ par symétrie.
-    % La $\tau$-équivalence est donc \emph{transitive}.
-    \qed
-\end{proposition}
-
-\begin{definition}[Classe d'équivalences]
-    On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
-    $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
-\end{definition}
-
-Le partitionnement d'un ensemble peut être calculé à l'aide d'un regroupement hiérarchique en lien simple et la mesure de similarité $sim_f$.
-\cite{carlssonCharacterizationStabilityConvergence2010} montre qu'un regroupement hiérarchique en lien simple correspond a partitionnement selon une relation d'équivalence.
-Le regroupement hiérarchique implique la construction d'une hiérarchie des éléments selon une mesure de similarité.
-Initialement, chaque individu forme une classe distincte.
-À chaque étape, les classes "proches" sont fusionnées deux à deux en fonction de la mesure de similarité (ou de disimilarité).
-Une hiérarchie est qualifiée "en lien simple" lorsque la similarité entre deux classes est évaluée comme étant le maximum de la similarité (ou le minimum de la dissimilarité) entre chaque paire d'éléments de ces classes respectives.
-Cette hiérarchie est fréquemment représentée graphiquement à l'aide d'un dendrogramme (cf. figure~\ref{fig:struct:quotient:dendrogramme}).
-Il s'agit d'un arbre binaire décrivant les fusions de classes, où les classes sont disposées sur l'axe des abscisses et l'axe des ordonnées représente la dissimilarité entre les classes (plus la valeur est élevée, plus les classes sont éloignées).
-
-Une classification par un taux $\tau$ consiste à fusionner des classes tant que la similarité demeure supérieure à $\tau$.
-Visuellement, il est possible de tracer une droite sur le dendrogramme et de conserver toutes les classes situées en dessous de cette droite.
-Dans la figure~\ref{fig:struct:quotient:dendrogramme}, en fixant $\tau = 0.3$, deux classes émergent, à savoir $\{a, b\}$ (en bleu) et $\{c, d, e\}$ (en orange).
-Si le seuil est augmenté à $\tau = 0.5$, trois classes distinctes apparaissent, à savoir $\{a\}$, $\{b\}$ et $\{c, d, e\}$.
-En continuant d'augmenter le seuil, par exemple à $\tau = 0.7$, quatre classes distinctes seraient obtenues, à savoir $\{a\}$, $\{b\}$, $\{c, d\}$ et $\{e\}$.
-
-\begin{figure}[H]
-    \centering
-    \begin{adjustbox}{max width=\linewidth}
-        \begin{tikzpicture}[sloped]
-            \node (a) at (-6,0) {a};
-            \node (b) at (-3,0) {b};
-            \node (c) at (-0.5,0) {c};
-            \node (d) at (0.5,0) {d};
-            \node (e) at (2,0) {e};
-            \node (ab) at (-4.5,3) {};
-            \node (cd) at (0,1) {};
-            \node (cde) at (1,2) {};
-            \node (all) at (-1.5,4.5) {};
-
-            \draw[thick, blue] (a) |- (ab.center);
-            \draw[thick, blue] (b) |- (ab.center);
-            \draw[thick, orange] (c) |- (cd.center);
-            \draw[thick, orange] (d) |- (cd.center);
-            \draw[thick, orange] (e) |- (cde.center);
-            \draw[thick, orange] (cd.center) |- (cde.center);
-            \draw[thick] (ab.center) |- (all.center);
-            \draw[thick] (cde.center) |- (all.center);
-
-            \draw[<-,latex-] (-10,0) -- node[above]{simlaritée} (-10,5);
-            \draw[->,-latex] (-9,0) -- node[above]{disimilarité} (-9,5);
-
-            \draw (-7,0) -- (-7,5);
-
-            \foreach \y in {0,1,2,3,4,5}
-            \draw[shift={(0,\y)},color=black] (-7,0) -- (-7.1,0);
-
-            \node[left] at (-7.1,0) {$1.0$} ;
-            \node[left] at (-7.1,1) {$0.8$} ;
-            \node[left] at (-7.1,2) {$0.6$} ;
-            \node[left] at (-7.1,3) {$0.4$} ;
-            \node[left] at (-7.1,4) {$0.2$} ;
-            \node[left] at (-7.1,5) {$0.0$} ;
-
-            \draw[dashed,color=gray] (-7,3.5) -- node[at end, right]{$\tau$} (2.5,3.5);
-            \draw[color=gray] (-7,3.5) -- (-7.1,3.5) node[left] {$0.3$};
-        \end{tikzpicture}
-    \end{adjustbox}
-    \caption{Exemple de dendrogramme pour le partitionnement hiérarchique}
-    \label{fig:struct:quotient:dendrogramme}
-\end{figure}
-
-\subsection{Récupération du schéma d'une instance}
-
-Pour réaliser la migration de l'instance d'une grammaire vers une autre il est indispensable de pouvoir récupérer la grammaire à partir de l'instance afin de pouvoir la vérifier à l'aide de la méta-grammaire $G$.
-Étant donné une instance $I$ reconnu par une grammaire $G_S$, il est possible de récupérer l'arbre de dérivation $S$ de la grammaire $G$ en calculant le quotient de $I$. \todo{$S$ n'est pas la dérivation de $G$}
-
-% \begin{definition}[Quotient d'un graphe]
-%   Étant donné un graphe $G = (V, E)$ où $V$ est l'ensemble des sommets du graphe et $E$ l'ensemble des arêtes de la forme $\{u, v\} \in E$ où $u, v \in V$.
-%   Le quotient du graphe $G$ est un graphe distinct noté $Q_G = (Q_V, Q_E)$ qui respecte les propriétés suivantes :
-%   \begin{enumerate}
-%     \item \label{struct:quotient:prop1} $Q_V = V / \equiv$
-%     \item \label{struct:quotient:prop2} $\{u_Q, v_Q\} \in Q_E \iff \exists u \in u_Q, v \in v_Q$ tel que $\{u, v\} \in V$
-%   \end{enumerate}
-%   La propriété \ref{struct:quotient:prop1} signifie que chaque sommet de $Q_G$ correspond à une partition de $G$ par la relation d'équivalence $\equiv$.
-%   De plus, il existe une arête entre deux nœuds de $Q_G$ si et seulement si, il existe une arête entre au moins une paire d'élément de chaque partition dans $G$ comme définit par la propriété \ref{struct:quotient:prop2}.
-% \end{definition}
-
-% \begin{definition}[Quotient d'un arbre ordonné]
-%   Étant donné un arbre ordonné $T = (D, l)$, le quotient de l'arbre est un arbre distinct noté $Q_T = (Q_D, Q_l)$ avec une fonction injective de projection $\pi : (\mathbb{N})^* \to \mathcal{P}(D)$ où $\mathcal{P}(D)$ est l'ensemble des parties de $D$ (\emph{power set} en anglais, c.-à-d. l'ensemble des sous ensemble de $D$).
-%   $\pi$ respecte les propriétés suivantes :
-%   \begin{enumerate}
-%     \item \label{struct:quotient-tree:prop1} $\forall u_Q \in Q_D ~ \exists V \in D / \equiv$ tel que $\pi(u_Q) = V$.
-%     \item \label{struct:quotient-tree:prop2} $\forall u_Q \in Q_D ~ \exists v_Q \in Q_D$ tel que $v_Q \preceq u_Q \iff \exists u \in \pi(u_Q), v \in \pi(v_Q)$ tel que $v \prec u$
-%   \end{enumerate}
-%   La propriété \ref{struct:quotient-tree:prop1} signifie que chaque nœud de $Q_T$ correspond à une partition de $T$ par la relation d'équivalence $\equiv$.
-%   De plus, il existe une arête entre deux nœuds de $Q_T$ si et seulement si, il existe une arête entre au moins une paire d'élément de chaque partition dans $T$ comme définit par la propriété \ref{struct:quotient-tree:prop2}.
-%   La fonction de labellisation $Q_l$ est définie par : $\langle u \mapsto l(\pi(u)) \mid u \in Q_D \rangle$.
-%   De plus, pour toute position $u_Q \in Q_D$ s'il existe un $v \in D$ tel que $|\{u \mid u \in \pi(u_Q), v \prec u\}| > 1$ alors $Q_l(u_Q) = Q_l(u_Q)^+$
-% \end{definition}
-
-Le quotient d'un graphe est une construction ou les nœuds sont regroupées en suivant une relation d'équivalences.
-Chaque nœud du graphe quotient représente alors une classe d'équivalence et il existe une arête entre deux nœuds s'il existe au moins une arête entre deux individus de chaque classe.
-Pour construire la grammaire à partir d'un arbre, on définit un nouveau quotient qui maintient la structure d'arbre (c.-à-d. sans cycles et sans nœuds ayant plusieurs parents).
-Le quotient est calculé à partir d'une relation d'équivalence sur les labels.
-Pour capturer la structure hiérarchique de ces classes et construire l'arbre quotient, nous introduisons la fonction \textsf{Succ}, qui permet d'obtenir les successeurs de chaque classe d'équivalence.
-
-\begin{definition}
-    \label{def:struct:quotient:succ}
-    Étant donné un arbre $T = (D, l)$ et une relation d'équivalence $R$ définie par $(\forall x \in D, y \in D) ~ x R y \iff l(x) = l(y)$.
-    Soit $D/R = \{C_0, \dots, C_n\}$ l'ensemble des classes d'équivalences de $T$, on définit la fonction \textsf{Succ} tel que :
-    \begin{equation}
-        \textsf{Succ}(C) = \{ C' \mid \exists u \in C, v \in C' \text{ tq. } u \prec v \}
-    \end{equation}
-    % \begin{equation}
-    %   \textsf{Succ}(C_i) = \begin{cases*}
-    %     \{ \epsilon \}                           & si $C_i  = \emptyset$ \\
-    %     \{ C_j \mid \exists u \in C_i, p \in C_j \text{ tq. } u \prec p \} & si $C_i \neq \emptyset$
-    %   \end{cases*}
-    % \end{equation}
-\end{definition}
-
-À l'aide de la fonction \textsf{Succ}, on définit la fonction \textsf{QDom} qui permet de construire le domaine de l'arbre quotient.
-$\textsf{QDom}(C, u)$ a pour objectif d'associer a chaque classe successeurs de $C$ une position relative $u.p$.
-Comme on souhaite maintenir la hiérarchie sous forme d'arbre, une classe d'équivalence peut avoir plusieurs positions dans l'arbre quotient si elle a plusieurs parents.
-L'arbre quotient est construit à partir de la fonction \textsf{QDom}.
-
-\begin{definition}[Quotient d'un arbre ordonné]
-    Étant donné un arbre $T = (D, l)$ et une relation d'équivalence $R$ définie par $(\forall x \in D, y \in D) ~ x R y \iff l(x) = l(y)$.
-    Soit $D/R = \{C_0, \dots, C_n\}$ l'ensemble des classes d'équivalences de $T$ et la fonction \textsf{Succ} donnée par la définition~\ref{def:struct:quotient:succ}.
-    On commence par définir la fonction \textsf{QDom} à l'aide de l'algorithme \ref{algo:struct:quotient:QDom}.
-    L'arbre quotient de $T$, noté $Q_T$ est construit à l'aide de la fonction \textsf{QDom} et sa construction est définie par l'algorithme~\ref{algo:struct:quotient:QT}.\\
-
-    \begin{algorithm}[H]
-        \caption{$\textsf{QDom}(C_i, u)$}
-        \label{algo:struct:quotient:QDom}
-        \SetKwFunction{succ}{Succ}
-
-        $S = \emptyset$\;
-        $p = 0$\;
-        \ForEach{$C_j \in \succ(C_i)$}{
-            $S = S \cup \{(C_j, u.p)\}$\;
-            $p = p+1$\;
-        }
-        \Return{$S$}
-    \end{algorithm}
-
-    \begin{algorithm}[H]
-        \caption{$Q_T(T = (D, l))$}
-        \label{algo:struct:quotient:QT}
-        \SetKwFunction{succ}{Succ}
-        \SetKwFunction{qdom}{QDom}
-
-        $Q_D \gets \{\epsilon\}$\;
-        $Q_l \gets \langle \epsilon \mapsto \lambda \rangle$\;
-
-        $classes \gets \{(\{\epsilon\}, \epsilon)\}$\;
-        \While{$classes \neq \emptyset$}{
-            \tcp{Prendre une classe d'équivalence et ajouter ses successeurs dans l'ensemble a traité}
-            $classes \gets classes - \{(C, u)\}$\;
-            $successeurs \gets \qdom(C, u)$\;
-            $classes \gets classes \cup successeurs$\;
-            \BlankLine
-            $Q_D = Q_D \cup \{u\}$\;
-            \tcp{Si un nœud a plusieurs successeurs on ajoute le symbole `${}^+$' au label}
-            \uIf{$\lvert\{v \mid \forall (C', v) \in successeurs$ tq. $u \prec v\}\rvert > 1$\label{algo:struct:quotient:QT:plus}}{
-                $Q_l(u) = l(u)~+~$`${}^+$'\;
-            } \Else {
-                $Q_l(u) = l(u)$\;
-            }
-        }
-
-        \Return{$Q_D, Q_l$}
-    \end{algorithm}
-\end{definition}
-
-\begin{example}{Arbre quotient et grammaire}
-    \begin{figure}[H]
-        \centering
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \begin{adjustbox}{valign=c, max width=\textwidth}
-                \begin{forest}
-                    for tree={s sep=5em}
-                    [$\lambda$
-                    [$X$ [$a$] [$b$]]
-                        [$X$,before computing xy={s/.average={s}{siblings}} [$b$] [$c$]]
-                        [$Y$ [$a$]]
-                    ]
-                \end{forest}
-            \end{adjustbox}
-            \caption{Arbre $T$}
-            \label{fig:struct:quotient:ex:tree}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \begin{adjustbox}{valign=c, max width=\textwidth}
-                \begin{forest}
-                    for tree={s sep=20mm}
-                    [$\lambda$
-                    [$X^+$ [$a$] [$b$] [$c$]]
-                        [$Y$ [$a$]]
-                    ]
-                \end{forest}
-            \end{adjustbox}
-            \caption{Arbre quotient $Q_T$}
-            \label{fig:struct:quotient:ex:quotient}
-        \end{subfigure}
-        \caption{Exemple du quotient d'un arbre}
-        \label{fig:struct:quotient:ex}
-    \end{figure}
-
-    Étant donné l'arbre $T = (D, l)$ donné en figure~\ref{fig:struct:quotient:ex:tree}.
-    La première étape de la construction de l'arbre quotient $Q_T$ commence par la récupération des classes d'équivalences de $D$ données par la relation $R$.
-    On obtient alors les classes suivantes :
-    \begin{align*}
-        C_\lambda & = \{\epsilon\} & C_X & = \{0, 1\}   & C_Y & = \{2\}  \\
-        C_a       & = \{00, 20\}   & C_b & = \{01, 10\} & C_c & = \{11\}
-    \end{align*}
-
-    La construction de $Q_T$ implique la récupération de la hiérarchie des ensembles équivalents.
-    L'algorithme commence par la classe $C_\lambda$ et parcours récursivement ses successeurs.
-    On a, pour chaque classe, les successeurs suivants :
-    \begin{align*}
-        \textsf{Succ}(C_\lambda) & = \{C_X, C_Y\} & \textsf{Succ}(C_X) & = \{C_a, C_b, C_c\} & \textsf{Succ}(C_Y) & = \{C_c\}   \\
-        \textsf{Succ}(C_a)       & = \emptyset    & \textsf{Succ}(C_b) & = \emptyset         & \textsf{Succ}(C_c) & = \emptyset
-    \end{align*}
-
-    À partir de la hiérarchie obtenue, on construit le domaine de l'arbre en associant, a chaque successeur, une position relative a son parent. On commence à la position $\epsilon$ où $\textsf{QDom}(C_\lambda, \epsilon) = \{(C_X, 0), (C_Y, 1)\}$ dans l'arbre $T$.
-    Finalement, on obtient la construction suivante :
-    \begin{align*}
-        \textsf{QDom}(C_X, 0)  & = \{(C_a, 00), (C_b, 01), (C_c, 02)\} & \textsf{QDom}(C_Y, 1)  & = \{(C_a, 10)\} \\
-        \textsf{QDom}(C_a, 00) & = \emptyset                           & \textsf{QDom}(C_a, 10) & = \emptyset     \\
-        \textsf{QDom}(C_b, 01) & = \emptyset                           & \textsf{QDom}(C_c, 02) & = \emptyset
-    \end{align*}
-
-    En construisant le domaine de $Q_T$ il est facile de se rendre compte que le nœud correspondant à la classe $C_a$ sera dupliqué dans l'arbre, car il est lié à deux positions : $00$ et $10$.
-    Avec le domaine construit par $QDom$ on peut construire l'arbre donné en figure~\ref{fig:struct:quotient:ex:quotient}.
-    Le nœud correspondant à la classe d'équivalence $C_X$ se voit attribué le symbole `${}^+$' signifiant que le symbole $X$ peut être répété plusieurs fois comme enfant de $\lambda$ (voir la définition~\ref{def:struct:pre:cfg} des \gls{cfg} condensée).
-    Cette information est déduite de l'ensemble des positions de $C_X = \{0, 1\}$ (ligne~\ref{algo:struct:quotient:QT:plus} de l'algorithme~\ref{algo:struct:quotient:QT}) où deux positions partages le même préfixe (ici, $\epsilon$).
-    À partir de l'arbre quotient $Q_T$ il est possible de reconstruire la \gls{cfg} condensée $G_T$ où $T$ est une dérivation partielle (c.-à-d. que certains symboles non-terminaux ne sont pas présent) de $G_T$.
-    Pour chaque nœud à la position $u$ qui n'est pas une feuille, la grammaire est un ensemble de règles $Q_T|_u \to Q_T|_{u.0}, \dots Q_T|_{u.i}$.
-    On obtient donc la grammaire $G_T$ suivante :
-    \begin{align*}
-        \lambda & \to X^+ ~ Y & X & \to a ~ b ~ c & Y & \to a
-    \end{align*}
-
-    % Il est à noté que l'on ne traite pas les attributs \emph{facultatifs} dans la grammaire de schéma bien qu'ils sont autorisé dans l'instance, ils seront traités comme des valeurs nulles.
-\end{example}
+\FloatBarrier
