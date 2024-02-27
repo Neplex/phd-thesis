@@ -1,76 +1,134 @@
-\begin{algorithm}[H]
-    \caption{$\textsf{ALGO}(T = (D, l), epochs, \tau, minSupport)$}
-    \SetKwFunction{reduce}{reduce}
-    \SetKwFunction{findGroups}{findGroups}
-    \SetKwFunction{findSubgroups}{findSubgroups}
-    \SetKwFunction{mergeGroups}{mergeGroups}
-    \SetKwFunction{findCollections}{findCollections}
-    \SetKwFunction{findRelationship}{findRelationship}
+\SetKw{skip}{SKIP}
 
-    \While{$i \leq \text{epochs}$ and $simp$}{
+% \SetKwData{epochs}{epochs}
+\SetKwData{simp}{simp}
+% \SetKwData{minSupport}{minSupport}
+\SetKwData{groupFound}{groupFound}
+\SetKwData{relationshipFound}{relationshipFound}
+\SetKwData{collectionFound}{collectionFound}
+% \SetKwData{splitColl}{splitColl}
+\SetKwData{subSet}{subSet}
+\SetKwData{subPos}{subPos}
+\SetKwData{st}{st}
+
+\SetKwFunction{combination}{combination}
+\SetKwFunction{findSTwithMinLeavesTree}{findSTwithMinLeavesTree}
+\SetKwFunction{reduce}{reduce}
+\SetKwFunction{insElem}{ins\_elem}
+\SetKwFunction{delElem}{del\_elem}
+\SetKwFunction{leaves}{leaves}
+% \SetKwFunction{depth}{depth}
+
+Dans cette section, nous décrivons en détail une implémentation de la procédure de réécriture des arbres.
+Notre approche ici, est d'unifier les arbres en éliminant les variations de structurelle (c.-à-d. de minimiser le nombre de règles de production) et en maximisant la fréquence d'apparition de ces structures.
+L'idée est la suivante : à chaque étape, on essaye d'effectuer l'opération la moins destructive, si l'arbre est modifié, on recommence le cycle pour vérifier la validité du schéma et recalculer les classes d'équivalences qui ont pu changer.
+Si aucun changement n'a pu être réalisé, on essaye une autre opération plus destructive que la précédente.
+La procédure principale~\ref{algo:struct:rewrite} se charge d'orchestrer les différentes opérations d'édition et implémente la boucle décrite dans la section précédente.
+On suppose qu'on a en entrée un unique arbre en tant que forêt enracinée d'arbre d'instances.
+La phase de prétraitement qui consiste à enrichir et à simplifier les arbres de syntaxe a déjà été réalisée.
+On définit quatre paramètres supplémentaires :
+\begin{itemize}
+    \item la fonction de similarité $f$ ;
+    \item le seuil $\tau$ de similarité ;
+    \item le support minimum qui détermine quand un élément doit être considéré fréquent ;
+    \item l'epoch qui borne le nombre de cycles que l'on autorise.
+\end{itemize}
+L'algorithme proposé est une version simplifiée de la boucle proposée précédemment.
+Il converge vers une solution qui est valide par rapport à la méta-grammaire $\mathbb{G}$.
+L'epoch permet de garantir sa terminaison même si cela implique que des parties de l'arbre ne sont pas valide à la fin de l'exécution.
+L'algorithme s'affranchit de l'extraction de la grammaire et sa vérification à chaque étape.
+Cela est rendu possible, car les opérations de transformations s'appliquent uniquement sur les parties invalides de l'arbre.
+C'est-à-dire que quand plus aucune transformation n'est possible, la grammaire est valide.
+
+\begin{procedure}[htb]
+    \caption{rewrite($T$ = ($D$, $l$), epochs, $\tau$, minSupport)}
+    \label{algo:struct:rewrite}
+
+    $\simp \gets \textsc{True}$\;
+    \While{$i \leq \text{epochs}$ and $\simp = \textsc{True}$}{
         $i \gets i + 1$\;
-        simp $\gets$ True\;
 
-        \tcp{Supprimer les noeuds redondants}
-        \lForAll{$p \in D_i$  tel que $t_i(p) \notin \{`ENT`, `LEAF`\}$}{
+        \tcp{Supprimer les nœuds redondants}
+        \lForAll{$p \in D_i$  tel que $t_i(p) \notin \{`ENT`, `LEAF`\}$\label{algo:struct:rewrite:reduce}}{
             \reduce{$T_i$, $p$, $\emptyset$}
         }
 
-        \tcp{Identifier les neouds groupes}
-        \findGroups{$T_i$, $\tau$, minSupport}\;
+        \tcp{Identifier les nœuds groupes}
+        \ref{algo:struct:rewrite-findGroups}$(T, \tau, \text{minSupport})$\;
 
-        \tcp{Ajouter des neouds pour separer un sous-groupe frequent}
-        simp $\gets$ \findSubgroups{$T_i$, $\tau$, minSupport}\;
+        \tcp{Ajouter des nœuds pour séparer un sous-groupe fréquent}
+        $\simp \gets \ref{algo:struct:rewrite-findSubgroups}(T, \tau, \text{minSupport})$\;
 
-        \tcp{Fusionner des noeuds voisin pour augmenter un groupes}
-        \lIf{simp = False}{
-            simp $\gets$ \mergeGroups{$T_i$, $\tau$, minSupport}
+        \tcp{Fusionner des nœuds voisins pour augmenter un groupe}
+        \lIf{$\simp = \textsc{False}$}{
+            $\simp \gets \ref{algo:struct:rewrite-mergeGroups}(T, \tau, \text{minSupport})$
         }
 
         \tcp{Identifier les collections de groupes}
-        \lIf{simp = False}{
-            simp $\gets$ \findCollections{$T_i$, $\tau$, minSupport}
+        \lIf{$\simp = \textsc{False}$}{
+            $\simp \gets \ref{algo:struct:rewrite-findCollections}(T, \tau, \text{minSupport})$
         }
 
         \tcp{Identifier les relations}
-        \lIf{simp = False}{
-            simp $\gets$ \findRelationship{$T_i$, $\tau$, minSupport}
+        \lIf{$\simp = \textsc{False}$}{
+            $\simp \gets \ref{algo:struct:rewrite-findRelationship}(T, \tau, \text{minSupport})$
         }
 
         \tcp{Identifier les collections de relations}
-        \lIf{simp = False}{
-            simp $\gets$ \findCollections{$T_i$, $\tau$, minSupport}
+        \lIf{$\simp = \textsc{False}$}{
+            $\simp \gets \ref{algo:struct:rewrite-findCollections}(T, \tau, \text{minSupport})$
         }
 
         \tcp{Aplatir l'arbre en haut}
-        \If{simp = False}{
-            \ForEach{$p \in D_i$  tel que $\text{depth}(p) = 1$}{
-                simp $\gets$ \reduce{$T_i$, p, $\{`ENT`, `GROUP`, `REL`, `COLL`\}$}\;
+        \If{$\simp = \textsc{False}$}{
+            \ForEach{$p \in D_i$ tel que $depth(p) = 1$\label{algo:struct:rewrite:reduce-top}}{
+                $\simp \gets \reduce{T, p, \{`ENT`, `GROUP`, `REL`, `COLL`\}}$\;
             }
         }
 
-        \tcp{Supprimer les noeuds non labelisés en bas}
-        \If{simp = False}{
-            \ForEach{$u.j \in D_i$ où $t(u.j) = `ENT$'}{
-                simp $\gets$ \reduce{$T_i$, u, $\{`ENT`, `GROUP`, `REL`, `COLL`\}$}\;
+        \tcp{Supprimer les nœuds non étiquetés en bas}
+        \If{$\simp = \textsc{False}$}{
+            \ForEach{$u.j \in D_i$ où $t(u.j) = `ENT$'\label{algo:struct:rewrite:reduce-bot}}{
+                $\simp \gets \reduce{T, u, \{`ENT`, `GROUP`, `REL`, `COLL`\}}$\;
             }
         }
     }
-\end{algorithm}
+\end{procedure}
 
-\FloatBarrier
+Dans la procédure, la variable \textsf{simp} permet d'enregistrer si une simplification a été faite.
+Si c'est le cas, la boucle continue à l'itération suivante tant que l'epoch n'est pas dépassé.
+Pour une itération $i$, on récupère cette information à chaque étape et on continue vers les opérations suivantes uniquement si aucune modification n'est opérée par rapport à l'arbre de l'itération $i - 1$.
+Il est à noter que l'on n'utilise pas l'opération \ref{algo:struct:rewrite-findGroups} pour savoir si une simplification a été effectuée, car cette opération identifie les groupes à chaque étape et ne constitue donc pas une étape de reconstruction.
+
+L'algorithme commence (à la ligne~\ref{algo:struct:rewrite:reduce}) par simplifier l'arbre en supprimant les nœuds redondants.
+Dans la suite, on identifie les nœuds, candidats pour représenter des groupes.
+Une fois ces premières étapes effectuées, la procédure tente successivement d'effectuer des transformations en commençant par la moins destructrice.
+Dans l'ordre, on retrouve :
+\begin{enumerate}
+    \item \ref{algo:struct:rewrite-findSubgroups} pour construire des sous-groupes fréquents ;
+    \item \ref{algo:struct:rewrite-mergeGroups} pour construire des groupes plus grands en incorporant d'autres informations, mais qui maintient sa similarité avec sa classe d'équivalence ainsi qu'une fréquence au-dessus de support minimum ;
+    \item \ref{algo:struct:rewrite-findCollections} pour construire des collections de groupes (ces collections peuvent être utilisées lors de l'étape suivante) ;
+    \item \ref{algo:struct:rewrite-findRelationship} pour construire des relations entre deux groupes ;
+    \item \ref{algo:struct:rewrite-findCollections} pour construire des collections de relations.
+\end{enumerate}
+
+Une fois ces cinq opérations effectuées, si aucune modification n'a pu être effectuée, on cherche à supprimer des structures trop complexes qui ne sont pas catégorisable.
+Notamment, les arbres peuvent avoir une grande profondeur, mais nos grammaires de schéma autorisent uniquement une profondeur maximale de 5.
+L'idée est donc de mettre à plat des structures trop profondes en supprimant un à un les niveaux supérieurs.
+L'algorithme construit les instances en commençant par le bas de l'arbre et en remontant, les niveaux supérieurs sont donc les plus susceptibles de ne pas être catégorisés.
+La ligne~\ref{algo:struct:rewrite:reduce-top} supprime alors l'ensemble des racines qui n'ont pas été catégorisée en tant qu'\emph{entité}, \emph{groupe}, \emph{relation} ou \emph{collection}.
+S'il n'est plus possible de détruire les racines, on détruit l'arbre par le bas en supprimant les niveaux intermédiaires situés au-dessus des entités (ligne~\ref{algo:struct:rewrite:reduce-bot}).
+
+Dans la suite, on étudie en détail l'implémentation des opérations de transformations mise en place.
 
 \subsection{Opérations de structuration}
 
-\begin{algorithm}
-    \caption{$\textsf{findGroups}(T = (D, l), \tau, minSupport)$}
-    \SetKwFunction{findSTwithMinLeavesTree}{findSTwithMinLeavesTree}
-    \SetKwFunction{insElem}{ins\_elem}
-    \SetKwFunction{delElem}{del\_elem}
-    \SetKwFunction{leaves}{leaves}
+\begin{procedure}
+    \caption{findGroups($T$ = ($D$, $l$), $\tau$, minSupport)}
+    \label{algo:struct:rewrite-findGroups}
 
-    \tcp{Identifier les clusters de sous-arbres equivalent et garder uniquement les fréquents}
-    $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/\equiv_\tau, |equiv\_pos| \ge minSupport\}$\;
+    \tcp{Identifier les clusters de sous-arbres équivalents et garder uniquement les fréquents}
+    $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/\equiv_\tau, |equiv\_pos| \ge$ minSupport$\}$\;
     $k \gets 0$\;
 
     \While{$equivalent\_st \neq \emptyset$}{
@@ -91,20 +149,15 @@
             $k \gets k+1$\;
         }
     }
-\end{algorithm}
+\end{procedure}
 
 % \nh{Something is not great here, in findSubgroups. We mixed a set of positions with a set of labels. The set contains trees but the combinaition should not allow a label to appear multiple times}
 
-\begin{algorithm}
-    \caption{$\textsf{findSubgroups}(T = (D, l), minSupport)$}
-    \SetKwData{groupFound}{groupFound}
-    \SetKwData{st}{st}
+\begin{procedure}
+    \caption{findSubgroups($T$ = ($D$, $l$), minSupport)}
+    \label{algo:struct:rewrite-findSubgroups}
 
-    \SetKwFunction{combination}{combination}
-    \SetKwFunction{insElem}{ins\_elem}
-    \SetKwFunction{delElem}{del\_elem}
-
-    $\groupFound \gets$ \textbf{False}\;
+    $\groupFound \gets$ \textsc{False}\;
 
     \ForAll{sous-arbre \st tel que $\st = T|_u$ et $t(u) \notin \{`ENT`, `REL`, `COLL`\}$}{
         $S_{ENT} \gets \{T|_{u.i} \mid \forall i \ t(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
@@ -132,11 +185,11 @@
             \tcp{Choisir le groupe qui a le plus grand support}
             $j_{max}$ est un indice tel que $support_{j_{max}} = \max(support_j)$\;
 
-            \If{$support_{j_{max}} \ge min\_support$ et $support_{j_{max}} > group\_support$}{
+            \uIf{$support_{j_{max}} \ge min\_support$ et $support_{j_{max}} > group\_support$}{
                 \tcp{On continue de combiner les arbres d'entités restants dans \st}
                 $\groupFound \gets$ \textbf{True}\;
                 $S_{ENT} \gets S_{ENT} \setminus combi_{j_{max}}$\;
-                \tcp{La taille de la combinaison suivante $k$ est reduite lorsque $|S_{ENT}| < k$}
+                \tcp{La taille de la combinaison suivante $k$ est réduite lorsque $|S_{ENT}| < k$}
                 $k \gets \min(|S_{ENT}|, k)$\;
                 $T \gets T_{j_{max}}$ \tcp*[l]{L'arbre modifié est sauvegardé}
             } \Else {
@@ -146,20 +199,15 @@
     }
 
     \Return \groupFound \;
-\end{algorithm}
+\end{procedure}
 
-\begin{algorithm}
-    \caption{$\textsf{mergeGroups}(T = (D, l), minSupport)$}
-    \SetKwData{groupFound}{groupFound}
-    \SetKwData{st}{st}
+\begin{procedure}
+    \caption{mergeGroups($T$ = ($D$, $l$), minSupport)}
+    \label{algo:struct:rewrite-mergeGroups}
 
-    \SetKwFunction{combination}{combination}
-    \SetKwFunction{insElem}{ins\_elem}
-    \SetKwFunction{delElem}{del\_elem}
+    $\groupFound \gets$ \textsc{False}\;
 
-    $\groupFound \gets$ \textbf{False}\;
-
-    \ForAll{subtree \st such that $\st = T|_u$ and $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
+    \ForAll{sous-arbre \st tel que $\st = T|_u$ and $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
         $S_{GROUP} = \{T|_{u.i} \mid \forall i \ t(u.i) = `GROUP`\}$ \tcp*{Ensemble des arbres groupe enfants de \st}
         $S_{ENT} = \{T|_{u.i} \mid \forall i \ t(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
 
@@ -168,19 +216,19 @@
             $j \gets 0$\;
 
             \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S_{GROUP} \cup S_{ENT}}$}
-            \ForAll{combination $combi_j \in \text{Combination}(S_{GROUP} \cup S_{ENT}, k)$}{
-                \tcp{For each subset of size $k$ in $\mathcal{P}_{S}$}
+            \ForAll{combinaison $combi_j \in \combination(S_{GROUP} \cup S_{ENT}, k)$}{
+                %\tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S}$}
                 $ST = \{x \mid \forall x~t(x) = `GROUP`\}$\;
                 $ST_{ENT} = \{T|_{u.i} \mid \forall x~t(x) = `ENT`\} \cup \{x \mid \forall g \in ST, \forall x \in g\}$\;
 
-                \lIf{$ST_{ENT}$ contient plusieurs fois la même entitée}{SKIP}
+                \lIf{$ST_{ENT}$ contient plusieurs fois la même entité}{\skip}
 
                 $subgroup\_support_j \gets \max(|g| \mid \forall g \in ST)$\;
                 $T_j \gets \text{copy}(T)$ \tcp*{$T_j$ est l'arbre où l'on remplace l'ensemble $combi_j$ par un groupe}
 
                 $\insElem(T_j, GROUP, u.0)$\;
                 \ForAll{$\st_E \in ST_{ENT}$}{
-                    $\delElem(T_j, u.i)$ such that $T_j|_{u.i} = \st_E$\;
+                    $\delElem(T_j, u.i)$ tel que $T_j|_{u.i} = \st_E$\;
                     $\insElem(T_j, \st_E, u.0.0)$\;
                 }
 
@@ -190,13 +238,13 @@
 
             \BlankLine
             \tcp{Choisir le groupe qui a le plus grand support}
-            $j_{max}$ est un indice tel que $support_{j_{max}} = \max(support_j \mid support_j \ge subgroup\_support_j)$\;
+            $j_{max}$ est un indice tel que $support_{j_{max}} = \max\{support_j \mid support_j \ge subgroup\_support_j\}$\;
 
-            \If{$support_{j_{max}} \ge min\_support$}{
+            \uIf{$support_{j_{max}} \ge min\_support$}{
                 \tcp{On continue de combiner les arbres d'entités restants dans \st}
-                $\groupFound \gets$ \textbf{True}\;
+                $\groupFound \gets$ \textsc{True}\;
                 $S_{ENT} \gets S_{ENT} \setminus combi_{j_{max}}$\;
-                \tcp{La taille de la combinaison suivante $k$ est reduite lorsque $|S_{ENT}| < k$}
+                \tcp{La taille de la combinaison suivante $k$ est réduite lorsque $|S_{ENT}| < k$}
                 $k \gets \min(|S_{ENT}|, k)$\;
                 $T \gets T_{j_{max}}$ \tcp*[l]{L'arbre modifié est sauvegardé}
             } \Else {
@@ -206,31 +254,25 @@
     }
 
     \Return \groupFound \;
-\end{algorithm}
+\end{procedure}
 
-\begin{algorithm}
-    \caption{$\textsf{findRelationship}(T = (D, l), minSupport)$}
-    \SetKwData{relationshipFound}{relationshipFound}
-    \SetKwData{splitColl}{splitColl}
-    \SetKwData{st}{st}
+\begin{procedure}
+    \caption{findRelationship($T$ = ($D$, $l$), minSupport)}
+    \label{algo:struct:rewrite-findRelationship}
 
-    \SetKwFunction{combination}{combination}
-    \SetKwFunction{insElem}{ins\_elem}
-    \SetKwFunction{delElem}{del\_elem}
-
-    $\relationshipFound \gets$ \textbf{False}\;
+    $\relationshipFound \gets$ \textsc{False}\;
 
     \ForEach{sous-arbre \st tel que $\st = T|_u$, $|\st| = 2$, et $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
 
-        \If{$t(u.0) = `GROUP`$ and $t(u.1) = `GROUP`$}{
-            \tcp{tout les enfants de \st sont des noeuds groupe, il est donc marqué comme relation}
+        \If{$t(u.0) = `GROUP`$ et $t(u.1) = `GROUP`$}{
+            \tcp{tous les enfants de \st sont des nœuds groupe, il est donc marqué comme relation}
             $t(u) \gets `REL`$\;
-            $\relationshipFound \gets$ \textbf{True}\;
+            $\relationshipFound \gets$ \textsc{True}\;
         }
 
         \If{$(t(u.0) = `COLL`$ et $t(u.1) = `GROUP`)$ or $(t(u.0) = `GROUP`$ et $t(u.1) = `COLL`)$}{
             $group \gets u.l$ tel que $t(u.l) = `GROUP`$\;
-            $coll \gets u.m$ tel que $t(u.m) = `GROUP`$\;
+            $coll \gets u.m$ tel que $t(u.m) = `COLL`$\;
 
             \ForAll{$i \in coll$}{
                 $pos \gets |T|_{coll}|$\;
@@ -242,23 +284,16 @@
             }
             
             $\delElem(T, group)$\;
-            $\relationshipFound \gets$ \textbf{True}\;
+            $\relationshipFound \gets$ \textsc{True}\;
         }
     }
 
     \Return \relationshipFound \;
-\end{algorithm}
+\end{procedure}
 
-\begin{algorithm}
-    \caption{findCollections($T = (D, l), \text{minSupport}$)}
-    \SetKwData{collectionFound}{collectionFound}
-    \SetKwData{subSet}{subSet}
-    \SetKwData{subPos}{subPos}
-    \SetKwData{st}{st}
-
-    \SetKwFunction{combination}{combination}
-    \SetKwFunction{insElem}{ins\_elem}
-    \SetKwFunction{delElem}{del\_elem}
+\begin{procedure}
+    \caption{findCollections($T$ = ($D$, $l$), minSupport)}
+    \label{algo:struct:rewrite-findCollections}
 
     $\collectionFound \gets \text{False}$
 
@@ -286,7 +321,7 @@
             }
         }
 
-        \tcp{Ajout d'elements à une collection}
+        \tcp{Ajout d'éléments à une collection}
         \ForAll{$group, coll$ tel que $\exists x, i, j$ où $t(u.i) = `GROUP`$, $t(u.j) = `COLL`$, $T|_{u.i} \in [x]$ et $\forall k T|_{u.j,k} \in [x]$}{
             $\collectionFound \gets \text{True}$
             $group\_pos = |T|_{u.j}|$
@@ -296,6 +331,6 @@
     }
 
     \Return \collectionFound \;
-\end{algorithm}
+\end{procedure}
 
 \FloatBarrier

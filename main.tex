@@ -51,7 +51,6 @@
 \usepackage[svgnames]{xcolor}
 \usepackage{bookmark}
 \usepackage{hyperref}                % Lien hypertextes
-\usepackage{minitoc}                 % Produce a TOC for all chapters
 \usepackage{array}                   % Outils supplémentaires pour les tableaux
 \usepackage{multicol}                % Plusieurs colonnes possibles
 %\usepackage{indentfirst}            % Indenter le premier paragraphe après une nouvelle section
@@ -86,6 +85,7 @@
 \usepackage[acronym,shortcuts,translate=babel]{glossaries}
 \usepackage[type={CC},modifier={by-nc-nd},lang=french,version={4.0}]{doclicense}
 \usepackage{hyperxmp}
+\usepackage{minitoc}                 % Produce a TOC for all chapters
 
 % Bib
 \selectbiblanguage{french}
@@ -103,6 +103,9 @@
 % Algorithm2e
 \renewcommand{\CommentSty}[1]{\footnotesize\ttfamily\textcolor{Green}{#1}}
 \renewcommand{\KwSty}[1]{\textnormal{\textcolor{blue}{\bfseries #1}}\unskip}
+
+\NewCommandCopy{\legacyunderscore}{\_}
+\renewcommand{\_}{\ifincsname_\else\legacyunderscore\fi}
 
 \makeatletter
 \def\@algocf@pre@ruled{\begin{shaded}}%

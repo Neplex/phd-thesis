@@ -1,5 +1,5 @@
-\begin{wrapfigure}[24]{r}{.4\textwidth}
-    \vspace{-4em}
+\begin{wrapfigure}[25]{r}{.4\textwidth}
+    \vspace{-2em}
     \centering
     \tikzstyle{flow-node} = [text centered, minimum height=2em, minimum width=5em, text width=5em, draw]
     \tikzstyle{flow-start} = [rectangle, rounded corners, flow-node]
@@ -34,12 +34,11 @@
     \label{fig:struct:flow}
 \end{wrapfigure}
 
-La figure~\ref{fig:struct:flow} illustre, à l'aide d'un diagramme de flux, les différentes étapes mise en œuvres pour structurer les données textuelles, c'est-à-dire pour obtenir une grammaire représentant le schéma de nos données.
-Une première étape s'attèle à la préparation des textes.
 Les arbres syntaxiques constituent la fondation de la structuration automatique de l'information.
+L'objectif final est d'obtenir des arbres contenant uniquement les entités hiérarchisées conformément à la structure de l'arbre de syntaxe et valide selon la méta-grammaire $\mathbb{G}$.
 Plusieurs traitements sont nécessaires pour la préparation des textes à la suite de l'analyse syntaxique.
 L'objectif est de simplifier les arbres sur lesquels nous travaillons et d'incorporer les informations extraites, telles que les entités et les relations, au sein de l'arbre de syntaxe.
-En effet, dans le domaine du traitement automatique des langues, le pipeline d'extraction d'information est normalement constitué par une étape d'extraction d'entités nommées suivie par une étape d'extraction de relations entre ces entités. 
+En effet, dans le domaine du traitement automatique du langage, la tâche d'extraction d'information inclue généralement une étape d'extraction d'entités nommées suivie par une étape d'extraction de relations entre ces entités.
 Une entité nommée est une expression linguistique référentielle, souvent associée aux noms propres et aux descriptions définies.
 Elle est souvent définie comme une représentation d'un objet ou d'un concept du monde physique.
 Ainsi, les entités nommées peuvent être considérées comme des instances d'une classe.
@@ -47,147 +46,159 @@ Elles se composent donc d'un type (la classe) et d'une valeur (représentant l'i
 Par exemple, \textquote{Paris} peut représenter une entité de type \textquote{Ville} avec la valeur \textquote{Paris}.
 Lors de l'extraction des informations dans un texte, une fois que les entités sont identifiées, l'extraction de relations est une tâche qui consiste à détecter si deux entités ou plus sont liées et à classer le lien.
 Les entités représentent les unités d'information, les données, qui seront structurées en vue de leur enregistrement en base de données.
-Par conséquent, toute partie de l'arbre qui ne fait pas référence à une entité peut être éliminée, car elle n'est pas porteuse d'information.
-L'objectif final est d'obtenir des arbres contenant uniquement les entités hiérarchisées conformément à la structure de l'arbre de syntaxe et valide selon la méta-grammaire $\mathbb{G}$.
 
+%Par conséquent, toute partie de l'arbre qui ne fait pas référence à une entité peut être éliminée, car elle n'est pas porteuse d'information.
+
+\begin{definition}[Entité nommée]
+    Une entité nommée est définie comme un tuple $E = (entityName,$ $startToken,$ $endToken)$ où $entityName$ est le nom ou le type de l'entité nommée, $startToken$ est l'indice du token qui marque le début de l'entité, et $endToken$ est l'indice du token qui marque la fin de l'entité.
+    $L_{tokens}(E)$ correspond à la séquence de tokens faisant partie de l'entité, définie comme $L_{tokens}(E) = [startToken, \dots, endToken]$.
+\end{definition}
+
+La figure~\ref{fig:struct:flow} illustre, à l'aide d'un diagramme de flux, les différentes étapes mise en œuvres pour structurer les données textuelles, c'est-à-dire pour obtenir une grammaire représentant le schéma de nos données.
 La première étape constitue une phase de préparation des arbres syntaxiques afin d'incorporer les entités et les relations au sein de l'arbre syntaxique.
 Cette étape vise aussi la simplification de ses arbres en supprimant les structures redondantes.
 Comme indiqué dans la section~\ref{sec:struct:meta}, une seconde étape cruciale consiste à vérifier que nous sommes en mesure de construire un schéma valide qui couvre l'ensemble de nos arbres.
 Pour cela, il est impératif de pouvoir construire automatiquement la grammaire de schéma à partir des arbres d'instances.
 Pour finir, si le schéma construit n'est pas valide, il est nécessaire de réécrire les arbres.
-Pour cela, on commence par calculer l'ensemble des classes d'équivalences pour les non-terminaux.
-La réécriture cherche à unifier les sous-arbres équivalents et à leur donner une structure valide par rapport à la méta-grammaire $\mathbb{G}$.
+Pour cela, on commence, dans la troisieme étape par calculer l'ensemble des classes d'équivalences pour les non-terminaux.
+Dans la quatrieme étape, la réécriture cherche à unifier les sous-arbres équivalents et à leur donner une structure valide par rapport à la méta-grammaire $\mathbb{G}$.
 
-Dans la suite de cette section, nous suivrons les étapes décrites sur le diagramme (figure~\ref{fig:struct:flow}) pour expliquer ces différentes étapes.
+Les différents traitements proposés dans notre approche reposent sur des régles de réécriture d'arbre (section~\ref{sec:struct:pre:tree-rewritting}).
+Dans la suite, nous introduisons les régles de réécriture préliminaires (section~\ref{sec:struct:auto:pre}) avant d'aborder en detail les différentes étapes presentées sur la figure~\ref{fig:struct:flow}) (sections~\ref{sec:struct:auto:text} a \ref{sec:struct:auto:rewrite}).
 
-\paragraph{}
-Les différents traitements décrits dans cette section reposent sur la réécriture d'arbre définie dans la section~\ref{sec:struct:pre:tree-rewritting}.
-La table~\ref{} introduit les opérations élémentaires qui seront utilisé dans la suite.
+\subsection{Régles de réécriture élémentaires}
+\label{sec:struct:auto:pre}
+%Les différents traitements décrits dans cette section reposent sur la réécriture d'arbre définie dans la section~\ref{sec:struct:pre:tree-rewritting}.
+On commence par introduire les opérations de réécriture d'arbre élémentaires qui seront utilisé dans la suite.
+La première règle : $\textsf{ins\_elem}$ (figure~\ref{fig:sch:op:insElem}), permet l'insertion d'un sous-arbre de racine $A$ dans l'arbre $T$ à la position $u.i$.
 
 \begin{figure}[htb]
-	\centering
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[U
-				[$x$]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-			[U
-				[$x$]
-				[A]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{ins\_elem}(T, A, u.i)$ where $A \in N, |\sigma(x)| = i$}
-	\label{fig:sch:op:insElem}
+    \centering
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=4em}
+                [U
+                    [$x$]
+                    [$y$]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{lhs}}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.1\textwidth}
+        \centering
+        \Large{$\longrightarrow$}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=2em}
+                [U
+                    [$x$]
+                    [A]
+                    [$y$]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{rhs}}
+    \end{subfigure}
+    \caption[Règle $\textsf{ins\_elem}(T, A, u.i)$]{$\textsf{ins\_elem}(T, A, u.i)$ où $A \in N, |\sigma(x)| = i$}
+    \label{fig:sch:op:insElem}
 \end{figure}
 
-\begin{figure}[htb]
-	\centering
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-			[T]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[ROOT]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{del\_elem}(T, \epsilon)$}
-	\label{fig:sch:op:insElem}
-\end{figure}
+Les figures~\ref{fig:sch:op:delElemRoot} et \ref{fig:sch:op:delElem} présente la règle de réécriture $\textsf{del\_elem}$ utilisée pour supprimer un sous-arbre dans un arbre $T$ à une position donnée $u.i$.
+La règle est récursive : si l'on supprime l'unique enfant $a$ d'un nœud $b$, c'est le nœud $b$ qui est supprimé (figure~\ref{fig:sch:op:delElem}), car un non-terminal vide est redondant.
+Si l'on se retrouve à devoir supprimer l'arbre au complet (figure~\ref{fig:sch:op:delElemRoot}), on le remplace par un arbre vide contenant uniquement le symbole racine $\lambda$.
 
 \begin{figure}[htb]
-	\centering
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-			[U
-				[$x$]
-				[A]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[U
-				[$x$]
-				[$y$]
-			]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{del\_elem}(T, u.i)$ où $|\sigma(x)| = i$ si $|\sigma(x)| + |\sigma(y)| \neq 0$, sinon $\textsf{del\_elem}(X, u)$}
-	\label{fig:sch:op:insElem}
+    \centering
+    \begin{minipage}[c]{.35\textwidth}
+        \centering
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    [T]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{lhs}}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.1\textwidth}
+            \centering
+            \Large{$\longrightarrow$}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    [$\lambda$]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{rhs}}
+        \end{subfigure}
+        \caption[Règle $\textsf{del\_elem}(T, \epsilon)$]{$\textsf{del\_elem}(T, \epsilon)$}
+        \label{fig:sch:op:delElemRoot}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{.55\textwidth}
+        \centering
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=2em}
+                    [U
+                        [$x$]
+                        [A]
+                        [$y$]
+                    ]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{lhs}}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.1\textwidth}
+            \centering
+            \Large{$\longrightarrow$}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=4em}
+                    [U
+                        [$x$]
+                        [$y$]
+                    ]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{rhs}}
+        \end{subfigure}
+        \caption[Règle $\textsf{del\_elem}(T, u.i)$]{$\textsf{del\_elem}(T, u.i)$ où $|\sigma(x)| = i$ \\si $|\sigma(x)| + |\sigma(y)| \neq 0$, sinon $\textsf{del\_elem}(X, u)$}
+        \label{fig:sch:op:delElem}
+    \end{minipage}%
 \end{figure}
 
 \subsection{Préparation des textes}
-Avant de commencer à décrire les prétraitements appliqués aux arbres syntaxiques, il est nécessaire d'introduire certains éléments.
-La définition des entités utilisée dans cette section est donnée ci-dessous :
-
-\begin{definition}[Entité nommée]
-    Dans ce chapitre, une entité nommée est définie comme un tuple $E = (entityName,$ $startToken,$ $endToken)$ où $entityName$ est le nom/type de l'entité nommée, $startToken$ est la position du token qui débute l'entité et $endToken$ est la position du token qui termine l'entité.
-    $L_{tokens}(E)$ correspond à la séquence de tokens faisant partie de l'entité telle que $L_{tokens}(E) = [startToken, \dots, endToken]$.
-\end{definition}
+\label{sec:struct:auto:text}
+L'étape de préparation des textes constitue une phase importante.
+Les arbres de syntaxe enrichie et simplifié obtenue apres cette phase sont la base de la structuration automatique.
+L'ensemble des opérations définie pour cette étapes ont été conçus de maniére empirique.
+La representation des arbres d'entités et les simplification effectuée sont guidée par la structure que l'on souhaite obtenir.
 
 \subsubsection{Conjonctions de coordinations}
 La structure des arbres syntaxiques est dépendante de la langue étudiée.
 Plus particulièrement, on s'intéresse à la représentation des conjonctions de coordination, lesquelles se révèlent être d'excellents candidats pour la représentation des collections.
-La figure~\ref{fig:struct:conj} illustre la disparité structurelle entre le français (\ref{fig:struct:conj:fr}) et l'anglais (\ref{fig:struct:conj:en}).
-Le français est annoté avec une structure en profondeur, tandis que l'anglais présente une structure à plat qui sépare les ben les composants de la coordination en les mettant au même niveau.
-Ainsi, la structure de l'anglais se rapproche davantage de la représentation des collections, lesquels sont représentés par un sous-arbre où chaque enfant constitue un élément de la collection.
+La figure~\ref{fig:struct:conj} illustre la disparité structurelle entre le français (\ref{fig:struct:conj:fr}) et l'anglais (\ref{fig:struct:conj:en}) dans laes banques d'arbres utilisées.
+Le français est annoté avec une structure en profondeur, tandis que l'anglais présente une structure à plat qui sépare bien les composants de la coordination en les mettant au même niveau.
+Ainsi, la structure de l'anglais se rapproche davantage de la représentation des collections, lesquels sont représentées par un sous-arbre où chaque enfant constitue un élément de la collection.
 Une première étape dans la préparation des textes implique par conséquent la transformation (pour le français) des conjonctions vers la structure, plus adaptée, de l'anglais.
 
 \begin{figure}[ht]
     \centering
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.48\textwidth}
         \centering
         \begin{adjustbox}{max width=\linewidth}
             \begin{forest}
@@ -211,7 +222,7 @@ Une première étape dans la préparation des textes implique par conséquent la
         \label{fig:struct:conj:fr}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.47\textwidth}
         \centering
         \begin{adjustbox}{max width=\linewidth}
             \begin{forest}
@@ -238,77 +249,84 @@ Une première étape dans la préparation des textes implique par conséquent la
     \label{fig:struct:conj}
 \end{figure}
 
+Pour ce faire, on introduit deux règle de réécriture : \textsf{fix\_coord} (figure~\ref{fig:sch:op:fixCoord}) et \textsf{fix\_conj} (figure~\ref{fig:sch:op:fixConj}).
+\textsf{fix\_coord} est chargée de mettre a plat la structure imbriquée des sous-arbres de conjonction.
+La régle \textsf{fix\_conj} est utilisée pour fusionner plusieurs conjonction imbriqués.
+Par exemple, la phrase \textquote{A et B et C} sera representé par un sous-arbre de conjonction $T_1$ entre A et $T_2$ où $T_2$ est un sous-arbre de conjonction entre B et C.
+Comme une collection est representée à plat, cette régle à pour objectif de transformer cette double conjonction en un seul sous-arbre ayant pour enfants A, B et C.
+
 \begin{figure}[htb]
-	\centering
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[U [$x$] [$y_1$[ $y_2$] [$x_{coord}$ [$x_{cconj}$] [$y_3$]]] [$z$]]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-            [U [$x$] [CONJ [$y_1$ [$y_2$]] [$y_3$]] [$z$]]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{fix\_coord}(T, u.i)$ where $|\sigma(x)| = i$, $|\sigma(x_{coord})| = 1$, $|\sigma(x_{cconj})| = 1$, $t(\sigma(x_{coord}) = `COORD`$ and $t(\sigma(x_{cconj})) = `CCONJ`$}
-	\label{fig:sch:op:fixCoord}
+    \centering
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=4em}
+                [U [$x$] [$y_1$[ $y_2$] [$x_{coord}$ [$x_{cconj}$] [$y_3$]]] [$z$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{lhs}}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.1\textwidth}
+        \centering
+        \Large{$\longrightarrow$}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=4em}
+                [U [$x$] [CONJ [$y_1$ [$y_2$]] [$y_3$]] [$z$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{rhs}}
+    \end{subfigure}
+    \caption[Règle $\textsf{fix\_coord}(T, u.i)$]{$\textsf{fix\_coord}(T, u.i)$ où $|\sigma(x)| = i$, $|\sigma(x_{coord})| = 1$, $|\sigma(x_{cconj})| = 1$, $t(\sigma(x_{coord})) = `COORD`$ et $t(\sigma(x_{cconj})) = `CCONJ`$}
+    \label{fig:sch:op:fixCoord}
 \end{figure}
 
 \begin{figure}[htb]
-	\centering
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[U [$x$] [$conj_1$ [$y_1$] [$conj_2$ [$y_2$]] [$y_3$]] [$z$]]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-            [U [$x$] [CONJ [$y_1$] [$y_2$] [$y_3$]] [$z$]]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{fix\_conj}(T, u.i)$ where $t(\sigma(conj_1)) = `CONJ`$, $t(\sigma(conj_2)) = `CONJ`$ and $|\sigma(conj_2)| = 1$}
-	\label{fig:sch:op:fixConj}
+    \centering
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=4em}
+                [U [$x$] [$conj_1$ [$y_1$] [$conj_2$ [$y_2$]] [$y_3$]] [$z$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{lhs}}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.1\textwidth}
+        \centering
+        \Large{$\longrightarrow$}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=4em}
+                [U [$x$] [CONJ [$y_1$] [$y_2$] [$y_3$]] [$z$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{rhs}}
+    \end{subfigure}
+    \caption[Règle $\textsf{fix\_conj}(T, u.i)$]{$\textsf{fix\_conj}(T, u.i)$ où $t(\sigma(conj_1)) = `CONJ`$, $t(\sigma(conj_2)) = `CONJ`$ and $|\sigma(conj_2)| = 1$}
+    \label{fig:sch:op:fixConj}
 \end{figure}
 
 \subsubsection{Enrichissement des arbres}
 L'intégration d'une entité dans un arbre syntaxique se concrétise par la création d'un nœud \emph{ENT}, auquel est attribué le type de l'entité (Personne, Pays, Maladie, etc.).
 Ce nœud agit en tant que parent englobant l'ensemble des mots qui composent l'entité, correspondant au nœud dont la position représente le plus grand préfixe commun à tous les termes de l'entité.
-Par exemple, dans la figure~\ref{fig:struct:enrichissement:2} le nœud \emph{ENT\_PERSON} à la position $0$ de l'arbre. 
+Par exemple, dans la figure~\ref{fig:struct:enrichissement:2} le nœud \emph{ENT\_PERSON} à la position $00$ de l'arbre et a pour enfants les mots \emph{John} À la posiion $0000$ et \emph{Smith} à la position $0010$.
 Dans certaines situations, les entités peuvent être imbriquées, c'est-à-dire qu'elles peuvent être contenues dans une autre.
-Lorsqu'une entité $A$ englobe une entité $B$, dans l'arbre syntaxique, le nœud représentant l'entité $A$ est parent du nœud de l'entité $B$, ou occupe la même position que ce dernier.
+Dans l'arbre syntaxique d'origine, lorsqu'une entité $A$ englobe une entité $B$, le nœud représentant l'entité $A$ est parent du nœud de l'entité $B$, ou occupe la même position que ce dernier.
+Dans l'arbre enrichi, ils seront representé par deux noeud distincts.
 Cependant, cette structure est considérée comme invalide selon la méta-grammaire $\mathbb{G}$, où il est spécifié que les nœuds entités ne peuvent pas avoir une entité comme parent.
 Pour s'aligner sur la métagrammaire, il a été choisi de représenter cette imbrication sous la forme d'une relation entre l'entité englobante et la liste des entités contenues.
 Pour ce faire, un nouveau nœud \emph{ER\_NODE} est introduit pour symboliser cette relation et a comme enfants :
 \begin{enumerate*}[label=(\roman*)]
-    \item l'arbre d'entité englobant, qui a pour feuille le texte complet couvert par l'entité, et
+    \item l'arbre d'entité englobant, qui a pour feuille le texte complet couvert par l'entité englobante, et
     \item un nœud \emph{EC\_NODE}, symbolisant la collection et possédant comme enfants l'ensemble des arbres d'entités contenues.
 \end{enumerate*}
 L'exemple suivant illustre la procédure.
@@ -325,17 +343,18 @@ L'exemple suivant illustre la procédure.
         \end{enumerate}
     \end{multicols}
 
-    Pour la première entité, \emph{John} est situé à la position $000$ et \emph{Smith} à la position $010$.
-    Le nœud représentant cette entité doit donc être inséré comme enfant du nœud à la position $0$, qui correspond au préfixe commun à \emph{John} et \emph{Smith}.
+    Pour la première entité, \emph{John} est situé à la position $000$ dans l'arbre de syntaxe et \emph{Smith} à la position $010$.
+    Le nœud représentant cette entité doit donc être inséré comme enfant du nœud à la position $0$, qui correspond au préfixe commun à \emph{John} et \emph{Smith} (respectivement aux positions $000$ et $010$).
     Les entités \ref{ex:struct:enrich-ent:val} et \ref{ex:struct:enrich-ent:unit} sont des entités imbriquées dans l'entité \ref{ex:struct:enrich-ent:dosage}.
     Par conséquent, il est nécessaire d'introduire la structure de relation précédemment présentée.
     % On introduit alors le nœud \emph{ER\_NODE} à la position de l'entité englobante.
     % Cette entité contient les mots \emph{500} à la position $11000$ et \emph{mg} à la position $11010$, et doit alors être inséré comme enfant du nœud \emph{NP} situé à la position $110$.
-    On introduit alors le nœud \emph{ER\_NODE} à la position de l'entité englobante, c'est-à-dire, comme enfant du nœud \emph{NP} situé à la position $110$.
+    On introduit alors le nœud \emph{ER\_NODE} à la position de l'entité englobante, c'est-à-dire, comme enfant du nœud \emph{NP} situé à la position $110$ dans l'arbre de syntaxe.
     Ainsi, dans la figure~\ref{fig:struct:enrichissement:2}, \emph{ER\_NODE} est racine d'un sous-arbre qui contient les mots \emph{500} à la position $11000$ et \emph{mg} à la position $11010$.
     À noter que $110$ est le plus grand préfixe commun entre $11000$ et  $11010$.
     Sous le nœud \emph{ER\_NODE}, on ajoute l'arbre d'entité \emph{ENT\_DOSAGE} (correspondant à l'entité \ref{ex:struct:enrich-ent:dosage}, \emph{dosage}) et le nœud \emph{EC\_NODE}.
     Sous le nœud \emph{EC\_NODE}, on conserve le sous-arbre qui était initialement positionné sous la position $110$.
+    Ce sous-arbre contient les entitiés imbriquées \emph{ENT\_VALUE} et \emph{ENT\_UNIT}.
     Ensuite, le reste des entités peuvent être annotés de la même manière que la première entité.
     Le résultat de cette opération d'enrichissement est illustré dans la figure~\ref{fig:struct:enrichissement:2}.
     Intuitivement, le nœud \emph{ER\_NODE} représente une relation entre l'entité englobante et une collection d'entité imbriquée, matérialisée par le nœud \emph{EC\_NODE}.
@@ -402,53 +421,109 @@ L'exemple suivant illustre la procédure.
                 ]
             \end{forest}
         \end{adjustbox}
-        \caption{Arbre enrichie}
+        \caption{Arbre enrichi}
         \label{fig:struct:enrichissement:2}
     \end{subfigure}
     \caption{Exemple d'enrichissement d'arbre de syntaxe}
     \label{fig:struct:enrichissement}
 \end{figure}
 
-Afin de pouvoir introduire les entités nommées dans l'arbre de syntaxique, on commence par définir les sous-arbres d'entités.
+Pour formaliser l'operation d'enrichissement de l'arbre de syntaxique, on commence par définir les sous-arbres d'entités.
 Ces sous-arbres sont la représentation d'une entité nommée dans un arbre de syntaxe.
 
 \begin{definition}[Sous-arbre ordonné d'entité]
     \label{def:struct:entity-tree}
     Soit un arbre syntaxique $T = (D, l)$ et une entité nommée $E = (entityName,$ $startToken,$ $endToken)$.
-    Un sous-arbre ordonné d'entité est défini comme un tuple $E_T = (entityName, L_{tree}(T, E))$.
-    $L_{tree}(T, E)$ est la séquence des positions des tokens de $E$ dans l'arbre $T$ tel que $L_{tree}(T, E) = [u.b,$ $\dots,$ $u.e]= [treePos(t, startToken),$ $\dots,$ $treePos(t, endToken)]$ où $u$ est la position commune à tous les tokens de $E$.
-    $|E|$ est la taille de l'entité telle que :
+    Un sous-arbre ordonné d'entité est défini par un tuple $E_T = (entityName, L_{tree}(T, E))$.
+    $L_{tree}(T, E)$ est la séquence des positions des tokens de $E$ dans l'arbre $T$ tel que $L_{tree}(T, E) = [u.b,$ $\dots,$ $u.e]= [treePos(t, startToken),$ $\dots,$ $treePos(t, endToken)]$ où $u$ est la position commune à tous les tokens de $E$ et $treePos : \mathbb{N} \to D$ est une fonction qui associe pour chaque indice d'un token sa position dans l'arbre.
+    $|E|$ est la taille de l'entité (ou nombre de tokens) telle que :
     \[
-        |TreeEnt| =|L_{tree}(T, E)| = |L_{tokens}(E)| = |E| = (endToken - startToken)
+        |E| = |L_{tree}(T, E)| = |L_{tokens}(E)| = (endToken - startToken)
     \]
 \end{definition}
 
-La procédure pour enrichir les arbres de syntaxe est donnée par l'algorithme~\ref{algo:struct:insent}.
-On commence par définir une opération d'édition qui permet de transformer les entités imbriquées en une structure de relation.
+La procédure pour enrichir les arbres de syntaxe est donnée par la procédure~\ref{algo:struct:insent}.
+La ligne~\ref{algo:struct:insent:sum} permet de vérifier si le premier token de l'entité n'a pas de frère à gauche sous la position $u$ qui ne ferait alors pas partie de l'entitité.
+Si c'est le cas, il est nécessaire de laisser la partie gauche à sa place et d'introduire un nouveau sous-arbre pour représenté l'entité, sinon on peut simplement convertir le sous-arbre à la position $u.x_0$.
+Ici, on est obligé de garder le nœud $u.x_0$ s'il n'y a pas d'enfants à gauche, sinon lors de la suppression des feuilles sa suppression pourrait engendrer la suppression du nœud parent étant donné que la suppression est récursive.La boucle tant que (ligne~\ref{algo:struct:insent:while}) collecte les feuilles de l'entité dans $H$ et les supprime de l'arbre.
+À la fin de la boucle, l'ensemble de l'arbre correspondant à l'entité est supprimé.
+Il reste les éléments à gauche et à droite sous la position $u$ qui ne font pas partie de l'entité.
+À la ligne~\ref{algo:struct:insent:add}, on insère un nouveau nœud correspondant à l'entité à la position $u.x'$ entre la partie gauche et droite.
+Pour finir, la boucle à la ligne~\ref{algo:struct:insent:leafs} ajoute les feuilles à l'arbre d'entité.
+
+\begin{procedure}[htb]
+    \caption{ins\_ent($T$ = ($D$, $l$), $E$)}
+    \label{algo:struct:insent}
+
+    \SetKwFunction{inselem}{ins\_elem}
+    \SetKwFunction{delelem}{del\_elem}
+
+    $[u.b, \dots, u.e] \gets L_{tree}(T, E)$\;
+    $u.x_0.x_1 \dots x_n \gets u.b$ \tcp*{On decompose la position de début en composants $x_0, x_1, \dots$}
+    \tcp{Vérifier si $u.x_0$ a des enfants qui ne sont pas dans l'entité et qui doivent être laissés en place}
+    \uIf{$\sum_{i=1}^{n} (x_i) \neq 0$\label{algo:struct:insent:sum}}{
+        $x' \gets x_0 + 1$\;
+    } \Else {
+        $x' \gets x_0$\;
+    }
+    $j \gets |L_{ent}| - 1$\;
+    $H \gets []$\;
+    \While{$j \geq 0$\label{algo:struct:insent:while}}{
+        $pos \gets L_{ent}[j]$\;
+        $H \gets H.\textsf{append}(T|_{pos})$\;
+        \delelem{$X$, $pos$}\;
+        $j \gets j-1$\;
+    }
+    \inselem{$T$, entityName, $u.x'$}\label{algo:struct:insent:add}\;
+    \For{$leaf \in H$}{
+        \inselem{$T$, leaf, $u.x'.0$}\label{algo:struct:insent:leafs}\;
+    }
+\end{procedure}
+
+Si une entité englobe une autre dans le texte, la procédure~\ref{algo:struct:insent} construit un arbre d'entité pour l'entité englobante qui contient, comme enfant, l'entité englobée.
+L'arbre d'entité de l'entité englobante n'est donc pas valide.
+Les entités imbriquées sont alors réécrites en accord avec la description faite précédemment.
+Pour ce faire, on introduit un nouveau nœud \emph{ER\_NODE} faisant le lien entre les deux entités qui se retrouve alors au même niveau.
+Cependant, si plusieurs entités se retrouvent englobées, elles seront d'abord regroupées dans un nœud \emph{EC\_NODE}.
+Cela permet de préserver la proximité des entités englobées tout en mettant en avant une relation entre l'entité englobante et les entités englobée.
+La règle donnée dans la figure~\ref{fig:sch:op:unnestEnt} permet cette transformation.
 
 \begin{figure}[htb]
     \centering
-    \begin{adjustbox}{max width=\linewidth}
-        \begin{forest}
-            [U
-                    [$x_0$]
-                    [ENT
-                            [$z_0$]
-                            [ENT$_0$ [$y_0$]]
-                            [$z_1$]
-                            [$\dots$]
-                            [ENT$_n$ [$y_n$]]
-                            [$z_{n+1}$]
-                    ]
-                    [$x_1$]
-            ]
-        \end{forest}
-        {\Large$\rightarrow$}
-        \begin{forest}
-            [U
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                % for tree={s sep=3em}
+                [U
+                        [$x_0$]
+                        [ENT
+                                [$z_0$]
+                                [ENT$_0$ [$y_0$]]
+                                [$z_1$]
+                                [$\dots$]
+                                [ENT$_n$ [$y_n$]]
+                                [$z_{n+1}$]
+                        ]
+                        [$x_1$]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{lhs}}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.1\textwidth}
+        \centering
+        \Large{$\longrightarrow$}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=5em}
+                [U
                     [$x_0$]
                     [ER\_NODE
-                        [ENT [$z_0$] [$y_0$] [$z_1$] $\dots $ [$y_n$] [$z_{n+1}$]]
+                        [ENT [$z_0$] [$y_0$] [$z_1$] [$\dots$] [$y_n$] [$z_{n+1}$]]
                         [EC\_NODE
                             [ENT$_0$ [$y_0$]]
                             [$\dots$]
@@ -456,162 +531,154 @@ On commence par définir une opération d'édition qui permet de transformer les
                         ]
                     ]
                     [$x_1$]
-            ]
-        \end{forest}
-    \end{adjustbox}
-    \caption{$\textsf{unnest\_ent}(T, u.i)$ where $|\sigma(x_0)| = i$}
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{rhs}}
+    \end{subfigure}
+    \caption[Règle $\textsf{unnest\_ent}(T, u.i)$]{$\textsf{unnest\_ent}(T, u.i)$ où $|\sigma(x_0)| = i$}
+    \label{fig:sch:op:unnestEnt}
 \end{figure}
-
-\begin{algorithm}[H]
-    \caption{$\textsf{ins\_ent}(T = (D, l), TreeEnt)$}
-        \label{algo:struct:insent}
-
-    $u.b \gets u.x_0.x_1 \dots x_n$\;
-        \tcp{Check if $u.x_0$ has children not in the entity and should be left in place}
-        \uIf{$\sum_{i=1}^{n} (x_i) \neq 0$}{
-            $x' \gets x_0 + 1$\;
-        } \Else {
-            $x' \gets x_0$\;
-        }
-    $j \gets |L_{ent}| - 1$\;
-    $H \gets []$\;
-        \While{$j \geq 0$}{
-            $pos \gets L_{ent}[j]$\;
-            $H \gets H.\textsf{append}(T|_{pos})$\;
-            $\textsf{del\_elem}(X, pos)$\;
-            $j \gets j-1$\;
-        }
-    $\textsf{ins\_elem}(T, entityName, u.x')$\;
-    \For{$leaf \in H$}{
-        $\textsf{ins\_elem}(T, leaf, u.x'.0)$\;
-    }
-\end{algorithm}
-
-\begin{algorithm}[H]
-    \caption{$\textsf{ins\_ent\_list}(T = (D, l), L_{TreeEnt}, L_{Rels})$}
-        \ForEach{$p \in D$}{
-            $\textsf{fix\_coord}(T, p)$\;
-            $\textsf{fix\_conj}(T, p)$\;
-        }
-
-        Trier $L_{TreeEnt}$ par longueur ($|TreeEnt|$), le plus long en premier\;
-
-    \ForEach{$TreeEnt \in L_{TreeEnt}$}{
-        $\textsf{ins\_ent}(T, TreeEnt)$\;
-    }
-
-    \ForEach{$(entPos_1, entPos_2, rel) \in L_{Rels}$}{
-        $\textsf{ins\_rel}(T, entPos_1, entPos_2, rel)$\;
-    }
-
-    \ForEach{$p \in D$ tq. $\textsf{height}(p) = 1$ and $l(p) \neq \textsf{ENT}$}{
-        $\textsf{del\_elem}(T, l)$\;
-    }
-
-    \ForEach{$p \in D$}{
-        $\textsf{reduce}(T, p, \emptyset)$\;
-    }
-\end{algorithm}
 
 \subsubsection{Simplifications}
-La simplification des arbres consiste en la suppression de toutes les branches qui ne continent pas une entité.
-Les structures redondantes, sont aussi supprimées.
-
-Cependant, cette structure est invalide, car les nœuds entités, qui représentent les données, doivent être les parents directs des feuilles (c'est-à-dire, les mots) de l'arbre syntaxique.
-
-\begin{figure}[ht]
-    \centering
-    \begin{subfigure}[b]{.45\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [COORD
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [renal]]
-                            [NN [ultrasound]]
-                    ]
-                    [CCONJ,before computing xy={s/.average={s}{siblings}} [and]]
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [retrograde]]
-                            [NN [cystography]]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Arbre non simplifié}
-        \label{fig:struct:simplification:1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{.45\textwidth}
-        \centering
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{forest}
-                where n children=0{tier=word}{}
-                [COORD
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [renal]]
-                            [NN [ultrasound]]
-                    ]
-                    [CCONJ,before computing xy={s/.average={s}{siblings}} [and]]
-                    [NP
-                            [DT [a]]
-                            [ADJ,before computing xy={s/.average={s}{siblings}} [retrograde]]
-                            [NN [cystography]]
-                    ]
-                ]
-            \end{forest}
-        \end{adjustbox}
-        \caption{Arbre simplifié}
-        \label{fig:struct:simplification:2}
-    \end{subfigure}
-    \caption{Exemple de simplificiation d'un arbre}
-    \label{fig:struct:simplification}
-\end{figure}
+La simplification des arbres consiste en la suppression de toutes les branches qui ne contiennent pas d'entité.
+Dans les arbres de syntaxe, il est aussi possible de trouver des structures redondantes où des nœuds intermédiaires ne contiennent qu'un seul enfant.
+Bien que porteur d'information dans l'arbre syntaxique, ces nœuds n'ajoutent pas d'information pour la structuration des entités au sein de l'arbre.
+Une seconde étape de la simplification permet la réduction de ces structures.
+Pour ce faire, on utilise successivement la règle de réécriture \textsf{reduce} présentée dans la figure~\ref{fig:sch:op:reduce}.
+Pour finir, on s'assure que pour chaque entité une seule feuille est présente, représentant la concaténation de l'ensemble des token de l'entité.
 
 \begin{figure}[htb]
-	\centering
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=5em}
-			[U [$x$] [$y_1$ [$y_2$]] [$z$]]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{lhs}}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.1\textwidth}
-		\centering
-		\huge{$\Rightarrow$}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.4\textwidth}
-		\centering
-		\begin{adjustbox}{valign=c, max width=\textwidth}
-			\begin{forest}
-			for tree={s sep=3em}
-			[U [$x$] [$y_2$] [$z$]]
-			\end{forest}
-		\end{adjustbox}
-		\caption*{\glsname*{rhs}}
-	\end{subfigure}
-	\caption{$\textsf{reduce}(T, u.i, S_{labels})$ where $|\sigma(x)| = i$, $|\sigma(y_1)| = 1$}
-	\label{fig:sch:op:reduce}
+    \centering
+    \begin{minipage}[c]{.4\textwidth}
+        \centering
+        \begin{subfigure}[t]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=2em}
+                    [U [$x$] [$y_1$ [$y_2$]] [$z$]]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{lhs}}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.1\textwidth}
+            \centering
+            \Large{$\longrightarrow$}
+        \end{subfigure}
+        \begin{subfigure}[t]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=2em}
+                    [U [$x$] [$y_2$] [$z$]]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{rhs}}
+        \end{subfigure}
+        \caption[Règle $\textsf{reduce}(T, u.i, S_{labels})$]{$\textsf{reduce}(T, u.i, S_{labels})$ où $|\sigma(x)| = i$ et $|\sigma(y_1)| = 1$ avec $|\sigma(y_2)| = 1$ si $S_{label} = \emptyset$ ; $t(u.i) \notin S_{labels}$ si $S_{label} \neq \emptyset$}
+        \label{fig:sch:op:reduce}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{.55\textwidth}
+        \centering
+        \begin{adjustbox}{max width=.8\linewidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [S
+                    [\textbf{ENT\_PERSON}
+                        [John Smith]
+                    ]
+                    [NP
+                        [\textbf{ER\_NODE}
+                            [\textbf{ENT\_DOSAGE} [500 mg]]
+                            [\textbf{EC\_NODE}
+                                [\textbf{ENT\_VALUE} [500]]
+                                [\textbf{ENT\_UNIT} [mg]]
+                            ]
+                        ]
+                        [\textbf{ENT\_DRUG} [Paracetamol]]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Exemple d'arbre enrichie simplifié}
+        \label{fig:struct:simplification}
+    \end{minipage}%
 \end{figure}
 
-\begin{itemize}
-    \item $|\sigma(y_2)| = 1$ when $S_{label} = \emptyset$
-    \item $t(u.i) \notin S_{labels}$ when $S_{label} \neq \emptyset$
-\end{itemize}
+\begin{example}
+    Dans l'arbre donné dans la figure~\ref{fig:struct:enrichissement:2}, on remarque que pour le nœud \emph{ENT\_PERSON} le nœud parent \emph{NP} est redondant.
+    Il en est de même pour les enfants \emph{NNP}.
+    Le sous-arbre du nœud \emph{VBZ} ne contient aucune entité et peut donc être supprimé.
+    Sa suppression rend le nœud parent \emph{VP} redondant à son tour, car il ne possède alors plus qu'un seul enfant.
+    En appliquant le raisonnement à tout l'arbre, on obtient l'arbre donné dans la figure~\ref{fig:struct:simplification}.
+\end{example}
 
-\subsection{Extraction de la grammaire $G_i$}
-Pour réaliser la migration de l'instance d'une grammaire vers une autre il est indispensable de pouvoir récupérer la grammaire à partir de l'instance afin de pouvoir la vérifier à l'aide de la méta-grammaire $G$.
-Étant donné une instance $I$ reconnu par une grammaire $G_S$, il est possible de récupérer l'arbre de dérivation $S$ de la grammaire $G$ en calculant le quotient de $I$.
-\todo[inline]{$S$ n'est pas la dérivation de $G$}
+\subsubsection{Prétraitement}
+Pour finir, la procèdure~\ref{algo:struct:inslist} resume les transformations nécessaires au nettoyage et à l'insertion des ensembles d'entitités ($Ents$) et de relations ($Rels$) au sein d'un arbres syntaxiques ($T$) afin de construire un arbre enrichis.
+La procèdure commence par réécrire les arbres en simplifiant les sous-arbres de coordination (ligne~\ref{algo:struct:inslist:coord}).
+Le tri à la ligne~\ref{algo:struct:inslist:sort} permet de traiter correctement les entités imbriquées afin que leur insertion se fasse du haut vers le bas de l'arbre.
+La ligne~\ref{algo:struct:inslist:ent} se charge d'ajouter les entitités dans l'arbre et la ligne~\ref{algo:struct:inslist:rel} insere les relations.
+Apres l'enrichissement des arbres syntaiques, l'algorithme s'occupe de la simplification en commençant par supprimer les branches ne contenant pas d'entités (ligne~\ref{algo:struct:inslist:del}) avant de reduire l'arbre (ligne~\ref{algo:struct:inslist:reduce}).
 
+\begin{procedure}[htb]
+    \caption{enrich\_tree($T$ = ($D$, $l$), $Ents$, $Rels$)}
+    \label{algo:struct:inslist}
+
+    \SetKwFunction{delelem}{del\_elem}
+    \SetKwFunction{fixcoord}{fix\_coord}
+    \SetKwFunction{fixconj}{fix\_conj}
+    \SetKwFunction{reduce}{reduce}
+    \SetKwFunction{insent}{\ref{algo:struct:insent}}
+    \SetKwFunction{insrel}{\ref{algo:struct:insrel}}
+
+    \tcp{Réécriture des coordinations}
+    \ForEach{$p \in D$\label{algo:struct:inslist:coord}}{
+        \fixcoord{$T$, $p$}\;
+        \fixconj{$T$, $p$}\;
+    }
+
+    \tcp{Enrichissement des arbres}
+    Trier l'ensemble $Ents$ par longueur ($|E|$) de façon decroisante\label{algo:struct:inslist:sort}\;
+    \ForEach{$E \in Ents$}{
+        \insent{$T$, $E$}\label{algo:struct:inslist:ent}\;
+    }
+    \ForEach{$(entPos_1, entPos_2, rel) \in Rels$}{
+        \insrel{$T$, $entPos_1$, $entPos_2$, $rel$}\label{algo:struct:inslist:rel}\;
+    }
+
+    \tcp{Simplification des arbres}
+    \ForEach{$p \in D$ tant que $\textsf{height}(p) = 1$ et $l(p) \neq \textsf{ENT}$}{
+        \delelem{$T$, $l$}\label{algo:struct:inslist:del}\;
+    }
+    \ForEach{$p \in D$}{
+        \reduce{$T$, $p$, $\emptyset$}\label{algo:struct:inslist:reduce}\;
+    }
+\end{procedure}
+
+\subsection{Extraction de la grammaire}
+Pour réaliser la migration de l'instance d'une grammaire vers une autre il est indispensable de pouvoir récupérer la grammaire à partir de l'instance afin de pouvoir la vérifier à l'aide de la méta-grammaire $\mathbb{G}$.
+Étant donné une instance $I$ reconnue par une grammaire $G$, il est possible de récupérer la grammaire $G$ à partir de $I$ en calculant l'arbre quotient $S$.
+%Le quotient d'un graphe est une construction ou les nœuds sont regroupées en suivant une relation d'équivalences.
+%Chaque nœud du graphe quotient représente alors une classe d'équivalence et il existe une arête entre deux nœuds s'il existe au moins une arête entre deux individus de chaque classe.
+Rappelons d'abord qu'en mathématiques, une \textit{partition} d'un ensemble $X$ est un regroupement de ses éléments en sous-ensembles non vides et mutuellement disjoints.
+Toute \textit{relation d'équivalence} sur un ensemble définit une partition de cet ensemble, et toute partition définit une relation d'équivalence.
+Une \textit{famille d'ensembles} $F$ est une partition d'un ensemble $X$ si et seulement si toutes les conditions suivantes sont remplies:
+\begin{enumerate*}[label=(\roman*)]
+    \item $\emptyset \not\in F$ ;
+    \item $\bigcup_{A \in F}A = X$ et
+    \item $\forall A, B  \in F~ (A \neq B) \Rightarrow ( A \cap B = \emptyset)$.
+\end{enumerate*}
+Les ensembles de $F$ sont appelés \textit{blocs}.
+En théorie des graphes, un graphe quotient $Q$ d'un graphe $G$ est un graphe dont les sommets sont des blocs d'une partition des sommets de $G$ et où un bloc $A$ est adjacent a un bloc $B$ si au moins un sommet de $A$ est adjacent à un sommet de $B$ par rapport à l'ensemble des arêtes de $G$.
+Pour construire la grammaire à partir d'un arbre, on introduit la définition d'\textit{arbre quotient}, ce qui correspond à un graphe quotient sans cycles et sans sommets ayant des multiples parents.
+Dans la construction d'un arbre quotient la définition de la fonction \textsf{Succ} ci-dessous est nécessaire.
+
+%Pour construire la grammaire à partir d'un arbre, on définit un nouveau quotient qui maintient la structure d'arbre (c.-à-d. sans cycles et sans nœuds ayant plusieurs parents).
+%Le quotient est calculé à partir d'une relation d'équivalence sur les labels.
+%Pour capturer la structure hiérarchique de ces classes et construire l'arbre quotient, nous introduisons la fonction \textsf{Succ}, qui permet d'obtenir les successeurs de chaque classe d'équivalence.
+%
 % \begin{definition}[Quotient d'un graphe]
 %   Étant donné un graphe $G = (V, E)$ où $V$ est l'ensemble des sommets du graphe et $E$ l'ensemble des arêtes de la forme $\{u, v\} \in E$ où $u, v \in V$.
 %   Le quotient du graphe $G$ est un graphe distinct noté $Q_G = (Q_V, Q_E)$ qui respecte les propriétés suivantes :
@@ -636,15 +703,9 @@ Pour réaliser la migration de l'instance d'une grammaire vers une autre il est 
 %   De plus, pour toute position $u_Q \in Q_D$ s'il existe un $v \in D$ tel que $|\{u \mid u \in \pi(u_Q), v \prec u\}| > 1$ alors $Q_l(u_Q) = Q_l(u_Q)^+$
 % \end{definition}
 
-Le quotient d'un graphe est une construction ou les nœuds sont regroupées en suivant une relation d'équivalences.
-Chaque nœud du graphe quotient représente alors une classe d'équivalence et il existe une arête entre deux nœuds s'il existe au moins une arête entre deux individus de chaque classe.
-Pour construire la grammaire à partir d'un arbre, on définit un nouveau quotient qui maintient la structure d'arbre (c.-à-d. sans cycles et sans nœuds ayant plusieurs parents).
-Le quotient est calculé à partir d'une relation d'équivalence sur les labels.
-Pour capturer la structure hiérarchique de ces classes et construire l'arbre quotient, nous introduisons la fonction \textsf{Succ}, qui permet d'obtenir les successeurs de chaque classe d'équivalence.
-
 \begin{definition}
     \label{def:struct:quotient:succ}
-    Étant donné un arbre $T = (D, l)$ et une relation d'équivalence $R$ définie par $(\forall x \in D, y \in D) ~ x R y \iff l(x) = l(y)$.
+    Étant donné un arbre $T = (D, l)$ et une relation d'équivalence $R$.
     Soit $D/R = \{C_0, \dots, C_n\}$ l'ensemble des classes d'équivalences de $T$, on définit la fonction \textsf{Succ} tel que :
     \begin{equation}
         \textsf{Succ}(C) = \{ C' \mid \exists u \in C, v \in C' \text{ tq. } u \prec v \}
@@ -657,99 +718,53 @@ Pour capturer la structure hiérarchique de ces classes et construire l'arbre qu
     % \end{equation}
 \end{definition}
 
-À l'aide de la fonction \textsf{Succ}, on définit la fonction \textsf{QDom} qui permet de construire le domaine de l'arbre quotient.
-$\textsf{QDom}(C, u)$ a pour objectif d'associer a chaque classe successeurs de $C$ une position relative $u.p$.
-Comme on souhaite maintenir la hiérarchie sous forme d'arbre, une classe d'équivalence peut avoir plusieurs positions dans l'arbre quotient si elle a plusieurs parents.
-L'arbre quotient est construit à partir de la fonction \textsf{QDom}.
+Pour réaliser l'extraction des grammaires $G_i$ nous utilisons la relation d'équivalence $R_l$ entre les labels d'un arbre $T$, définie par $(\forall x \in D, y \in D) ~ x R_l y \iff l(x) = l(y)$.
+Intuitivement, on obtient alors comme classes d'equivalences un ensemble de positions pour chaque étiquette presente dans l'arbre $T$.
+Par exemple, dans la figure~\ref{fig:struct:quotient:ex:tree}, $C_{\lambda} = \{\epsilon\}$ et $C_{X} = \{0,1\}$ sont les classes d'équivalence pour les etiquettes $\lambda$ et $X$ respectivement.
+La fonction \textsf{Succ} permet de calculer la hiérarchie des classes d'équivalence où pour une classe donnée $C$, la fonction retourne l'ensemble des classes d'equivalences qui ont au moins un élément enfant d'un elment de $C$.
+Nous pouvons également écrire que $\textsf{Succ}(C) = \bigcup_{u \in C} \{ C' \mid  \exists  i ~u.i \in C'\}$.
+L'exemple suivant illustre cette fonction.
 
-\begin{definition}[Quotient d'un arbre ordonné]
-    Étant donné un arbre $T = (D, l)$ et une relation d'équivalence $R$ définie par $(\forall x \in D, y \in D) ~ x R y \iff l(x) = l(y)$.
-    Soit $D/R = \{C_0, \dots, C_n\}$ l'ensemble des classes d'équivalences de $T$ et la fonction \textsf{Succ} donnée par la définition~\ref{def:struct:quotient:succ}.
-    On commence par définir la fonction \textsf{QDom} à l'aide de l'algorithme \ref{algo:struct:quotient:QDom}.
-    L'arbre quotient de $T$, noté $Q_T$ est construit à l'aide de la fonction \textsf{QDom} et sa construction est définie par l'algorithme~\ref{algo:struct:quotient:QT}.\\
-
-    \begin{algorithm}[H]
-        \caption{$\textsf{QDom}(C_i, u)$}
-        \label{algo:struct:quotient:QDom}
-        \SetKwFunction{succ}{Succ}
-
-        $S = \emptyset$\;
-        $p = 0$\;
-        \ForEach{$C_j \in \succ(C_i)$}{
-            $S = S \cup \{(C_j, u.p)\}$\;
-            $p = p+1$\;
-        }
-        \Return{$S$}
-    \end{algorithm}
-
-    \begin{algorithm}[H]
-        \caption{$Q_T(T = (D, l))$}
-        \label{algo:struct:quotient:QT}
-        \SetKwFunction{succ}{Succ}
-        \SetKwFunction{qdom}{QDom}
-
-        $Q_D \gets \{\epsilon\}$\;
-        $Q_l \gets \langle \epsilon \mapsto \lambda \rangle$\;
-
-        $classes \gets \{(\{\epsilon\}, \epsilon)\}$\;
-        \While{$classes \neq \emptyset$}{
-            \tcp{Prendre une classe d'équivalence et ajouter ses successeurs dans l'ensemble a traité}
-            $classes \gets classes - \{(C, u)\}$\;
-            $successeurs \gets \qdom(C, u)$\;
-            $classes \gets classes \cup successeurs$\;
-            \BlankLine
-            $Q_D = Q_D \cup \{u\}$\;
-            \tcp{Si un nœud a plusieurs successeurs on ajoute le symbole `${}^+$' au label}
-            \uIf{$\lvert\{v \mid \forall (C', v) \in successeurs$ tq. $u \prec v\}\rvert > 1$\label{algo:struct:quotient:QT:plus}}{
-                $Q_l(u) = l(u)~+~$`${}^+$'\;
-            } \Else {
-                $Q_l(u) = l(u)$\;
-            }
-        }
-
-        \Return{$Q_D, Q_l$}
-    \end{algorithm}
-\end{definition}
-
-\begin{example}{Arbre quotient et grammaire}
-    \begin{figure}[H]
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
         \centering
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \begin{adjustbox}{valign=c, max width=\textwidth}
-                \begin{forest}
-                    for tree={s sep=5em}
-                    [$\lambda$
-                    [$X$ [$a$] [$b$]]
-                        [$X$,before computing xy={s/.average={s}{siblings}} [$b$] [$c$]]
-                        [$Y$ [$a$]]
-                    ]
-                \end{forest}
-            \end{adjustbox}
-            \caption{Arbre $T$}
-            \label{fig:struct:quotient:ex:tree}
-        \end{subfigure}
-        \hfill
-        \begin{subfigure}{0.45\textwidth}
-            \centering
-            \begin{adjustbox}{valign=c, max width=\textwidth}
-                \begin{forest}
-                    for tree={s sep=20mm}
-                    [$\lambda$
-                    [$X^+$ [$a$] [$b$] [$c$]]
-                        [$Y$ [$a$]]
-                    ]
-                \end{forest}
-            \end{adjustbox}
-            \caption{Arbre quotient $Q_T$}
-            \label{fig:struct:quotient:ex:quotient}
-        \end{subfigure}
-        \caption{Exemple du quotient d'un arbre}
-        \label{fig:struct:quotient:ex}
-    \end{figure}
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=5em}
+                [$\lambda$
+                [$X$ [$a$] [$b$]]
+                    [$X$,before computing xy={s/.average={s}{siblings}} [$b$] [$c$]]
+                    [$Y$ [$a$]]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre $T$}
+        \label{fig:struct:quotient:ex:tree}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=20mm}
+                [$\lambda$
+                [$X^+$ [$a$] [$b$] [$c$]]
+                    [$Y$ [$a$]]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre quotient $Q_T$}
+        \label{fig:struct:quotient:ex:quotient}
+    \end{subfigure}
+    \caption{Exemple du quotient d'un arbre}
+    \label{fig:struct:quotient:ex}
+\end{figure}
 
+\begin{example}
+    \label{ex:struct:quotient:1}
     Étant donné l'arbre $T = (D, l)$ donné en figure~\ref{fig:struct:quotient:ex:tree}.
-    La première étape de la construction de l'arbre quotient $Q_T$ commence par la récupération des classes d'équivalences de $D$ données par la relation $R$.
+    La première étape de la construction de l'arbre quotient $Q_T$ commence par la récupération des classes d'équivalences de $D$ données par la relation $R_l$.
     On obtient alors les classes suivantes :
     \begin{align*}
         C_\lambda & = \{\epsilon\} & C_X & = \{0, 1\}   & C_Y & = \{2\}  \\
@@ -763,14 +778,68 @@ L'arbre quotient est construit à partir de la fonction \textsf{QDom}.
         \textsf{Succ}(C_\lambda) & = \{C_X, C_Y\} & \textsf{Succ}(C_X) & = \{C_a, C_b, C_c\} & \textsf{Succ}(C_Y) & = \{C_c\}   \\
         \textsf{Succ}(C_a)       & = \emptyset    & \textsf{Succ}(C_b) & = \emptyset         & \textsf{Succ}(C_c) & = \emptyset
     \end{align*}
+\end{example}
 
-    À partir de la hiérarchie obtenue, on construit le domaine de l'arbre en associant, a chaque successeur, une position relative a son parent. On commence à la position $\epsilon$ où $\textsf{QDom}(C_\lambda, \epsilon) = \{(C_X, 0), (C_Y, 1)\}$ dans l'arbre $T$.
+La construction de l'arbre quotient consiste maintenant à associer à chaque classe d'équivalence une position d'un arbre ordonné.
+À l'aide de la fonction \textsf{Succ}, on définit la fonction \ref{algo:struct:quotient:QDom} qui permet de construire le domaine de l'arbre quotient.
+Elle a pour objectif d'associer a chaque classe successeurs de $C$ une position relative $u.p$.
+L'arbre quotient de $T$, noté $Q_T$ est construit à l'aide de la fonction \ref{algo:struct:quotient:QDom} et sa construction est définie par la fonction~\ref{algo:struct:quotient:QT}.\\
+
+%À l'aide de la fonction \textsf{Succ}, on définit la fonction \ref{algo:struct:quotient:QDom} qui permet de construire le domaine de l'arbre quotient.
+%Elle a pour objectif d'associer a chaque classe successeurs de $C$ une position relative $u.p$.
+%Comme on souhaite maintenir la hiérarchie sous forme d'arbre, une classe d'équivalence peut avoir plusieurs positions dans l'arbre quotient si elle a plusieurs parents.
+%L'arbre quotient est ensuite construit à partir de la fonction \ref{algo:struct:quotient:QDom}.
+
+\begin{function}[htb]
+    \caption{QDom($C_i$, $u$)}
+    \label{algo:struct:quotient:QDom}
+    \SetKwFunction{succ}{Succ}
+
+    $S = \emptyset$\;
+    $p = 0$\;
+    \ForEach{$C_j \in$ \succ{$C_i$}}{
+        $S = S \cup \{(C_j, u.p)\}$\;
+        $p = p+1$\;
+    }
+    \Return{$S$}
+\end{function}
+
+\begin{function}[htb]
+    \caption{Quotient($T$ = ($D$, $l$))}
+    \label{algo:struct:quotient:QT}
+    \SetKwFunction{succ}{Succ}
+    \SetKwFunction{qdom}{QDom}
+
+    $Q_D \gets \{\epsilon\}$\;
+    $Q_l \gets \langle \epsilon \mapsto \lambda \rangle$\;
+
+    $classes \gets \{(\{\epsilon\}, \epsilon)\}$\;
+    \While{$classes \neq \emptyset$}{
+        \tcp{Prendre une classe d'équivalence et ajouter ses successeurs dans l'ensemble a traité}
+        $classes \gets classes \setminus \{(C, u)\}$\;
+        $successeurs \gets$ \qdom{$C$, $u$}\;
+        $classes \gets classes \cup successeurs$\;
+        \BlankLine
+        $Q_D = Q_D \cup \{u\}$\;
+        \tcp{Si un nœud a plusieurs successeurs on ajoute le symbole `${}^+$' au label}
+        \uIf{$\lvert\{v \mid \forall (C', v) \in successeurs$ tq. $u \prec v\}\rvert > 1$\label{algo:struct:quotient:QT:plus}}{
+            $Q_l(u) = l(u)~+~$`${}^+$'\;
+        } \Else {
+            $Q_l(u) = l(u)$\;
+        }
+    }
+
+    \Return{$Q_T = (Q_D, Q_l)$}
+\end{function}
+
+\begin{example}%{Arbre quotient et grammaire}
+    À partie de la hiérarchie obtenue dans l'exemple~\ref{ex:struct:quotient:1}, on construit le domaine de l'arbre en associant, a chaque successeur, une position relative a son parent. On commence à la position $\epsilon$ où $\textsf{QDom}(C_\lambda, \epsilon) = \{(C_X, 0), (C_Y, 1)\}$ dans l'arbre $T$.
     Finalement, on obtient la construction suivante :
     \begin{align*}
         \textsf{QDom}(C_X, 0)  & = \{(C_a, 00), (C_b, 01), (C_c, 02)\} & \textsf{QDom}(C_Y, 1)  & = \{(C_a, 10)\} \\
         \textsf{QDom}(C_a, 00) & = \emptyset                           & \textsf{QDom}(C_a, 10) & = \emptyset     \\
         \textsf{QDom}(C_b, 01) & = \emptyset                           & \textsf{QDom}(C_c, 02) & = \emptyset
-    \end{align*}
+    \end{align*}    
 
     En construisant le domaine de $Q_T$ il est facile de se rendre compte que le nœud correspondant à la classe $C_a$ sera dupliqué dans l'arbre, car il est lié à deux positions : $00$ et $10$.
     Avec le domaine construit par $QDom$ on peut construire l'arbre donné en figure~\ref{fig:struct:quotient:ex:quotient}.
@@ -797,21 +866,21 @@ Les arbres syntaxiques de ces phrases ne seront pas identiques.
 Néanmoins, les deux représentent un \emph{traitement}.
 Dans notre approche, nous allons considérer qu'ils sont équivalents.
 
-Néanmoins, pour déterminer l'équivalence entre deux sous arbres, considérer uniquement l'ensemble des arbres d'entités présent dans chacun des sous-arbres les arbres d'entités n'est pas suffisant.
+Néanmoins, pour déterminer l'équivalence entre deux sous-arbres, considérer uniquement l'ensemble des arbres d'entités présent dans chacun des sous-arbres les arbres d'entités n'est pas suffisant.
 La langue naturelle est ambiguë et une même forme de surface (et donc un même arbre d'entité) peux représenter deux objets différents.
 Il est donc nécessaire de prendre aussi en compte le contexte.
 Pour ce faire nous utilisons le concept d'équivalence régulière comme introduite par~\cite{whiteGraphSemigroupHomomorphisms1983} pour les graphes.
-L'idée est que deux sommets d'un graphe sont jugé équivalents si leur voisinage est équivalent.
-Par exemple, deux personnes peuvent être jugées \emph{équivalente} (comme catégorie d'objet représenté, ici un patient) s'ils sont toutes les deux lié à des sommets \emph{équivalents} comme une maladie, un traitement, etc sans pour autant que ces nœuds soient les mêmes.
+L'idée est que deux sommets d'un graphe sont jugés équivalents si leur voisinage est équivalent.
+Par exemple, deux personnes peuvent être jugées \emph{équivalentes} (comme catégorie d'objet représenté, par exemple un patient) si elles sont toutes les deux liées à des sommets \emph{équivalents} comme une maladie, un traitement, etc sans pour autant que ces nœuds soient les mêmes.
 
 Afin de définir la relation d'équivalence, nous définissons une mesure de similarité entre deux sous-arbres.
 On note $\mathbb{T}$ l'ensemble de tous les arbres et $\mathbb{ST}$ l'ensemble de tous les sous-arbres.
 Une mesure de similarité est une fonction symétrique $f : \mathbb{ST} \times \mathbb{ST} \to [0,1]$ où $f(x, x) = 1$ pour tout $x \in \mathbb{ST}$.
-Plusieurs mesures $f$ de similarité peuvent être utilisés comme Jaccard, Levenshtein, Jaro, etc.
-La similarité contextuelle d'arbres est notée $sim_f(x, y)$, entre deux sous-arbres enrichis $x = T|_u$ et $y = T'|v$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous arbre parent.
-Les poids sont inversement proportionnels à la distance entre les sous arbre parents et les sous-arbres $x$ et $y$.
-L'idée sous-jacente est que plus un sous arbre est distant d'un autre, moins il a de valeur dans son contexte.
-La mesure $sim_f(x, y)$ est donné par l'équation~\ref{eq:struct:sim} où $P^x_i$ (respectivement $P^y_i$) est le $i$-éme sous arbre parent de $x$ (respectivement $y$) et $depth_{min}$ est la profondeur minimum entre les sous-arbres $x$ et $y$ tel que $depth_{min} = \min\{|u|, |v|\}$.
+Plusieurs mesures $f$ de similarité peuvent être utilisés comme Jaccard, Levenshtein, Jaro, ou encore la distance d'edition pour les arbres \cite{zhangSimpleFastAlgorithms1989}.
+La similarité contextuelle d'arbres est notée $sim_f(x, y)$, entre deux sous-arbres enrichis $x = T|_u$ et $y = T'|v$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous-arbre parent.
+Les poids sont inversement proportionnels à la distance entre les sous-arbres parents et les sous-arbres $x$ et $y$.
+L'idée sous-jacente est que plus un sous-arbre est distant d'un autre, moins il a de valeur dans son contexte.
+La mesure $sim_f(x, y)$ est donnée par l'équation~\ref{eq:struct:sim} où $P^x_i$ (respectivement $P^y_i$) est le $i$-éme sous-arbre parent de $x$ (respectivement $y$) et $depth_{min}$ est la profondeur minimum entre les sous-arbres $x$ et $y$ tel que $depth_{min} = \min\{|u|, |v|\}$.
 
 \begin{equation}
     sim_f(x, y) = \frac{\sum_{i=0}^{depth_{min}} \frac{1}{i + 1} \cdot f(P^x_i, P^y_i)}{\sum_{j=0}^{depth_{min}} \frac{1}{j + 1}} \label{eq:struct:sim}
@@ -823,16 +892,80 @@ La mesure $sim_f(x, y)$ est donné par l'équation~\ref{eq:struct:sim} où $P^x_
 \end{axiom}
 
 \begin{example}
-    % \todo{example deux sous-arbres}
+    Soit l'arbre donné figure~\ref{fig:struct:sim:ex}.
+    On commence par definir une fonction de similaritée.
+    Dans cette exemple on utilisera simplement l'indice de Jaccard \cite{jaccardDistributionFloreAlpine1901} sur les nom d'entité present dans le sous-arbre.
+    L'indice de Jaccard est definit comme suit :
+    \[
+        J(X, Y) = \frac{\lvert X \cap Y \rvert}{\lvert X \cup Y \rvert}
+    \]
+    Il est facile de voir que les deux sous-arbres ER\_NODE$_1$ et ER\_NODE$_2$ sont identique on obtient alors $f(\text{ER\_NODE}_1, \text{ER\_NODE}_2) = 1$.
+    Cependant, comme leur contexte est différent : l'un est associé à un médicament (Paracetamol) et l'autre à une frequence (every day) on s'attend à une similarité différente de $1$.
+    La fonction $sim_f$ (\ref{eq:struct:sim}) permet de calculer cette différence.
+    On commence par calculer la similarité entre les sous-arbres NP$_1$ et NP$_2$ et on obtient $f(\text{NP}_1, \text{NP}_2) = 0.75$.
+    Puis ont continue recursivement jusqu'à atteindre la racine.
+    A partir du noeud CONJ, les sous-arbres sont identiques avec une similarité de $1$.
+    On obtient alors :
+    \[
+        sim_f(\text{ER\_NODE}_1, \text{ER\_NODE}_2) = \frac{1 \times 1 + 0.5 \times 0.75 + 0.33 \times 1 + 0.25 \times 1}{1 + 0.5 + 0.33 + 0.25} = \frac{1.955}{2.08} \simeq 0.94
+    \]
+
+    Ce qui permet de montrer que les deux sous-arbres sont proches sans pour autant etre equivalents car il ne sont pas mis en relation avec les mêmes objets.
+
+    % Dans cet exemple, on utilise la distance de Jaccard noté $J(X, Y)$ où $X$ et $Y$ sont deux liste triée de nom d'entitiés pouvant contenir des redondances.
+    % La distance de Jaccard est definie comme suit :
+    % \[
+    %     J(X, Y) = \frac{\lvert X \cap Y \rvert}{\lvert X \cup Y \rvert}
+    % \]
+    % Où $\lvert X \cap Y \rvert$ est la concatenation des séquances minimale pour chaque nom d'entité, par exemple $[A, A, B] \cap [A, B, C] = [A, B]$.
+    % $\lvert X \cup Y \rvert$ est la concatenation des séquances maximale pour chaque nom d'entité, par exemple $[A, A, B] \cup [A, B, C] = [A, A, B, C]$.
+
+    \begin{figure}[H]
+        \centering
+        \begin{adjustbox}{valign=c, max width=.9\textwidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [S
+                    [\textbf{ENT\_PERSON}
+                        [John Smith]
+                    ]
+                    [CONJ
+                        [NP$_1$
+                            [\textbf{ER\_NODE}$_1$
+                                [\textbf{ENT\_DOSAGE} [500 mg]]
+                                [\textbf{EC\_NODE}
+                                    [\textbf{ENT\_VALUE} [500]]
+                                    [\textbf{ENT\_UNIT} [mg]]
+                                ]
+                            ]
+                            [\textbf{ENT\_DRUG} [Paracetamol]]
+                        ]
+                        [NP$_2$
+                            [\textbf{ER\_NODE}$_2$
+                                [\textbf{ENT\_DOSAGE} [200 mg]]
+                                [\textbf{EC\_NODE}
+                                    [\textbf{ENT\_VALUE} [200]]
+                                    [\textbf{ENT\_UNIT} [mg]]
+                                ]
+                            ]
+                            [\textbf{ENT\_FREQ} [every day]]
+                        ]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Exemple d'arbre enrichi}
+        \label{fig:struct:sim:ex}
+    \end{figure}
 \end{example}
 
 Avec cette mesure de similarité, il est possible de définir la relation de similarité entre deux sous-arbres enrichis.
 On dira alors que deux sous-arbres sont similaires si leur similarité est supérieure à un taux donné en paramètre.
-La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaque ensemble de données.
+La décision de ce taux n'est pas arbitraire et il doit être déterminé pour chaque ensemble de données.
 
 \begin{definition}[Similarité de sous-arbres]
     \label{def:struct:sim}
-    Soit deux arbres enrichis $T_1$ et $T_2$ avec deux sous-arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et un seuil noté $\tau \in [0, 1]$, on dit que $st_1$ et $st_2$ sont $\tau$-similaires, noté $st_1 \sim_\tau st_2$, si et seulement si $sim_f(st_1, st_2) \geq \tau$.
+    Soient deux arbres enrichis $T_1$ et $T_2$ avec deux sous-arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et un seuil noté $\tau \in [0, 1]$, on dit que $st_1$ et $st_2$ sont $\tau$-similaires, noté $st_1 \sim_\tau st_2$, si et seulement si $sim_f(st_1, st_2) \geq \tau$.
 \end{definition}
 
 \begin{proposition}
@@ -849,7 +982,7 @@ La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaq
 \begin{definition}[Equivalence de sous-arbres]
     \label{def:struct:equiv}
     Étant donné deux arbres enrichis $T_1$ et $T_2$ avec deux sous-arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et la relation de $\tau$-similarité définit précédemment (\ref{def:struct:sim}).
-    On définit la relation de $\tau$-équivalence entre $st_1$ et $st_2$ noté $st_1 \equiv_\tau st_2$ tel que $x$ est $\tau$-équivalent à $y$ si et seulement si $x$ est $\tau$-similaires à $y$ ou à au moins un des sous-arbres $\tau$-équivalent à $y$.
+    On définit la relation de $\tau$-équivalence entre $st_1$ et $st_2$ notée $st_1 \equiv_\tau st_2$ tel que $st_1$ est $\tau$-équivalent à $st_2$ si $st_1$ est $\tau$-similaires à $st_2$ ou si $st_1$ est  $\tau$-équivalent à un sous-arbre $st_3$ lui même $\tau$-équivalent à $st_2$.
     La proposition est synthétisée par l'équation~\ref{eq:struct:equiv}.
     \begin{equation}
         (\forall x \in \mathbb{ST}, y \in \mathbb{ST}) ~ x \equiv_\tau y \iff x \sim_\tau y \lor (\exists z \in \mathbb{ST}) ~ x \equiv_\tau z \land y \equiv_\tau z \label{eq:struct:equiv}
@@ -861,23 +994,26 @@ La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaq
 \end{proposition}
 
 \begin{proof}
-    Soit $st_1$ un sous arbre enrichi.
+    Soit $st_1$ un sous-arbre enrichi.
     La réflexivité de la $\tau$-équivalence découle directement de la réflexivité de celle de la $\tau$-similarité, car $st_1 \equiv_\tau st_1$ implique $st_1 \sim_\tau st_1$ qui est toujours vrais.
     $st_1 \equiv_\tau z \land st_1 \equiv_\tau z$ est vrai pour $z = st_1$ étant donné que $st_1 \equiv_\tau st_1$ par hypothèse.
     La $\tau$-équivalence est donc \emph{réflexive}.
-    Soit $st_1$ et $st_2$ deux sous-arbres enrichis et supposons que $st_1 \equiv_\tau st_2$.
+
+    Soient $st_1$ et $st_2$ deux sous-arbres enrichis et supposons que $st_1 \equiv_\tau st_2$.
     On a alors deux cas :
     \begin{itemize}
         \item $st_1 \sim_\tau st_2$ : qui implique, par symétrie, $st_2 \sim_\tau st_1$ et donc $st_2 \equiv_\tau st_1$.
         \item $\exists z (st_1 \equiv_\tau z \land st_2 \equiv_\tau z)$ : qui peut se réécrire en $\exists z (st_2 \equiv_\tau z \land st_1 \equiv_\tau z)$ et qui donne, par définition, $st_2 \equiv_\tau st_1$.
     \end{itemize}
     On peut donc en déduire que la $\tau$-équivalence est \emph{symétrique}.
-    Soit $st_1$, $st_2$ et $st_3$ trois sous-arbres enrichis et supposons que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
+
+    Soient $st_1$, $st_2$ et $st_3$ trois sous-arbres enrichis et supposons que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
     Par symétrie, nous avons $st_1 \equiv_\tau st_2$ et $st_3 \equiv_\tau st_2$.
     En utilisant la définition de la $\tau$-équivalence (\ref{eq:struct:equiv}), nous pouvons remplacer $z$ par $st_2$.
     On obtient alors, par définition, $st_1 \equiv_\tau st_3$.
-    L'inverse est trivial et on peut conclure que $(st_1 \equiv_\tau st_2 \land st_2 \equiv_\tau st_3) \iff st_1 \equiv_\tau st_3$.
+    On peut conclure que $(st_1 \equiv_\tau st_2 \land st_2 \equiv_\tau st_3) \implies st_1 \equiv_\tau st_3$.
     La $\tau$-équivalence est donc \emph{transitive}.
+
     La $\tau$-équivalence respecte les trois propriétés d'une relation d'équivalence : \emph{réflexive}, \emph{symétrique} et \emph{transitive}.
     % Supposons que $st_1 \equiv_\tau st_2$, on a donc $st_1 \sim_\tau st_2$ ou il existe un $z$ qui vérifie $st_1 \equiv_\tau z \implies st_2 \equiv_\tau z$.
     % Dans le premier cas on peut déduire que $st_2 \sim_\tau st_1$ par réflectivité et par conséquent $st_2 \equiv_\tau st_1$.
@@ -895,7 +1031,7 @@ La décision de ce taux n'est pas arbitraire et doit être déterminé pour chaq
     $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
 \end{definition}
 
-Le partitionnement d'un ensemble peut être calculé à l'aide d'un regroupement hiérarchique en lien simple et la mesure de similarité $sim_f$.
+Le partitionnement d'un ensemble, basé sur une distance, peut être calculé à l'aide d'un regroupement hiérarchique en lien simple et la mesure de similarité $sim_f$.
 \cite{carlssonCharacterizationStabilityConvergence2010} montre qu'un regroupement hiérarchique en lien simple correspond a un partitionnement selon une relation d'équivalence.
 Le regroupement hiérarchique implique la construction d'une hiérarchie des éléments selon une mesure de similarité.
 Initialement, chaque individu forme une classe distincte.
@@ -957,5 +1093,13 @@ En continuant d'augmenter le seuil, par exemple à $\tau = 0.7$, quatre classes 
 \end{figure}
 
 \subsection{Réécriture des arbres}
+\label{sec:struct:auto:rewrite}
+La dernière étape du processus de structuration consiste à réécrire les arbres d'instances.
+L'objectif est de réécrire l'arbre d'instances de façons à ce que l'instance soit reconnues par un schéma valide selon la méta-grammaire $\mathbb{G}$.
+Pour cela, on cherche à identifier les nœuds correspondants à des \emph{groupes}, des \emph{relations} ou les \emph{collections}.
+L'ensemble des sous-arbres équivalents peuvent être réécrits pour correspondre à la structure associée à leur catégorie.
+Cette réécriture est un processus itératif ou à chaque modification de l'arbre, on vérifie si ce dernier produit un schéma valide ou non.
+Comme il n'existe pas de schéma unique, la procédure de réécriture dans cette étape peut varier en fonction des objectifs définis.
+Une proposition d'objectifs et une implémentation des procédures correspondantes sont données dans la section suivante.
 
 \FloatBarrier

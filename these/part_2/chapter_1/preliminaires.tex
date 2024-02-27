@@ -13,7 +13,8 @@ Cette section se termine par la définition des opérations de transformations e
     Une \glsreset{cfg}\gls{cfg} est définie par un quadruplet $(N, T, R, S)$ où $N$ est un ensemble fini de symboles non-terminaux ; $T$ est un ensemble fini de symboles terminaux ; $R$ un ensemble fini de règles de production et $S \in N$ est le symbole initial.
     Une règle de production est définie par la forme $X \to \alpha$, avec $X \in N$ et $\alpha$ est une chaîne de symboles terminaux et non-terminaux.
 
-    Nous introduisons la notion de \gls{cfg} condensée qui admet aussi des règles de production de la forme $X \to \alpha^+$ où $\alpha^+$ est une expression régulière qui répété une ou plusieurs fois la chaîne $\alpha$.
+    Nous introduisons la notion de \gls{cfg} condensée qui admet aussi des règles de production de la forme $X \to \alpha^+$ où $\alpha^+$ est une expression régulière qui répéte une ou plusieurs fois la chaîne $\alpha$.
+    Cela est équivalent aux règles $X \to \alpha$ et $X \to \alpha~X$.
 \end{definition}
 
 \begin{wrapfigure}[14]{r}{.3\textwidth}
@@ -40,7 +41,7 @@ La construction de l'arbre de dérivation s'effectue de manière récursive en s
         \item Chaque feuille de l'arbre $f$ est étiquetée par un symbole terminal, c'est-à-dire que $l(f) \in T$ ;
         \item Chaque nœud interne $n$ de l'arbre est étiqueté par un symbole non-terminal, c'est-à-dire que $l(n) \in N$ ;
         \item Si $U$ est un non-terminal utilisé comme étiquette d'un nœud interne $n$ et $X_1, \dots, X_n$ sont les étiquettes des enfants de $n$ de gauche à droite, alors il existe une règle de production $U \to X_1 ~ \dots ~ X_n$ dans $R$.
-              Les étiquettes $X_1, \dots, X_n$ représentent une combinaison de symboles terminaux et non-terminaux.
+        Les étiquettes $X_1, \dots, X_n$ représentent une séquence de symboles terminaux et non-terminaux.
     \end{enumerate}
 \end{definition}
 
@@ -146,15 +147,16 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
 
 \begin{definition}[Méta-grammaire]
     Une méta-grammaire $\mathbb{G} = (N, T, R, S)$ est une grammaire S-attribuée qui définit la syntaxe des règles de production d'un ensemble de \gls{cfg} condensées.
+    Autrement dit, chaque mot du langage reconnu par $\mathbb{G}$ sera la liste des règles de productions d'une \gls{cfg} condensées.
     $N$ est l'ensemble fini de méta-non-terminaux, $T$ l'ensemble fini de méta-terminaux, $R$ l'ensemble fini des règles de productions et $S \in N$ le symbole initial.
-    On définit l'attribut spécial $\gamma$ qui permet de vérifier à chaque niveau de l'arbre de dérivation que la dérivation produit bien une \gls{cfg} condensées valide.
+    On définit l'attribut synthétisé spécial $\gamma$ qui permet de vérifier à chaque niveau de l'arbre de dérivation que la dérivation produit bien une \gls{cfg} condensée valide.
     Si $S_\gamma = \top$, alors la dérivation de $\mathbb{G}$ est considérée valide, inversement, si $S_\gamma = \bot$ la dérivation de $\mathbb{G}$ est considérée invalide.
     On distingue alors deux types de règles sémantiques dans une règle de production $r \in R$ :
     \begin{itemize}
         \item Les règles de la forme $a \gets \alpha$ où $a$ est l'attribut qui est évalué et $\alpha$ est une formule sur les attributs dans $r$ ;
         \item Les règles de la forme $\gamma \gets \beta$ où $\beta$ est une formule logique sur les attributs dans $r$.
     \end{itemize}
-    Pour des raisons de lisibilité, on omettra la partie $\gamma \gets$ et les règle de la forme $a \gets a$ dans la suite de ce chapitre.
+    Pour des raisons de lisibilité, on omettra la partie $\gamma \gets$ et les règles de la forme $a \gets a$ dans la suite de ce chapitre.
 \end{definition}
 
 \subsection{Arbres}
@@ -164,25 +166,28 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
     Formellement, un arbre $T$ est une paire $T = (D, l)$ où $D$ est le domaine de l'arbre et $l$ est une fonction de d'étiquetage telle que $l : D \to \Sigma \cup \{\lambda\}$ où $\Sigma$ est l'ensemble des labels de l'arbre et $\lambda$ un symbole spécial.
     Le domaine $D$ d'un arbre est un sous ensemble de $(\mathbb{N})^*$ (c.-à-d. un ensemble de séquence d'entier de la forme $x.y.z$) qui respecte les propriétés suivantes :
     \begin{enumerate}
-        \item $D$ est clos sur les préfixes, c'est-à-dire que pour $u, u' \in (\mathbb{N})^*$ si $u$ est un préfixe de $u'$ (noté $u \preceq u'$) et $u' \in D$, alors $u \in D$, et
-        \item Pour tout $u, j \in \mathbb{N}$ si $u.j \in D$ alors $\forall i \in \mathbb{N}$ tel que $0 \leq i \leq j ~ u.i \in D$.
+        \item $D$ est clos sur les préfixes, c'est-à-dire que pour $u, u' \in (\mathbb{N})^*$ si $u$ est un préfixe de $u'$ et $u' \in D$, alors $u \in D$, et
+        \item Pour tout $u \in (\mathbb{N})*$ et $j \in \mathbb{N}$ si $u.j \in D$ alors pour tous $i \in \mathbb{N}$ tel que $0 \leq i \leq j$ on a $u.i \in D$.
     \end{enumerate}
     Chaque élément de $D$ est appelé \emph{position}.
     Pour un nœud $n$ à la position $p$, $|p|$ définit la longueur de la séquence, aussi appelée \emph{profondeur} de $n$.
-    La racine d'un arbre est à la position $\epsilon$ et est représenté par le symbole spécial $\lambda$ tel que $l(\epsilon) = \lambda$.
-    Un arbre vide est donc défini par  $T = (\epsilon, \langle \epsilon \mapsto \lambda \rangle)$.
-    Étant donné un nœud à la position $u.i$ on appelle \emph{parent} le nœud à la position $u$ et \emph{enfants} les nœuds aux positions $u.i.j ~ \forall j \in \mathbb{N}$ tel que $u.i.j \in D$.
-    Un nœud $n$ à la position $u$ est un \emph{descendant} d'un nœud $m$ la position $v$ si et seulement si $v$ est un préfixe direct de $u$ (noté $v \preceq u$) ou indirect (noté $v \preceq^* u$), inversement $m$ est un \emph{ancêtre} de $n$.
-    On appelle \emph{feuille} un nœud à une position $u$ tel que $\nexists u.i \in D ~ \forall i \in \mathbb{N}$, en d'autres termes, c'est un nœud qui n'a pas d'enfants.
+    La racine d'un arbre est à la position $\epsilon$ et est représentée par le symbole spécial $\lambda$ tel que $l(\epsilon) = \lambda$.
+    Un arbre vide est donc défini par  $T = (\{\epsilon\}, \langle \epsilon \mapsto \lambda \rangle)$.
+    On note $v \prec u$ si $\exists i \in \mathbb{N}$ tel que $v = u.i$ et on appelle le nœud à la position $v$ \emph{parent} du nœud à la position $u$ inversement $u$ est \emph{enfant} de $v$.  
+    %Étant donné un nœud à la position $u.i$ on appelle \emph{parent} le nœud à la position $u$ et \emph{enfants} les nœuds aux positions $u.i.j ~ \forall j \in \mathbb{N}$ tel que $u.i.j \in D$.
+    On note $v \prec^* u$ si $\exists v'$ tel que $u = v.v'$, on dit que $v$ est \emph{préfixe} de $u$ et on appelle un nœud à la position $u$ \emph{descendant} du nœud à la position $v$.
+    %Un nœud $n$ à la position $u$ est un \emph{descendant} d'un nœud $m$ la position $v$ si et seulement si $v$ est un préfixe direct de $u$ (noté $v \preceq u$) ou indirect (noté $v \preceq^* u$), inversement $m$ est un \emph{ancêtre} de $n$.
+    On appelle \emph{feuille} un nœud à une position $u$ tel que $u.0 \notin D$, en d'autres termes, c'est un nœud qui n'a pas d'enfants.
+    % $\nexists u.i \in D ~ \forall i \in \mathbb{N}$
 \end{definition}
 
-\begin{definition}[Sous arbre]
-    Étant donné un arbre $T = (D, l)$, un sous arbre de $T$ à la position $u \in D$ est noté $T|_u = (D', l')$ et respecte les propriétés suivantes :
+\begin{definition}[Sous-arbre]
+    Étant donné un arbre $T = (D, l)$, un sous-arbre de $T$ à la position $u \in D$ est noté $T|_u = (D', l')$ et respecte les propriétés suivantes :
     \begin{enumerate}
         \item $D' \subseteq D$ tel que $\forall v \in D' ~ u \preceq v$ et
         \item $l' = \langle v \mapsto l(v) \mid v \in D' \rangle $.
     \end{enumerate}
-    Soit un sous arbre $t = T|_u$, on note $t' = P_i^t$ le $i$-éme sous arbre parent de $t$ tel que $t' = T|_v$,  $u = vw$ et $|w| = i$.
+    Soit un sous-arbre $t = T|_u$, on note $t' = P_i^t$ le $i$-éme sous-arbre parent de $t$ tel que $t' = T|_v$,  $u = vw$ et $|w| = i$.
 \end{definition}
 
 La figure~\ref{fig:struct:tree-ex} illustre un arbre $T = (D, l)$ ordonné où $D=\{\epsilon, 0, 1, 1.0, 1.1\}$.
@@ -217,10 +222,10 @@ Il existe deux structures très utilisées dans la littérature :
 \begin{description}
     \item[Arbre syntaxique]
           (Figure~\ref{fig:struct:ex-tree:syx})
-          Aussi appelé arbre en constituant, c'est l'arbre de dérivation de la grammaire du texte.
-          Il représente les relations syntaxiques (de proche en proche) entre les mots et les clauses et met en évidence la composition d'une phrase en sous parties.
+          Aussi appelé arbre en constituant, est l'arbre de dérivation de la grammaire du texte.
+          En linguistique, il représente la structure syntaxique d'une phrase.
+          Il met en évidence les relations hiérarchiques entre les mots ou groupe de mots et les catégories auxquelles ils appartiennent où \gls{pos} en anglais : nom (NN), verbe (VBD), adjectif (ADJ), déterminent (DT), etc.
           Les feuilles de l'arbre sont les unités lexicales (les mots) et les nœuds intermédiaires représente les structures abstraites comme une phrase verbale (VP) ou un groupe nominal (NP).
-          Chaque mot a pour parent un nœud représentant sa nature où \gls{pos} en anglais : nom (NN), verbe (VBD), adjectif (ADJ), déterminent (DT), etc.
 
     \item[Arbre de dépendance]
           (Figure~\ref{fig:struct:ex-tree:dep})
@@ -296,7 +301,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 \begin{definition}[Règle de réécriture]
     Une règle de réécriture sur un arbre décrit comment un arbre $t$ peut être réécrit en $t'$ pour une position $u$ donnée.
     Elle est constituée d'une partie gauche, appelée \gls{lhs}, représentant un motif et d'une partie droite, appelée \gls{rhs}, représentant la transformation et s'écrit $\gls*{lhs} \to \gls*{rhs}$.
-    Le motif est un sous arbre construit sur l'ensemble $\Sigma \cup V \cup \{\lambda\}$ où $\Sigma$ est l'ensemble des labels de $t$, $V$ est un ensemble de variables et $\lambda$ est le symbole racine.
+    Le motif est un sous-arbre construit sur l'ensemble $\Sigma \cup V \cup \{\lambda\}$ où $\Sigma$ est l'ensemble des labels de $t$, $V$ est un ensemble de variables et $\lambda$ est le symbole racine.
     Il existe un morphisme entre les variables de \gls{lhs} et \gls{rhs} permettant la transformation.
 
     La transformation s'applique sur une substitution $\sigma$ du motif de la partie gauche par un sous-arbre de $t$ à une position donnée $u$.
@@ -309,10 +314,10 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 
 \begin{example}[Règle de réécriture]
     Étant donné la règle de réécriture $rule(u.i)$ et la contrainte $|\sigma(x)| = i$ donnée figure~\ref{fig:sch:pre:rewritting:ex-rule}.
-    $U$ représente le nœud à la position $u$ de l'arbre cible, $x \in V$ est une variable et $A \in \Sigma$ représente un label de sous arbre.
-    La règle est applicable sur un arbre $T$ s'il existe un sous arbre $t = T|_u$ avec une substitution $\sigma$ tel que $\sigma(x) = [t|_0, \dots, t|_i]$ et $l(u.i) = A$.
-    L'arbre de destination \gls{rhs} à une correspondance avec le modèle \gls{lhs}, ici intuitivement claire : $U \mapsto U$ et $x \mapsto x$.
-    En cas d'application de la règle, le sous arbre $A$ est supprimé de $T$.
+    $U$ représente le nœud à la position $u$ de l'arbre cible, $x \in V$ est une variable et $X, Y, A, B, C, D \in \Sigma$ représentent des étiquettes (des non-terminaux) de l'arbre.
+    La règle est applicable sur un arbre $T$ s'il existe un sous-arbre $t = T|_u$ avec une substitution $\sigma$ tel que $\sigma(x) = [t|_0, \dots, t|_{i-1}]$ et $l(u.i) = A$.
+    %L'arbre de destination \gls{rhs} à une correspondance avec le modèle \gls{lhs}, ici intuitivement claire : $U \mapsto U$ et $x \mapsto x$.
+    En cas d'application de la règle, le sous-arbre $A$ est supprimé de $T$.
 
     \begin{figure}[htb]
         \centering

@@ -85,7 +85,7 @@ L'objectif de la méta-grammaire $\mathbb{G}$ est d'établir la description gén
 Lorsqu'on considère une instance $I$, les non-terminaux d'une grammaire $G$ sont définis pour représenter les concepts suivants, qui seront appliqués aux arbres de $I$ :
 
 \begin{description}
-    \item[Arbre d'entités] Un arbre de profondeur $1$ dont la racine a un nom d'entité comme étiquette et dont les enfants sont des terminaux.
+    \item[Arbre d'entité] Un arbre de profondeur $1$ dont la racine a un nom d'entité comme étiquette et dont les enfants sont des terminaux.
 
     \item[Groupe] Un arbre de profondeur $2$ dont tous les enfants sont des arbres d'entités.
 
@@ -111,36 +111,82 @@ Les règles sémantiques sont présentées dans la partie droite de la table~\re
     \centering
     \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
         \parbox{\linewidth}{\begin{align}
-                \epsilon                                    & ::= \langle root_{eL',gL',cgL',rL',crL'} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                       & [eL' \subseteq eL; gL' \subseteq gL; cgL' \subseteq cgL; rL' \subseteq rL; crL' \subseteq crL]                    \label{meta:start}      \\
-                \langle root_{eL,gL,cgL,rL,crL} \rangle     & ::= ROOT \to \langle rootList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                                              \label{meta:root}       \\[1em]
+                \epsilon                                    & ::= \langle root_{eL',gL',cgL',rL',crL'} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                  & [eL' \subseteq eL; gL' \subseteq gL; cgL' \subseteq cgL; rL' \subseteq rL; crL' \subseteq crL]                    \label{meta:start}      \\
+                \langle root_{eL,gL,cgL,rL,crL} \rangle     & ::= \lambda \to \langle rootList_{eL,gL,cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                                           \label{meta:root}                                                                                                                                                  \\[1em]
                 % Root list
-                \langle rootList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                                                                                                                                                      & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]            \label{meta:rootList:1} \\
-                                                            & ~~ \mid ~ ENT_{name}  ~ \langle rootList_{eL',gL,cgL,rL,crL} \rangle                                                                                                                                                                              & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:rootList:2} \\
-                                                            & ~~ \mid ~ GROUP_{name} ~ \langle rootList_{eL,gL',cgL,rL,crL} \rangle                                                                                                                                                                             & [name \notin gL'; gL \gets \{name\} \cup gL']                                                                     \label{meta:rootList:3} \\
-                                                            & ~~ \mid ~ REL_{name}  ~ \langle rootList_{eL,gL,cgL,rL',crL} \rangle                                                                                                                                                                              & [name \notin rL'; rL \gets \{name\} \cup rL']                                                                     \label{meta:rootList:4} \\
-                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL',rL,crL} \rangle                                                                                                                                                                              & [name \notin cgL'; cgL \gets \{name\} \cup cgL']                                                                  \label{meta:rootList:5} \\
-                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL,rL,crL'} \rangle                                                                                                                                                                              & [name \notin crL'; crL \gets \{name\} \cup crL']                                                                  \label{meta:rootList:6} \\[1em]
+                \langle rootList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                                                                                                                                                                                                                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]            \label{meta:rootList:1} \\
+                                                            & ~~ \mid ~ ENT_{name}  ~ \langle rootList_{eL',gL,cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                                                         & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:rootList:2} \\
+                                                            & ~~ \mid ~ GROUP_{name} ~ \langle rootList_{eL,gL',cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                                                        & [name \notin gL'; gL \gets \{name\} \cup gL']                                                                     \label{meta:rootList:3} \\
+                                                            & ~~ \mid ~ REL_{name}  ~ \langle rootList_{eL,gL,cgL,rL',crL} \rangle                                                                                                                                                                                                                                                                                                                         & [name \notin rL'; rL \gets \{name\} \cup rL']                                                                     \label{meta:rootList:4} \\
+                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL',rL,crL} \rangle                                                                                                                                                                                                                                                                                                                         & [name \notin cgL'; cgL \gets \{name\} \cup cgL']                                                                  \label{meta:rootList:5} \\
+                                                            & ~~ \mid ~ COLL_{name} ~ \langle rootList_{eL,gL,cgL,rL,crL'} \rangle                                                                                                                                                                                                                                                                                                                         & [name \notin crL'; crL \gets \{name\} \cup crL']                                                                  \label{meta:rootList:6} \\[1em]
                 % Rules list
-                \langle ruleList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                                                                                                                                                      & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]            \label{meta:ruleList:1} \\
-                                                            & ~~ \mid ~ \langle entity_{name}          \rangle ~\textsc{eol}~ \langle ruleList_{eL',gL,cgL,rL,crL} \rangle                                                                                                                                      & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:ruleList:2} \\
-                                                            & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle                                                                                                                                      & [name \notin gL' \land eL' \subseteq eL; gL \gets \{name\} \cup gL']                                              \label{meta:ruleList:3} \\
-                                                            & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle                                                                                                                                      & [name \notin rL' \land gL' \subseteq gL; rL \gets \{name\} \cup rL']                                              \label{meta:ruleList:4} \\
-                                                            & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle                                                                                                                                      & [name \notin cgL' \land grpName \in gL; cgL \gets \{name\} \cup cgL']                                             \label{meta:ruleList:5} \\
-                                                            & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle                                                                                                                                      & [name \notin crL' \land relName \in rL; crL \gets \{name\} \cup crL']                                             \label{meta:ruleList:6} \\[1em]
+                \langle ruleList_{eL,gL,cgL,rL,crL} \rangle & ::= \epsilon                                                                                                                                                                                                                                                                                                                                                                                 & [eL \gets \emptyset; gL \gets \emptyset; cgL \gets \emptyset; rL \gets \emptyset; crL \gets \emptyset]            \label{meta:ruleList:1} \\
+                                                            & ~~ \mid ~ \langle entity_{name}          \rangle ~\textsc{eol}~ \langle ruleList_{eL',gL,cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                 & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:ruleList:2} \\
+                                                            & ~~ \mid ~ \langle group_{name, eL'}      \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL',cgL,rL,crL} \rangle                                                                                                                                                                                                                                                                                 & [name \notin gL' \land eL' \subseteq eL; gL \gets \{name\} \cup gL']                                              \label{meta:ruleList:3} \\
+                                                            & ~~ \mid ~ \langle relation_{name, gL'}   \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL',crL} \rangle                                                                                                                                                                                                                                                                                 & [name \notin rL' \land gL' \subseteq gL; rL \gets \{name\} \cup rL']                                              \label{meta:ruleList:4} \\
+                                                            & ~~ \mid ~ \langle collGrp_{name,grpName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL',rL,crL} \rangle                                                                                                                                                                                                                                                                                 & [name \notin cgL' \land grpName \in gL; cgL \gets \{name\} \cup cgL']                                             \label{meta:ruleList:5} \\
+                                                            & ~~ \mid ~ \langle collRel_{name,relName} \rangle ~\textsc{eol}~ \langle ruleList_{eL,gL,cgL,rL,crL'} \rangle                                                                                                                                                                                                                                                                                 & [name \notin crL' \land relName \in rL; crL \gets \{name\} \cup crL']                                             \label{meta:ruleList:6} \\[1em]
                 % Groups
-                \langle group_{name, eL} \rangle            & ::= GROUP_{name} \to \langle entList_{eL} \rangle                                                                                                                                                                                                                                                                                                                     \label{meta:group}      \\
-                \langle collGrp_{name,grpName} \rangle      & ::= COLL_{name} \to GROUP_{grpName}^+                                                                                                                                                                                                                                                                                                                                 \label{meta:collGroup}  \\[1em]
+                \langle group_{name, eL} \rangle            & ::= GROUP_{name} \to \langle entList_{eL} \rangle                                                                                                                                                                                                                                                                                                                     \label{meta:group}                                                                                                                                                 \\
+                \langle collGrp_{name,grpName} \rangle      & ::= COLL_{name} \to GROUP_{grpName}^+                                                                                                                                                                                                                                                                                                                                 \label{meta:collGroup}                                                                                                                                             \\[1em]
                 % Relations
-                \langle relation_{name, gL} \rangle         & ::= REL_{name} \to GROUP_{name1} ~ GROUP_{name2}                                                                                                                                                                                                  & [name1 \neq name2; gL \gets \{name1, name2\}]                                                                     \label{meta:rel}        \\
-                \langle collRel_{name,relName} \rangle      & ::= COLL_{name} \to REL_{relName}^+                                                                                                                                                                                                                                                                                                                                   \label{meta:collRel}    \\[1em]
+                \langle relation_{name, gL} \rangle         & ::= REL_{name} \to GROUP_{name1} ~ GROUP_{name2}                                                                                                                                                                                                                                                                                                                                             & [name1 \neq name2; gL \gets \{name1, name2\}]                                                                     \label{meta:rel}        \\
+                \langle collRel_{name,relName} \rangle      & ::= COLL_{name} \to REL_{relName}^+                                                                                                                                                                                                                                                                                                                                   \label{meta:collRel}                                                                                                                                               \\[1em]
                 % Entities
-                \langle entList_{eL} \rangle                & ::= ENT_{name}                                                                                                                                                                                                                                    & [eL \gets \{name\}]                                                                                               \label{meta:entList:1}  \\
-                                                            & ~~ \mid ~ ENT_{name} ~ \langle entList_{eL'} \rangle                                                                                                                                                                                              & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:entList:2}  \\
+                \langle entList_{eL} \rangle                & ::= ENT_{name}                                                                                                                                                                                                                                                                                                                                                                               & [eL \gets \{name\}]                                                                                               \label{meta:entList:1}  \\
+                                                            & ~~ \mid ~ ENT_{name} ~ \langle entList_{eL'} \rangle                                                                                                                                                                                                                                                                                                                                         & [name \notin eL'; eL \gets \{name\} \cup eL']                                                                     \label{meta:entList:2}  \\
                 \langle entity_{name} \rangle               & ::= ENT_{name} \to \langle data \rangle \label{meta:entity}
             \end{align}}
     \end{adjustbox}
     \captionof{table}[Méta-grammaire S-attribuée $\mathbb{G}$ au format \glsname*{bnf}]{Méta-grammaire S-attribuée $\mathbb{G}$ au format \glsname*{bnf}. Cette grammaire définit des grammaires qui seront vues comme des schémas de base de donnée \label{table:struct:meta}}
 \end{landscape}
+
+La première méta-règle de production de $\mathbb{G}$ (\ref{meta:start}) indique que la grammaire cible $G$ est définie par une règle initiale suivie par une liste de règles, éventuellement vide.
+La règle initiale engendrée par $\mathbb{G}$ (méta-règle~\ref{meta:root}) contient le symbole \emph{ROOT} (non-terminal initial de $G$) du côté gauche.
+Son côté droit est défini par les méta-règles \ref{meta:rootList:1}-\ref{meta:rootList:6} qui spécifie la construction d'une série de non-terminaux de $G$.
+Ces non-terminaux sont : \emph{ENT}, \emph{GROUP}, \emph{REL} and \emph{COLL}, représentant, respectivement, des entités, des groupes d'entités, des relations entre des groupes et des collections de groupes ou de relations.
+Pour distinguer chaque structuration spécifique à une grammaire $G$, on associe un attribut $name$ à chaque non-terminal.
+Les attributs de $\mathbb{G}$ sont synthétisés et représentent des listes de noms ($name$) utilisés comme identificateur :
+\begin{itemize}
+    \item $eL$ (ou $eL'$) : liste contenant les noms des entités,
+    \item $gL$ (ou $gL'$) : liste contenant les noms des groupes,
+    \item $rL$ (ou $rL'$) : liste contenant les noms des relations,
+    \item $cgL$ (ou $cqL'$) : liste contenant les noms des collections de groupes,
+    \item $crL$ (ou $crL'$) : liste contenant les noms des collections de relations.
+\end{itemize}
+
+Leur initialisation commence du bas vers le haut.
+Les règles syntaxiques permettent, notamment de vérifier qu'un nom est unique.
+Par exemple, lors de l'application de la méta-règle \ref{meta:entList:1}-\ref{meta:entList:2}, la liste $eL$ reçoit des noms d'entité qui sont uniques.
+Cela est aussi le cas pour toutes les autres listes : l'unicité du nom d'un nouveau non-terminal est assurée par les règles sémantiques.
+Il est également essentiel de noter que ces règles sémantiques garantissent que chaque non-terminal apparaissant du côté droit d'une règle de production de la grammaire $G$ doit avoir une règle le définissant.
+Par exemple, lors de l'application de la méta-règle \ref{meta:start}, tous les éléments de la liste $gL'$ doivent être présents dans $gL$.
+Dans l'exemple de la figure~\ref{table:struct:meta:ex}, si $gL' = {A}$ et $gL = {A, B}$, le non-terminal $GROUP_A$ présent dans la règle $ROOT \rightarrow GROUP_A ~ COLL_1$ à gauche de l'arbre de dérivation (voir figure~\ref{table:struct:meta:ex}) est défini par la règle $GROUP_A \rightarrow ENT_1$, comme illustré dans la partie droite de cet arbre de dérivation (voir figure~\ref{table:struct:meta:ex}).
+
+\begin{example}
+    \label{ex:struct:meta}
+    La figure~\ref{table:struct:meta:ex} illustre la dérivation de la grammaire $G$ via la méta-grammaire $\mathbb{G}$.
+    En bleu on note, pour chaque nœud, la valeur de chaque attribut en omettant, pour des raisons de visibilité, $\gamma$ et les attributs ayant pour valeur un ensemble vide.
+    Les règles de production de la grammaire $G$ sont les suivantes :
+    \begin{align*}
+        ROOT    & \to GROUP_A ~ COLL_1                                          \\
+        COLL_1  & \to REL_X^+              & REL_X   & \to GROUP_A ~ GROUP_B    \\
+        GROUP_A & \to ENT_1                & GROUP_B & \to ENT_1 ~ ENT_2        \\
+        ENT_1   & \to \langle data \rangle & ENT_2   & \to \langle data \rangle
+    \end{align*}
+
+    La règle de production $ROOT \rightarrow GROUP_A ~ COLL_1$ est obtenue par l'application de la méta-règle~\ref{meta:start}, suivie de \ref{meta:root}.
+    Ce qui nous donne $ROOT \rightarrow \langle rootList \rangle$.
+    Le côté droit de cette règle est un méta-non-terminal.
+    Dans la suite, il est spécifié par l'application de la méta-règle \ref{meta:rootList:3} qui engendre $ROOT \rightarrow GROUP_A ~ \langle rootList \rangle$, puis \ref{meta:rootList:6} nous donne $ROOT \rightarrow GROUP_A ~ COLL_1 ~ \langle rootList \rangle$ et \ref{meta:rootList:1} produit $ROOT \rightarrow GROUP_A ~ COLL_1$.
+    Voir la figure~\ref{table:struct:meta:ex} avec l'arbre de dérivation.
+    Les méta-règles~\ref{meta:ruleList:1}-\ref{meta:ruleList:6} permettent de définir un ensemble de règles.
+    En effet, le méta-non-terminal $\langle ruleList \rangle$ a déjà été utilisé dans \ref{meta:start}.
+    Chaque règle produite permet de définir un non-terminal de $G$.
+    Dans la suite, nous verrons que les règles sémantiques poseront des contraintes, obligeant que chaque non-terminal de notre grammaire cible $G$ soit définit afin de construire une grammaire valide.
+    Dans notre exemple, nous avons $GROUP_A \rightarrow  \langle entList \rangle$ et ensuite $GROUP_A \rightarrow ENT_1$.
+\end{example}
 
 \begin{landscape}
     \centering
@@ -150,7 +196,7 @@ Les règles sémantiques sont présentées dans la partie droite de la table~\re
             for tree={align=center}
             [\huge{$\epsilon$}
             [{\large{$\langle root \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}gL=\{A\}$}
-                    [$ROOT$]
+                    [$\lambda$]
                     [$\to$,before computing xy={s/.average={s}{siblings}}]
                     [{\large{$\langle rootList \rangle$}\\$\color{blue}crL=\{1\}$\\$\color{blue}gL=\{A\}$}
                             [$GROUP_A$]
@@ -228,53 +274,5 @@ Les règles sémantiques sont présentées dans la partie droite de la table~\re
     \captionof{figure}{Exemple de dérivation de la méta-grammaire \label{table:struct:meta:ex}}
     \vspace*{\fill}
 \end{landscape}
-
-La première méta-règle de production de $\mathbb{G}$ (\ref{meta:start}) indique que la grammaire cible $G$ est définie par une règle initiale suivie par une liste de règles, éventuellement vide.
-La règle initiale engendrée par $\mathbb{G}$ (méta-règle~\ref{meta:root}) contient le symbole \emph{ROOT} (non-terminal initial de $G$) du côté gauche.
-Son côté droit est défini par les méta-règles \ref{meta:rootList:1}-\ref{meta:rootList:6} qui spécifie la construction d'une série de non-terminaux de $G$.
-Ces non-terminaux sont préfixés par \emph{ENT}, \emph{GROUP}, \emph{REL} and \emph{COLL}, représentant, respectivement, des entités, des groupes d'entités, des relations entre des groupes et de collections de groupes ou des relations.
-Pour distinguer chaque structuration spécifique à une grammaire $G$, ces préfixes sont suivis par un identifiant ($name$).
-
-Dans l'exemple~\ref{ex:struct:meta} ci-dessous, la règle de production $ROOT \rightarrow GROUP_A ~ COLL_1$ est obtenue par l'application de la méta-règle~\ref{meta:start}, suivie de \ref{meta:root}.
-Ce qui nous donne $ROOT \rightarrow \langle rootList \rangle$.
-Le côté droit de cette règle est un méta-non-terminal.
-Dans la suite, il est spécifié par l'application de la méta-règle \ref{meta:rootList:3} qui engendre $ROOT \rightarrow GROUP_A ~ \langle rootList \rangle$, puis \ref{meta:rootList:6} nous donne $ROOT \rightarrow GROUP_A ~ COLL_1 ~ \langle rootList \rangle$ et \ref{meta:rootList:1} produit $ROOT \rightarrow GROUP_A ~ COLL_1$.
-Voir la figure~\ref{table:struct:meta:ex} avec l'arbre de dérivation.
-Les méta-règles~\ref{meta:ruleList:1}-\ref{meta:ruleList:6} permettent de définir un ensemble de règles.
-En effet, le méta-non-terminal $\langle ruleList \rangle$ a déjà été utilisé dans \ref{meta:start}.
-Chaque règle produite permet de définir un non-terminal de $G$.
-Dans la suite, nous verrons que les règles sémantiques poseront des contraintes, obligeant que chaque non-terminal de notre grammaire cible $G$ soit définit afin de construire une grammaire valide.
-Dans notre exemple, nous avons $GROUP_A \rightarrow  \langle entList \rangle$ et ensuite $GROUP_A \rightarrow ENT_1$.
-
-Les attributs de $\mathbb{G}$ sont synthétisés et représentent des listes de noms ($name$) utilisés comme identificateur :
-\begin{itemize}
-    \item $eL$ (ou $eL'$) : liste contenant les noms des entités,
-    \item $gL$ (ou $gL'$) : liste contenant les noms des groupes,
-    \item $rL$ (ou $rL'$) : liste contenant les noms des relations,
-    \item $cgL$ (ou $cqL'$) : liste contenant les noms des collections de groupes,
-    \item $crL$ (ou $crL'$) : liste contenant les noms des collections de relations.
-\end{itemize}
-
-Leur initialisation commence du bas vers le haut.
-Les règles syntaxiques permettent, notamment de vérifier qu'un nom est unique.
-Par exemple, lors de l'application de la méta-règle \ref{meta:entList:1}-\ref{meta:entList:2}, la liste $eL$ reçoit des noms d'entité qui sont uniques.
-Cela est aussi le cas pour toutes les autres listes : l'unicité du nom d'un nouveau non-terminal est assurée par les règles sémantiques.
-
-Il est également essentiel de noter que ces règles sémantiques garantissent que chaque non-terminal apparaissant du côté droit d'une règle de production de la grammaire $G$ doit avoir une règle le définissant.
-Par exemple, lors de l'application de la méta-règle \ref{meta:start}, tous les éléments de la liste $gL'$ doivent être présents dans $gL$.
-Dans l'exemple de la figure~\ref{table:struct:meta:ex}, si $gL' = {A}$ et $gL = {A, B}$, le non-terminal $GROUP_A$ présent dans la règle $ROOT \rightarrow GROUP_A ~ COLL_1$ à gauche de l'arbre de dérivation (voir figure~\ref{table:struct:meta:ex}) est défini par la règle $GROUP_A \rightarrow ENT_1$, comme illustré dans la partie droite de cet arbre de dérivation (voir figure~\ref{table:struct:meta:ex}).
-
-\begin{example}
-    \label{ex:struct:meta}
-    La figure~\ref{table:struct:meta:ex} illustre la dérivation de la grammaire $G$ via la méta-grammaire $\mathbb{G}$.
-    En bleu on note, pour chaque nœud, la valeur de chaque attribut en omettant, pour des raisons de visibilité, $\gamma$ et les attributs ayant pour valeur un ensemble vide.
-    Les règles de production de la grammaire $G$ sont les suivantes :
-    \begin{align*}
-        ROOT    & \to GROUP_A ~ COLL_1                                          \\
-        COLL_1  & \to REL_X^+              & REL_X   & \to GROUP_A ~ GROUP_B    \\
-        GROUP_A & \to ENT_1                & GROUP_B & \to ENT_1 ~ ENT_2        \\
-        ENT_1   & \to \langle data \rangle & ENT_2   & \to \langle data \rangle
-    \end{align*}
-\end{example}
 
 \FloatBarrier
