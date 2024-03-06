@@ -135,7 +135,7 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
         $ST\_min \gets \findSTwithMinLeavesTree(equivalent\_st)$\;
         $equivalent\_st \gets equivalent\_st \setminus ST\_min$\;
 
-        \ForEach{$st \in ST\_min$ tel que $\{e | e \in st, t(e) \neq `GROUP`\} = \emptyset$}{
+        \ForEach{$st \in ST\_min$ tel que $\{e \mid e \in st, t(e) \neq `GROUP`\} = \emptyset$}{
             $j \gets 0$\;
             Construire $T_{GROUP} = (D_{GROUP}, t_{GROUP})$ un nouvel arbre avec $t_{GROUP}(\epsilon) = `GROUP_k`$\;
 
@@ -157,7 +157,7 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \caption{findSubgroups($T$ = ($D$, $l$), minSupport)}
     \label{algo:struct:rewrite-findSubgroups}
 
-    $\groupFound \gets$ \textsc{False}\;
+    $\groupFound \gets \textsc{False}$\;
 
     \ForAll{sous-arbre \st tel que $\st = T|_u$ et $t(u) \notin \{`ENT`, `REL`, `COLL`\}$}{
         $S_{ENT} \gets \{T|_{u.i} \mid \forall i \ t(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
@@ -187,11 +187,10 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
 
             \uIf{$support_{j_{max}} \ge min\_support$ et $support_{j_{max}} > group\_support$}{
                 \tcp{On continue de combiner les arbres d'entités restants dans \st}
-                $\groupFound \gets$ \textbf{True}\;
+                $\groupFound \gets \textsc{True}$\;
                 $S_{ENT} \gets S_{ENT} \setminus combi_{j_{max}}$\;
-                \tcp{La taille de la combinaison suivante $k$ est réduite lorsque $|S_{ENT}| < k$}
-                $k \gets \min(|S_{ENT}|, k)$\;
-                $T \gets T_{j_{max}}$ \tcp*[l]{L'arbre modifié est sauvegardé}
+                $k \gets \min(|S_{ENT}|, k)$ \tcp*{La taille de la combinaison suivante $k$ est réduite lorsque $|S_{ENT}| < k$}
+                $T \gets T_{j_{max}}$ \tcp*{L'arbre modifié est sauvegardé}
             } \Else {
                 $k \gets k - 1$\;
             }
@@ -205,11 +204,11 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \caption{mergeGroups($T$ = ($D$, $l$), minSupport)}
     \label{algo:struct:rewrite-mergeGroups}
 
-    $\groupFound \gets$ \textsc{False}\;
+    $\groupFound \gets \textsc{False}$\;
 
     \ForAll{sous-arbre \st tel que $\st = T|_u$ and $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
-        $S_{GROUP} = \{T|_{u.i} \mid \forall i \ t(u.i) = `GROUP`\}$ \tcp*{Ensemble des arbres groupe enfants de \st}
-        $S_{ENT} = \{T|_{u.i} \mid \forall i \ t(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
+        $S_{GROUP} = \{T|_{u.i} \mid \forall i ~ t(u.i) = `GROUP`\}$ \tcp*{Ensemble des arbres groupe enfants de \st}
+        $S_{ENT} = \{T|_{u.i} \mid \forall i ~ t(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
 
         $k \gets |S_{GROUP}/\equiv_\tau| + |S_{ENT}|$\;
         \While{$k > 1$}{
@@ -242,11 +241,11 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
 
             \uIf{$support_{j_{max}} \ge min\_support$}{
                 \tcp{On continue de combiner les arbres d'entités restants dans \st}
-                $\groupFound \gets$ \textsc{True}\;
+                $\groupFound \gets \textsc{True}$\;
                 $S_{ENT} \gets S_{ENT} \setminus combi_{j_{max}}$\;
                 \tcp{La taille de la combinaison suivante $k$ est réduite lorsque $|S_{ENT}| < k$}
                 $k \gets \min(|S_{ENT}|, k)$\;
-                $T \gets T_{j_{max}}$ \tcp*[l]{L'arbre modifié est sauvegardé}
+                $T \gets T_{j_{max}}$ \tcp*{L'arbre modifié est sauvegardé}
             } \Else {
                 $k \gets k - 1$\;
             }
@@ -260,17 +259,17 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \caption{findRelationship($T$ = ($D$, $l$), minSupport)}
     \label{algo:struct:rewrite-findRelationship}
 
-    $\relationshipFound \gets$ \textsc{False}\;
+    $\relationshipFound \gets \textsc{False}$\;
 
     \ForEach{sous-arbre \st tel que $\st = T|_u$, $|\st| = 2$, et $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
 
-        \If{$t(u.0) = `GROUP`$ et $t(u.1) = `GROUP`$}{
+        \uIf{$t(u.0) = `GROUP`$ et $t(u.1) = `GROUP`$}{
             \tcp{tous les enfants de \st sont des nœuds groupe, il est donc marqué comme relation}
             $t(u) \gets `REL`$\;
-            $\relationshipFound \gets$ \textsc{True}\;
+            $\relationshipFound \gets \textsc{True}$\;
         }
 
-        \If{$(t(u.0) = `COLL`$ et $t(u.1) = `GROUP`)$ or $(t(u.0) = `GROUP`$ et $t(u.1) = `COLL`)$}{
+        \ElseIf{$(t(u.0) = `COLL`$ et $t(u.1) = `GROUP`)$ ou $(t(u.0) = `GROUP`$ et $t(u.1) = `COLL`)$}{
             $group \gets u.l$ tel que $t(u.l) = `GROUP`$\;
             $coll \gets u.m$ tel que $t(u.m) = `COLL`$\;
 
@@ -284,7 +283,7 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
             }
             
             $\delElem(T, group)$\;
-            $\relationshipFound \gets$ \textsc{True}\;
+            $\relationshipFound \gets \textsc{True}$\;
         }
     }
 
@@ -295,38 +294,38 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \caption{findCollections($T$ = ($D$, $l$), minSupport)}
     \label{algo:struct:rewrite-findCollections}
 
-    $\collectionFound \gets \text{False}$
+    $\collectionFound \gets \textsc{False}$\;
 
     \ForEach{sous-arbre \st tel que $\st = T|_u$ et $t(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
-        $pos \gets |st|$\\
+        $pos \gets |st|$\;
 
         \tcp{Construction d'une collection de groupes ou de relations}
         \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $t|_{u.i} \in [x]$, $t(u.i) \in \{`GROUP`, `REL`\}$ et $|\subSet| \ge 2$}{
-            $\collectionFound \gets \text{True}$
-            $\insElem(T, `COLL`, u.pos)$
+            $\collectionFound \gets \textsc{True}$\;
+            $\insElem(T, `COLL`, u.pos)$\;
             \ForAll{$u.i \in \subSet$}{
-                $\insElem(T, T|_{u.i}, u.pos.0)$
-                $\delElem(T, \subPos)$
+                $\insElem(T, T|_{u.i}, u.pos.0)$\;
+                $\delElem(T, \subPos)$\;
             }
         }
 
         \tcp{Fusion de collections}
         \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $T|_{u.i} \in [x]$, $t(u.i) \in \{`COLL`\}$ et $|\subSet| \ge 2$}{
-            $\collectionFound \gets \text{True}$
-            $\insElem(T, `COLL`, u.pos)$
+            $\collectionFound \gets \textsc{True}$\;
+            $\insElem(T, `COLL`, u.pos)$\;
 
             \ForAll{$u.i.j$ tel que $u.i \in \subSet$}{
-                $\insElem(T, T|_{u.i.j}, u.pos.0)$
-                $\delElem(T, u.i.j)$
+                $\insElem(T, T|_{u.i.j}, u.pos.0)$\;
+                $\delElem(T, u.i.j)$\;
             }
         }
 
         \tcp{Ajout d'éléments à une collection}
         \ForAll{$group, coll$ tel que $\exists x, i, j$ où $t(u.i) = `GROUP`$, $t(u.j) = `COLL`$, $T|_{u.i} \in [x]$ et $\forall k T|_{u.j,k} \in [x]$}{
-            $\collectionFound \gets \text{True}$
-            $group\_pos = |T|_{u.j}|$
-            $\insElem(T, T|_{u.i}, u.j.group\_pos)$
-            $\delElem(T, u.i)$
+            $\collectionFound \gets \textsc{True}$\;
+            $group\_pos = |T|_{u.j}|$\;
+            $\insElem(T, T|_{u.i}, u.j.group\_pos)$\;
+            $\delElem(T, u.i)$\;
         }
     }
 

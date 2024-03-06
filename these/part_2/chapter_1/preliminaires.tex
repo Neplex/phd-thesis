@@ -133,12 +133,19 @@ La définition suivante formalise cette notion.
     Cela est formalisé par les règles de production suivantes en associant un attribut synthétisé $val$ au non terminal $P$ et en fournissant des règles pour calculer la valeur de l'attribut $val$ par rapport à la valeur de l'attribut $val'$ précédemment calculé et associé au côté droit de la règle de production.
     Dans les règles de production, les attributs sont indiqués en indice et les règles sémantiques sont présentées, entre crochet, à droite de la règle de production.
     La figure~\ref{fig:struct:parsetree-attr} montre, pour chaque niveau, la valeur calculé de l'attribut $val$ pour $0011$.
-    \begin{align*}
-        P_{val} & \to 0 & [val \gets 0] \\
-        P_{val} & \to 1 & [val \gets 1] \\
-        P_{val} & \to P_{val'}~0 & [val \gets 2 * val'] \\
-        P_{val} & \to P_{val'}~1 & [val \gets 2 * val' + 1]
-    \end{align*}
+    \begin{minipage}[b]{.45\textwidth}
+        \begin{align*}
+            P_{val} & \to 0 & [val \gets 0] \\
+            P_{val} & \to 1 & [val \gets 1]
+        \end{align*}
+    \end{minipage}
+    \quad
+    \begin{minipage}[b]{.45\textwidth}
+        \begin{align*}
+            P_{val} & \to P_{val'}~0 & [val \gets 2 * val'] \\
+            P_{val} & \to P_{val'}~1 & [val \gets 2 * val' + 1]
+        \end{align*}
+    \end{minipage}
 \end{example}
 
 Les grammaires \emph{S-attribuées} sont des grammaires attribuées qui contiennent uniquement des attributs synthétisés.
@@ -313,8 +320,9 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 \end{definition}
 
 \begin{example}[Règle de réécriture]
+    \label{ex:struct:rewriteRule}
     Étant donné la règle de réécriture $rule(u.i)$ et la contrainte $|\sigma(x)| = i$ donnée figure~\ref{fig:sch:pre:rewritting:ex-rule}.
-    $U$ représente le nœud à la position $u$ de l'arbre cible, $x \in V$ est une variable et $X, Y, A, B, C, D \in \Sigma$ représentent des étiquettes (des non-terminaux) de l'arbre.
+    $U$ représente le nœud à la position $u$ de l'arbre cible, $x \in V$ est une variable et $\{X, Y, A, B, C, D\} \subseteq \Sigma$ représentent des étiquettes (des non-terminaux) de l'arbre.
     La règle est applicable sur un arbre $T$ s'il existe un sous-arbre $t = T|_u$ avec une substitution $\sigma$ tel que $\sigma(x) = [t|_0, \dots, t|_{i-1}]$ et $l(u.i) = A$.
     %L'arbre de destination \gls{rhs} à une correspondance avec le modèle \gls{lhs}, ici intuitivement claire : $U \mapsto U$ et $x \mapsto x$.
     En cas d'application de la règle, le sous-arbre $A$ est supprimé de $T$.
@@ -388,3 +396,118 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
         \label{fig:sch:pre:rewritting:ex}
     \end{figure}
 \end{example}
+
+On introduit les opérations de réécriture d'arbre élémentaires qui seront utilisé dans ce chapitre.
+La première règle, $\textsf{ins\_elem}$ (figure~\ref{fig:sch:op:insElem}), permet l'insertion d'un nœud d'étiquette $A$ dans l'arbre $T$ à la position $u.i$.
+Comme discuté dans l'exemple~\ref{ex:struct:rewriteRule}, la condition $|\sigma(x)| = i$ assure qu'il y a $i$ éléments dans la haie $\sigma(x)$ impliquant que le nœud $A$ se trouve bien à la position $u.i$.
+Il n'y a aucunes contraintes sur $y$ qui a pour rôle de déplacer les éléments à droite de $A$.
+
+Les figures~\ref{fig:sch:op:delElemRoot} et \ref{fig:sch:op:delElem} présente la règle de réécriture $\textsf{del\_elem}$ utilisée pour supprimer un sous-arbre dans un arbre $T$ à une position donnée $u.i$.
+La règle est récursive : si l'on supprime l'unique enfant $a$ d'un nœud $b$, c'est le nœud $b$ qui est supprimé (figure~\ref{fig:sch:op:delElem}).
+Pour cela, on utilise la condition $|\sigma(x)| + |\sigma(y)| \neq 0$ pour vérifier si la substitution est non-vide.
+Si l'on se retrouve à devoir supprimer l'arbre au complet (figure~\ref{fig:sch:op:delElemRoot}), on le remplace par un arbre vide contenant uniquement le symbole racine $\lambda$.
+
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=4em}
+                [U
+                    [$x$]
+                    [$y$]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{lhs}}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.1\textwidth}
+        \centering
+        \Large{$\longrightarrow$}
+    \end{subfigure}
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=2em}
+                [U
+                    [$x$]
+                    [A]
+                    [$y$]
+                ]
+            \end{forest}
+        \end{adjustbox}
+        \caption*{\glsname*{rhs}}
+    \end{subfigure}
+    \caption[Règle $\textsf{ins\_elem}(T, A, u.i)$]{$\textsf{ins\_elem}(T, A, u.i)$ où $A \in \Sigma, |\sigma(x)| = i$}
+    \label{fig:sch:op:insElem}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \begin{minipage}[c]{.35\textwidth}
+        \centering
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    [T]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{lhs}}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.1\textwidth}
+            \centering
+            \Large{$\longrightarrow$}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    [$\lambda$]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{rhs}}
+        \end{subfigure}
+        \caption[Règle $\textsf{del\_elem}(T, \epsilon)$]{$\textsf{del\_elem}(T, \epsilon)$}
+        \label{fig:sch:op:delElemRoot}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{.55\textwidth}
+        \centering
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=2em}
+                    [U
+                        [$x$]
+                        [A]
+                        [$y$]
+                    ]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{lhs}}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.1\textwidth}
+            \centering
+            \Large{$\longrightarrow$}
+        \end{subfigure}
+        \begin{subfigure}[c]{0.4\textwidth}
+            \centering
+            \begin{adjustbox}{valign=c, max width=\textwidth}
+                \begin{forest}
+                    for tree={s sep=4em}
+                    [U
+                        [$x$]
+                        [$y$]
+                    ]
+                \end{forest}
+            \end{adjustbox}
+            \caption*{\glsname*{rhs}}
+        \end{subfigure}
+        \caption[Règle $\textsf{del\_elem}(T, u.i)$]{$\textsf{del\_elem}(T, u.i)$ où $|\sigma(x)| = i$ \\si $|\sigma(x)| + |\sigma(y)| \neq 0$, sinon $\textsf{del\_elem}(X, u)$}
+        \label{fig:sch:op:delElem}
+    \end{minipage}%
+\end{figure}

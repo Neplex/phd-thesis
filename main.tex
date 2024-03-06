@@ -69,6 +69,7 @@
 \usepackage{tikz-qtree}
 \usepackage{tikz-qtree-compat}
 \usepackage{pgfplots}
+\usepackage{pgfplotstable}
 \usepackage{forest}
 \usepackage{simplebnf}
 \usepackage{syntaxdi}
@@ -103,6 +104,8 @@
 % Algorithm2e
 \renewcommand{\CommentSty}[1]{\footnotesize\ttfamily\textcolor{Green}{#1}}
 \renewcommand{\KwSty}[1]{\textnormal{\textcolor{blue}{\bfseries #1}}\unskip}
+\renewcommand{\FuncSty}[1]{\textsf{#1}}
+\renewcommand{\ProcFnt}[1]{\textsf{#1}}
 
 \NewCommandCopy{\legacyunderscore}{\_}
 \renewcommand{\_}{\ifincsname_\else\legacyunderscore\fi}
@@ -156,6 +159,8 @@
 % Pgf
 \usepgfplotslibrary{units}
 \usepgfplotslibrary{colorbrewer}
+\usetikzlibrary{pgfplots.groupplots}
+
 \pgfplotsset{
     compat=newest,
     cycle list/Set1,
