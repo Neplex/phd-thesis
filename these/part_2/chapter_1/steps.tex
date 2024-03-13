@@ -774,6 +774,8 @@ La simplification des arbres est faite en deux étapes:
 \end{example}
 
 \subsection{Extraction de la grammaire}
+\label{sec:struct:steps:grammar}
+
 Pour réaliser la migration de l'instance d'une grammaire vers une autre, il est indispensable de pouvoir récupérer la grammaire à partir de l'instance afin de pouvoir la vérifier à l'aide de la méta-grammaire $\mathbb{G}$.
 Étant donné une instance $I$ reconnue par une grammaire $G$, il est possible de récupérer la grammaire $G$ à partir de $I$ en calculant l'arbre quotient $S$.
 Dans la suite, nous introduisons cette notion.
@@ -919,7 +921,7 @@ Elle a pour objectif d'associer à chaque classe successeur de $C$ une position 
 \end{function}
 
 \begin{remark}
-    Une classe d'équivalence peut apparaître comme successeur de différentes classes.
+    Une classe d'équivalence peut aussi apparaître comme successeur de différentes classes.
     Dans l'exemple~\ref{ex:struct:quotient:1}, $C_a$ apparaît comme successeur de $C_Y$ et de $C_X$.
     Dans ce cas, nous aurons différentes positions associées à $C_a$.
 \end{remark}
@@ -928,7 +930,6 @@ Elle a pour objectif d'associer à chaque classe successeur de $C$ une position 
 Cette construction commence par la racine qui représente la classe d'équivalence $C_{\lambda}$.
 Un ensemble $classes$ contenant des couples de la forme \textit{(classe d'équivalence, position dans $Q_T$)} guide la construction (ligne~\ref{algo:struct:quotient:QT:classes}).
 Ainsi, initialement, $classes$ contient le couple $(C_{\lambda}, \epsilon)$ et, par conséquent, l'arbre quotient est un nœud à la positon $\epsilon$ avec l'étiquette $\lambda$.
-
 Ensuite, pour chaque couple $(CL, u)$ extrait de $classes$, la fonction~\ref{algo:struct:quotient:QDom} calcule l'ensemble de ses couples successeurs, l'ajoute à l'ensemble $classes$ à la ligne~\ref{QT-ligne:updClasses}.
 La nouvelle position $u$ est ajoutée au domaine de $Q_T$.
 Dans les lignes~\ref{algo:struct:quotient:QT:plus} à~\ref{algo:struct:quotient:QT:fin} la fonction vérifie si la classe d'équivalence $CL$ contient plusieurs positions ayant le même père.

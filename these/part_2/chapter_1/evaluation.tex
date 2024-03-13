@@ -1,0 +1,302 @@
+Dans cette section, nous entreprenons une évaluation préliminaire critique de notre stratégie.
+Il est essentiel de noter qu'il n'existe pas de modèle universel pour évaluer la qualité d'une stratégie donnée.
+Comme mentionné précédemment, les approches discutées dans la littérature ne sont souvent pas directement comparables.
+De plus, l'accès au code source ou aux données utilisées pour reproduire ces expériences est souvent difficile, voire impossible.
+Par conséquent, notre objectif principal dans cette section est d'évaluer la stratégie que nous avons définie précédemment.
+Nous commençons par valider les procédures utilisées par rapport à cette stratégie en étudiant le comportement de la procédure~\ref{algo:struct:rewrite} dans la section~\ref{sec:struct:eval:algo}.
+Dans la suite, nous procédons à une analyse critique des résultats obtenus dans la section~\ref{sec:struct:eval:schema}.
+Cette analyse nous permettra d'identifier les points forts et les points faibles de notre approche.
+
+\subsection{Comportement de la réécriture}
+\label{sec:struct:eval:algo}
+
+L'analyse discutée ici utilise le corpus CAS~\cite{grabarCASFrenchCorpus2018}, un corpus textuel composé de cas cliniques réels et fictifs.
+Ce corpus est annoté manuellement par différents annotateurs avec \num{0} entités nommées réparties en \num{0} catégories.
+Les entités peuvent être imbriquées les unes dans les autres.
+L'analyse repose sur les paramètres d'expérience suivants :
+\begin{enumerate*}[label=(\roman*)]
+    \item on exécute l'algorithme sur un sous-ensemble du corpus composé de \num{150} phrases et \num{0} entités ;
+    \item on utilise l'indice de Jaccard comme présenté dans la section~\ref{sec:struct:equiv-classes} pour notre mesure de similarité avec
+    \item $\tau$ fixé à \num{0.5} et, pour finir,
+    \item on autorise \num{50} itérations de l'algorithme.
+\end{enumerate*}
+L'implémentation a été réalisée en \gls{python} et utilise \gls{corenlp} pour l'analyse syntaxique.
+Le code source du projet nécessaire pour la reproduction des expériences est disponible sur \gls{git}~\cite{}.
+Pour le corpus, \cite{grabarCASFrenchCorpus2018} donne les modalités d'accès aux données.
+
+À la fin de chaque itération de la procédure, on recherche (sans modifier la structure de l'arbre) les nœuds candidats pour être des \emph{relations} (des nœuds ayant exactement deux \emph{groupes} distincts comme enfants) ou des \emph{collections} (des nœuds ayant uniquement comme enfant des nœuds \emph{groupes} équivalents) qui ne nécessite pas de réécriture (il s'agit d'un simple nommage d'une structure valide).
+La recherche des nœuds \emph{relations} et \emph{collections} permet de mesurer à chaque itération leur nombre potentiel même si l'opération de réécriture associée ne s'est pas déclenchée.
+Pour la première itération, seul l'opération \ref{algo:struct:rewrite-findGroups} est effectuée pour permettre de comparer l'instance avant et après réécriture par les différentes opérations.
+La figure~\ref{figure:struct:xp:prod} montre le nombre de règles de production de la grammaire $G_i$ (\ref{figure:struct:xp:prod:prod}) avec la droite de tendance (\ref{figure:struct:xp:prod:prod-trend}).
+La courbe \ref{figure:struct:xp:prod:unlabelled} montre le nombre de nœuds non catégorisés et \ref{figure:struct:xp:prod:unlabelled-trend} est la droite de tendance.
+La partie basse du graphique indique l'opération de transformation appliquée pour chaque étape $i$ (\ref{figure:struct:xp:prod:op}).
+On rappelle que la procédure~\ref{algo:struct:rewrite} (page~\pageref{algo:struct:rewrite}) applique successivement un ensemble d'opérations qui sont numérotées comme suit et quelles sont classée par ordre de destruction :
+\begin{multicols}{2}
+    \begin{enumerate}
+        \item \ref{algo:struct:rewrite-findSubgroups}
+        \item \ref{algo:struct:rewrite-mergeGroups}
+        \item \ref{algo:struct:rewrite-findCollections} (groupes)
+        \item \ref{algo:struct:rewrite-findRelationship}
+        \item \ref{algo:struct:rewrite-findCollections} (relations)
+        \item \textsf{reduce} (bottom)
+        \item \textsf{reduce} (top)
+    \end{enumerate}
+\end{multicols}
+
+\begin{figure}[htb]
+    \centering
+    \begin{tikzpicture}
+        \begin{groupplot}[
+                group style={
+                        group size=1 by 2,
+                        xlabels at=edge bottom,
+                        xticklabels at=edge bottom,
+                        vertical sep=0pt
+                    },
+                enlarge x limits=.01,
+                xmin=1,
+                xmax=50,
+                xlabel={Etapes},
+                xtick align=outside,
+                ytick align=outside,
+                tickpos=left,
+                legend columns=-1,
+                legend style={draw=none, at={(0.5,-0.2)}, anchor=north},
+                width=\textwidth,
+            ]
+            \nextgroupplot[ylabel={Nombre de production}, height=.25\textheight]
+            
+            \addplot+[mark=*, cycle list shift=0] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_prod.csv}; \label{figure:struct:xp:prod:prod}
+            \addplot+[dashed, cycle list shift=0] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_prod.csv}; \label{figure:struct:xp:prod:prod-trend}
+            
+            \addplot+[mark=triangle*, cycle list shift=1] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_unlabelled.csv}; \label{figure:struct:xp:prod:unlabelled}
+            \addplot+[dashed, cycle list shift=1] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_unlabelled.csv}; \label{figure:struct:xp:prod:unlabelled-trend}
+            
+            \nextgroupplot[ybar, ymin=0, ymax=9, ylabel={Opération}, pattern=crosshatch, height=.15\textheight, bar width=.5em]
+            
+            \addplot+[nodes near coords, cycle list shift=2, fill] table [x=step, y expr={1 + \thisrow{value}}, col sep=comma] {these/part_2/chapter_1/eval/edit_op.csv}; \label{figure:struct:xp:prod:op}
+        \end{groupplot}
+    \end{tikzpicture}
+    \caption{Nombre de règles de productions qui compose la grammaire pour chaque étape de la procédure}
+    \label{figure:struct:xp:prod}
+\end{figure}
+
+Comme on traite un ensemble de phrases représentées par des arbres syntaxiques distincts, notre instance est vue comme une forêt enracinée.
+On applique les opérations de réécriture pour chaque phrase de façon indépendante.
+Le calcul des classes d'équivalence et du support est réalisé sur l'ensemble de la forêt.
+Seule l'opération~\ref{algo:struct:rewrite-findCollections} est capable de fusionner des collections entre plusieurs phrases.
+Traiter les phrases de façon indépendante permet de s'assurer que les groupements se font au sein d'une même phrase et donc d'une même unité sémantique.
+On ne construit donc pas des regroupements inter-phrases qui ne serait alors pas aligné sur la sémantique du texte.
+
+On remarque que la procédure proposée tend bien vers l'objectif de minimiser la taille de la grammaire de schéma tout en structurant l'instance.
+On passe ainsi de \num{178} règles de production différentes à \num{68}.
+Au terme des \num{50} itérations, seule \num{34} nœuds n'ont pas pu être catégorisés contre \num{155} au départ.
+À chaque plateau, c'est-à-dire quand, le nombre de règles de production reste stable, on peut voir qu'une opération plus destructrice (identifié par un nombre plus élevé) est utilisée.
+Ce phénomène se produit notamment aux étapes \numlist{22;26;27;28}.
+Les opérations les plus destructrices réduisent considérablement le nombre de règles de productions.
+% Cela est dû au fait que ces opérations suppriment des niveaux entiers non annotés de l'arbre d'instance, créant ainsi des sous-arbres ayant beaucoup d'enfants.
+Cependant, le résultat de ces opérations ne produit pas d'arbres valides ou fréquents et une restructuration est alors nécessaire.
+Aux étapes \numlist{23;24;29;30;31;32}, le nombre de règles de productions remonte alors rapidement, car la procédure ajoute les structures nécessaires à la bonne structuration, notamment par l'identification de collections au sein des sous-arbres nouvellement construits, ajoutant alors de nouvelles structures.
+
+\begin{figure}[htb]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                enlarge x limits=.01,
+                xmin=1,
+                xmax=50,
+                xlabel={Etapes},
+                xtick align=outside,
+                ytick align=outside,
+                tickpos=left,
+                legend columns=-1,
+                legend style={draw=none, at={(0.5,-0.2)}, anchor=north},
+                width=\textwidth,
+                ylabel={Nombre},
+                height=.3\textheight
+            ]
+            \addplot+[mark=*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_equiv_subtrees.csv}; \label{figure:struct:xp:ratio:equiv}
+            %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_equiv_subtrees.csv}; \label{figure:struct:xp:ratio:equiv-trend}
+
+            \addplot+[mark=triangle*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/group_ratio.csv}; \label{figure:struct:xp:ratio:group}
+            %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/group_ratio.csv}; \label{figure:struct:xp:ratio:group-trend}
+
+            \addplot+[mark=square*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/rel_ratio.csv}; \label{figure:struct:xp:ratio:rel}
+            %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/rel_ratio.csv}; \label{figure:struct:xp:ratio:rel-trend}
+
+            \addplot+[mark=+] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/coll_ratio.csv}; \label{figure:struct:xp:ratio:coll}
+            %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/coll_ratio.csv}; \label{figure:struct:xp:ratio:coll-trend}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Nombre d'individus moyen pour chaque catégorie (\emph{groupe}, \emph{relation}, \emph{collection})}
+    \label{figure:struct:xp:ratio}
+\end{figure}
+
+La figure~\ref{figure:struct:xp:ratio} permet de mettre en évidence la stratégie adoptée et de valider que l'algorithme tend bien vers l'objectif.
+La courbe~\ref{figure:struct:xp:ratio:equiv} montre le nombre de classes d'équivalences qui sont construite à chaque étape. %  (et la droite de tendance~\ref{figure:struct:xp:ratio:equiv-trend})
+On remarque que ce nombre diminue avec le temps (passant de \num{25} classes d'équivalence à \num{17}) ce qui signifie que les structures s'unifie au fur et à mesure des étapes et que les transformations opérées on permit de rapprocher deux groupes distincts.
+%Cela nous permet de voir que les groupes identifiés au démarrage continue de se retrouver dans la suite, mais avec des structures unifiées et montre que la procédure proposée, avec les paramètres choisis, maintient le partitionnement initial des données.
+
+Les courbes~\ref{figure:struct:xp:ratio:group}, \ref{figure:struct:xp:ratio:rel} et \ref{figure:struct:xp:ratio:coll} montre respectivement le nombre d'individus moyen pour chaque groupe, relation et collections. % (et leur droite de tendance associée~\ref{figure:struct:xp:ratio:group-trend}, \ref{figure:struct:xp:ratio:rel-trend} et \ref{figure:struct:xp:ratio:coll-trend})
+Malgré, la diminution du nombre de nœuds non étiquetés, on remarque que leur nombre reste plutôt stable.
+% La légère diminution du nombre d'individus pour les groupes peut s'expliquer par l'augmentation du nombre d'instances pour les relations.
+Au démarrage le nombre moyen d'individu est de \num{34.2} pour les groupes et de \num{2.2} pour les relations.
+À la fin de l'exécution, on obtient \num{29.8} individus en moyenne pour les groupes et \num{3} pour les relations.
+La diminution du nombre d'individus pour les groupes peut s'expliquer par leur promotion au rang de relations augmentant ainsi le nombre d'individus moyen par relation.
+Concernant la baisse du nombre d'individus pour les collections, cela s'explique par la fusion successive des collections.
+Au bout des \num{50} itérations, on obtient \num{1.4} individu par collections en moyenne.
+Dans l'idéal ce nombre devrait être à \num{1}, signifiant que toutes les collections ont bien été fusionnée les unes avec les autres.
+
+% Cela est corrélé avec le nombre de classes d'équivalence : moins de classes implique que les individus sont catégorisés dans une autre classe.
+% Cependant, l'augmentation générale montre aussi que la procédure ne construit pas une classe ou tout les indivis se retrouvent, mais qu'ils se repartissent bien entre les différents groupes créés.
+
+\begin{figure}[htb]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+                enlarge x limits=.01,
+                xmin=1,
+                xmax=50,
+                xlabel={Etapes},
+                xtick align=outside,
+                ytick align=outside,
+                tickpos=left,
+                legend columns=-1,
+                legend style={draw=none, at={(0.5,-0.2)}, anchor=north},
+                width=\textwidth,
+                ylabel={Nombre de structure},
+                height=.3\textheight
+            ]
+            \addplot+[mark=*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_group.csv}; \label{figure:struct:xp:nbElems:group}
+            %\addplot+[dashed, red] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_group.csv}; \label{figure:struct:xp:nbElems:group-trend}
+
+            \addplot+[mark=triangle*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_rel.csv}; \label{figure:struct:xp:nbElems:rel}
+            %\addplot+[dashed, green] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_rel.csv}; \label{figure:struct:xp:nbElems:rel-trend}
+
+            \addplot+[mark=square*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_coll.csv}; \label{figure:struct:xp:nbElems:coll}
+            %\addplot+[dashed, blue] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_coll.csv}; \label{figure:struct:xp:nbElems:coll-trend}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Nombre de structures remarquable différentes pour chaque catégorie (\emph{groupe}, \emph{relation}, \emph{collection})}
+    \label{figure:struct:xp:nbElems}
+\end{figure}
+
+La figure~\ref{figure:struct:xp:nbElems} montre le nombre de structures différentes pour chaque catégorie d'objets.
+C'est-à-dire que \ref{figure:struct:xp:nbElems:group} représente le nombre de groupes, \ref{figure:struct:xp:nbElems:rel} le nombre de relations et pour finir \ref{figure:struct:xp:nbElems:coll} le nombre de collections.
+Durant la première étape de la procédure, on est donc capable de construire \num{10} groupes différents et d'annoter \num{6} relations et \num{0} collections.
+Au bout de l'itération \num{28}, la procédure a construit \num{11} groupes, \num{8} relations et \num{15} collections.
+Il s'agit de l'itération qui contient le moins de règle de productions.
+Les itérations \numlist{29;30} fusionne les collections après la réduction de l'arbre par le haut exécuté durant l'itération \num{28}.
+On constate une chute importante du nombre de relations ou uniquement \num{2} relations sont identifiée avant qu'une troisième ne soit découverte à l'itération \num{31}.
+Cela peut s'expliquer par le changement au niveau des groupes, à l'itération \num{29} on passe de \num{15} à \num{10} groupes.
+La suppression de ces groupes implique la suppression des relations associées.
+Inversement le nombre d'individus moyen par relations augmente ce qui implique que deux classes d'équivalence correspondantes à das groupes ont fusionnées, entrainant alors la fusion de relations (on a donc moins de relations différentes, mais plus d'individus de cette relation).
+On constate le même phénomène à l'itération \num{21}.
+La procédure se termine avec \num{10} groupes, \num{3} relations et \num{12} collections.
+Passé les premières étapes, on remarque que le nombre de groupes et de collections reste stable.
+Cela montre que l'on a identifié une structure qui représente bien les données et que les étapes suivantes servent uniquement à supprimer ou à réécrire des structures dans l'instance sans impact majeur sur le schéma obtenue.
+
+\paragraph{Stratégie}
+La stratégie employée, qui vise à repérer les éléments fréquents, semble converger vers une solution satisfaisante.
+Cependant, elle est particulièrement sensible aux paramètres sélectionnés, tels que le support minimal ou $\tau$.
+La figure~\ref{fig:struct:eval:ex} illustre un exemple de l'échec de cette méthode sur le même jeu de données, avec $\tau = 0.7$ plutôt que $\tau=0.5$ comme mentionné précédemment.
+De manière intuitive, on pourrait espérer que l'opération \ref{algo:struct:rewrite-mergeGroups} fusionne le groupe 7 avec l'entité \emph{Anatomie}.
+Cependant, même si la structure de l'arbre suggère cette association, elle n'est pas réalisée.
+L'intégration de l'entité éloigne trop le nouveau groupe des autres instances, créant ainsi une autre catégorie d'équivalence dont le support est trop faible.
+Cela est notamment dû au fait que les éditions sont traité individuellement et non comme un ensemble.
+En effet, si l'ensemble des groupes de la classe d'équivalence était modifiées simultanément, cette association aurait peut-être était réalisée.
+
+\begin{figure}[H]
+    \centering
+    \begin{adjustbox}{valign=c, max width=.9\textwidth}
+        \begin{forest}
+            where n children=0{tier=word}{}
+            [$\dots$
+            [X
+                        [GROUP\_7 [$\dots$]]
+                        [ENT\_ANATOMIE [$\dots$]]
+                ]
+                [Y
+                        [GROUP\_7 [$\dots$]]
+                        [ENT\_ANATOMIE [$\dots$]]
+                ]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \caption{Exemple d'instance}
+    \label{fig:struct:eval:ex}
+\end{figure}
+
+Dans la suite, nous étudions la grammaire de schéma obtenue à l'issue de la procédure~\ref{algo:struct:rewrite}.
+
+\subsection{Étude critique de la grammaire obtenue}
+\label{sec:struct:eval:schema}
+
+Nous nous attardons ici sur une étude critique de la grammaire de schéma obtenue par réécriture successive des arbres syntaxiques.
+Avec les paramètres définis dans la section précédente, nous obtenons la grammaire de schéma suivante.
+Notez que ce schéma est obtenu à partir de l'instance construite par la procédure~\ref{algo:struct:rewrite} à laquelle on a supprimé les nœuds non étiquetés ainsi que les entités orphelines n'étant pas rattachées à un nœud \emph{groupe}.
+La grammaire est obtenue à l'aide de la procédure décrite dans la section~\ref{sec:struct:steps:grammar}.
+
+\begin{align*}
+    COLL_0                      \to & ~ GROUP_0^+                    & COLL_1                     \to & ~ GROUP_1^+                     \\
+    COLL_2                      \to & ~ GROUP_2^+                    & COLL_3                     \to & ~ GROUP_3^+                     \\
+    COLL_4                      \to & ~ GROUP_4^+                    & COLL_6                     \to & ~ GROUP_6^+                     \\
+    COLL_8                      \to & ~ GROUP_8^+                    & COLL_9                     \to & ~ GROUP_9^+                     \\
+    COLL_{10}                   \to & ~ GROUP_{10}^+                 & COLL_{11}                  \to & ~ GROUP_{11}^+                  \\
+    COLL_{11 \leftrightarrow 8} \to & ~ REL_{11 \leftrightarrow 8}^+ & COLL_{2 \leftrightarrow 6} \to & ~ REL_{2 \leftrightarrow 6}^+   \\
+    GROUP_0                     \to & ~ ENT_{Dose} ~ ENT_{Frequence} & GROUP_1                    \to & ~ ENT_{Examen} ~ ENT_{Valeur}   \\
+                                    & ~ ENT_{Mode} ~ ENT_{Substance}   & GROUP_2                    \to & ~ ENT_{Frequence}               \\
+                                    & ~ ENT_{Sosy} ~ ENT_{Traitement}  & GROUP_4                    \to & ~ ENT_{Anatomie} ~ ENT_{Examen} \\
+    GROUP_3                     \to & ~ ENT_{Dose} ~ ENT_{Examen}    &                                & ~ ENT_{Sosy}                      \\
+                                    & ~ ENT_{Sosy} ~ ENT_{Substance}   & GROUP_6                    \to & ~ ENT_{Dose}                    \\
+    GROUP_8                     \to & ~ ENT_{Examen} ~ ENT_{Sosy}    & GROUP_9                    \to & ~ ENT_{Mode}                    \\
+    GROUP_{10}                  \to & ~ ENT_{Substance}              & GROUP_{11}                 \to & ~ ENT_{Anatomie}                \\
+    REL_{10 \leftrightarrow 9}  \to & ~ GROUP_{10} ~ GROUP_9         & REL_{11 \leftrightarrow 8} \to & ~ GROUP_{11} ~ GROUP_8          \\
+    REL_{2 \leftrightarrow 6}   \to & ~ GROUP_2 ~ GROUP_6
+\end{align*}
+
+On remarque que le schéma obtenu, bien que peut intuitif, reste cependant cohérent avec les données.
+Le schéma est aussi valide par rapport à la méta-grammaire, on ne s'attardera donc pas sur les collections qui sont correctement construites.
+Pour chaque groupe une collection est bien construite, mais pour les relations, il manque la collection associée à la relation $REL_{10 \leftrightarrow 9}$.
+
+En analysant les groupes, nous constatons des associations prévisibles, telles que le groupe 1 (\emph{Examen}, \emph{Valeur}) qui représente le résultat d'un examen.
+%Ces entités sont souvent associées, comme illustré dans la phrase \enquote{} et peuvent parfois être imbriquées, comme dans la phrase \enquote{}.
+Certains groupes correspondent en réalité à ce qui serait intuitivement interprété comme une relation, par exemple le groupe 8 (\emph{Examen}, \emph{Sosy}) et le groupe 4 (\emph{Anatomie}, \emph{Examen}, \emph{Sosy}) qui représentent le lien entre un examen (groupe 1) et un symptôme.
+L'\emph{Anatomie} peut faire référence à la localisation de l'examen ou du symptôme.
+Étant donné que ces informations sont souvent interdépendantes et qu'il existe peu d'autres liens avec d'autres entités dans le corpus, il est cohérent de les regrouper ensemble.
+Cependant, il serait préférable de construire deux groupes distincts : un premier pour représenter l'examen (\emph{Examen}, \emph{Anatomie}) et un second pour représenter le symptôme (\emph{Sosy}, \emph{Anatomie}).
+Le lien entre ces deux groupes serait alors représenté par une relation.
+Les groupes 0 et 3 représentent tous deux une prescription médicale.
+Intuitivement, une prescription se compose d'un ensemble d'éléments (\emph{Traitement} ou \emph{Substance}, \emph{Dose}, \emph{Mode}, \emph{Fréquence}) pour un symptôme ou une maladie (\emph{Sosy}).
+Dans le corpus, un traitement est presque systématiquement associé à un symptôme.
+Si l'on considère les phrases de manière isolée, il est donc naturel de retrouver des phrases qui évoquent un examen montrant un symptôme (groupe 8) et des phrases explicites sur un traitement mis en place pour un symptôme (groupe 0).
+Du point de vue des bases de données, le symptôme pourrait être représenté comme une entité distincte et nous pourrions établir une relation entre l'examen et le symptôme, ainsi qu'entre le symptôme et le traitement.
+Sans information supplémentaire, il est approprié de regrouper ces éléments, étant donné que le symptôme est généralement représenté par une seule entité (parfois associée à une \emph{Anatomie} ou à une \emph{Valeur}).
+Cependant, si le symptôme était plus souvent représenté par un ensemble d'entités, la procédure de réécriture aurait pu favoriser la création de ce groupe et donc de relations par la suite.
+Cela serait d'autant plus probable si les symptômes pouvaient apparaître seuls, sans autres contextes.
+Cependant, il est à noter qu'un grand nombre de groupes sont unitaires.
+Pour les groupes 9 (\emph{Mode}), 10 (\emph{Substance}) et 11 (\emph{Anatomie}), cela reste cohérent, car il s'agit d'un ensemble fini de valeurs qui pourraient, dans un modèle relationnel, être enregistrées dans une table distincte et référencées par des clés étrangères.
+Cependant, cette observation est plus problématique pour les entités \emph{Dose} et \emph{Fréquence}.
+
+Pour les relations, seulement \num{3} ont été identifiées.
+La relation $11 \leftrightarrow 8$ entre les entités \emph{Anatomie} et le groupe 8 (\emph{Examen}, \emph{Sosy}), on remarque que cette association correspond en fait au groupe 4, mais n'a pas pu être construit à cause de l'ordre d'application des opérations de réécriture.
+Les relations $10 \leftrightarrow 9$ entre les entités \emph{Dose} et \emph{Substance} et la relation $2 \leftrightarrow 6$ entre \emph{Fréquence} et \emph{Dose}, font référence à un traitement et aurait donc du êtres traité comme le groupe 0.
+Cependant, comme les ensembles d'entités sont assez différents (en partie à cause de l'intégration de l'entité \emph{Sosy} au sein du groupe 0) le rapprochement n'a pas pu être fait.
+Cela met en avant une limitation de la procédure de réécriture, elle permet d'identifier des structures selon leurs usages et non de leur sémantique.
+C'est particulièrement le cas ici, car le groupement intuitif correspondant à un traitement contient beaucoup d'entités et que beaucoup ne sont pas toujours présentes.
+Donc bien que leur sémantique soit la même, leur similarité est relativement faible.
+L'utilisation d'une mesure de similarité contextuelle permet de corriger cela pour certains groupes, mais le groupe traitement est souvent beaucoup plus large que son contexte.
+Il serait intéressant d'expérimenter d'autres mesures de similarité pour essayer de corriger ce problème.
+L'utilisation de la procédure de réécriture sur un jeu de données ou les groupements sont plus petit et plus équilibrés pourrais aussi permettre d'obtenir de meilleurs résultats.
+
+Il convient de souligner que la procédure s'exécute sans connaissance préalable des données ni de leur sémantique intrinsèque, se fondant uniquement sur la structure de l'arbre.
+Les associations générées demeurent cohérentes par rapport aux textes et permettent de produire une structure homogène qui pourrait être interrogée ou utilisée pour des analyses ultérieures.
+De plus, cette instance peut être intégrée dans une base existence via un mappage de schéma.
+Il serait intéressant, dans le cadre de travaux futurs, de proposer des modifications à ces opérations, s'appuyant également sur les données afin d'éviter certaines redondances induites par le schéma produit.
+Il s'agit ici de détecter automatiquement si une entité correspond à un domaine infini ou à une collection finie auquel cas on s'intéresserait à construire des relations plutôt que des groupes.
+
+Comme l'algorithme travail directement sur l'instance, il est possible de guider la procédure vers un schéma donné en considérant une forêt composée d'arbre syntaxique enrichie issue de texte et d'arbre d'instance déjà structuré selon la modélisation souhaitée.
+Si l'instance structurée donnée est suffisamment représentée pour être considérée fréquente, la procédure tentera alors d'unifier l'instance issue du texte vers cette structure en ajoutant si besoin des éléments manquants.
+Dans un premier temps, on effectue une évaluation sans ajouter d'informations supplémentaires et on ajoutera par la suite une instance structurée.
+Afin d'obtenir un schéma plus intuitif, nous expérimentons ensuite la procédure sur une instance comprenant à la fois des textes et une structure déjà existante.
+Cette situation pourrait représenter une problématique d'intégration de données, où l'on tente d'intégrer différentes instances possédant des schémas différents.

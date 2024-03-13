@@ -88,6 +88,8 @@
 \usepackage{hyperxmp}
 \usepackage{minitoc}                 % Produce a TOC for all chapters
 
+%\usepackage[a-3u,ua,x-4]{pdfx}
+
 % Bib
 \selectbiblanguage{french}
 
@@ -159,11 +161,11 @@
 % Pgf
 \usepgfplotslibrary{units}
 \usepgfplotslibrary{colorbrewer}
-\usetikzlibrary{pgfplots.groupplots}
+\usepgfplotslibrary{groupplots}
 
 \pgfplotsset{
     compat=newest,
-    cycle list/Set1,
+    cycle list/Paired,
     scaled x ticks=false,
     scaled y ticks=false
 }
@@ -271,8 +273,6 @@
   unicode,
   breaklinks,
   bookmarksopen,
-  pdfapart=2,
-  pdfaconformance=B,
   pdflicenseurl={https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr},
   pdfauthor={Nicolas HIOT},
   pdfcontactaddress={419 Av. de France},

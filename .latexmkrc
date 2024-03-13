@@ -1,5 +1,8 @@
 $ENV{'TZ'}='Europe/Paris';
 
+$pdf_mode = 1;
+$make = "make -j4";
+
 add_cus_dep('glo', 'gls', 0, 'makeglossary');
 
 sub makeglossary{
