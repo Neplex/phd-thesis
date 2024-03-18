@@ -1,15 +1,31 @@
-\minitoc
-
 \section{Movie}
 
 \subsection{Description}
 
-\begin{figure}[H]
-    \caption{Schéma d'origine de la base \textit{Movie}}
-\end{figure}
+La base de données \emph{Movie} (\url{https://github.com/neo4j-graph-examples/movies}) est fournie par \gls{neo4j} et sert d'exemple pratique pour l'apprentissage de la syntaxe \gls{cypher} et l'exécution d'opérations courantes sur les bases de données graphes telles que l'interrogation, le filtrage et l'exploration des relations.
+La base de données contient des informations sur les films, les acteurs, les réalisateurs, les producteurs, les scénaristes, les critiques et leurs relations.
+Chaque entité \emph{Person} ou \emph{Movie} comprend plusieurs attributs.
+Les acteurs, réalisateurs, producteurs, scénaristes et critiques sont liés aux films par les relations : \emph{ActedIn}, \emph{Directed}, \emph{Produced}, \emph{Wrote} et  \emph{Reviewed}.
+Les relations \emph{ActedIn} et \emph{Reviewed} possèdent aussi des attributs.
 
 \begin{figure}[H]
-    \caption{Extrait de la base \textit{Movie} avec le modèle définit section~\ref{sec:update:db}}
+    \centering
+    \begin{adjustbox}{max width=.8\linewidth, max height=.5\textheight}
+        \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,block/.style={rectangle,align=center},node distance=4cm]
+            \node[draw] (person) {Person};
+            \node[draw, right = of person] (movie) {Movie};
+
+            \path
+            (person) edge [bend left=40] node [above] {ActedIn} (movie)
+            (person) edge [bend left=20] node [above] {Directed} (movie)
+            (person) edge node [above] {Produced} (movie)
+            (person) edge [bend right=20] node [above] {Wrote} (movie)
+            (person) edge [bend right=40] node [above] {Reviewed} (movie)
+            (person) edge [loop left] node {Follows} (person)
+            ;
+        \end{tikzpicture}
+    \end{adjustbox}
+    \caption{Schéma de la base \emph{Movie}}
 \end{figure}
 
 \subsection{Prédicats et contraintes}
@@ -18,58 +34,94 @@
     \centering
     \begin{adjustbox}{max width=\linewidth}
         \begin{tabular}{l|c|l|l}
-            Prédicat & Arité & Termes & Description \\
+            Prédicat   & Arité & Termes                               & Description                                      \\
             \hline
             \hline
-            $Movie$ & 4 & $id, year, title, subtitle$ & La description d'un film \\
-            $Person$ & 3 & $id, birthYear, name$ & La description d'une personne \\
-            $ActedIn$ & 3 & $actorId, movieId, role$ & Relie un acteur à un rôle dans un film \\
-            $Directed$ & 2 & $directorId, movieId$ & Relie un réalisateur à un film \\
-            $Produced$ & 2 & $producerId, movieId$ & Relie un producteur à un film \\
-            $Wrote$ & 2 & $authorId, movieId$ & Relie un scénariste à un film \\
-            $Reviewed$ & 4 & $reviewerId, movieId, score, review$ & Une critique sur un film, rattaché à l'auteur \\
-            $Follows$ & 2 & $followerId, personId$ & Décrit une relation de suivi entre les personnes \\
+            $Movie$    & 4     & $id, year, title, subtitle$          & La description d'un film                         \\
+            $Person$   & 3     & $id, birthYear, name$                & La description d'une personne                    \\
+            $ActedIn$  & 3     & $actorId, movieId, role$             & Relie un acteur à un rôle dans un film           \\
+            $Directed$ & 2     & $directorId, movieId$                & Relie un réalisateur à un film                   \\
+            $Produced$ & 2     & $producerId, movieId$                & Relie un producteur à un film                    \\
+            $Wrote$    & 2     & $authorId, movieId$                  & Relie un scénariste à un film                    \\
+            $Reviewed$ & 4     & $reviewerId, movieId, score, review$ & Une critique sur un film, rattaché à l'auteur    \\
+            $Follows$  & 2     & $followerId, personId$               & Décrit une relation de suivi entre les personnes \\
         \end{tabular}
     \end{adjustbox}
-    \caption{Description de la base \textit{Movie}}
+    \caption{Description de la base \emph{Movie}}
 \end{table}
 
 \begin{figure}[H]
     \centering
-    \begin{adjustbox}{max width=\linewidth,max height=.5\textheight}
+    \begin{adjustbox}{max width=\linewidth, max height=.5\textheight}
         \parbox{\linewidth}{\begin{align*}
-            Movie(movieId, year, title, subtitle) &\to ActedIn(actorId, movieId, role) \\
-            Movie(movieId, year, title, subtitle) &\to Directed(directorId, movieId) \\
-            Movie(movieId, year, title, subtitle) &\to Produced(producerId, movieId) \\
-            Movie(movieId, year, title, subtitle) &\to Reviewed(reviewerId, movieId, score, review) \\
-            Movie(movieId, year, title, subtitle) &\to Wrote(authorId, movieId) \\
-            ActedIn(actorId, movieId, role) &\to Person(actorId, birthYear, name) \\
-            ActedIn(actorId, movieId, role) &\to Movie(movieId, year, title, subtitle) \\
-            Directed(directorId, movieId) &\to Person(directorId, birthYear, name) \\
-            Directed(directorId, movieId) &\to Movie(movieId, year, title, subtitle) \\
-            Produced(producerId, movieId) &\to Person(producerId, birthYear, name) \\
-            Produced(producerId, movieId) &\to Movie(movieId, year, title, subtitle) \\
-            Wrote(authorId, movieId) &\to Person(authorId, birthYear, name) \\
-            Wrote(authorId, movieId) &\to Movie(movieId, year, title, subtitle) \\
-            Reviewed(reviewerId, movieId, score, review) &\to Person(reviewerId, birthYear, name) \\
-            Reviewed(reviewerId, movieId, score, review) &\to Movie(movieId, year, title, subtitle) \\
-            Follows(followerId, personId) &\to Person(followerId, birthYear, name) \\
-            Follows(followerId, personId) &\to Person(personId, birthYear, name)
-        \end{align*}}
+                Movie(movieId, year, title, subtitle)        & \to  ActedIn(actorId, movieId, role)              \\
+                                                             & \to  Directed(directorId, movieId)                \\
+                                                             & \to  Produced(producerId, movieId)                \\
+                                                             & \to  Reviewed(reviewerId, movieId, score, review) \\
+                                                             & \to Wrote(authorId, movieId)                      \\
+                ActedIn(actorId, movieId, role)              & \to Person(actorId, birthYear, name)              \\
+                                                             & \to Movie(movieId, year, title, subtitle)         \\
+                Directed(directorId, movieId)                & \to  Person(directorId, birthYear, name)          \\
+                                                             & \to  Movie(movieId, year, title, subtitle)        \\
+                Produced(producerId, movieId)                & \to  Person(producerId, birthYear, name)          \\
+                                                             & \to  Movie(movieId, year, title, subtitle)        \\
+                Wrote(authorId, movieId)                     & \to  Person(authorId, birthYear, name)            \\
+                                                             & \to  Movie(movieId, year, title, subtitle)        \\
+                Reviewed(reviewerId, movieId, score, review) & \to  Person(reviewerId, birthYear, name)          \\
+                                                             & \to  Movie(movieId, year, title, subtitle)        \\
+                Follows(followerId, personId)                & \to  Person(followerId, birthYear, name)          \\
+                                                             & \to  Person(personId, birthYear, name)
+            \end{align*}}
     \end{adjustbox}
-    \caption{Liste des contraintes de la base \textit{Movie}}
+    \caption{Liste des contraintes de la base \emph{Movie}}
 \end{figure}
 
 \section{GameOfThrone}
 
 \subsection{Description}
 
-\begin{figure}[H]
-    \caption{Schéma d'origine de la base \index{GOT}}
-\end{figure}
+La base de données \emph{GOT} \enquote{Game of Thrones} (\url{https://github.com/neo4j-graph-examples/graph-data-science}), fournie par \gls{neo4j}, est un exemple de démonstration pour leur bibliothèque \emph{Graph Data Science}, axée sur la détection des communautés et l'analyse des réseaux basé sur les travaux de \cite{beveridgeNetworkThrones2016}.
+Elle modélise les relations au sein du monde fictif de Westeros, tiré de la série de livres \enquote{A Song of Ice and Fire} de George R.R. Martin.
+Le graphe contient des nœuds \emph{Person}, représentant les personnages et des relations \emph{Interacts}, représentant les interactions entre les personnages.
+Une interaction se produit chaque fois que les noms (ou surnoms) de deux personnages apparaissent à moins de 15 mots l'un de l'autre dans le texte du livre.
+Pour chaque personnage, nous avons sons status, la maison auquel il appartient et les livres ou il est mentionné.
+Une partie du graphe modélise les batailles avec ses différents acteurs et la zone géographique ou elle prend place.
 
 \begin{figure}[H]
-    \caption{Extrait de la base \index{GOT} avec le modèle définit section~\ref{sec:update:db}}
+    \centering
+    \begin{adjustbox}{max width=.9\linewidth,max height=.5\textheight}
+        \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,block/.style={rectangle,align=center},node distance=2cm]
+            \node[draw] (person) {Person};
+            \node[draw, left = 4.5cm of person] (book) {Book};
+            \node[draw, right = 4.5cm of person] (battle) {Battle};
+            \node[draw, above = of battle] (house) {House};
+            \node[draw, below = of battle] (region) {Region};
+            \node[draw, right = of region] (location) {Location};
+            \node[draw, above = of book] (status) {Status};
+            \node[draw, below = of book] (culture) {Culture};
+
+            \path
+            (person) edge [bend left=20] node [below] {AppearedIn} (book)
+            (person) edge [bend right=20] node [above] {DiedIn} (book)
+            (person) edge [bend left] node [above left] {BelongsTo} (house)
+            (person) edge [bend right] node [above right] {HasStatus} (status)
+            (person) edge [bend left] node [below right] {MemberOfCulture} (culture)
+            (person) edge [loop above] node [above] {Interacts} (person)
+            (person) edge [loop below] node [below] {RelatedTo} (person)
+            (person) edge [bend left=30] node [above] {DefenderCommander} (battle)
+            (person) edge [bend left=10] node [above] {DefenderKing} (battle)
+            (person) edge [bend right=30] node [below] {AttackerCommander} (battle)
+            (person) edge [bend right=10] node [below] {AttackerKing} (battle)
+            (house) edge [bend left=10] node [right, near start] {Defender} (battle)
+            (house) edge [bend right=10] node [left, near start] {Attacker} (battle)
+            (battle) edge node [above right] {IsIn} (location)
+            (battle) edge node [left] {IsIn} (region)
+            (location) edge [loop above] node [above] {IsIn} (location)
+            (location) edge node [above] {IsIn} (region)
+            ;
+        \end{tikzpicture}
+    \end{adjustbox}
+    \caption{Schéma de la base \index{GOT}}
 \end{figure}
 
 \subsection{Prédicats et contraintes}
@@ -78,103 +130,143 @@
     \centering
     \begin{adjustbox}{max width=\linewidth}
         \begin{tabular}{l|c|l|l}
-            Prédicat & Arité & Termes & Description \\
+            Prédicat            & Arité & Termes                                    & Description                               \\
             \hline
             \hline
+            $Book$              & 3     & $bookId, name, bookNumber$                & La description d'un livre                 \\
+            $House$             & 2     & $houseId, name$                           & La description d'une maison               \\
+                                &       & $personId, age, birthYear, deathChapter,$ &                                           \\
+            $Person$            & 10    & $introChapter, community,deathYear,$      & La description d'une personne             \\
+                                &       & $gender, name, title$                     &                                           \\
+                                &       & $battleId, attackerSize, battleType,$     &                                           \\
+            $Battle$            & 10    & $defenderSize, majorCapture, majorDeath,$ & La description d'une bataille             \\
+                                &       & $name, note, summer, year$                &                                           \\
+            $Status$            & 2     & $statusId, name$                          & La description d'un statut                \\
+            $Culture$           & 2     & $cultureId, name$                         & La description d'une culture              \\
+            $Region$            & 1     & $regionName$                              & Une région                                \\
+            $Location$          & 1     & $locationName$                            & Un lieu                                   \\
+            $Defender$          & 3     & $houseId, battleId, outcome$              & Une maison défendant dans une bataille    \\
+            $Attacker$          & 3     & $houseId, battleId, outcome$              & Une maison attaquant dans une bataille    \\
+            $DefenderCommander$ & 2     & $personId, battleId$                      & Le commandant défendant dans une bataille \\
+            $AttackerCommander$ & 2     & $personId, battleId$                      & Le commandant attaquant dans une bataille \\
+            $DefenderKing$      & 2     & $personId, battleId$                      & Le roi défendant dans une bataille        \\
+            $AttackerKing$      & 2     & $personId, battleId$                      & Le roi attaquant dans une bataille        \\
+            $AppearedIn$        & 2     & $personId, bookId$                        & Un personnage est apparu dans un livre    \\
+            $DiedIn$            & 2     & $personId, bookId$                        & Un personnage est mort dans un livre      \\
+            $HasStatus$         & 2     & $personId, statusId$                      & Un personnage a un certain statut         \\
+            $BelongsTo$         & 2     & $personId, houseId$                       & Un personnage appartient à une maison     \\
+            $MemberOfCulture$   & 2     & $personId, cultureId$                     & Un personnage est membre d'une culture    \\
+            $Interacts$         & 4     & $personId, otherId, bookId, weight$       & Interaction entre deux personnages        \\
+            $RelatedTo$         & 3     & $personId, otherId, relationName$         & Relation entre deux personnages           \\
+            $IsIn$              & 2     & $id, locationId$                          & Une bataille se déroule dans un lieu      \\
+                                &       &                                           & ou un lieu est dans un autre              \\
         \end{tabular}
     \end{adjustbox}
-    \caption{Description de la base \textit{GOT}}
+    \caption{Description de la base \emph{GOT}}
 \end{table}
 
 \begin{figure}[H]
     \centering
     \begin{adjustbox}{max width=\linewidth,max height=.5\textheight}
         \parbox{\linewidth}{\begin{align*}
-            AppearedIn(personId, bookId) &\to Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            AppearedIn(personId, bookId) &\to Book(bookId, name, bookNumber) \\
-            BelongsTo(personId, houseId) &\to Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            BelongsTo(personId, houseId) &\to House(houseId, name) \\
-            Defender(houseId, bookId, outcome) &\to House(houseId, name) \\
-            Defender(houseId, bookId, outcome) &\to Battle(bookId, attackerSize, battleType, defenderSize, majorCapture, majorDeath, name, note, summer, year) \\
-            DiedIn(personId, bookId) &\to Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            DiedIn(personId, bookId) &\to Book(bookId, name, bookNumber) \\
-            HasStatus(personId, statusId) &\to Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            HasStatus(personId, statusId) &\to Status(statusId, name) \\
-            Interacts(personId, otherId, bookId, weight) &\to Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            Interacts(personId, otherId, bookId, weight) &\to Person(otherId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            Interacts(personId, otherId, bookId, weight) &\to Book(bookId, name, bookNumber) \\
-            MemberOfCulture(personId, cultureId) &\to Person(otherId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            MemberOfCulture(personId, cultureId) &\to Culture(cultureId, name) \\
-            RelatedTo(personId, otherId, relationName) &\to Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            RelatedTo(personId, otherId, relationName) &\to Person(otherId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) \\
-            Culture(cultureId, name) &\to MemberOfCulture(personId, cultureId) \\
-            House(houseId, name) &\to BelongsTo(personId, houseId)
-        \end{align*}
-        \begin{align*}
-            Battle(bookId, attackerSize, battleType, defenderSize, majorCapture, majorDeath, name, note, summer, year) &\to Defender(houseId, bookId, outcome) \\
-            Battle(bookId, attackerSize, battleType, defenderSize, majorCapture, majorDeath, name, note, summer, year) &\to IsIn(bookId, locationId) \\
-            Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) &\to AppearedIn(personId, bookId) \\
-            Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) &\to BelongsTo(personId, houseId) \\
-            Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) &\to HasStatus(personId, statusId) \\
-            Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) &\to MemberOfCulture(personId, cultureId) \\
-            Person(personId, age, birthYear, deathChapter, introChapter, community, deathYear, gender, name, title) &\to Region(personId, regionName)
-        \end{align*}}
+                AppearedIn(personId, bookId)                 & \to Person(personId, \dots)        \\
+                                                             & \to Book(bookId, name, bookNumber) \\
+                BelongsTo(personId, houseId)                 & \to Person(personId, \dots)        \\
+                                                             & \to House(houseId, name)           \\
+                Attacker(houseId, battleId, outcome)         & \to House(houseId, name)           \\
+                                                             & \to Battle(battleId, \dots)        \\
+                Defender(houseId, battleId, outcome)         & \to House(houseId, name)           \\
+                                                             & \to Battle(battleId, \dots)        \\
+                DiedIn(personId, bookId)                     & \to Person(personId, \dots)        \\
+                                                             & \to Book(bookId, name, bookNumber) \\
+                HasStatus(personId, statusId)                & \to Person(personId, \dots)        \\
+                                                             & \to Status(statusId, name)         \\
+                Interacts(personId, otherId, bookId, weight) & \to Person(personId, \dots)        \\
+                                                             & \to Person(otherId, \dots)         \\
+                                                             & \to Book(bookId, name, bookNumber) \\
+                MemberOfCulture(personId, cultureId)         & \to Person(otherId, \dots)         \\
+                                                             & \to Culture(cultureId, name)       \\
+                RelatedTo(personId, otherId, relationName)   & \to Person(personId, \dots)        \\
+                                                             & \to Person(otherId, \dots)
+            \end{align*}}
     \end{adjustbox}
-    \caption{Liste des contraintes de la base \textit{GOT}}
+    \caption{Liste des contraintes de la base \emph{GOT}}
+\end{figure}
+
+\begin{figure}[H]
+    \ContinuedFloat
+    \centering
+    \begin{adjustbox}{max width=\linewidth,max height=.5\textheight}
+        \parbox{\linewidth}{\begin{align*}
+                Culture(cultureId, name) & \to MemberOfCulture(personId, cultureId) \\
+                House(houseId, name)     & \to BelongsTo(personId, houseId)         \\
+                Battle(battleId, \dots)  & \to Attacker(houseId, battleId, outcome) \\
+                                         & \to Defender(houseId, battleId, outcome) \\
+                                         & \to IsIn(battleId, locationId)           \\
+                Person(personId, \dots)  & \to AppearedIn(personId, bookId)         \\
+                                         & \to BelongsTo(personId, houseId)         \\
+                                         & \to HasStatus(personId, statusId)        \\
+                % & \to  Region(personId, regionName)                                \\
+                                         & \to MemberOfCulture(personId, cultureId)
+            \end{align*}}
+    \end{adjustbox}
+    \caption{Liste des contraintes de la base \emph{GOT}}
 \end{figure}
 
 \section{Social}
 
 \subsection{Description}
 
-\textit{Social} est un graphe généré artificiellement par \gls{ldbc} pour l'évaluation d'algorithmes sur les graphes.
+\emph{Social} (\url{https://ldbcouncil.org/benchmarks/snb/}), ou \gls{ldbcsnb} est un graphe non attribué et généré artificiellement par le \glsfirst{ldbc} pour l'évaluation d'algorithmes sur les graphes.
 Ce graphe représente un réseau social avec des collections de postes, des commentaires, etc.
+Cette base est utilisée pour l'évaluation des systèmes de gestion de bases de données.
+Les benchmarks sur la base \glsfirst{ldbcsnb} regroupes deux catégories :
+\begin{description}
+    \item[L'informatique décisionnelle] qui se concentre sur des requêtes complexes, comprenant beaucoup d'agrégation et de jointure touchant une grande partie du graphe avec des micro-lots d'opérations d'insertion/suppression.
+    \item[Une utilisation interactive] qui capture un scénario de traitement transactionnel des graphes avec des requêtes de lecture complexes qui accèdent au voisinage d'un nœud donné dans le graphe et des opérations de mise à jour qui insèrent continuellement de nouvelles données dans le graphe.
+\end{description}
 
 \begin{figure}[H]
     \centering
-    \begin{adjustbox}{max width=\linewidth,max height=.5\textheight}
+    \begin{adjustbox}{max width=.9\linewidth, max height=.5\textheight}
         \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,block/.style={rectangle,align=center},node distance=2.5cm]
             \node[draw] (forum) {Forum};
-            \node[draw, right = of forum] (person) {Person};
+            \node[draw, right = 4cm of forum] (person) {Person};
             \node[draw, below = of person] (post) {Post};
-            \node[draw, right = of post] (comment) {Comment};
-            \node[draw, above = of comment] (place) {Place};
+            \node[draw, right = 4cm of person] (place) {Place};
+            \node[draw, below = of place] (comment) {Comment};
             \node[draw, above = of place] (org) {Org};
             \node[draw, below = of forum] (tag) {Tag};
             \node[draw, below = of tag] (tagclass) {TagClass};
 
             \path
-            (forum) edge node [below] {ContainerOf} (post)
+            (forum) edge node [below left, near end] {ContainerOf} (post)
             (forum) edge [bend left=10] node [above] {HasMember} (person)
             (forum) edge [bend right=10] node [below] {HasModerator} (person)
-            (forum) edge node [left] {HasTag} (tag)
-            (post) edge [bend left=10] node [left,near end] {HasCreator} (person)
-            (post) edge [bend right=100,looseness=3,in=300,out=270] node [below left] {IsLocatedIn} (place)
+            (forum) edge node [right] {HasTag} (tag)
+            (post) edge [bend left=15] node [left, near end] {HasCreator} (person)
+            (post) edge [bend right=100,looseness=2.5,in=300,out=270] node [above left] {IsLocatedIn} (place)
             (post) edge node {HasTag} (tag)
             (comment) edge node [below] {ReplyOf} (post)
             (comment) edge [loop right] node [below left=.5cm] {ReplyOf} (comment)
-            (comment) edge [bend right=10] node [above right,near end] {HasCreator} (person)
+            (comment) edge [bend right=10] node [above right] {HasCreator} (person)
             (comment) edge node [right] {IsLocatedIn} (place)
             (comment) edge [bend left] node [below] {HasTag} (tag)
             (person) edge [loop above] node {Knows} (person)
-            (person) edge [bend right=80,looseness=2.5,in=280] node [above right] {HasInterest} (tag)
-            (person) edge [bend left=10] node [above left,near end] {WorkAt} (org)
-            (person) edge [bend right=10] node [right] {StudyAt} (org)
-            (person) edge [bend left=10] node [right,near end] {Likes} (post)
-            (person) edge [bend right=10] node [below,near start] {Likes} (comment)
+            (person) edge [bend right=80,looseness=2,in=280] node [below right] {HasInterest} (tag)
+            (person) edge [bend left=10] node [above left] {WorkAt} (org)
+            (person) edge [bend right=10] node [below right] {StudyAt} (org)
+            (person) edge [bend left=15] node [right,near end] {Likes} (post)
+            (person) edge [bend right=10] node [below left,near end] {Likes} (comment)
             (person) edge node [above] {IsLocatedIn} (place)
-            (org) edge node [above right] {IsLocatedIn} (place)
-            (tag) edge node [left] {HasType} (tagclass)
+            (org) edge node [below right] {IsLocatedIn} (place)
+            (tag) edge node [right] {HasType} (tagclass)
             (tagclass) edge [loop right] node {IsSubclassOf} (tagclass)
             (place) edge [loop right] node {IsPartOf} (place)
             ;
-            \end{tikzpicture}
-        \end{adjustbox}
-    \caption{Schéma d'origine de la base \textit{Social}}
-\end{figure}
-
-\begin{figure}[H]
-    \caption{Extrait de la base \textit{Social} avec le modèle définit section~\ref{sec:update:db}}
+        \end{tikzpicture}
+    \end{adjustbox}
+    \caption{Schéma de la base \emph{Social}}
 \end{figure}
 
 \subsection{Prédicats et contraintes}
@@ -183,78 +275,88 @@ Ce graphe représente un réseau social avec des collections de postes, des comm
     \centering
     \begin{adjustbox}{max width=\linewidth}
         \begin{tabular}{l|c|l|l}
-            Prédicat & Arité & Termes & Description \\
+            Prédicat       & Arité & Termes                   & Description                                              \\
             \hline
             \hline
-            $Forum$ & 1 & $forum$ & Un forum qui contient un ensemble de posts \\
-            $Post$ & 1 & $post$ & Un poste dans un forum \\
-            $Comment$ & 1 & $comment$ & Un commentaire à un poste \\
-            $Tag$ & 1 & $tag$ & Un label apposé sur un poste ou un forum \\
-            $TagClass$ & 1 & $class$ & Un type de label \\
-            $Person$ & 1 & $person$ & Une personne \\
-            $Organisation$ & 1 & $org$ & Une entreprise, un organisme, une université \\
-            $Place$ & 1 & $place$ & Un lieu ville/région/pays/continent \\
-            $HasCreator$ & 2 & $commentOrPost, person$ & Lie un commentaire ou un poste a son auteur \\
-            $ContainerOf$ & 2 & $forum, post$ & Lie un poste au forum dans lequel il est présent \\
-            $ReplyOf$ & 2 & $comment, commentOrPost$ & Lie un commentaire au poste/commentaire auquel il répond \\
-            $IsLocatedIn$ & 2 & $x, place$ & Donne la localisation d'un objet ou d'une personne \\
-            $Knows$ & 2 & $person1, person2$ & Deux personnes se connaissent \\
-            $HasInterest$ & 2 & $person, tag$ & Une personne qui est intéressée par un topique \\
-            $HasMember$ & 2 & $forul, person$ & Une personne est membre d'un forum \\
-            $WorkAt$ & 2 & $person, org$ & L'emploi d'une personne \\
-            $StudyAt$ & 2 & $person, org$ & Les études d'une personne \\
-            $IsSubclassOf$ & 2 & $subClass, superClass$ & Une relation hiérarchique entre les types de labels \\
-            $IsPartOf$ & 2 & $subPlace, place$ & Une relation d'inclusion entre les lieux (Paris est dans la France) \\
-            $HasType$ & 2 & $tag, superClass$ & Lie un label a son type \\
+            $Forum$        & 1     & $forum$                  & Un forum qui contient un ensemble de posts               \\
+            $Post$         & 1     & $post$                   & Un poste dans un forum                                   \\
+            $Comment$      & 1     & $comment$                & Un commentaire à un poste                                \\
+            $Tag$          & 1     & $tag$                    & Un label apposé sur un poste ou un forum                 \\
+            $TagClass$     & 1     & $class$                  & Un type de label                                         \\
+            $Person$       & 1     & $person$                 & Une personne                                             \\
+            $Organisation$ & 1     & $org$                    & Une entreprise, un organisme, une université             \\
+            $Place$        & 1     & $place$                  & Un lieu ville/région/pays/continent                      \\
+            $HasCreator$   & 2     & $commentOrPost, person$  & Lie un commentaire ou un poste a son auteur              \\
+            $ContainerOf$  & 2     & $forum, post$            & Lie un poste au forum dans lequel il est présent         \\
+            $ReplyOf$      & 2     & $comment, commentOrPost$ & Lie un commentaire au poste/commentaire auquel il répond \\
+            $IsLocatedIn$  & 2     & $x, place$               & Donne la localisation d'un objet ou d'une personne       \\
+            $Knows$        & 2     & $person1, person2$       & Deux personnes se connaissent                            \\
+            $HasInterest$  & 2     & $person, tag$            & Une personne qui est intéressée par un topique           \\
+            $HasMember$    & 2     & $forul, person$          & Une personne est membre d'un forum                       \\
+            $WorkAt$       & 2     & $person, org$            & L'emploi d'une personne                                  \\
+            $StudyAt$      & 2     & $person, org$            & Les études d'une personne                                \\
+            $IsSubclassOf$ & 2     & $subClass, superClass$   & Une relation hiérarchique entre les types de labels      \\
+            $IsPartOf$     & 2     & $subPlace, place$        & Une relation d'inclusion entre les lieux                 \\
+            $HasType$      & 2     & $tag, superClass$        & Lie un label a son type                                  \\
         \end{tabular}
     \end{adjustbox}
-    \caption{Description de la base \textit{Social}}
+    \caption{Description de la base \emph{Social}}
 \end{table}
 
 \begin{figure}[H]
     \centering
     \begin{adjustbox}{max width=\linewidth,max height=.5\textheight}
         \parbox{\linewidth}{\begin{align*}
-            Comment(comment) &\to HasCreator(comment, person) \\
-            Comment(comment) &\to ReplyOf(comment, commentOrPost) \\
-            Comment(comment) &\to IsLocatedIn(comment, place) \\
-            ReplyOf(comment, commentOrPost) &\to Comment(comment) \\
-            Post(post) &\to ContainerOf(forum, post) \\
-            Post(post) &\to HasCreator(post, person) \\
-            Post(post) &\to IsLocatedIn(post, place) \\
-            ContainerOf(forum, post) &\to Forum(forum) \\
-            ContainerOf(forum, post) &\to Post(post) \\
-            HasMember(forum, person) &\to Forum(forum) \\
-            HasMember(forum, person) &\to Person(person) \\
-            HasModerator(forum, person) &\to Forum(forum) \\
-            HasModerator(forum, person) &\to Person(person) \\
-            HasCreator(commentOrPost, person) &\to Person(person) \\
-            HasInterest(person, tag) &\to Person(person) \\
-            HasInterest(person, tag) &\to Tag(tag) \\
-            Knows(person, other) &\to Person(person) \\
-            Knows(person, other) &\to Person(other) \\
-            Knows(person, other) &\to Knows(other, person) \\
-            Likes(person, commentOrPost) &\to Person(person) \\
-            WorkAt(person, org) &\to Person(person) \\
-            WorkAt(person, org) &\to Organisation(org) \\
-            StudyAt(person, org) &\to Person(person) \\
-            StudyAt(person, org) &\to Organisation(org) \\
-            Organisation(org) &\to IsLocatedIn(org, place) \\
-            TagClass(class) &\to IsSubclassOf(class, `tagclass:0`) \\
-            IsSubclassOf(subClass, superClass) &\to TagClass(subClass) \\
-            IsSubclassOf(subClass, superClass) &\to TagClass(superClass) \\
-            HasTag(something, tag) &\to Tag(tag) \\
-            Tag(tag) &\to HasType(tag, `tagclass:0`) \\
-            HasType(tag, class) &\to Tag(tag) \\
-            HasType(tag, class) &\to TagClass(class) \\
-            IsLocatedIn(something, place) &\to Place(place) \\
-            Place(place) &\to IsPartOf(place, `place:0`) \\
-            IsPartOf(subPlace, place) &\to Place(subPlace) \\
-            IsPartOf(subPlace, place) &\to Place(place) \\
-            Post(post), HasCreator^-(post, person), ContainerOf(forum, post) &\to HasMember(forum, person) \\
-            IsSubclassOf^-(subClass, class), IsSubclassOf(class, superClass) &\to IsSubclassOf(subClass, superClass) \\
-            HasType(tag, subClass)^-, IsSubclassOf(subClass, superClass) &\to HasType(tag, superClass)
-        \end{align*}}
+                Comment(comment)                  & \to HasCreator(comment, person)     \\
+                                                  & \to ReplyOf(comment, commentOrPost) \\
+                                                  & \to IsLocatedIn(comment, place)     \\
+                ReplyOf(comment, commentOrPost)   & \to Comment(comment)                \\
+                Post(post)                        & \to ContainerOf(forum, post)        \\
+                                                  & \to HasCreator(post, person)        \\
+                                                  & \to IsLocatedIn(post, place)        \\
+                ContainerOf(forum, post)          & \to Forum(forum)                    \\
+                                                  & \to Post(post)                      \\
+                HasMember(forum, person)          & \to Forum(forum)                    \\
+                                                  & \to Person(person)                  \\
+                HasModerator(forum, person)       & \to Forum(forum)                    \\
+                                                  & \to Person(person)                  \\
+                HasCreator(commentOrPost, person) & \to Person(person)                  \\
+                HasInterest(person, tag)          & \to Person(person)                  \\
+                                                  & \to Tag(tag)                        \\
+                Knows(person, other)              & \to Person(person)                  \\
+                                                  & \to Person(other)                   \\
+                                                  & \to Knows(other, person)            \\
+                WorkAt(person, org)               & \to Person(person)                  \\
+                                                  & \to Organisation(org)               \\
+                Likes(person, commentOrPost)      & \to Person(person)
+            \end{align*}}
     \end{adjustbox}
-    \caption{Liste des contraintes de la base \textit{Social}}
+    \caption{Liste des contraintes de la base \emph{Social}}
+\end{figure}
+
+\begin{figure}[H]
+    \ContinuedFloat
+    \centering
+    \begin{adjustbox}{max width=\linewidth,max height=.5\textheight}
+        \parbox{\linewidth}{\begin{align*}
+                StudyAt(person, org)                                             & \to Person(person)                     \\
+                                                                                 & \to Organisation(org)                  \\
+                Organisation(org)                                                & \to IsLocatedIn(org, place)            \\
+                TagClass(class)                                                  & \to IsSubclassOf(class, `tagclass:0`)  \\
+                IsSubclassOf(subClass, superClass)                               & \to TagClass(subClass)                 \\
+                                                                                 & \to TagClass(superClass)               \\
+                HasTag(something, tag)                                           & \to Tag(tag)                           \\
+                Tag(tag)                                                         & \to HasType(tag, `tagclass:0`)         \\
+                HasType(tag, class)                                              & \to Tag(tag)                           \\
+                                                                                 & \to TagClass(class)                    \\
+                IsLocatedIn(something, place)                                    & \to Place(place)                       \\
+                Place(place)                                                     & \to IsPartOf(place, `place:0`)         \\
+                IsPartOf(subPlace, place)                                        & \to Place(subPlace)                    \\
+                                                                                 & \to Place(place)                       \\
+                Post(post), HasCreator^-(post, person), ContainerOf(forum, post) & \to HasMember(forum, person)           \\
+                IsSubclassOf^-(subClass, class), IsSubclassOf(class, superClass) & \to IsSubclassOf(subClass, superClass) \\
+                HasType(tag, subClass)^-, IsSubclassOf(subClass, superClass)     & \to HasType(tag, superClass)
+            \end{align*}}
+    \end{adjustbox}
+    \caption{Liste des contraintes de la base \emph{Social}}
 \end{figure}
