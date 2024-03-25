@@ -278,16 +278,16 @@ Cependant, il est à noter qu'un grand nombre de groupes sont unitaires.
 Pour les groupes 9 (\emph{Mode}), 10 (\emph{Substance}) et 11 (\emph{Anatomie}), cela reste cohérent, car il s'agit d'un ensemble fini de valeurs qui pourraient, dans un modèle relationnel, être enregistrées dans une table distincte et référencées par des clés étrangères.
 Cependant, cette observation est plus problématique pour les entités \emph{Dose} et \emph{Fréquence}.
 
-Pour les relations, seulement \num{3} ont été identifiées.
-La relation $11 \leftrightarrow 8$ entre les entités \emph{Anatomie} et le groupe 8 (\emph{Examen}, \emph{Sosy}), on remarque que cette association correspond en fait au groupe 4, mais n'a pas pu être construit à cause de l'ordre d'application des opérations de réécriture.
-Les relations $10 \leftrightarrow 9$ entre les entités \emph{Dose} et \emph{Substance} et la relation $2 \leftrightarrow 6$ entre \emph{Fréquence} et \emph{Dose}, font référence à un traitement et aurait donc du êtres traité comme le groupe 0.
-Cependant, comme les ensembles d'entités sont assez différents (en partie à cause de l'intégration de l'entité \emph{Sosy} au sein du groupe 0) le rapprochement n'a pas pu être fait.
-Cela met en avant une limitation de la procédure de réécriture, elle permet d'identifier des structures selon leurs usages et non de leur sémantique.
-C'est particulièrement le cas ici, car le groupement intuitif correspondant à un traitement contient beaucoup d'entités et que beaucoup ne sont pas toujours présentes.
-Donc bien que leur sémantique soit la même, leur similarité est relativement faible.
-L'utilisation d'une mesure de similarité contextuelle permet de corriger cela pour certains groupes, mais le groupe traitement est souvent beaucoup plus large que son contexte.
-Il serait intéressant d'expérimenter d'autres mesures de similarité pour essayer de corriger ce problème.
-L'utilisation de la procédure de réécriture sur un jeu de données ou les groupements sont plus petit et plus équilibrés pourrais aussi permettre d'obtenir de meilleurs résultats.
+Seules trois relations ont été identifiées.
+La relation entre l'entité \emph{Anatomie} et le groupe 8 (\emph{Examen}, \emph{Sosy}), notée $11 \leftrightarrow 8$, correspond en réalité au groupe 4.
+Les relations $10 \leftrightarrow 9$ entre les entités \emph{Dose} et \emph{Substance}, ainsi que la relation $2 \leftrightarrow 6$ entre \emph{Fréquence} et \emph{Dose}, font référence à un traitement et auraient dû être traitées comme le groupe 0.
+Cependant, en raison des différences significatives dans les ensembles d'entités (notamment l'intégration de l'entité \emph{Sosy} au sein du groupe 0), cette association n'a pas pu être établie.
+Cette observation met en lumière une limitation de la procédure de réécriture, qui permet d'identifier des structures selon leurs usages plutôt que leur sémantique.
+Cette limitation est particulièrement marquée ici, car le regroupement intuitif correspondant à un traitement contient de nombreuses entités, dont certaines ne sont pas toujours présentes.
+Ainsi, bien que leur sémantique soit similaire, leur similarité est relativement faible.
+L'utilisation d'une mesure de similarité contextuelle permet de corriger ce problème pour certains groupes, mais le groupe correspondant au traitement est souvent beaucoup plus large que son contexte.
+Il serait donc intéressant d'expérimenter d'autres mesures de similarité pour tenter de résoudre cette difficulté.
+De plus, l'application de la procédure de réécriture sur un jeu de données où les groupements sont plus petits et plus équilibrés pourrait conduire à de meilleurs résultats.
 
 Il convient de souligner que la procédure s'exécute sans connaissance préalable des données ni de leur sémantique intrinsèque, se fondant uniquement sur la structure de l'arbre.
 Les associations générées demeurent cohérentes par rapport aux textes et permettent de produire une structure homogène qui pourrait être interrogée ou utilisée pour des analyses ultérieures.

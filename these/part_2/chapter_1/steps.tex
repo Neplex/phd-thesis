@@ -688,6 +688,7 @@ La boucle de la ligne~\ref{algo:struct:insent:while} nous permet de parcourir le
 Cette série d'insertions et suppressions se fait de droite à gauche, pour éviter de recalculer les positions des tokens à chaque tour de boucle.
 
 \subsubsection{Simplifications}
+\label{sec:struct:simplify}
 % La simplification des arbres consiste en la suppression de toutes les branches qui ne contiennent pas d'entité.
 % Dans les arbres de syntaxe, il est aussi possible de trouver des structures redondantes où des nœuds intermédiaires ne contiennent qu'un seul enfant.
 % Bien que porteur d'information dans l'arbre syntaxique, ces nœuds n'ajoutent pas d'information pour la structuration des entités au sein de l'arbre.
@@ -1042,17 +1043,17 @@ La définition suivante établie de manière formelle la transformation d'un arb
 
 \subsection{Construction des classes d'équivalence}
 \label{sec:struct:equiv-classes}
-Rappelons maintenant le concept d'arbre d'entités donné par la définition~\ref{def:struct:entity-tree} (page~\pageref{def:struct:entity-tree}).
-Les arbres d'entités représentent l'information et sont donc la base de comparaison des sous-arbres.
-La représentation textuelle d'un objet du monde réel peut avoir plusieurs formes de surface matérialisée par différents arbres d'entité.
+Rappelons maintenant le concept de sous-arbre d'entité donné par la définition~\ref{def:struct:entity-tree} (page~\pageref{def:struct:entity-tree}).
+Les sous-arbres d'entité représentent l'information et sont donc la base de comparaison des sous-arbres.
+La représentation textuelle d'un objet du monde réel peut avoir plusieurs formes de surface matérialisées par différents sous-arbres d'entité.
 De plus, la langue naturelle contient souvent de l'information implicite ou manquante.
-Ainsi, deux sous-arbres peuvent contenir un ensemble différent d'arbres d'entités, mais quand même représenter le même objet.
-Par exemple, un \emph{traitement} ne contient pas toujours une fréquence ou un dosage (\textquote{Le patient prend 500 mg de Paracétamol} or \textquote{Le patient prend du Paracétamol tous les jours}).
+Ainsi, deux sous-arbres peuvent contenir un ensemble différent de sous-arbres d'entité, mais quand même représenter le même objet.
+Par exemple, un \emph{traitement} ne contient pas toujours une fréquence ou un dosage (\textquote{Le patient prend 500 mg de Paracétamol} ou \textquote{Le patient prend du Paracétamol tous les jours}).
 Les arbres syntaxiques de ces phrases ne seront pas identiques.
 Néanmoins, les deux représentent un \emph{traitement}.
 Dans notre approche, nous allons considérer qu'ils sont équivalents.
 
-Néanmoins, pour déterminer l'équivalence entre deux sous-arbres, considérer uniquement l'ensemble des arbres d'entités présent dans chacun des sous-arbres les arbres d'entités n'est pas suffisant.
+Pour déterminer l'équivalence entre deux sous-arbres, il n'est pas suffisant de considérer uniquement l'ensemble des arbres d'entités présent dans chacun des sous-arbres les arbres d'entités.
 La langue naturelle est ambiguë et une même forme de surface (et donc un même arbre d'entité) peux représenter deux objets différents.
 Il est donc nécessaire de prendre aussi en compte le contexte.
 Pour ce faire nous utilisons le concept d'équivalence régulière comme introduite par~\cite{whiteGraphSemigroupHomomorphisms1983} pour les graphes.
@@ -1073,19 +1074,20 @@ La mesure $sim_f(x, y)$ est donnée par l'équation~\ref{eq:struct:sim} où $P^x
 \end{equation}
 
 \begin{axiom}
-    Comme la fonction $sim_f$ est une moyenne pondérée de $f$ elle respecte alors ses propriétés :
-    $sim_f$ est symétrique, bornée par l'intervalle $[0, 1]$ et pour tout $x \in \mathbb{ST}$, $sim_f(x, x) = 1$.
+    La fonction $sim_f$ est une moyenne pondérée de $f$.
+    Par conséquent, $sim_f$ est symétrique, bornée par l'intervalle $[0, 1]$ et pour tout $x \in \mathbb{ST}$, $sim_f(x, x) = 1$.
 \end{axiom}
 
 \begin{example}
     Soit l'arbre donné figure~\ref{fig:struct:sim:ex}.
     On commence par definir une fonction de similaritée.
-    Dans cette exemple on utilisera simplement l'indice de Jaccard \cite{jaccardDistributionFloreAlpine1901} sur les nom d'entité present dans le sous-arbre.
+    Dans cette exemple on utilisera simplement l'indice de Jaccard \cite{jaccardDistributionFloreAlpine1901} sur les noms d'entité presents dans le sous-arbre.
     L'indice de Jaccard est definit comme suit :
     \[
         J(X, Y) = \frac{\lvert X \cap Y \rvert}{\lvert X \cup Y \rvert}
     \]
-    Il est facile de voir que les deux sous-arbres ER\_NODE$_1$ et ER\_NODE$_2$ sont identique on obtient alors $f(\text{ER\_NODE}_1, \text{ER\_NODE}_2) = 1$.
+    Il est facile de voir que les deux sous-arbres ER\_NODE$_1$ et ER\_NODE$_2$ sont identiques.
+    On obtient alors $f(\text{ER\_NODE}_1, \text{ER\_NODE}_2) = 1$.
     Cependant, comme leur contexte est différent : l'un est associé à un médicament (Paracetamol) et l'autre à une frequence (every day) on s'attend à une similarité différente de $1$.
     La fonction $sim_f$ (équation~\ref{eq:struct:sim}) permet de calculer cette différence.
     On commence par calculer la similarité entre les sous-arbres NP$_1$ et NP$_2$ et on obtient $f(\text{NP}_1, \text{NP}_2) = 0.75$.
@@ -1093,7 +1095,7 @@ La mesure $sim_f(x, y)$ est donnée par l'équation~\ref{eq:struct:sim} où $P^x
     A partir du noeud CONJ, les sous-arbres sont identiques avec une similarité de $1$.
     On obtient alors :
     \[
-        sim_f(\text{ER\_NODE}_1, \text{ER\_NODE}_2) = \frac{1 \times 1 + 0.5 \times 0.75 + 0.33 \times 1 + 0.25 \times 1}{1 + 0.5 + 0.33 + 0.25} = \frac{1.955}{2.08} \simeq 0.94
+        sim_f(\text{ER\_NODE}_1, \text{ER\_NODE}_2) = \frac{\overbrace{1 \times 1}^{\text{ER\_NODE}} + \overbrace{0.5 \times 0.75}^{\text{NP}} + \overbrace{0.33 \times 1}^{\text{CONJ}} + \overbrace{0.25 \times 1}^{\text{S}}}{1 + 0.5 + 0.33 + 0.25} = \frac{1.955}{2.08} \simeq 0.94
     \]
 
     Ce qui permet de montrer que les deux sous-arbres sont proches sans pour autant etre equivalents car il ne sont pas mis en relation avec les mêmes objets.
@@ -1160,14 +1162,14 @@ La décision de ce taux n'est pas arbitraire et il doit être déterminé pour c
 
 \begin{proof}
     Pour tout $x$, on a $sim_f(x, x) = 1$ et $1 \ge \tau$ pour toute valeur possible de $\tau$, alors, on peut déduire que la relation de $\tau$-similarité est \emph{réflexive}.
-    De plus, si on a $x \sim_\tau y$, alors $f(x, y) \ge \tau$.
-    Comme la fonction $sim_f$ est symétrique ($f(x, y) = f(y, x)$) on a donc $f(y, x) \ge \tau$ et par extension $y \sim_\tau x$.
+    De plus, si on a $x \sim_\tau y$, alors $sim_f(x, y) \ge \tau$.
+    Comme la fonction $sim_f$ est symétrique ($sim_f(x, y) = sim_f(y, x)$) on a donc $sim_f(y, x) \ge \tau$ et par extension $y \sim_\tau x$.
     Nous pouvons conclure que la relation de $\tau$-similarité est \emph{symétrique}.
 \end{proof}
 
 \begin{definition}[Equivalence de sous-arbres]
     \label{def:struct:equiv}
-    Étant donné deux arbres enrichis $T_1$ et $T_2$ avec deux sous-arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et la relation de $\tau$-similarité définit précédemment (\ref{def:struct:sim}).
+    Soient deux arbres enrichis $T_1$ et $T_2$ avec deux sous-arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et la relation de $\tau$-similarité définie précédemment (\ref{def:struct:sim}).
     On définit la relation de $\tau$-équivalence entre $st_1$ et $st_2$ notée $st_1 \equiv_\tau st_2$ tel que $st_1$ est $\tau$-équivalent à $st_2$ si $st_1$ est $\tau$-similaires à $st_2$ ou si $st_1$ est  $\tau$-équivalent à un sous-arbre $st_3$ lui même $\tau$-équivalent à $st_2$.
     La proposition est synthétisée par l'équation~\ref{eq:struct:equiv}.
     \begin{equation}
@@ -1176,14 +1178,14 @@ La décision de ce taux n'est pas arbitraire et il doit être déterminé pour c
 \end{definition}
 
 \begin{proposition}
-    La $\tau$-équivalence est une relation d'équivalence et est par conséquent \emph{réflexive}, \emph{symétrique} et \emph{transitive}.
+    La $\tau$-équivalence est une relation d'équivalence, c'est-à-dire \emph{réflexive}, \emph{symétrique} et \emph{transitive}.
 \end{proposition}
 
 \begin{proof}
     Soit $st_1$ un sous-arbre enrichi.
-    La réflexivité de la $\tau$-équivalence découle directement de la réflexivité de celle de la $\tau$-similarité, car $st_1 \equiv_\tau st_1$ implique $st_1 \sim_\tau st_1$ qui est toujours vrais.
-    $st_1 \equiv_\tau z \land st_1 \equiv_\tau z$ est vrai pour $z = st_1$ étant donné que $st_1 \equiv_\tau st_1$ par hypothèse.
-    La $\tau$-équivalence est donc \emph{réflexive}.
+    La réflexivité de la $\tau$-équivalence découle directement de la réflexivité de la $\tau$-similarité.%, car $st_1 \equiv_\tau st_1$ implique $st_1 \sim_\tau st_1$ qui est toujours vrais.
+    %$st_1 \equiv_\tau z \land st_1 \equiv_\tau z$ est vrai pour $z = st_1$ étant donné que $st_1 \equiv_\tau st_1$ par hypothèse.
+    %La $\tau$-équivalence est donc \emph{réflexive}.
 
     Soient $st_1$ et $st_2$ deux sous-arbres enrichis et supposons que $st_1 \equiv_\tau st_2$.
     On a alors deux cas :
@@ -1215,6 +1217,13 @@ La décision de ce taux n'est pas arbitraire et il doit être déterminé pour c
 \begin{definition}[Classe d'équivalences]
     On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
     $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
+\end{definition}
+
+\begin{definition}[Classe d'équivalences]
+    On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
+
+    Soit $T = (D, l)$ un arbre ordonné.
+    $D/_{\equiv_\tau}$ est l'ensemble quotient (ou partitionnement) de $D$ par $\equiv_\tau$ tel que $D/_{\equiv_\tau} = \{[x]_\tau \mid x \in D\}$, c-à-d. que $D/_{\equiv_\tau}$ est l'ensemble de tous les ensembles $\tau$-équivalent de $D$.
 \end{definition}
 
 Le partitionnement d'un ensemble, basé sur une distance, peut être calculé à l'aide d'un regroupement hiérarchique en lien simple et la mesure de similarité $sim_f$.

@@ -19,34 +19,21 @@
 \SetKwFunction{leaves}{leaves}
 % \SetKwFunction{depth}{depth}
 
-Dans cette section, nous décrivons en détail une implémentation de la procédure de réécriture des arbres.
-Notre approche ici, est d'unifier les arbres en éliminant les variations de structurelle (c.-à-d. de minimiser le nombre de règles de production) et en maximisant la fréquence d'apparition de ces structures.
-L'idée est la suivante : à chaque étape, on essaye d'effectuer l'opération la moins destructive, si l'arbre est modifié, on recommence le cycle pour vérifier la validité du schéma et recalculer les classes d'équivalences qui ont pu changer.
-Si aucun changement n'a pu être réalisé, on essaye une autre opération plus destructive que la précédente.
-La procédure principale~\ref{algo:struct:rewrite} se charge d'orchestrer les différentes opérations d'édition et implémente la boucle décrite dans la section précédente.
-On suppose qu'on a en entrée un unique arbre en tant que forêt enracinée d'arbre d'instances.
-La phase de prétraitement qui consiste à enrichir et à simplifier les arbres de syntaxe a déjà été réalisée.
-On définit quatre paramètres supplémentaires :
-\begin{itemize}
-    \item la fonction de similarité $f$ ;
-    \item le seuil $\tau$ de similarité ;
-    \item le support minimum qui détermine quand un élément doit être considéré fréquent ;
-    \item l'epoch qui borne le nombre de cycles que l'on autorise.
-\end{itemize}
-L'algorithme proposé est une version simplifiée de la boucle proposée précédemment.
-Il converge vers une solution qui est valide par rapport à la méta-grammaire $\mathbb{G}$.
-L'epoch permet de garantir sa terminaison même si cela implique que des parties de l'arbre ne sont pas valide à la fin de l'exécution.
-L'algorithme s'affranchit de l'extraction de la grammaire et sa vérification à chaque étape.
-Cela est rendu possible, car les opérations de transformations s'appliquent uniquement sur les parties invalides de l'arbre.
-C'est-à-dire que quand plus aucune transformation n'est possible, la grammaire est valide.
+Dans cette section, nous décrivons en détail une implémentation pour effectuer l'évolution de l'instance, illustrée par la séquence des $I_i$ dans la figure~\ref{fig:struct:general} (page~\pageref{fig:struct:general}).
+On rappelle que l'évolution de l'instance $I_i$ vers l'instance $I_{i+1}$ suit un processus de transformation.
+Au cours de cette transformation, les sous-arbres de l'arbre sont regroupés ou transformés sur la base d'une mesure de similarité.
+Il peut s'agir de réorganiser la structure des arbres afin d'améliorer leur cohérence ou de les aligner plus efficacement sur la représentation souhaitée.
+Chaque instance $I_i$ engendre une grammaire $G_i$.
+À l'étape $i$, si $G_i$ n'est pas conforme à $\mathbb{G}$, le processus se poursuit en transformant les structures des sous-arbres de $I_i$ donnant lieu à l'instance $I_{i+1}$ qui engendre une nouvelle grammaire $G_{i+1}$.
+Le processus se termine lorsque nous trouvons une grammaire qui satisfait $\mathbb{G}$.
 
 \begin{procedure}[htb]
-    \caption{rewrite($T$ = ($D$, $l$), epochs, $\tau$, minSupport)}
+    \caption{instanceEvolution($T$ = ($D$, $l$), epochs, $\tau$, minSupport)}
     \label{algo:struct:rewrite}
 
     $\simp \gets \textsc{True}$\;
     $i \gets 0$\;
-    \While{$i \leq \text{epochs}$ and $\simp = \textsc{True}$}{
+    \While{$i \leq \text{epochs}$ and $\simp = \textsc{True}$ \label{algoEvol:while}}{
         $i \gets i + 1$\;
 
         \tcp{Supprimer les nœuds redondants}
@@ -80,31 +67,59 @@ C'est-à-dire que quand plus aucune transformation n'est possible, la grammaire 
             $\simp \gets \ref{algo:struct:rewrite-findCollections}(T, \tau, \text{minSupport})$
         }
 
-        \tcp{Aplatir l'arbre en haut}
-        \If{$\simp = \textsc{False}$}{
-            \ForEach{$p \in D$ tel que $depth(p) = 1$\label{algo:struct:rewrite:reduce-top}}{
-                $\simp \gets \reduce{T, p, \{`ENT`, `GROUP`, `REL`, `COLL`\}}$\;
+        \BlankLine
+        \tcp{Supprimer les nœuds non étiquetés en bas}
+        \If{$\simp = \textsc{False}$ \label{algo:suppBas}}{
+            \ForEach{$u.j \in$ où $l(u.j) = `ENT$'\label{algo:struct:rewrite:reduce-bot}}{
+                $\simp \gets \reduce{T, u, \{`ENT`, `GROUP`, `REL`, `COLL`\}}$\;
             }
         }
 
-        \tcp{Supprimer les nœuds non étiquetés en bas}
+        \tcp{Aplatir l'arbre en haut}
         \If{$\simp = \textsc{False}$}{
-            \ForEach{$u.j \in$ où $l(u.j) = `ENT$'\label{algo:struct:rewrite:reduce-bot}}{
-                $\simp \gets \reduce{T, u, \{`ENT`, `GROUP`, `REL`, `COLL`\}}$\;
+            \ForEach{$p \in D$ tel que $depth(p) = 2$\label{algo:struct:rewrite:reduce-top}}{
+                $\simp \gets \reduce{T, p, \{`ENT`, `GROUP`, `REL`, `COLL`\}}$\;
             }
         }
     }
 \end{procedure}
 
-Dans la procédure, la variable \textsf{simp} permet d'enregistrer si une simplification a été faite.
-Si c'est le cas, la boucle continue à l'itération suivante tant que l'epoch n'est pas dépassé.
-Pour une itération $i$, on récupère cette information à chaque étape et on continue vers les opérations suivantes uniquement si aucune modification n'est opérée par rapport à l'arbre de l'itération $i - 1$.
-Il est à noter que l'on n'utilise pas l'opération \ref{algo:struct:rewrite-findGroups} pour savoir si une simplification a été effectuée, car cette opération identifie les groupes à chaque étape et ne constitue donc pas une étape de reconstruction.
+La procédure principale~\ref{algo:struct:rewrite} se charge d'orchestrer les différentes opérations d'édition et implémente l'évolution de l'instance, indiquée par la boucle de la figure~\ref{fig:struct:flow} (page~\pageref{fig:struct:flow}).
+On suppose qu'on a en entrée un unique arbre en tant que forêt enracinée d'arbre d'instances.
+La phase de prétraitement qui consiste à enrichir et à simplifier les arbres de syntaxe a déjà été réalisée.
+On définit quatre paramètres supplémentaires :
+\begin{itemize}
+    \item la fonction de similarité $f$ ;
+    \item le seuil $\tau$ de similarité ;
+    \item le support minimum qui détermine quand un élément doit être considéré fréquent ;
+    \item l'epoch qui borne le nombre de cycles que l'on autorise.
+\end{itemize}
 
-L'algorithme commence (à la ligne~\ref{algo:struct:rewrite:reduce}) par simplifier l'arbre en supprimant les nœuds redondants.
-Dans la suite, on identifie les nœuds, candidats pour représenter des groupes.
-Une fois ces premières étapes effectuées, la procédure tente successivement d'effectuer des transformations en commençant par la moins destructrice.
-Dans l'ordre, on retrouve :
+L'idée générale consiste à unifier les sous-arbres en
+\begin{enumerate*}[label=(\roman*)]
+    \item éliminant les variations de structurelle et
+    \item en maximisant la fréquence d'apparition de ces structures.
+\end{enumerate*}
+L'objectif est de minimiser le nombre de règles de production de la grammaire qui sera extraite de l'instance.
+La procédure~\ref{algo:struct:rewrite} permet de converger vers une solution qui est valide par rapport à la méta-grammaire $\mathbb{G}$.
+%Il faut comprendre, en suivant les explications de la section~\ref{}, que l'instance sera transformée, petit-à-petit, dans un arbre condensé qui représentera la grammaire (le schéma).
+La procédure~\ref{algo:struct:rewrite} est indépendante de l'extraction et de la vérification de la grammaire à chaque étape.
+Cela est rendu possible, car les opérations de transformation s'appliquent exclusivement aux parties invalides de l'arbre.
+Lorsque plus aucune transformation n'est possible, la grammaire résultante est par conséquent valide.
+L'utilisation de l'epoch assure la terminaison de la procédure, même si cela implique que certaines parties de l'arbre ne sont pas valides à la fin de l'exécution.
+
+La procédure est constituée d'une boucle générale (ligne~\ref{algoEvol:while}) qui construit les instances successivement.
+À chaque itération, l'algorithme commence par appliquer les simplifications décrites dans la section~\ref{sec:struct:simplify} (page~\ref{sec:struct:simplify}) en utilisant la règle de réécriture \reduce (ligne~\ref{algo:struct:rewrite:reduce}).
+Dans la suite, on identifie les nœuds candidats pour représenter des groupes (opération \ref{algo:struct:rewrite-findGroups}).
+%Cette opération ne constitue pas une étape de transformation de l'instance.
+Une fois ces premières étapes effectuées, la procédure tente successivement d'effectuer des transformations de l'instance.
+La variable \simp permet d'enregistrer si une simplification a été faite.
+Si une opération modifie l'arbre, les suivantes ne sont pas exécutées.
+En effet, on recommence le cycle pour recalculer les classes d'équivalences qui ont pu changer.
+Dans la  procédure~\ref{algo:struct:rewrite}, les opérations sont listées en suivant un ordre logique, car, il faut d'abord détecter les groupes, les unifier, puis les regrouper en collections ensuite, il est possible d'identifier des relations entre les groupes et finalement des collections de relations.
+Par exemple, si à l'itération $i$ les opérations \ref{algo:struct:rewrite-findSubgroups} et \ref{algo:struct:rewrite-mergeGroups} ne font pas de transformations sur l'arbre $I_i$, alors, c'est l'opération suivante : \ref{algo:struct:rewrite-findCollections} qui sera exécuté.
+Si cette dernière modifie l'instance $I_i$, on passe à l'instance $I_{i+1}$ et on recommence la boucle.
+Ainsi, dans l'ordre, on retrouve les opérations suivantes :
 \begin{enumerate}
     \item \ref{algo:struct:rewrite-findSubgroups} pour construire des sous-groupes fréquents ;
     \item \ref{algo:struct:rewrite-mergeGroups} pour construire des groupes plus grands en incorporant d'autres informations, mais qui maintient sa similarité avec sa classe d'équivalence ainsi qu'une fréquence au-dessus de support minimum ;
@@ -113,30 +128,42 @@ Dans l'ordre, on retrouve :
     \item \ref{algo:struct:rewrite-findCollections} pour construire des collections de relations.
 \end{enumerate}
 
-Une fois ces cinq opérations effectuées, si aucune modification n'a pu être effectuée, on cherche à supprimer des structures trop complexes qui ne sont pas catégorisable.
-Notamment, les arbres peuvent avoir une grande profondeur, mais nos grammaires de schéma autorisent uniquement une profondeur maximale de 5.
-L'idée est donc de mettre à plat des structures trop profondes en supprimant un à un les niveaux supérieurs.
-L'algorithme construit les instances en commençant par le bas de l'arbre et en remontant, les niveaux supérieurs sont donc les plus susceptibles de ne pas être catégorisés.
-La ligne~\ref{algo:struct:rewrite:reduce-top} supprime alors l'ensemble des racines qui n'ont pas été catégorisée en tant qu'\emph{entité}, \emph{groupe}, \emph{relation} ou \emph{collection}.
-S'il n'est plus possible de détruire les racines, on détruit l'arbre par le bas en supprimant les niveaux intermédiaires situés au-dessus des entités (ligne~\ref{algo:struct:rewrite:reduce-bot}).
+Si aucune transformation est faite avant la ligne~\ref{algo:suppBas} de la procédure~\ref{algo:struct:rewrite},
+nous procédons à des opérations qui transforment l'arbre de manière plus radicale en supprimant des nœuds que nous n'avons pas pu structurer via les opérations précédentes.
+Autrement dit, si aucune modification n'a pu être faite par les cinq opérations citées ci-dessus, on cherche à supprimer des structures trop complexes qui ne sont pas catégorisables.
+Notamment, les arbres peuvent avoir une grande profondeur, mais nos grammaires autorisent uniquement une profondeur maximale de 5.
+L'idée est donc de mettre à plat des structures trop profondes en supprimant un à un les niveaux.
+L'algorithme construit les instances en commençant par le bas de l'arbre et en remontant, on commence alors par détruire l'arbre par le bas en supprimant les niveaux intermédiaires situés au-dessus des entités qui n'ont pas pu être catégorisés (ligne~\ref{algo:struct:rewrite:reduce-bot}).
+Quand l'ensemble des nœuds présents au-dessus des entités ont été catégorisés, la ligne~\ref{algo:struct:rewrite:reduce-top} supprime alors l'ensemble des niveaux supérieurs qui n'ont pas été catégorisée en tant qu'\emph{entité}, \emph{groupe}, \emph{relation} ou \emph{collection}.
+
+\begin{remark}
+    Seul le niveau de profondeur $2$ est supprimé.
+    Ce choix permet de conserver la séparation entre les phrases (de profondeur $1$).
+    Passé ce point, seul les collections peuvent être fusionnées.
+    Cela permet d'empêcher la construction d'associations (\emph{groupe} ou \emph{relation}) à travers de multiples phrases.
+\end{remark}
+
+
+%\mhf{Il faut mettre une exemple ici de ce qui est dit dans le dernier paragraphe. Revoir le dernier paragraphe... l'ordre}
+
 
 Dans la suite, on étudie en détail l'implémentation des opérations de transformations mise en place.
 
-\subsection{Opérations de structuration}
+\subsection{Identification des groupes}
 
 \begin{procedure}
     \caption{findGroups($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findGroups}
 
     \tcp{Identifier les clusters de sous-arbres équivalents et garder uniquement les fréquents}
-    $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/\equiv_\tau, |equiv\_pos| \ge$ minSupport$\}$\;
+    $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/_{\equiv_\tau}, |equiv\_pos| \ge$ minSupport$\}$\;
     $k \gets 0$\;
 
     \While{$equivalent\_st \neq \emptyset$}{
         $ST\_min \gets \findSTwithMinLeavesTree(equivalent\_st)$\;
         $equivalent\_st \gets equivalent\_st \setminus ST\_min$\;
 
-        \ForEach{$st \in ST\_min$ tel que $\{e \mid e \in st, l(e) \neq `GROUP`\} = \emptyset$}{
+        \ForEach{$st \in ST\_min$ tel que $\{e \mid \forall e \in D, st \prec^* e \land l(e) \neq `GROUP`\} = \emptyset$}{
             $j \gets 0$\;
             Construire $T_{GROUP} = (D_{GROUP}, t_{GROUP})$ un nouvel arbre avec $t_{GROUP}(\epsilon) = `GROUP_k`$\;
 
@@ -145,9 +172,8 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
                 $j \gets j + 1$\;
             }
 
-            Soit $u$ tel que $T|_u = st$\;
-            $\insElem(T, t_{GROUP}, u + 1)$\;
-            $\delElem(T, u)$\;
+            $\insElem(T, t_{GROUP}, st + 1)$\;
+            $\delElem(T, st)$\;
         }
         $k \gets k+1$\;
     }
@@ -156,7 +182,7 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
 % \nh{Something is not great here, in findSubgroups. We mixed a set of positions with a set of labels. The set contains trees but the combinaition should not allow a label to appear multiple times}
 
 \begin{procedure}
-    \caption{findSubgroups($T$ = ($D$, $l$), minSupport)}
+    \caption{findSubgroups($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findSubgroups}
 
     $\groupFound \gets \textsc{False}$\;
@@ -172,14 +198,14 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
             \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S_{ENT}}$}
             \ForEach{combinaison  $combi_j \in \combination(S_{ENT}, k)$}{
                 $T_j \gets \text{copy}(T)$ \tcp*{$T_j$ est l'arbre où l'on remplace l'ensemble $combi_j$ par un groupe}
-                
+
                 $\insElem(T_j, GROUP, u.0)$\;
                 \ForAll{$\st_E \in combi_j$}{
                     $\delElem(T_j, u.i)$ tel que $T_j|_{u.i} = \st_E$\;
                     $\insElem(T_j, \st_E, u.0.0)$\;
                 }
 
-                $support_j \gets |[T_j|_{u.0}]|$ \tcp*{$[T_j|_{u.0}]$ est l'ensemble équivalent qui contient le sous-arbre $T_j|_{u.0}$}
+                $support_j \gets |[T_j|_{u.0}]_\tau|$ \tcp*{$[T_j|_{u.0}]_\tau$ est l'ensemble équivalent qui contient le sous-arbre $T_j|_{u.0}$}
                 $j \gets j + 1$\;
             }
 
@@ -202,8 +228,32 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \Return \groupFound \;
 \end{procedure}
 
+\begin{figure}[htb]
+    \centering
+    \begin{adjustbox}{valign=c, max width=\textwidth}
+        \begin{forest}
+            where n children=0{tier=word}{}
+            [$\dots$
+                [GROUP
+                    [ENT\_1 [$\dots$]]
+                    [ENT\_2 [$\dots$]]
+                    [ENT\_3 [$\dots$]]
+                    [ENT\_4 [$\dots$]]
+                    [ENT\_5 [$\dots$]]
+                ]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \caption{Exemple d'instance}
+    \label{fig:struct:rewrite-findSubgroups}
+\end{figure}
+
+\begin{example}
+    Étant donné la figure~\ref{fig:struct:rewrite-findSubgroups}, la procédure~\ref{algo:struct:rewrite-findSubgroups}...
+\end{example}
+
 \begin{procedure}
-    \caption{mergeGroups($T$ = ($D$, $l$), minSupport)}
+    \caption{mergeGroups($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-mergeGroups}
 
     $\groupFound \gets \textsc{False}$\;
@@ -212,7 +262,7 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
         $S_{GROUP} = \{T|_{u.i} \mid \forall i ~ l(u.i) = `GROUP`\}$ \tcp*{Ensemble des arbres groupe enfants de \st}
         $S_{ENT} = \{T|_{u.i} \mid \forall i ~ l(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
 
-        $k \gets |S_{GROUP}/\equiv_\tau| + |S_{ENT}|$\;
+        $k \gets |S_{GROUP}/_{\equiv_\tau}| + |S_{ENT}|$\;
         \While{$k > 1$}{
             $j \gets 0$\;
 
@@ -257,8 +307,35 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \Return \groupFound \;
 \end{procedure}
 
+\begin{figure}[htb]
+    \centering
+    \begin{adjustbox}{valign=c, max width=\textwidth}
+        \begin{forest}
+            where n children=0{tier=word}{}
+            [$\dots$
+                [NT
+                    [X [$\dots$]]
+                    [ENT\_1 [$\dots$]]
+                    [GROUP\_1 [$\dots$]]
+                    [ENT\_2 [$\dots$]]
+                    [GROUP\_2 [$\dots$]]
+                    [ENT\_6 [$\dots$]]
+                ]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \caption{Exemple d'instance}
+    \label{fig:struct:rewrite-mergeGroups}
+\end{figure}
+
+\begin{example}
+    Étant donné la figure~\ref{fig:struct:rewrite-mergeGroups}, la procédure~\ref{algo:struct:rewrite-mergeGroups}...
+\end{example}
+
+\subsection{Identification des relations}
+
 \begin{procedure}
-    \caption{findRelationship($T$ = ($D$, $l$), minSupport)}
+    \caption{findRelationship($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findRelationship}
 
     $\relationshipFound \gets \textsc{False}$\;
@@ -283,7 +360,7 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
                 $\insElem(T, T|_{coll.i}, u.pos.1)$\;
                 $\delElem(T, coll.i)$\;
             }
-            
+
             $\delElem(T, group)$\;
             $\relationshipFound \gets \textsc{True}$\;
         }
@@ -292,46 +369,111 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \Return \relationshipFound \;
 \end{procedure}
 
+\subsection{Identification des collections}
+
 \begin{procedure}
-    \caption{findCollections($T$ = ($D$, $l$), minSupport)}
+    \caption{findCollections($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findCollections}
 
     $\collectionFound \gets \textsc{False}$\;
 
     \ForEach{sous-arbre \st tel que $\st = T|_u$ et $l(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
-        $pos \gets |st|$\;
+    $pos \gets |st|$\;
 
-        \tcp{Construction d'une collection de groupes ou de relations}
-        \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $t|_{u.i} \in [x]$, $l(u.i) \in \{`GROUP`, `REL`\}$ et $|\subSet| \ge 2$}{
-            $\collectionFound \gets \textsc{True}$\;
-            $\insElem(T, `COLL`, u.pos)$\;
-            \ForAll{$u.i \in \subSet$}{
-                $\insElem(T, T|_{u.i}, u.pos.0)$\;
-                $\delElem(T, \subPos)$\;
-            }
-        }
+    \tcp{Construction d'une collection de groupes ou de relations}
+    \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $t|_{u.i} \in [x]_\tau$, $l(u.i) \in \{`GROUP`, `REL`\}$ et $|\subSet| \ge 2$}{
+    $\collectionFound \gets \textsc{True}$\;
+    $\insElem(T, `COLL`, u.pos)$\;
+    \ForAll{$u.i \in \subSet$}{
+        $\insElem(T, T|_{u.i}, u.pos.0)$\;
+        $\delElem(T, \subPos)$\;
+    }
+    }
 
-        \tcp{Fusion de collections}
-        \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $T|_{u.i} \in [x]$, $l(u.i) \in \{`COLL`\}$ et $|\subSet| \ge 2$}{
-            $\collectionFound \gets \textsc{True}$\;
-            $\insElem(T, `COLL`, u.pos)$\;
+    \tcp{Fusion de collections}
+    \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $T|_{u.i} \in [x]_\tau$, $l(u.i) \in \{`COLL`\}$ et $|\subSet| \ge 2$}{
+    $\collectionFound \gets \textsc{True}$\;
+    $\insElem(T, `COLL`, u.pos)$\;
 
-            \ForAll{$u.i.j$ tel que $u.i \in \subSet$}{
-                $\insElem(T, T|_{u.i.j}, u.pos.0)$\;
-                $\delElem(T, u.i.j)$\;
-            }
-        }
+    \ForAll{$u.i.j$ tel que $u.i \in \subSet$}{
+        $\insElem(T, T|_{u.i.j}, u.pos.0)$\;
+        $\delElem(T, u.i.j)$\;
+    }
+    }
 
-        \tcp{Ajout d'éléments à une collection}
-        \ForAll{$group, coll$ tel que $\exists x, i, j$ où $l(u.i) = `GROUP`$, $l(u.j) = `COLL`$, $T|_{u.i} \in [x]$ et $\forall k T|_{u.j,k} \in [x]$}{
-            $\collectionFound \gets \textsc{True}$\;
-            $group\_pos = |T|_{u.j}|$\;
-            $\insElem(T, T|_{u.i}, u.j.group\_pos)$\;
-            $\delElem(T, u.i)$\;
-        }
+    \tcp{Ajout d'éléments à une collection}
+    \ForAll{$group, coll$ tel que $\exists x, i, j$ où $l(u.i) = `GROUP`$, $l(u.j) = `COLL`$, $T|_{u.i} \in [x]_\tau$ et $\forall k T|_{u.j,k} \in [x]_\tau$}{
+    $\collectionFound \gets \textsc{True}$\;
+    $group\_pos = |T|_{u.j}|$\;
+    $\insElem(T, T|_{u.i}, u.j.group\_pos)$\;
+    $\delElem(T, u.i)$\;
+    }
     }
 
     \Return \collectionFound \;
 \end{procedure}
+
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [$\dots$
+                    [U
+                        [GROUP\_1 [$\dots$]]
+                        [GROUP\_1 [$\dots$]]
+                        [COLL\_1 [
+                            [GROUP\_1 [$\dots$]]
+                            [GROUP\_1 [$\dots$]]
+                        ]]
+                        [Y [$\dots$]]
+                        [COLL\_2 [
+                            [GROUP\_2 [$\dots$]]
+                            [GROUP\_2 [$\dots$]]
+                        ]]
+                        [COLL\_2 [
+                            [GROUP\_2 [$\dots$]]
+                            [GROUP\_2 [$\dots$]]
+                        ]]
+                        [Z [$\dots$]]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                where n children=0{tier=word}{}
+                [$\dots$
+                    [U
+                        [COLL\_1 [
+                            [GROUP\_1 [$\dots$]]
+                            [GROUP\_1 [$\dots$]]
+                            [GROUP\_1 [$\dots$]]
+                            [GROUP\_1 [$\dots$]]
+                        ]]
+                        [Y [$\dots$]]
+                        [COLL\_2 [
+                            [GROUP\_2 [$\dots$]]
+                            [GROUP\_2 [$\dots$]]
+                            [GROUP\_2 [$\dots$]]
+                            [GROUP\_2 [$\dots$]]
+                        ]]
+                        [Z [$\dots$]]
+                    ]
+                ]
+            \end{forest}
+        \end{adjustbox}
+    \end{subfigure}
+    
+    \caption{Exemple d'instance}
+    \label{fig:struct:rewrite-findCollections}
+\end{figure}
+
+\begin{example}
+    Étant donné la figure~\ref{fig:struct:rewrite-findCollections}, la procédure~\ref{algo:struct:rewrite-findCollections} cherche à construire, agrandir ou fusionner des collections existents.
+\end{example}
 
 \FloatBarrier
