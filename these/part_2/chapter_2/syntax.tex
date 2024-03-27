@@ -1,0 +1,101 @@
+Les travaux présentés dans cette thèse se basent sur le corpus CAS -- Corpus français de cas cliniques \cite{grabarCASFrenchCorpus2018} - utilisé dans plusieurs éditions de \gls{deft} \cite{cardonPresentationCampagneEvaluation2020,grouinClassificationCasCliniques2021}, une campagne d'évaluation des systèmes dédiés au traitement de texte médical en français.
+Le corpus est composé de \num{167} cas cliniques en français (\num{100} cas pour l'entraînement et \num{67} pour les tests) et contient \num{13548} entités.
+Les cas cliniques proviennent de publications dans la littérature scientifique et d'échantillons pédagogiques destinés aux étudiants en médecine.
+Les cas sont anonymisés et décrivent des situations réelles ou fictives issues de différents domaines médicaux (cardiologie, urologie, oncologie, etc.).
+Certaines parties du corpus ont été annotées manuellement à partir de zéro (par deux annotateurs), tandis que d'autres ont été pré-annotées automatiquement (en utilisant des \acrshortpl{crf}) puis corrigées manuellement.
+
+\begin{figure}[htb]
+    \centering
+    \begin{adjustbox}{max width=\linewidth}
+        \begin{tikzpicture}[node distance=1em]
+            \node (freq) {fréquence};
+            \node[right = of freq] (card) {cardiaque};
+            \node[right = of card] (fc) {(FC)};
+            \node[right = of fc] (val) {103};
+            \node[right = of val] (bpm) {battements/minute};
+
+            \draw [decorate,decoration={brace,amplitude=.5em,raise=.5em}]
+            (card.west) -- (card.east) node [midway,yshift=1.8em] {\emph{Anatomie}};
+            \draw [decorate,decoration={brace,amplitude=.5em,raise=.5em}]
+            ([yshift=2em] freq.west) -- ([yshift=2em] fc.east) node [midway,yshift=1.8em] {\emph{Examen}};
+            \draw [decorate,decoration={brace,amplitude=.5em,raise=.5em}]
+            (val.west) -- (bpm.east) node [midway,yshift=1.8em] {\emph{Valeur}};
+            \draw [decorate,decoration={brace,amplitude=.5em,raise=.5em}]
+            ([yshift=4em] freq.west) -- ([yshift=4em] bpm.east) node [black,midway,yshift=1.8em] {\emph{SOSY}};
+        \end{tikzpicture}
+    \end{adjustbox}
+    \caption{Imbrication d'entités dans le corpus CAS}
+    \label{fig:tal:nested-ents}
+\end{figure}
+
+\begin{wraptable}{r}{.5\textwidth}
+    \centering
+    \begin{adjustbox}{max width=\linewidth}
+        \begin{tabular}{c|c|c}
+            Entité                       & Support                     & Entités imbriquées                \\
+            \hline
+            \hline
+            \multirow{2}{*}{\emph{SOSY}} & \multirow{2}{*}{\num{1831}} & \emph{Substance}, \emph{Examen},  \\
+                                        &                             & \emph{Anatomie}, \emph{Valeur}    \\
+            \emph{Anatomie}              & \num{1608}                  &                                   \\
+            \emph{Examen}                & \num{1218}                  & \emph{Substance}, \emph{Anatomie} \\
+            \emph{Substance}             & \num{1024}                  &                                   \\
+            \emph{Valeur}                & \num{588}                   &                                   \\
+            \emph{Moment}                & \num{451}                   &                                   \\
+            \emph{Dose}                  & \num{392}                   &                                   \\
+            \emph{Traitement}            & \num{374}                   & \emph{Anatomie}                   \\
+            \emph{Pathologie}            & \num{369}                   & \emph{Anatomie}, \emph{Valeur}    \\
+            \emph{Mode}                  & \num{243}                   &                                   \\
+            \emph{Fréquence}             & \num{243}                   &                                   \\
+        \end{tabular}
+    \end{adjustbox}
+    \caption{Nombre d'entités par type dans le corpus d'entraînement}
+    \label{tab:tal:ent}
+\end{wraptable}
+
+Le corpus contient des annotations pour \num{13} types d'entités : \num{2} pour les expressions temporelles (\emph{Date}, \emph{Moment}), \num{4} pour les objets et faits médicaux (\emph{Anatomie}, \emph{Examen}, \emph{Pathologie} et \emph{Signe ou Symptôme - SOSY}), et \num{7} pour le traitement des patients (\emph{Dose}, \emph{Durée}, \emph{Fréquence}, \emph{Mode}, \emph{Substance}, \emph{Traitement} et \emph{Valeur}).
+Des entités plus courtes peuvent être imbriquées dans des entités plus grandes, par exemple une entité \emph{Examen} peut contenir la partie du corps (\emph{Anatomie}) sur laquelle l'examen est réalisé (figure~\ref{fig:tal:nested-ents}).
+Le tableau~\ref{tab:tal:ent} montre le nombre d'entités de chaque type et montre les imbrications possibles.
+On ne s'intéresse pas ua entités temporelles ici.
+
+Dans le tableau \ref{tab:tal:imb}, nous présentons les imbrications les plus fréquentes dans le corpus.
+La première colonne contient le type de l'entité englobante, la deuxième colonne le type de l'entité imbriquée, la troisième colonne le nombre de fois où ces deux entités sont imbriquées et les deux dernières colonnes le pourcentage d'entités imbriquées par rapport au nombre d'entités 1 ou 2 dans le corpus tel que :
+\begin{align*}
+    P_{ent_1} & = \text{nombre } ent_2 \text{ imbriquée dans } ent_1 / \text{nombre } ent_1 \\
+    P_{ent_2} & = \text{nombre } ent_2 \text{ imbriquée dans } ent_1 / \text{nombre } ent_2
+\end{align*}
+Nous remarquons entre autres que les entités \emph{SOSY} englobent très souvent d'autres entités, en particulier des entités $anatomie$ et que les entités $anatomie$ sont très souvent imbriquées (au total 1496 sont imbriquées, parfois dans plusieurs entités à la fois, ce qui représente 93\% des entités $anatomie$). Ces entités $sosy$ sont souvent longues, avec en moyenne 4,9 mots par entité, contre 1,5 mots par entité pour les entités $anatomie$.
+Cet aspect nous a incités à construire un système en cascade, en suivant les travaux de \cite{alex-etal-2007-recognising}. Ainsi, différents modèles seront entraînés pour apprendre à reconnaître un ou deux types d'entités.
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{c|c|c|c|c}
+        $ent_1$           & $ent_2$          & Nombre d'imbrications & $P_{ent_1}$       & $P_{ent_2}$       \\
+        \hline
+        \hline
+        \emph{SOSY}       & \emph{Anatomie}  & \num{980}             & \SI{54}{\percent} & \SI{61}{\percent} \\
+        \emph{SOSY}       & \emph{Examen}    & \num{440}             & \SI{24}{\percent} & \SI{36}{\percent} \\
+        \emph{SOSY}       & \emph{Valeur}    & \num{409}             & \SI{22}{\percent} & \SI{70}{\percent} \\
+        \emph{SOSY}       & \emph{Substance} & \num{ 80}             & \SI{4}{\percent}  & \SI{ 8}{\percent} \\
+        \emph{Pathologie} & \emph{Anatomie}  & \num{151}             & \SI{41}{\percent} & \SI{ 9}{\percent} \\
+        \emph{Pathologie} & \emph{Valeur}    & \num{ 18}             & \SI{5}{\percent}  & \SI{ 3}{\percent} \\
+        \emph{Traitement} & \emph{Anatomie}  & \num{111}             & \SI{30}{\percent} & \SI{ 7}{\percent} \\
+        \emph{Examen}     & \emph{Anatomie}  & \num{370}             & \SI{30}{\percent} & \SI{23}{\percent} \\
+        \emph{Examen}     & \emph{Substance} & \num{ 23}             & \SI{2}{\percent}  & \SI{ 2}{\percent}
+    \end{tabular}
+    \caption{Nombre d'entités imbriquées dans le corpus d'entraînement}
+    \label{tab:tal:imb}
+\end{table}
+
+Afin de pouvoir traiter les textes, on commence par réaliser une analyse syntaxique composée :
+\begin{itemize}
+    \item d'une tokenisation permettant de déterminer les unités lexicales (les mots) ;
+    \item de l'étiquetage des parties du discours qui détermine le rôle du mot dans une phrase (verbe, sujet, etc) ;
+    \item de la lemmatisation pour déterminer la forme canonique des mots ;
+    \item de la racinisation qui retire les suffixes et préfixes des mots et
+    \item de l'analyse en dépendance qui donne l'arbre de dépendance entre les unités lexicales.
+\end{itemize}
+
+L'ensemble de l'analyse syntaxique est réalisée avec l'aide de \emph{SpaCy} \cite{SpaCy101Everything,honnibalSpaCyIndustrialstrengthNatural2020,patelAppliedNaturalLanguage2021}
+Pour le français, on utilise le modèle \textsf{fr\_core\_news\_md} (3.7.0) qui est construit sur un \gls{cnn} \cite{honnibalSpacyNaturalLanguage2017} à partir des corpus français Sequoia \cite{canditoCorpusSequoiaAnnotation2012,barqueDeepSequoiaCorpus2020} et WikiNER \cite{nothmanLearningMultilingualNamed2013,LearningMultilingualNamed2017}.
+Pour l'anglais, on utilise le modèle \textsf{en\_core\_sci\_md} (0.5.2) de ScispaCy \cite{neumannScispaCyFastRobust2019,AllenaiScispacy2020} entrainé sur les corpus OntoNotes \cite{weischedelOntoNotesLargeTraining2011,weischedelralphOntoNotesRelease2013} et GENIA \cite{kimGENIACorpusSemantically2003,mccloskySelfTrainingBiomedicalParsing2008}.

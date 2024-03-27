@@ -1,0 +1,26 @@
+L'extraction ou la reconnaissance d'entités nommées, \gls{ner} en anglais, est une tâche commune du \gls{tal} qui consiste à identifier la partie d'un texte non structuré qui représente une entité nommée.
+Cette tâche peut être réalisée soit par des techniques basées sur des grammaires, soit par un modèle statistique tel que l'apprentissage automatique (voir \cite{jurafskySpeechLanguageProcessing2009} pour une introduction complète dans ce domaine).
+Les approches statistiques sont largement utilisées dans l'industrie, car elles offrent de bons résultats.
+Cependant, ces approches nécessitent beaucoup de données pour leur apprentissage, ce qui implique des coûts élevés pour leur récupération, leur annotation et l'apprentissage.
+De plus, il n'est pas toujours possible d'avoir accès à de grands volumes de données, en particulier pour le domaine médical à cause des données sensibles qu'ils peuvent contenir.
+Les méthodes plus conventionnelles basées sur la grammaire sont très utiles pour traiter de petits ensembles de données.
+
+\paragraph{Extraction itérative d'entités}
+L'extraction d'entités peut représenter une tâche complexe en raison de la diversité des types d'entités, de leurs valeurs, de leurs tailles ou de leur imbrication.
+Dans cette thèse, nous proposons de décomposer le processus d'extraction en sous-tâches plus simples, permettant d'exploiter une combinaison de diverses méthodes.
+Initialement, on se focalise sur l'extraction d'informations basiques à l'aide de grammaires ou de lexiques.
+Puis, progressivement, au travers d'une série d'étapes, on s'attelle à la combinaison, la correction, le filtrage et l'enrichissement de ces entités élémentaires afin de parvenir à des entités enrichie sémantiquement.
+Ainsi, dans la phrase "Marie est entrée à l'hôpital", on commencera par déterminer que \emph{Marie} est une personne avant d'ajouter l'information plus précise que \emph{Marie} est une patiente.
+Cette approche permet de tirer parti d'outils génériques pour l'analyse syntaxique et l'extraction d'entités simples, tels que l'extraction de nombres ou de dates.
+Dans la suite, il est possible d'appliquer des techniques d'apprentissage, en se basant sur les entités extraites plutôt que sur le texte brut.
+Cela permet de construire un processus d'extraction ne nécessitant pas l'accès à de larges ensembles de données du domaine étudié.
+
+\paragraph{Organisation}
+Ce chapitre commence par une description (section~\ref{sec:tal:syntax}) du corpus étudié dans cette thèse.
+La section~\ref{sec:tal:entity} présente les techniques mise en œuvres pour la reconnaissance d'entités nommées et la section~\ref{sec:tal:ctx} présente la notion de contextualisation des entités.
+Enfin, le chapitre se termine sur la présentation de deux cas d'usage direct des techniques présentées dans ce chapitre :
+\begin{itemize}
+    \item la classification de cas cliniques (section~\ref{sec:tal:classification}) et
+    \item les interface d'interrogation en langue naturelle (section~\ref{sec:tal:nl-query}).
+\end{itemize}
+La section~\ref{sec:tal:conclusion} conclue ce chapitre.

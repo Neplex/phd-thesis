@@ -15,7 +15,7 @@ D'autres mesures de pondération existent comme l'index de Jaccard \cite{jaccard
 \cite{mihalceaTextrankBringingOrder2004} proposent une autre méthode de pondération des termes basée sur l'algorithme de PageRank \cite{brinAnatomyLargescaleHypertextual1998} dans un graphe représentant les interactions entre les mots.
 
 \paragraph{}
-Cependant, dans un cadre ou les données nécessaires à l'apprentissage de tels modèles ne sont pas toujours accessible des alternatives sont nécessaires.
+Cependant, dans un cadre ou les données nécessaires à l'apprentissage de tels modèles ne sont pas toujours accessible, des alternatives sont nécessaires.
 Les différents outils d'extraction d'informations décrits dans ce chapitre répondent à cette problématique et sont aussi efficaces pour la classification de cas cliniques.
 Cette section présente un système développé pour l'identification du profil clinique du patient \cite{hiotDOINGDEFTUtilisation2021} lors d'une participation à \gls{deft} 2021~\footnote{\url{https://deft.lisn.upsaclay.fr/2021/}} \cite{grouinClassificationCasCliniques2021} qui a obtenue les meilleurs résultats pour la tâche n°1.
 La tâche consistait à identifier les types de maladies d'un patient décrit dans un cas clinique et correspondant aux entrées génériques du chapitre \ref{mesh:C} du \gls{mesh}, un thésaurus bilingue anglais-français du domaine médical fournit par la \gls{nlm}.
@@ -26,7 +26,7 @@ Bien que certaines des remarques discutées dans cette section sont spécifiques
 Le système, présenté dans la figure~\ref{fig:class:sys-sch}, utilise une méthode symbolique, basée sur l'extraction par lexique présentée section~\ref{sec:ie:lexicon}.
 Le lexique permet l'extraction des termes révélateurs de chaque classe et permet de remplacer un éventuel apprentissage d'un modèle \gls{tfidf}.
 Une phase de post-traitement des annotations retournées par le transducteur est utilisée pour nettoyer les résultats obtenus.
-Elle se charge de gérer les négations (section \ref{sec:class:neg}) et de traiter l'ambiguïté engendrée par certains termes sur le genre (section \ref{sec:class:genre}).
+Elle se charge de gérer les négations (section \ref{sec:class:neg}) et de traiter l'ambiguïté engendrée par certains termes sur le genre.
 
 \begin{figure}[htb]
     \small
@@ -40,17 +40,17 @@ Elle se charge de gérer les négations (section \ref{sec:class:neg}) et de trai
         \node[rectangle, draw, right = of neg] (sex) {Genre};
         \node[rectangle, draw, right = of sex] (out) {Classes \acs{mesh}};
         \node[rectangle, draw, above = of fst] (lex) {Lexique};
-        
+
         \path [-stealth]
-            % (text) edge node {} (stop)
-            % (stop) edge node {} (stemme)
-            % (stemme) edge node {} (fst)
-            (text) edge node {} (fst)
-            (fst) edge node {} (neg)
-            (neg) edge node {} (sex)
-            (sex) edge node {} (out)
-            (lex) edge node {} (fst);
-        
+        % (text) edge node {} (stop)
+        % (stop) edge node {} (stemme)
+        % (stemme) edge node {} (fst)
+        (text) edge node {} (fst)
+        (fst) edge node {} (neg)
+        (neg) edge node {} (sex)
+        (sex) edge node {} (out)
+        (lex) edge node {} (fst);
+
         % \node[draw, dotted, fit=(stop) (stemme), label=above:Pré-traitement] {};
         \node[draw, dotted, fit=(neg) (sex), label=above:Post-traitement] {};
     \end{tikzpicture}
@@ -60,48 +60,53 @@ Elle se charge de gérer les négations (section \ref{sec:class:neg}) et de trai
 
 Pour la construction du lexique, seule la catégorie \ref{mesh:C} du \gls{mesh} (maladie) a été utilisée pour cette tâche.
 Elle contient \num{26} classes, qui correspondent aux types de maladie à identifier dans les cas cliniques.
-La table~\ref{tab:classesMesh} donne les identifiants et les noms de chaque classe (trois classes ne sont pas mentionnées dans le tableau, car elles n'étaient pas utilisées dans la classification).
+La table~\ref{tab:mesh:C} donne les identifiants et les noms de chaque classe (trois classes ne sont pas mentionnées dans le tableau, car elles n'étaient pas utilisées dans la classification).
 Chaque classe est structurée en une arborescence de descripteurs, eux-mêmes constitués de concepts auxquels sont associés des termes.
 Nous avons extrait pour chaque classe du chapitre \ref{mesh:C} tous les termes associés à des concepts.
 Au total \num{40052} termes ont été extraits.
 Il est à noter qu'un même terme peut être associé à plusieurs classes.
 Par exemple "diabète gestationnel" est associé aux classes \ref{mesh:C:13}, \ref{mesh:C:18} et \ref{mesh:C:19}.
 
-\begin{multicols}{2}
-    \begin{enumerate}[label=\textbf{C\arabic*}]
-        \item \label{mesh:C:01} Infections bactériennes et mycoses
-        \item \label{mesh:C:02} Maladies virales
-        \item \label{mesh:C:03} Maladies parasitaires
-        \item \label{mesh:C:04} Tumeurs
-        \item \label{mesh:C:05} Maladies ostéomusculaires
-        \item \label{mesh:C:06} Maladies de l'appareil digestif
-        \item \label{mesh:C:07} Maladies du système stomatognathique
-        \item \label{mesh:C:08} Maladies de l'appareil respiratoire
-        \item \label{mesh:C:09} Maladies oto-rhino-laryngologiques
-        \item \label{mesh:C:10} Maladies du système nerveux
-        \item \label{mesh:C:11} Maladies de l'œil
-        \item \label{mesh:C:12} Maladies urogénitales de l'homme
-        \item \label{mesh:C:13} Maladies de l'appareil urogénital féminin et complications de la grossesse
-        \item \label{mesh:C:14} Maladies cardiovasculaires
-        \item \label{mesh:C:15} Hémopathies et maladies lymphatiques
-        \item \label{mesh:C:16} Malformations et maladies congénitales, héréditaires et néonatales
-        \item \label{mesh:C:17} Maladies de la peau et du tissu conjonctif
-        \item \label{mesh:C:18} Maladies métaboliques et nutritionnelles
-        \item \label{mesh:C:19} Maladies endocriniennes
-        \item \label{mesh:C:20} Maladies du système immunitaire
-        \setcounter{enumi}{22}
-        \item \label{mesh:C:23} États, signes et symptômes pathologiques
-        \setcounter{enumi}{24}
-        \item \label{mesh:C:25} Troubles dus à des produits chimiques
-        \item \label{mesh:C:26} Plaies et blessures
-    \end{enumerate}
-\end{multicols}
+\begin{table}[H]
+    \begin{multicols}{2}
+        \begin{enumerate}[label=\textbf{C\arabic*}]
+            \item \label{mesh:C:01} Infections bactériennes et mycoses
+            \item \label{mesh:C:02} Maladies virales
+            \item \label{mesh:C:03} Maladies parasitaires
+            \item \label{mesh:C:04} Tumeurs
+            \item \label{mesh:C:05} Maladies ostéomusculaires
+            \item \label{mesh:C:06} Maladies de l'appareil digestif
+            \item \label{mesh:C:07} Maladies du système stomatognathique
+            \item \label{mesh:C:08} Maladies de l'appareil respiratoire
+            \item \label{mesh:C:09} Maladies oto-rhino-laryngologiques
+            \item \label{mesh:C:10} Maladies du système nerveux
+            \item \label{mesh:C:11} Maladies de l'œil
+            \item \label{mesh:C:12} Maladies urogénitales de l'homme
+            \item \label{mesh:C:13} Maladies de l'appareil urogénital féminin et complications de la grossesse
+            \item \label{mesh:C:14} Maladies cardiovasculaires
+            \item \label{mesh:C:15} Hémopathies et maladies lymphatiques
+            \item \label{mesh:C:16} Malformations et maladies congénitales, héréditaires et néonatales
+            \item \label{mesh:C:17} Maladies de la peau et du tissu conjonctif
+            \item \label{mesh:C:18} Maladies métaboliques et nutritionnelles
+            \item \label{mesh:C:19} Maladies endocriniennes
+            \item \label{mesh:C:20} Maladies du système immunitaire
+                  \setcounter{enumi}{22}
+            \item \label{mesh:C:23} États, signes et symptômes pathologiques
+                  \setcounter{enumi}{24}
+            \item \label{mesh:C:25} Troubles dus à des produits chimiques
+            \item \label{mesh:C:26} Plaies et blessures
+        \end{enumerate}
+    \end{multicols}
+    \caption{Classes du chapitre \ref*{mesh:C} du \acrshort*{mesh}}
+    \label{tab:mesh:C}
+\end{table}
+
 
 Bien que la ressource \gls{mesh} soit assez riche, le lexique peux être complété avec des lexèmes supplémentaires obtenus dans \gls{meddra} grâce aux correspondances établies entre les classes dans l'\gls{umls}.
 Au total, \num{13} classes de \gls{meddra} ont été considérées, ajoutant \num{58071} termes au lexique.
 Le \gls{mesh} contient un certains nombres de termes trop générique (par exemple \emph{maladie}) ou ambigus (par exemple \emph{pris}).
 En suivant la loi de Zipf, ces termes peuvent être éliminés en utilisant un corpus de termes fréquent extérieur au domaine médical.
-Le corpus \gls{wikipedia} FR2008 \cite{REDACCorpusTexte} fournit une liste des termes avec leur fréquence dans l'ensemble du corpus.
+Le corpus \gls{wikipedia} FR2008 \cite{REDACCorpusTexte2008} fournit une liste des termes avec leur fréquence dans l'ensemble du corpus.
 L'ensemble des lexèmes présent dans le corpus et qui sont suffisamment fréquents peuvent ainsi êtres supprimés pour nettoyer le lexique.
 Une évaluation a montré un meilleur rappel avec une fréquence maximum d'apparition de \num{5000} et une meilleure précision avec une fréquence de \num{100}.
 La F-mesure maximale a été obtenue avec une fréquence de \num{1000}.
@@ -118,4 +123,45 @@ C'est le cas de la double négation comme \enquote{Il n'est pas impossible que \
 \cite{blancoIssuesDetectingNegation2011} présente la complexité de la détection de la négation.
 Les auteurs étudient aussi la problématique de la portée de la négation.
 \cite{moranteLearningScopeNegation2008} propose une approche basée sur l'apprentissage pour identifier la portée de la négation dans des textes médicaux.
+Dans le contexte de la classification, la tâche peut être simplifiée en raison de la recherche de marqueurs de classes.
+Il n'est alors pas nécessaire d'analyser précisément la portée de la négation.
+Lorsqu'une classe est représentée, nous faisons l'hypothèse qu'il existe une quantité suffisante de marqueurs permettant de la reconnaître.
+En outre, l'élimination des faux négatifs est considérée comme ayant un impact négligeable sur le résultat final de la classification.
 
+\subsection{Évaluation}
+
+Les résultats de l'évaluation sont montré dans la table~\ref{tab:class:result}.
+L'évaluation est réalisée à partir du corpus de tests utilisé dans la campagne \gls{deft} 2021 et est réalisée sur différentes versions du système proposé.
+L'exécution ne contenant que le lexique \gls{mesh}, nous permet d'obtenir des bons résultats et supérieurs à la médiane de la tâche.
+La table~\ref{tab:class:result} permet de mettre en évidence l'impact de la préparation des lexiques et des post-traitements sur les performances du système.
+Nous observons que le post-traitement lié à l'identification du genre du patient permet une amélioration importante des performances (+ \num{0,036} pour la F-mesure).
+Le filtrage par fréquence des mots trop générique dans les lexiques permet une augmentation attendue de la précision.
+Un gain important est également observé avec l'utilisation des annotations du corpus d'entrainement pour enrichir le lexique.
+C'est cette version qui a obtenue la meilleure F-mesure à \num{0,814}.
+Pour finir, nous avons également utilisé \gls{meddra} pour augmenter le lexique de façon considérable (+\num{58071} termes).
+Cette augmentation permet d'augmenter un peu le rappel par rapport aux deux versions précédentes, mais fait chuter la précision à \num{0,679}.
+
+Les classes pour lesquelles nous avons obtenues les moins bons résultats sont la classe \emph{blessures} (F-mesure \numrange{0,49}{0,55}), \emph{chimiques} (F-mesure \numrange{0,36}{0,54}) et \emph{virales} (1 classe sur 4 a été identifiée dans le corpus de test).
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{l|ccc}
+        Configuration                                                                   & Précision   & Rappel      & F1          \\
+        \hline
+        \hline
+        \acrshort{mesh}                                                                 & \num{0,725} & \num{0,739} & \num{0,732} \\
+        \acrshort{mesh} + négation                                                      & \num{0,739} & \num{0,738} & \num{0,738} \\
+        \acrshort{mesh} + genre                                                         & \num{0,739} & \num{0,798} & \num{0,768} \\
+        \acrshort{mesh} + négation + genre                                              & \num{0,816} & \num{0,738} & \num{0,775} \\
+        \acrshort{mesh} + négation + genre + fréquence                                  & \num{0,873} & \num{0,713} & \num{0,785} \\
+        \acrshort{mesh} + négation + genre + fréquence + annotation                     & \num{0,888} & \num{0,750} & \num{0,814} \\
+        \acrshort{mesh} + négation + genre + fréquence + annotation + \acrshort{meddra} & \num{0,686} & \num{0,769} & \num{0,725}
+    \end{tabular}
+    \caption{Résultat d'expérimentations supplémentaires sur l'impact des post-traitements.}
+    \label{tab:class:result}
+\end{table}
+
+Une analyse d'erreur rapide nous a permis de mettre en évidence que la plupart des erreurs étaient dues à l'absence de certains termes dans le lexique (e.g. \emph{kystes biliaires hépatiques}), ou au fait que certains termes présents ne sont pas reliés à la classe identifiée manuellement (e.g. \emph{fistule} et \emph{fistule cutanée} sont contenus dans la classe \emph{etatsosy} et \emph{peau} pour le deuxième, mais pas dans la classe \emph{tumeur}, contrairement à ce qui a été annoté manuellement).
+Nous observons aussi quelques cas qui nécessitent un raisonnement, par exemple \emph{violente chute} qui induit des blessures.
+
+\FloatBarrier

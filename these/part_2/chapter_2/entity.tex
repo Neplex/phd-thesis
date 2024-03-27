@@ -1,0 +1,279 @@
+L'extraction d'informations dans un texte implique souvent l'identification et la classification des entités nommées \cite{alshaikhdeebBiomedicalNamedEntity2016,goyalRecentNamedEntity2018,nasarNamedEntityRecognition2021}.
+Elles représentent des éléments spécifiques dans un texte qui ont un nom propre ou une désignation particulière.
+Ces éléments peuvent inclure des personnes, des lieux, des organisations, des dates, des quantités, des mesures, etc.
+Une entité nommée est alors représenté par une plage de texte ainsi qu'un type.
+Dans ce cadre, l'annotation sémantique est un processus du \gls{tal} qui vise à associer une valeur aux entités, notamment des références dans une base de connaissances ou une base de données, mais aussi des valeurs numériques ou encore des dates.
+
+Les approches récentes dans la littérature pour l'extraction d'entités se reposent généralement sur l'apprentissage automatique \cite{nasarNamedEntityRecognition2021}.
+Bien que ces approches offrent généralement de bonnes performances, elles nécessitent d'avoir de grands volumes de données annotés pour leur apprentissage.
+Depuis quelques années, les modèles basés sur l'apprentissage profond, tels que les \gls{cnn} et les modèles à base de transformateurs comme \gls{bert} \cite{devlinBERTPretrainingDeep2019} ou les \glspl{llm} tels que \gls{gpt} \cite{radfordImprovingLanguageUnderstanding2018, brownLanguageModelsAre2020}, ont montré des résultats prometteurs dans une variété de tâches de traitement automatique du langage naturel.
+Cependant, l'utilisation de modèles génériques peut poser des défis dans des domaines spécifiques tels que le médical, où le vocabulaire peut être plus complexe et où des données annotées sont souvent rares et coûteuses à obtenir.
+Dans cette thèse, nous explorons l'idée d'associer des solutions génériques pour l'extraction d'informations avec des approches plus \emph{traditionnelles} adaptées au domaine médical.
+
+\paragraph{Lexiques}
+Lorsque le champ des valeurs à extraire est restreint, connu à l'avance et disponible dans une base de données, l'utilisation de lexiques s'avère pertinente surtout quand les données d'entrainement sont difficilement accessibles.
+L'extraction d'entités au moyen de lexiques est une approche courante dans le domaine du traitement automatique du langage naturel \cite{nasarNamedEntityRecognition2021} et qui remonte aux premiers systèmes d'extraction d'entités \cite{rauExtractingCompanyNames1991}.
+Certaines études comme \cite{passosLexiconInfusedPhrase2014} s'intéresse à utiliser des lexiques pour améliorer les systèmes basés sur des réseaux de neurones.
+Les lexiques ont l'intérêt d'être peut couteux, de ne pas nécessiter d'entrainement et sont d'autant plus intéressant quand on travaille sur un domaine ou le vocabulaire est contrôlé comme pour le médical \cite{camposBiomedicalNamedEntity2012}.
+Ainsi, la variation linguistique est réduite et les ressources souvent déjà disponibles.
+Ces lexiques sont essentiellement des répertoires comprenant des termes spécifiques et leurs variations lexicales associées.
+Par exemple, on pourrait créer un lexique des noms de maladies avec leurs acronymes ou encore construire une liste de personne associée à leur nom, leur prénom, leur adresse email, etc.
+
+Dans la section~\ref{sec:ie:lexicon}, nous listerons certaines ressources disponibles pour le domaine médical.
+Nous présenterons également une méthode efficace pour rechercher et identifier des entités dans le texte en s'appuyant sur ces lexiques.
+
+\paragraph{Grammaires locales}
+Lorsque les données appartiennent à un domaine infini ou avec une grande variété de valeurs, les grammaires locales sont plus adaptée que les lexiques.
+Elles sont particulièrement efficaces pour des informations plus ou moins structurées tel que des nombres ou des dates.
+Cette approche repose sur la définition de règles syntaxiques et grammaticales qui décrivent les schémas récurrents des entités que l'on souhaite extraire.
+Par exemple, une grammaire locale peut être construite pour identifier des dates sous la forme \textquote{jour / mois / année} ou encore des valeurs sous la forme \textquote{nombre unité}.
+L'utilisation de grammaires locales pour l'extraction d'entités a été largement étudiée dans la littérature scientifique.
+
+Nous commençons cette section par une description des entités utilisées dans cette thèse puis, nous présenterons les méthodes mise en place pour l'enrichissement des entités.
+
+\subsection{Entités multi-valuée}
+
+L'ambiguïté inhérente aux textes constitue un défi majeur pour les systèmes de traitement automatique du langage, qui doivent être capables de comprendre précisément le sens des énoncés.
+Lors de la phase d'extraction des entités, l'ambiguïté peut concerner le type (par exemple \textit{Paris} peut se référer à une ville ou à une personne) ou la valeur (par exemple, plusieurs personnes dans la base de données ont le même nom).
+En général, on cherche à éliminer cette ambiguïté en ne conservant que la solution la plus probable.
+Une telle solution peut introduire des contradictions par rapport à la sémantique du texte.
+Dans nos travaux, nous choisissons de représenter explicitement l'ambiguïté : une même entité peut alors posséder plusieurs valeurs et une valeur peut être associée à différents types.
+Nous gardons trace des interprétations multiples au cours des étapes d'extraction.
+Durant certaines étapes du traitement, cette ambiguïté pourra être résolue : si l'on détermine le type exact d'une entité, il est alors possible de supprimer les valeurs incohérentes.
+De plus, la détection de la coréférence peut aussi permettre de résoudre l'ambiguïté sur les valeurs si on suppose que les valeurs sont alors l'intersection de l'ensemble des références.
+Si l'ambiguïté ne peut être résolue, c'est l'utilisateur qui sera chargé d'effectuer cette tâche.
+Cette représentation permet aussi la représentation de la conjonction de coordination \textquote{ou}.
+
+\begin{definition}[Entité multi-valuée]
+    Une entité est représentée par un tuple $E = (\mathcal{V}, \mathcal{T},  m)$ où $\mathcal{V}$ est l'ensemble des valeurs de l'entité, $\mathcal{T}$ l'ensemble des types et $m$ est une fonction surjective telle que $\forall v \in \mathcal{V}, \exists T \subseteq \mathcal{T}, m(v) \rightarrow T$
+\end{definition}
+
+\subsection{Extraction par lexiques}
+\label{sec:ie:lexicon}
+
+Les lexiques sont un ensemble de termes, de synonymes, d'acronymes, d'expressions et de concepts propres à un domaine ou à une profession spécifique.
+Ils sont souvent utilisés pour faciliter la communication et la compréhension au sein d'une communauté ou d'un secteur d'activité particulier.
+Les lexiques permettent aux professionnels d'articuler leur discours de manière précise, de prévenir les éventuels malentendus, et d'assurer une compréhension commune des sujets et des enjeux relatifs à leur domaine d'expertise.
+Ils constituent une ressource riche pour l'extraction d'entités.
+
+Un lexique se compose d'un ensemble d'entrée chacune composée d'un identifiant unique et d'une liste de lexèmes représentant cette entrée.
+Les lexiques peuvent être construits à partir de thésaurus, de terminologies ou de bases de connaissances qui représentent des ressources riches qui s'enrichissent avec le temps (souvent semi-automatiquement à partir de corpus annotés) et qui sont très souvent surveillées par une autorité qui vérifie les informations et se charge du nettoyage des entrées.
+% On retrouve un grand nombre de projets communautaires de lexiques ou base de connaissances (\gls{wikidata}, \gls{geonames}, \dots).
+Nous pouvons prendre comme exemple la base \gls{geonames} qui contient un ensemble d'informations sur les lieux géographiques.
+À partir de cette ressource, un lexique pourrait être constitué d'une collection d'identifiants uniques pour chaque lieu auxquels on associe l'ensemble de ses noms possibles.
+La ville de Paris\footnote{\url{http://www.geonames.org/2988507/paris.html}} se voit donc associée l'ensemble de lexèmes suivant : Paris, Île-de-France, Paname, \dots
+
+\subsubsection{Lexiques médicaux}
+
+Le domaine médical ne fait pas exception et fait peut-être partie des plus représentés, notamment avec des institutions comme la \gls{nlm} qui a regroupé, dans le métathésaurus \gls{umls}, un grand nombre de ressources\footnote{\url{https://www.nlm.nih.gov/research/umls/sourcereleasedocs/index.html}} pouvant être très utiles pour le traitement du langage naturel.
+Parmi les ressources de l'\gls{umls} on peut notamment citer \gls{mesh}, \gls{meddra}, \gls{snomed} et \gls{rxnorm}.
+
+\paragraph{MeSH}
+Le \glsreset{mesh}\gls{mesh} \cite{lipscombMedicalSubjectHeadings2000} est un thésaurus du domaine biomédical, à l'origine en anglais, qui est géré par la \gls{nlm}.
+Il permet entre autres d'indexer et d'interroger des bases de données comme MEDLINE/PubMed.
+Une traduction du \gls{mesh} en français, mise à jour chaque année, a été réalisée par l'\gls{inserm}.
+La version bilingue anglais-français peut être interrogée depuis une interface en ligne (\url{http://mesh.inserm.fr/FrenchMesh/}), et il est également possible de télécharger le thésaurus au format XML.
+Le \gls{mesh} est organisé en \num{16} catégories thématiques :
+
+\begin{table}[H]
+    \begin{multicols}{2}
+        \begin{enumerate}[label=\textbf{\Alph*}]
+            \item \label{mesh:A} Anatomie
+            \item \label{mesh:B} Organismes
+            \item \label{mesh:C} Maladies
+            \item \label{mesh:D} Produits chimiques et pharmaceutiques
+            \item \label{mesh:E} Techniques et équipements analytiques, diagnostiques et thérapeutiques
+            \item \label{mesh:F} Psychiatrie et psychologie
+            \item \label{mesh:G} Phénomènes et processus
+            \item \label{mesh:H} Disciplines et professions
+            \item \label{mesh:I} Anthropologie, enseignement, sociologie et phénomènes sociaux
+            \item \label{mesh:J} Technologie, industrie et agriculture
+            \item \label{mesh:K} Sciences humaines
+            \item \label{mesh:L} Sciences de l'information
+            \item \label{mesh:M} Individus
+            \item \label{mesh:N} Santé
+                  \setcounter{enumi}{21}
+            \item \label{mesh:V} Caractéristiques d'une publication
+                  \setcounter{enumi}{25}
+            \item \label{mesh:Z} Lieux géographiques
+        \end{enumerate}
+    \end{multicols}
+    \caption{Liste des catégories thématiques du \glsname*{mesh}}
+\end{table}
+
+\paragraph{MedDRA}
+\glsreset{meddra}\gls{meddra}\footnote{La marque \gls{meddra} est enregistrée par l'\acs{ifpma} au nom du \acs{cih}.}~\cite{brownMedicalDictionaryRegulatory1999} est un dictionnaire terminologique médical développé par le \gls{cih} et utilisé par les autorités réglementaires et l'industrie bio-pharmaceutique.
+\gls{meddra} est disponible en plusieurs langues, dont le français.
+Il contient aussi bien des termes référant à des symptômes, des examens ou encore des traitements, structurés en 5 niveaux qui regroupe les termes par étiologie, site de manifestation, etc.
+Le niveau le plus haut étant une classification par discipline médicale.
+Il existe 26 classes, par exemple \textit{Affections vasculaires}, \textit{Affections du rein et des voies urinaires} ou \textit{Affections du système immunitaire}.
+
+\paragraph{Médicaments et substances : \gls*{rcp}}
+Chaque médicament soumis à une procédure d'autorisation de mise sur le marché au niveau européen est accompagné d'un \gls{rcp} fourni par l'\gls{ansm}.
+Ces \glsreset{rcp}\gls{rcp} sont accessibles sur le site de l'\gls{ema} et sont disponibles dans toutes les langues de l'Union Européenne.
+Ils constituent une source d'information riche pour la création de lexiques destinés à l'extraction des médicaments et des substances actives.
+Aux États-Unis, on trouve un équivalent dans le \gls{pdr} (uniquement en anglais) qui est vérifié par l'agence de santé locale, la \gls{fda}.
+
+DrugBank \cite{wishartDrugBankKnowledgebaseDrugs2008,wishartDrugBankMajorUpdate2018} (\url{https://go.drugbank.com/}) est une base de données unifiée en anglais disponible en ligne regroupant des informations détaillées sur les médicaments, y compris leurs propriétés, mécanismes d'action, indications et interactions.
+Fournit par l'université de l'Alberta au Canada, elle est accessible gratuitement en version publique, avec une version professionnelle disponible pour les chercheurs et les professionnels de la santé.
+
+\paragraph{HeTOP}
+Le projet \gls{cismef} fournit le portail \gls{hetop} pour accéder à une ontologie en multilingues qui regroupe beaucoup de ressources comme l'\gls{umls}.
+
+\subsubsection{Transducteurs finis}
+
+Les transducteurs finis sont une forme d'automate fini qui reconnaissent un langage, mais qui sont aussi capables de produire une sortie.
+Ils sont formellement définis comme des machines de Turing à deux rubans.
+À notre connaissance, \cite{grossUseFiniteAutomata1989} est le premier à introduire l'utilisation des transducteurs finis dans le traitement automatique de la langue naturelle.
+Les transducteurs finis peuvent être utilisés pour de l'analyse syntaxique \cite{briscoeRobustAccurateStatistical2002} mais aussi pour l'extraction d'entités \cite{gaioExtendedNamedEntity2017}.
+\cite{mihovDirectConstructionMinimal2001} ont introduit un algorithme permettant de construire un transducteur minimal à partir d'une liste triée de mots reconnus par le langage avec leur sortie.
+Cet algorithme est celui implémenté dans pour la construction des \gls{fst} dans \gls{lucene}, un moteur d'indexation de texte notamment utilisé par \gls{solr}.
+
+\begin{definition}[FST]
+    Un transducteur fini $T = (\Sigma^{in}, \Sigma^{out}, Q, I, F, \delta)$ est un automate fini qui reconnaît un langage $L = \{w_1, \dots, w_n\}$ sur un alphabet $\Sigma^{in}$ où les transitions possèdent deux labels ($l^{in} \in \Sigma^{in}$ et $l^{out} \in \Sigma^{out}$).
+    Le premier caractérise la transition et le second constitue la sortie de l'automate.
+    $Q$ est l'ensemble des états, $I$ les états initiaux, $F$ les états finaux, $\delta$ l'ensemble des transitions et $\epsilon$ est le mot vide.
+    La sortie de l'automate (quand un mot $w$ est reconnu, c.-à-d. $w \in L$) peut être une somme des labels de sortie, leur concaténation ou, comme ici, une unique valeur (la classe).
+    Un transducteur n'est pas obligatoirement déterministe et peut donc, pour un même mot, retourner plusieurs valeurs de sortie.
+\end{definition}
+
+Les transducteurs sont des structures plus optimisées en mémoire que d'autres structures comme les tables triées, mais au détriment d'un accès plus coûteux en ressources processeur.
+Ils sont par conséquent, très utiles pour traiter des langages de grande taille qui ne pourraient pas normalement tenir en mémoire tout en offrant un accès suffisamment rapide.
+Nous utilisons l'implémentation fournie dans \gls{solr}/\gls{lucene} par le projet OpenSextant\footnote{\url{https://github.com/OpenSextant/SolrTextTagger}}.
+Elle repose sur l'algorithme de \cite{mihovDirectConstructionMinimal2001} qui permet d'obtenir le transducteur minimal efficacement.
+Les transducteurs gardent aussi l'avantage d'être facilement mis à jour.
+Il est possible d'ajouter ou de supprimer de nouveaux mots dans le langage sans avoir à reconstruire l'automate entièrement.
+
+\paragraph{Construction}
+Nos lexiques sont définis comme une application surjective $\forall v_i \in V\ \exists X_i \subset X,\ Lex: v_i \rightarrow X_i$ où $V$ est l'ensemble des valeurs du lexique et $X$ est l'ensemble des lexèmes présents dans le lexique.
+$X_i$ est l'ensemble des exemples de la valeur $v_i$.
+Afin de construire notre transducteur pour le lexique $Lex: V \rightarrow X$, nous définissons les alphabets $\Sigma^{in} = \{t_i \mid t_i \in \textit{token}(x_j)\ \forall x_j \in X\} \cup \{\epsilon\}$ où \textit{token} est une fonction qui retourne l'ensemble des tokens $t_i$ d'un lexème $x_j$ et $\Sigma^{out} = V \cup \{\epsilon\}$.
+Notre langage $L$ est alors naturellement défini comme l'ensemble des lexèmes $X$ du lexique, c.-à-d. chaque lexème est un mot du langage.
+
+La fonction \textit{token} permet l'extraction des tokens utilisés pour la construction du transducteur.
+Cette fonction est aussi appliquée aux textes en entrée afin de les faire correspondre à l'alphabet $\Sigma^{in}$.
+Elle a pour rôle :
+\begin{itemize}
+    \item Le découpage des lexèmes (mot ou suite de mots) en tokens.
+          Le découpage est réalisé sur les caractères d'espacement, les ponctuations, les traits d'union et les chiffres accolés à du texte (ex : 50mg devient \{50, mg\}) ;  % Tokenizer
+    \item Le passage en minuscule de l'ensemble des tokens ;                                                                                                                  % LowerCase
+    \item Le filtrage des tokens correspondant à des mots vides (basé sur une liste) ;                                                                                        % StopWordsFilter
+    \item La transformation de tous les tokens non-ASCII par leur équivalent (suppression des accents) ;                                                                      % ASCIIFolding
+    \item Le remplacement de chaque token par sa racine en utilisant l'algorithme Snowball \cite{porterSnowballLanguageStemming2001}.                                         % SnowballPorter (Stemme)
+\end{itemize}
+
+Un prétraitement visant à transformer les mots en $n$-grammes a aussi été envisagé, mais a été jugé trop coûteux en ressources pour un gain de qualité trop faible.
+
+\paragraph{Détection des valeurs}
+Notre système transforme le texte en entrée en une liste de tokens avec l'aide de la fonction \textit{token}.
+La liste de tokens est ensuite passée dans le transducteur afin d'extraire l'ensemble des valeurs du lexique.
+Si plusieurs valeurs sont trouvées pour un même mot de $L$, les multiples valeurs sont sélectionnées et on produit alors une entité multi-valuée.
+Cependant, si deux lexèmes différents se recoupent (ex : \emph{aggravation transitoire des symptômes} et \emph{symptômes cardiovasculaires}) seule les valeurs associées au plus grand lexème (ici, \emph{aggravation transitoire des symptômes}) sont gardées.
+Les tokens restants (\emph{cardiovasculaires}) sont remis en jeux (au cas où ils pourraient former un autre mot de $L$).
+Cette approche permet de sélectionner les plus grands lexèmes qui sont plus discriminant de par leur taille.
+
+\begin{example}
+    \label{ex:fst}
+    Prenons comme exemple trois lexèmes du \gls{mesh} avec des classes arbitraires dans la table~\ref{tab:fst-ex}.
+    À partir des exemples pour chaque classe, nous pouvons construire le transducteur Figure~\ref{fig:fst-ex}.
+
+    \begin{table}[htb]
+        \centering
+        \begin{tabular}{cll}
+            Classe & Lexème                                 & Tokens                           \\
+            \hline
+            C1     & Exacerbation transitoire des symptômes & \{exacerb, transitoir, symptom\} \\
+            C1     & Aggravation transitoire des symptômes  & \{aggrav,  transitoir, symptom\} \\
+            C2     & Aggravation passagère des symptômes    & \{aggrav,  passager,   symptom\} \\
+        \end{tabular}
+        \caption{Liste de lexèmes avec leur classe associée et la liste des tokens obtenus avec la fonction \textit{token}}
+        \label{tab:fst-ex}
+    \end{table}
+
+    \begin{figure}[!htb]
+        \small
+        \centering
+        \begin{tikzpicture}[node distance = 3cm, on grid, auto, thick, every initial by arrow/.style={-stealth}]
+            \node[state, initial, initial distance=.7cm, initial text=] (s0) {s0};
+            \node[state, above right = of s0] (s1) {s1};
+            \node[state, below right = of s0] (s2) {s2};
+            \node[state, below right = of s1] (s3) {s3};
+            \node[state, accepting, right = of s3] (s4) {s4};
+
+            \path [-stealth]
+            (s0) edge             node[above left ] {aggrav     $\mid \epsilon$} (s1)
+            (s0) edge             node[below left ] {exacerb    $\mid$ C1}       (s2)
+            (s1) edge[bend left ] node[above right] {transitoir $\mid$ C1}       (s3)
+            (s1) edge[bend right] node[below left ] {passager   $\mid$ C2}       (s3)
+            (s2) edge             node[below right] {transitoir $\mid \epsilon$} (s3)
+            (s3) edge             node[above      ] {symptom    $\mid \epsilon$} (s4);
+        \end{tikzpicture}
+        \caption[Exemple d'un transducteur fini]{Exemple d'un transducteur fini construit à partir de la table~\ref{tab:fst-ex}}
+        \label{fig:fst-ex}
+    \end{figure}
+\end{example}
+
+\subsection{Cascade de \acrshortpl*{crf}}
+\label{sec:tal:crf}
+
+Le corpus CAS permet de mettre en avant la complexité de certaines entités cliniques, dont la longueur rend difficile l'extraction précise des bornes de l'entité.
+En se basant sur le nombre significatif d'entités imbriquées (par exemple, les \num{1831} entités \emph{SOSY} contiennent \num{1909} entités imbriquées), nous avons proposé dans \cite{minardDOINGDEFTCascade2020} l'utilisation de cascades de \glspl{crf} \cite{laffertyConditionalRandomFields2001,alexRecognisingNestedNamed2007}.
+Une cascade de \glspl{crf} est une approche en apprentissage automatique qui consiste à utiliser plusieurs modèles \gls{crf} successivement en différents niveaux, chacun se concentrant sur une tâche spécifique, afin d'améliorer l'annotation.
+L'imbrication rend nécessaire cette approche, car les \glspl{crf} n'annotent qu'un seul label par token.
+De plus cela permet de tirer profit des labels extraits précédemment en les utilisant comme traits pour l'apprentissage des niveaux suivants.
+L'idée sous-jacente est de commencer par extraire des entités simples, puis d'utiliser ces annotations pour extraire des entités plus complexes composées de ces entités simples.
+Les entités de niveaux inférieurs peuvent être extraites à l'aide d'\gls{crf}, mais également par d'autres techniques telles que les lexiques ou les grammaires locales, comme expliqué dans l'introduction.
+
+Dans l'article \cite{minardDOINGDEFTCascade2020}, uniquement des \glspl{crf} ont été employés.
+On propose de regrouper les entités qui partagent des similitudes sémantiques, morphologiques et en suivant les imbrications.
+Nous obtenons ainsi les niveaux suivants :
+\begin{multicols}{2}
+    \begin{enumerate}
+        \item \emph{Dose} et \emph{Valeur}
+        \item \emph{Durée} et \emph{Fréquence}
+        \item \emph{Date} et \emph{Moment}
+        \item \emph{Anatomie} et \emph{Mode}
+        \item \emph{Traitement} et \emph{Examen}
+        \item \emph{Substance}
+        \item \emph{SOSY} et \emph{Pathologie}
+    \end{enumerate}
+\end{multicols}
+
+La figure \ref{tab:tal:cascade} donne un aperçu du fonctionnement de la cascade pour la phrase \textquote{La fonction rénale était normale et une rhabdomyolyse était éliminée, les CPK étant normales}.
+La première colonne montre la liste des tokens et les colonnes suivantes, la liste des étiquettes considérées pour chacun des niveaux correspondants au format \gls{bio} \cite{ramshawTextChunkingUsing1995}.
+La méthode proposée dans \cite{minardDOINGDEFTCascade2020} à montrée une bonne précision mesurée à \num{0.839}, avec un rappel plus faible de \num{0.613} pour une mesure F1 de \num{0.708}.
+
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{l|cccc}
+                      & Niveau 1 & Niveau 4   & Niveau 5 & Niveau 7 \\
+        \hline
+        \hline
+        La            & O        & O          & O        & O        \\
+        fonction      & O        & O          & B-examen & B-sosy   \\
+        rénale        & O        & B-anatomie & I-examen & I-sosy   \\
+        était         & O        & O          & O        & I-sosy   \\
+        normale       & B-valeur & O          & O        & I-sosy   \\
+        et            & O        & O          & O        & O        \\
+        une           & O        & O          & O        & O        \\
+        rhabdomyolyse & O        & O          & O        & B-sosy   \\
+        était         & O        & O          & O        & O        \\
+        éliminée      & O        & O          & O        & O        \\
+        ,             & O        & O          & O        & O        \\
+        les           & O        & O          & O        & O        \\
+        CPK           & O        & O          & B-examen & B-sosy   \\
+        étant         & O        & O          & O        & I-sosy   \\
+        normales      & B-valeur & O          & O        & I-sosy   \\
+        .             & O        & O          & O        & O
+    \end{tabular}
+    \caption{Exemple des différents niveaux d'annotation pour la cascade de \acrshortpl*{crf}}
+    \label{tab:tal:cascade}
+\end{table}
+
+\paragraph{\acrshort*{dsl}}
+Les \acrshortpl*{crf} nécessitent une quantité conséquente de données annotées pour leur apprentissage.
+Quand il n'est pas possible de récupérer suffisamment de données, on utilise un \gls{dsl} pour générer artificiellement des exemples.
+Un \gls{dsl} est un langage de programmation spécifique à un domaine.
+Dans cette thèse, on utilise Chatette~\cite{ChatetteDatasetGenerator2024} qui permet de construire une grammaire pour générer facilement de construire une grande variété d'exemples synthétiques représentant différentes variations des entités attendues.
+Cela permet d'avoir des exemples pour les entités annotés qui sont utilisées comme attribut du \gls{crf} et permet de construire également des jeux de tests recouvrant l'ensemble des entités.
+Les exemples de valeurs pour les entités associés à des lexiques sont automatiquement généré.

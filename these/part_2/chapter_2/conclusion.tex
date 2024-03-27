@@ -1,6 +1,32 @@
+Nous avons examiné deux applications directes des différentes méthodes utilisées dans cette thèse dans des contextes variés.
+Cela met en lumière l'efficacité de ces méthodes pour un vocabulaire contrôlé et avec peu de données d'apprentissage.
+Dans le cadre d'\gls{ennov}, il est essentiel de combiner des lexiques avec des méthodes d'apprentissage plus traditionnelles.
+En effet, même si deux clients peuvent manipuler les mêmes catégories d'objets dans leur base de données (telles que des personnes, des produits, etc.), les valeurs peuvent différer considérablement.
+L'utilisation de lexiques permet d'éviter d'entrainer un modèle pour chaque base de données et évite également d'avoir besoin d'accéder aux données des clients, puisque les lexiques sont construits automatiquement et localement.
+Notre approche montre que les lexiques constituent une ressource riche, facilement mise à jour et permettent d'obtenir une bonne qualité pour l'extraction d'entités et la classification de documents.
+Nous avons également vu que le filtrage automatique de termes trop génériques fonctionne bien pour du vocabulaire spécifique.
 
+En ce qui concerne la classification, nous avons constaté que le système proposé offre de bons résultats et surpasse les approches basées sur l'apprentissage automatique proposées lors de \gls{deft} 2021.
+Contrairement aux méthodes d'apprentissage, notre approche basée sur les lexiques ne nécessite pas d'apprentissage initial (à l'exception du raffinement), ni de grands corpus d'entraînement.
+De plus, elle est facilement mise à jour (il est possible d'ajouter ou de supprimer des valeurs sans nécessiter un réapprentissage du modèle) et elle est performante (la classification de \num{108} documents s'exécute en environ une minute avec notre système).
+L'impact en ressources utilisées est réduit et un tel système aussi être facilement déployé sur des systèmes embarqués.
 
+Cela met en perspective l'utilisation quasi systématique de l'apprentissage automatique, notamment des réseaux de neurones et des modèles de langue (\acrshortpl{llm}), dans l'industrie, malgré les coûts élevés et l'impact environnemental de ces solutions.
+Selon \cite{strubellEnergyPolicyConsiderations2019}, l'entraînement d'un modèle de réseau de neurones profond \textquote{à l'état de l'art} pour effectuer de la traduction équivaut à l'impact de la durée de vie de cinq voitures.
+De plus, les durées d'entraînement pour ces modèles peuvent varier de quelques jours à plusieurs semaines.
+Il est donc important de continuer à considérer les approches symboliques, qui demeurent efficaces pour certaines tâches.
 
-Les outils vu dans ce chapitre ne représente que première étape de l'extraction d'information.
-Il est important de raisonner sur les données extraites pour extraire la connaissance.
-Les données extraites peuvent ensuite êtres structurés pour être stockées dans des bases de données.
+Le traitement de la négation, tel qu'abordé dans la section~\ref{sec:class:neg}, constitue une version simplifiée de la problématique.
+Dans le cadre de futurs travaux, il serait envisageable de mettre en place une méthode sémantique visant à mieux identifier la portée des marqueurs de négation.
+La détection de la négation peut aussi être considéré comme le problème de la détection de la portée de la contextualisation et pourrait être réalisée par une cascade de \acrshortpl{crf}.
+De plus, il pourrait être intéressant d'explorer la détection de négations plus complexes, comme dans la phrase \textquote{Elle n'a présenté des nausées que durant la nuit et aucun vomissement}.
+Par ailleurs, il serait également pertinent de pouvoir extraire la temporalité et la causalité au sein des textes médicaux, car ces éléments représentent des informations capitales pour la compréhension des cas cliniques.
+
+Pour aller plus loin dans l'extraction d'information, nous avons proposé dans \cite{savaryRelationExtractionClinical2022} d'extraire un ensemble de relations médicales couramment rencontrées dans la littérature.
+Cette approche repose sur un ensemble de règles appliquées sur l'arbre de dépendances et exploite le fait que la relation entre deux entités est entièrement déterminée par les types de ces entités.
+Malgré les limites discutées dans la section~\ref{sec:tal:ctx:rule} pour la contextualisation des entités dans des phrases complexes, les résultats obtenus dans \cite{savaryRelationExtractionClinical2022} sont encourageants.
+En effet, avec un ensemble restreint de sept règles simples, le système proposé atteint un rappel de \num{0.84}, une précision de \num{0.95} et une mesure F1 de \num{0.89}.
+
+Les outils présentés dans ce chapitre ne constituent qu'une première étape dans le processus d'extraction d'informations.
+La structuration automatique des informations, telle que présentée dans le chapitre~\ref{chp:struct}, représente une seconde étape cruciale permettant de stocker ces informations dans des bases de données.
+Leur stockage facilite l'interrogation, l'exploitation et le raisonnement efficace sur ces données afin d'extraire de la connaissance.
