@@ -42,11 +42,17 @@ Nous gardons trace des interprétations multiples au cours des étapes d'extract
 Durant certaines étapes du traitement, cette ambiguïté pourra être résolue : si l'on détermine le type exact d'une entité, il est alors possible de supprimer les valeurs incohérentes.
 De plus, la détection de la coréférence peut aussi permettre de résoudre l'ambiguïté sur les valeurs si on suppose que les valeurs sont alors l'intersection de l'ensemble des références.
 Si l'ambiguïté ne peut être résolue, c'est l'utilisateur qui sera chargé d'effectuer cette tâche.
-Cette représentation permet aussi la représentation de la conjonction de coordination \textquote{ou}.
+Nous verrons aussi dans la section~\ref{sec:tal:nl-query} que, selon l'usage, l'ambiguïté n'a pas nécessairement besoin d'être résolue.
 
 \begin{definition}[Entité multi-valuée]
     Une entité est représentée par un tuple $E = (\mathcal{V}, \mathcal{T},  m)$ où $\mathcal{V}$ est l'ensemble des valeurs de l'entité, $\mathcal{T}$ l'ensemble des types et $m$ est une fonction surjective telle que $\forall v \in \mathcal{V}, \exists T \subseteq \mathcal{T}, m(v) \rightarrow T$
 \end{definition}
+
+Cette représentation permet aussi la représentation de la conjonction de coordination \textquote{ou}.
+Deux entités $E_1 = (\mathcal{V}_1, \mathcal{T}_1, m_1)$ et $E_2 = (\mathcal{V}_2, \mathcal{T}_2, m_2)$ liées par une conjonction \textquote{ou}, peuvent alors êtres représentés comme une seule entité $E = (\mathcal{V}_1 \cup \mathcal{V}_2, \mathcal{T}_1 \cup \mathcal{T}_2, m_1 \circ m_2)$.
+Les entités sont extraites en utilisant différentes stratégies de façon indépendante.
+En particulier, si plusieurs approches identifient des entités se chevauchant (mais pas nécessairement avec les mêmes bornes), nous ne conservons que l'entité résultant de l'union de ces entités pour représenter l'ambiguïté causée par l'extraction.
+On peut aussi utiliser le même phénomène pour accentuer la précision en gardant alors l'intersection des entités.
 
 \subsection{Extraction par lexiques}
 \label{sec:ie:lexicon}

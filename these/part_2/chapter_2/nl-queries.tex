@@ -1,8 +1,17 @@
-Les systèmes d'interrogation de bases de donnés graphes visant les \emph{experts du domaine} plutôt que les experts dans des bases de données, suscitent un intérêt grandissant, car ce sont ces utilisateurs auxquels profite le plus l'information et qui sont les plus aptes à la transformer en connaissance.
+Les systèmes d'interrogation de bases de données graphes visant les \emph{experts du domaine} plutôt que les experts dans des bases de données, suscitent un intérêt grandissant, car ce sont ces utilisateurs auxquels profite le plus l'information et qui sont les plus aptes à la transformer en connaissance.
 Il est donc crucial de rendre ces systèmes plus conviviaux et accessibles aux utilisateurs sans compétences techniques avancées.
-Malgré la puissance des langages d'interrogation comme \gls{sql} \gls{sparql} ou encore \gls{cypher}, leur utilisation nécessite une compréhension de la structure des données et de leurs interactions.
+Malgré la puissance des langages d'interrogation comme \acrshort{sql}, \acrshort{sparql} ou encore \gls{cypher}, leur utilisation nécessite une compréhension de la structure des données et de leurs interactions.
 Afin d'améliorer l'accessibilité à l'information sauvegardée dans ces \gls{sgbd}, la recherche sur les \gls{nli} a suscité beaucoup d'intérêt ces dernières années \cite{zhengQuestionAnsweringKnowledge2018,wangCrossdomainNaturalLanguage2019,xuMirrorNaturalLanguage2023,vargas-solarTranslatingDataScience2023,vargas-solarConversationalDataExploration2023}.
 L'intérêt fondamental des interfaces en langage naturel réside dans la capacité à permettre aux utilisateurs de se concentrer sur la signification de leurs requêtes, plutôt que sur les mécanismes sous-jacents de recherche d'information.
+
+Certains travaux se concentrent sur l'augmentation du pouvoir d'expression des requêtes, tandis que d'autres se concentrent sur l'indépendance par rapport au domaine.
+Par exemple, dans~\cite{zhengQuestionAnsweringKnowledge2018}, les auteurs proposent d'utiliser des modèles binaires plutôt que des analyses sémantiques pour mieux comprendre les requêtes complexes, tandis que~\cite{wangCrossdomainNaturalLanguage2019} propose un \gls{nli} inter-domaines avec basé sur un étiquetage générique des questions proposées.
+Plusieurs études \cite{zouNaturalLanguageQuestion2014,faderOpenQuestionAnswering2014,amsterdamerNaturalLanguageInterface2015} s'intéressent aux systèmes de questions-réponses, ou \gls{qa}, où les utilisateurs posent des questions en langage naturel sur une base de données \acrshort{rdf}.
+Les requêtes d'agrégation sont examinées dans~\cite{huNaturalLanguageAggregate2018} : les auteurs proposent une méthode pour identifier automatiquement l'agrégation et la transformer en une instruction d'agrégation \acrshort{sparql}.
+Les méthodes utilisées varient aussi considérablement.
+Dans \cite{vargas-solarTranslatingDataScience2023}, les auteurs cherche à construire des requêtes pour l'analyse de données à partir d'une requête formulée en langage naturel.
+\cite{vargas-solarConversationalDataExploration2023} propose un système pour l'exploration de donnée pour des graphes de propriétés en mode conversationnel.
+Dans \cite{zafarFormalQueryGeneration2018,zhengQuestionAnsweringKnowledge2018,steinmetzNaturalLanguageQuestions2019}, les auteurs fondent leur approche sur des techniques de \gls{tal} avec l'extraction d'entités et des grammaires, tandis que dans \cite{utamaEndtoendNeuralNatural2018,wangCrossdomainNaturalLanguage2019}, ils utilisent des réseaux neuronaux.
 
 Dans ce contexte, et en s'appuyant sur les méthodes de reconnaissances d'informations textuelles présentées dans les sections précédentes, on s'intéresse aux requêtes factuelles sur les instances d'une \emph{classe} \gls{rdf} avec deux objectifs principaux :
 \begin{enumerate*}[label=(\roman*)]
@@ -95,19 +104,19 @@ Plus simplement, on ne considère que des requêtes simples qui sont traduites e
             \depedge{15}{14}{nummod}
         \end{dependency}
     \end{adjustbox}
-    \caption{Arbre de dépendance d'une version simplifiée de $NLQ_{run}$ obtenu avec \gls*{spacy}}
+    \caption[Arbre de dépendance d'une version simplifiée de $NLQ_{run}$]{Arbre de dépendance d'une version simplifiée de $NLQ_{run}$ obtenu avec \gls{spacy}}
     \label{fig:nl-query:dep}
 \end{figure}
 
 \subsection{Extraction d'entités}
 
-En s'appuyant sur les sections précédentes, l'ensemble des classes présentes dans la base de données peuvent être représentés par un lexique.
-Dans l'exemple de $NLQ_{run}$, on suppose que l'on a un lexique de \emph{Personne} qui à pour valeur les identifiants des individus associés au nom, prénom, etc de chaque personne.
+En s'appuyant sur les sections précédentes, l'ensemble des classes présentes dans la base de données peuvent être représentées par un lexique.
+Dans l'exemple de $NLQ_{run}$, on suppose que l'on a un lexique de \emph{Personne} qui a pour valeur les identifiants des individus associés au nom, prénom, etc. de chaque personne.
 Ainsi, l'ensemble des individus de la base peuvent être reconnus et associé directement à la classe (correspondant au type de l'entité).
 Un lexique des classes cible disponible et un lexique des champs/propriété dans la base sont aussi construit.
 Ces lexiques nécessitent généralement une intervention humaine pour compléter la liste des synonymes pour ne pas uniquement dépendre du nom de la classe.
-Pour identifier les dates et les nombre (ex : 30 euros), on utilise un ensemble de grammaire locale.
-Les \emph{texte libres}, comme le titre dans $NLQ_{run}$, sont extrait à l'aide d'un \gls{crf} appris sur un jeu de donnée généré en utilisant un \gls{dsl}.
+Pour identifier les dates et les nombres (ex : 30 euros), on utilise un ensemble de grammaire locale.
+Les \emph{textes libres}, comme le titre dans $NLQ_{run}$, sont extrait à l'aide d'un \gls{crf} appris sur un jeu de donnée généré en utilisant un \gls{dsl}.
 L'exemple~\ref{ex:nl-query:simpleEnts} montre les entités extraites pour la requête $NLQ_{run}$.
 
 \begin{example}
@@ -145,7 +154,7 @@ L'exemple~\ref{ex:nl-query:simpleEnts} montre les entités extraites pour la req
 \end{example}
 
 L'extraction des associations \emph{classe cible} -- attributs (c.-à-d. des arêtes dans le graphe) se fait par contextualisation.
-Comme discuté dans la section~\ref{sec:tal:ctx}, cette dernière peut s'opérer par extraction de marqueur de contexte (dans $NLQ_{run}$ on peut identifier les marqueurs \textquote{intitulés} et \textquote{écrits par}) ou en utilisant un \gls{crf}.
+Comme discuté dans la section~\ref{sec:tal:ctx}, cette dernière peut s'opérer par extraction de marqueur de contexte (dans $NLQ_{run}$, on peut identifier les marqueurs \textquote{intitulés} et \textquote{écrits par}) ou en utilisant un \gls{crf}.
 Ici, on utilise des \acrshortpl{crf} pour les attributs génériques et l'ensemble de règles donné dans la section~\ref{sec:tal:ctx:rule} pou identifier le lien entre une entité correspondante à un attribut (ex : \ref{nl-query:e5} \textquote{prix}) et l'entité correspondante à la valeur de l'attribut (ex : \ref{nl-query:e6} \textquote{30 euros}).
 Dans $NLQ_{run}$, on remarque la présence d'un opérateur \textquote{inférieur à}.
 Un opérateur est un modificateur (comme les contextes) qui vient enrichir la valeur (contrairement au type pour les contextes) d'une entité.
@@ -233,7 +242,7 @@ Les lignes~\ref{algo:nl-query:ent-start} à \ref{algo:nl-query:ent-end} de la pr
 On commence par construire pour chaque valeur de l'entité une variable avec la fonction \GetNewVar et on construit la formule de comparaison correspondant à l'opérateur entre la variable et la valeur à l'aide de la fonction \BuildAtomOP.
 Pour chaque type associé à la valeur ($E(value)$, ligne~\ref{algo:nl-query:types}), on construit les atomes correspondants.
 La fonction \BuildAtom est utilisée pour construire les atomes qui seront ajoutés à $body(q)$.
-Notez que \BuildAtom associe à chaque type, le symbole de prédicat correspondant et construit l'atome en prenant en compte l'emplacement de la valeur de l'entité (variable $y$) dans l'atome
+Notez que \BuildAtom associe à chaque type, le symbole de prédicat correspondant et construit l'atome en prenant en compte l'emplacement de la valeur de l'entité (variable $y$) dans l'atome.
 Dans les prédicats binaires, $x$ est toujours l'autre variable.
 Si, dans $E_e$, il y a plus d'une valeur, alors l'entité est ambiguë, soit parce qu'elle a été extraite par un lexique et que le lexème est ambiguë soit c'est une entité obtenue après prise en compte de la conjonction de coordination \textit{or}.
 On matérialise l'ambiguïté par une union de requête.
@@ -294,12 +303,12 @@ On obtient alors la DB-query suivante :
 \end{equation*}
 
 \subsection{Évaluation}
-
-On évalue le système sur un cas concret d'une instance de la \glsreset{ged}\gls{ged} d'\gls{ennov}.
-L'ensemble des métadonnées des documents sont regroupés et indexés dans des lexiques de façon automatique.
-Après l'extraction des diverses entités on ajoute une phase de post-traitement pour supprimer les incohérences.
-Par exemple, on vérifie qu'il s'agit bien d'une personne dans un champ personne, sinon on supprime la condition.
-Cette phase de post-traitement permet ainsi de corriger les éventuelles erreurs qui ont eu lieu lors de l'extraction et de la contextualisation.
+Le système est évalué sur un cas concret impliquant une instance de la \glsreset{ged}\gls{ged} d'\gls{ennov}.
+Dans cette configuration, les métadonnées des documents sont regroupées et indexées automatiquement dans des lexiques.
+Après l'extraction des différentes entités, une phase de post-traitement est ajoutée pour éliminer les incohérences éventuelles.
+Par exemple, cette phase vérifie si une entité identifiée comme un champ personne est bien associé à un identifiant valide de personne.
+Si ce n'est pas le cas, la condition est supprimée.
+Cette étape de post-traitement permet ainsi de rectifier d'éventuelles erreurs survenues lors de l'extraction et de la contextualisation des entités.
 
 \begin{figure}[htb]
     \centering
@@ -308,10 +317,12 @@ Cette phase de post-traitement permet ainsi de corriger les éventuelles erreurs
     \label{fig:nl-query:ui}
 \end{figure}
 
-La figure~\ref{fig:nl-query:ui} montre l'interface utilisateur et un exemple de requête en anglais.
-Le résultat de la recherche n'est pas présent sur la figure.
-Pour aider l'utilisateur à comprendre la requête qui a été construite, on la représente sous la forme d'un arbre comme présenté sur la figure.
-On remarque par exemple l'utilisation de la conjonction \textquote{ou} et l'ambiguïté du prénom \emph{John}.
+La figure~\ref{fig:nl-query:ui} présente l'interface utilisateur ainsi qu'un exemple de requête en anglais : \enquote{written by John or me during 2024}.
+Le résultat de la recherche n'est pas présent sur cette figure.
+Pour aider l'utilisateur à comprendre la requête qui a été formulée, celle-ci est représentée sous forme d'un arbre, tel que présenté sur la figure.
+Dans la requête, on observe par exemple l'utilisation de la conjonction \textquote{ou} entre \emph{Nicolas} et \emph{John} ainsi que l'ambiguïté du prénom \emph{John}.
+De plus, la date exprimée par \enquote{during 2024} est convertie en une plage de valeur, créant ainsi deux conditions : $>= 2024$ et $<2025$.
+Dans cette implémentation, nous utilisons la bibliothèque \gls{duckling}\footnote{\url{https://github.com/facebook/duckling}} pour extraire les entités détectables par des grammaires locales telles que les dates, les nombres, les adresses e-mail, etc.
 
 \begin{table}[htb]
     \centering
@@ -342,23 +353,31 @@ On remarque par exemple l'utilisation de la conjonction \textquote{ou} et l'ambi
     \label{tab:nl-query:result}
 \end{table}
 
-La table~\ref{tab:nl-query:result} présente l'évaluation sur le corpus synthétique de test.
-Le corpus de test a été généré en utilisant le même \gls{dsl} que pour les données d'entrainement des \acrshortpl{crf}.
-La première section (de \emph{object type} à \emph{unit}) sont des entités extraites en utilisant des lexiques.
-Les entités \emph{time} sont extraite en utilisant des grammaires locales et \emph{title} à l'aide d'un \gls{crf}.
-La section suivante (de \emph{application date} à \emph{signatories}) concerne les entités contextualisées, les dates à partir de l'entité \emph{time} et \emph{issuer/signatories} à partir de l'entité \emph{person}.
+La table~\ref{tab:nl-query:result} présente les résultats de l'évaluation sur un corpus synthétique de test.
+Le corpus de test a été généré en utilisant le même  \gls{dsl} que celui utilisé pour les données d'entraînement des \acrshortpl{crf}.
+La première section (de \emph{object type} à \emph{unit}) concerne les entités extraites à l'aide de lexiques.
+Les entités \emph{time} sont extraites en utilisant des grammaires locales (via \gls{duckling}), tandis que les entités \emph{title} sont extraites à l'aide d'un \gls{crf}.
+La section suivante (de \emph{application date} à \emph{signatories}) concerne les entités contextualisées, où les dates sont extraites à partir de l'entité \emph{time} et les entités \emph{issuer/signatories} sont obtenues à partir de l'entité \emph{person}.
 
-De façon générale, on observe que les lexiques donne un très bon rappel (supérieur à \num{0.9}), mais une précision plus faible, en particulier pour les entités \emph{field} et \emph{type}.
-Cela s'explique par le manque de filtrage sur les lexiques : dans cette version on ne filtre pas les lexèmes trop génériques.
-\emph{field} et \emph{type} sont deux entités particulières où les lexèmes associés à chaque valeur peuvent être long.
-Pour l'entité \emph{title}, il est difficile d'annoté correctement les bornes de l'entité à cause de la longueur de la séquence et de la grande variabilité dans les titres.
-L'entité \emph{time} est l'entité la mieux annotée avec une mesure F1 de \num{0.93}.
-Concernant la contextualisation, on remarque que les dates sont correctement classifiée à \SI{70}{\percent}.
-Pour les entités \emph{issuer} et \emph{signatories} on remarque que le système n'arrive pas à classifier correctement les personnes.
-Le \gls{crf} associé s'appuie sur les entités \emph{person} extraite précédemment et dépend alors de sa qualité qui est parmi les trois plus faibles avec seulement \num{0.69} pour la mesure F1.
+De manière générale, on observe que les lexiques donnent un très bon rappel (supérieur à \num{0.9}), mais une précision plus faible, en particulier pour les entités \emph{field} et \emph{type}.
+Cela s'explique par le manque de filtrage sur les lexiques : dans cette version, nous ne filtrons pas les lexèmes trop génériques.
+Les entités \emph{field} et \emph{type} sont deux cas particuliers où les lexèmes associés à chaque valeur peuvent être longs.
+Pour l'entité \emph{title}, il est difficile d'annoter correctement les bornes de l'entité en raison de la longueur de la séquence et de la grande variabilité dans les titres.
+L'entité \emph{time} est la mieux annotée avec une mesure F1 de \num{0.93}.
+En ce qui concerne la contextualisation, on remarque que les dates sont correctement classifiées à \SI{70}{\percent}.
+En revanche, pour les entités \emph{issuer} et \emph{signatories}, le système a du mal à classifier correctement les personnes.
+Le \gls{crf} associé s'appuie sur les entités \emph{person} extraites précédemment et dépend donc de leur qualité, qui est parmi les trois plus faibles, avec seulement \num{0.69} pour la mesure F1.
 
-Une des problématiques de cette approche est que les différents composants du système sont entrainé de façon individuelle.
-Il pourrait être intéressant d'entrainer les \gls{crf} à partir des annotations que les composants précédents sont capables d'extraire plutôt que depuis les données correctement annotées.
+\paragraph{}
+Une des problématiques majeures rencontrées dans ce type d'application est le temps de traitement.
+L'extraction est effectuée par un enchaînement séquentiel de composants exécuté avec l'écosystème \gls{ray} sur une machine équipée de \SI{4}{vCPU} et \SI{16}{\giga\byte} de mémoire primaire.
+Nous utilisons les modèles \gls{spacy} \textsf{en\_core\_web\_md} (version 3.7.1) pour l'anglais et \textsf{fr\_core\_news\_md} (version 3.7.0) pour le français.
+Le temps moyen nécessaire pour l'analyse du texte, les vérifications de cohérence par rapport à la base pour le post-traitement et l'exécution de la recherche sur un core \gls{solr} est d'environ \SI{2.5}{\second}.
+Bien que ce temps d'exécution soit acceptable, il demeure élevé, en particulier en raison des vérifications qui génèrent plusieurs requêtes en base et sont traitées de manière séquentielle.
+En plus de traiter les vérifications de façon concurrente, il serait possible de considérer l'enchaînement des composants comme un graphe acyclique orienté ou \gls{dag} en anglais plutôt que comme une séquence, afin de calculer certaines étapes en parallèle.
+
+Une autre problématique de cette approche est que les différents composants du système sont entraînés individuellement.
+Il pourrait être intéressant d'envisager d'entraîner les \acrshortpl{crf} à partir des annotations que les composants précédents sont capables d'extraire, plutôt que de les entraîner à partir de données correctement annotées.
 
 \FloatBarrier
 \subsection{Construction de graphique}
@@ -370,16 +389,16 @@ Il pourrait être intéressant d'entrainer les \gls{crf} à partir des annotatio
     \label{fig:nl-query:dashboard-ui}
 \end{figure}
 
-Pour aller plus loin, nous proposons de construire des graphiques à partir d'une requête en langage naturel.
-La figure~\ref{fig:nl-query:dashboard-ui} illustre le résultat dans l'interface.
-L'idée est qu'un utilisateur puisse construire un graphique simplement avec les données présente dans la base.
-Le graphique est construit à partir des champs d'une unique table.
-Ici, on recherche l'évolution du nombre de cas de cosmetovigilance par année de réception par l'entreprise et par pays.
+Pour aller plus loin, nous proposons de permettre la création de graphiques à partir d'une requête en langage naturel.
+L'idée est de permettre à un utilisateur de construire simplement un graphique à partir des données présentes dans la base.
+Chaque graphique est construit à partir des champs d'une seule table.
+La figure~\ref{fig:nl-query:dashboard-ui} illustre le résultat de cette fonctionnalité dans l'interface utilisateur.
+Par exemple, dans cette illustration, nous recherchons l'évolution du nombre de cas de cosmétovigilance par année de réception de l'entreprise et par pays.
 
 Pour cela, on commence par identifier le type de graphique (\emph{chart type}), si on ne le trouve pas, on détermine le type automatiquement en fonction du nombre d'axes sélectionnés.
-Ensuite on identifie les différents axes du graphique : \emph{value axis} pour les ordonnées, \emph{x axis} pour l'axe des abscisses et \emph{y axis} pour le second axe utilisé pour construire plusieurs courbes dans l'exemple de la figure~\ref{fig:nl-query:dashboard-ui}.
-Pour chaque axe, on identifie l'étiquette (\emph{value label}, \emph{x label} et \emph{y label}) si elle est fournis, le champ de la table utilisé pour l'axe (\emph{field}) la fonction d'agrégation pour les valeurs (\emph{axis aggregate}, moyenne, somme, etc) et le modificateur (\emph{axis modifier}, par exemple, pour une date on peut demander seulement le mois ou l'année).
-Pour finir on cherche la table à utiliser, si elle n'est pas spécifiée dans la requête de l'utilisateur, on cherche la table la plus petite qui contient les champs identifiés.
+Ensuite, on identifie les différents axes du graphique : \emph{value axis} pour les ordonnées, \emph{x axis} pour l'axe des abscisses et \emph{y axis} pour le second axe utilisé pour construire plusieurs courbes dans l'exemple de la figure~\ref{fig:nl-query:dashboard-ui}.
+Pour chaque axe, on identifie l'étiquette (\emph{value label}, \emph{x label} et \emph{y label}) si elle est fournie, le champ de la table utilisé pour l'axe (\emph{field}) la fonction d'agrégation pour les valeurs (\emph{axis aggregate}, moyenne, somme, etc) et le modificateur (\emph{axis modifier}, par exemple, pour une date, on peut demander seulement le mois ou l'année).
+Pour finir, on cherche la table à utiliser, si elle n'est pas spécifiée dans la requête de l'utilisateur, on cherche la table la plus petite qui contient les champs identifiés.
 Ici on ne s'intéresse qu'à l'extraction des entités, mais un filtrage est effectué après l'extraction pour s'assurer que le graphique construit est cohérent, permettant de rejeter certaines ambiguïtés.
 
 \begin{table}[htb]
@@ -395,10 +414,10 @@ Ici on ne s'intéresse qu'à l'extraction des entités, mais un filtrage est eff
         field          & \num{0,292157} & \num{0,977049} & \num{0,449811} & \num{ 305} \\
         \hline
         value axis     & \num{0,940461} & \num{0,990560} & \num{0,964860} & \num{1483} \\
-        value label    & \num{0,894886} & \num{0,875000} & \num{0,884831} & \num{ 360} \\
         x axis         & \num{0,894330} & \num{0,973807} & \num{0,932378} & \num{1069} \\
-        x label        & \num{0,915541} & \num{1.000000} & \num{0,955908} & \num{ 271} \\
         y axis         & \num{0,822669} & \num{0,813743} & \num{0,818182} & \num{ 553} \\
+        value label    & \num{0,894886} & \num{0,875000} & \num{0,884831} & \num{ 360} \\
+        x label        & \num{0,915541} & \num{1.000000} & \num{0,955908} & \num{ 271} \\
         y label        & \num{0,913043} & \num{0,777778} & \num{0,840000} & \num{ 162} \\
         \hline
         Total          & \num{0,785912} & \num{0,918128} & \num{0,824037} & \num{5073}
@@ -408,6 +427,13 @@ Ici on ne s'intéresse qu'à l'extraction des entités, mais un filtrage est eff
 \end{table}
 
 La table~\ref{tab:nl-query:result-dashboard} présente les résultats obtenus.
-Le premier groupe d'entité (de \emph{axis aggregate} à \emph{tables}) sont extrait à partir de lexiques te le second groupe (de \emph{value axis} à \emph{y label}) sont extrait à partir de \acrshortpl{crf}.
+Le premier groupe d'entités (de \emph{axis aggregate} à \emph{tables}) est extrait à partir de lexiques te le second groupe (de \emph{value axis} à \emph{y label}) sont extrait à partir de \acrshortpl{crf}.
+L'extraction des axes (\emph{value axis}, \emph{x axis}, \emph{y axis}) se repose sur les entités : \emph{axis aggregate}, \emph{axis modifier}, \emph{chart type}, \emph{table} et \emph{fields}.
+Les étiquettes des axes (\emph{value label}, \emph{x label}, \emph{y label}) se basent sur l'extraction des entités : \emph{value axis}, \emph{x axis} et \emph{y axis}.
+
+On identifie, pour les lexiques \emph{axis modifier} et \emph{field}, une problématique similaire à celle évoquée pour la recherche en langage naturel où les lexèmes sont assez génériques.
+On obtient donc une bonne couverture (rappel de \num{0,99}) mais une précision assez faible (\num{0,36}).
+La contextualisation s'appuie ici sur un plus grand nombre d'entités, ce qui augmente la qualité générale (F1 de \num{0,69} pour la recherche et \num{0,90} pour la construction de graphique).
+De plus, les requêtes sont plus structurées avec un ordre clair des axes (\emph{value} $\to$ \emph{x} $\to$ \emph{y}), n'ont pas de chevauchement possible (contrairement aux contextes de dates ou de personne) et sont composées d'un plus faible nombre d'entités.
 
 \FloatBarrier

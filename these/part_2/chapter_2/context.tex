@@ -62,7 +62,7 @@ Pour ce faire, on utilise l'arbre de dépendance et on identifie les situations 
 
 On remarque avec les règles~\ref{ctx:rule:1} et \ref{ctx:rule:2} que la portée n'est pas toujours trivial et on se rend compte que la détection de la portée est plus compliquée dès lors qu'on ajoute de multiples contextes, des conjonctions de coordinations.
 De plus, cet ensemble de règles ne couvre pas toutes les structures possibles.
-Par exemple, dans la phrase \textquote{écrit par Alice et signé ou relus par Bob avant le 10 mars}, on s'attend à avoir les entités $E_1 = (:alice, \{Auteur\})$, $E_2 = (:bob, \{Signataire, Relecteur\})$ et $E_3 = (10/03, \{DateSignature, DateRelecture\})$.
+Par exemple, dans la phrase \textquote{écrit par Alice et signé ou relus par Bob avant le 10 mars}, on s'attend à avoir les entités $E_1 = (\text{:alice}, \{Auteur\})$, $E_2 = (\text{:bob}, \{Signataire, Relecteur\})$ et $E_3 = (10/03, \{DateSignature, DateRelecture\})$.
 Cependant, la règle~\ref{ctx:rule:1} ne permet pas d'associer les contextes \emph{DateSignature} et \emph{DateRelecture} à l'entité date à cause de sa distance avec le marqueur de contexte \textquote{signé ou relus}.
 
 \subsubsection{Cascade de \gls*{crf}}
