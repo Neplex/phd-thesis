@@ -1214,10 +1214,10 @@ La décision de ce taux n'est pas arbitraire et il doit être déterminé pour c
     % La $\tau$-équivalence est donc \emph{transitive}.
 \end{proof}
 
-\begin{definition}[Classe d'équivalences]
-    On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
-    $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
-\end{definition}
+% \begin{definition}[Classe d'équivalences]
+%     On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
+%     $S/\equiv_\tau$ est l'ensemble quotient (ou partitionnement) de $S$ par $\equiv_\tau$ tel que $S/\equiv_\tau = \{[x] \mid x \in S\}$, c-à-d. que $S/\equiv_\tau$ est l'ensemble de tous les ensembles $\tau$-équivalent de $S$.
+% \end{definition}
 
 \begin{definition}[Classe d'équivalences]
     On note $[x]_\tau$ l'ensemble $\tau$-équivalent de $x$ (partition ou classe d'équivalence) donné par la clôture transitive de $\equiv_\tau$ tel que $y \in [x]_\tau \iff y \equiv_\tau x$.
@@ -1235,13 +1235,7 @@ Une hiérarchie est qualifiée \emph{en lien simple} lorsque la similarité entr
 Cette hiérarchie est fréquemment représentée graphiquement à l'aide d'un dendrogramme (cf. figure~\ref{fig:struct:quotient:dendrogramme}).
 Il s'agit d'un arbre binaire décrivant les fusions de classes, où les classes sont disposées sur l'axe des abscisses et l'axe des ordonnées représente la dissimilarité entre les classes (plus la valeur est élevée, plus les classes sont éloignées).
 
-Une classification par un taux $\tau$ consiste à fusionner des classes tant que la similarité demeure supérieure à $\tau$.
-Visuellement, il est possible de tracer une droite sur le dendrogramme et de conserver toutes les classes situées en dessous de cette droite.
-Dans la figure~\ref{fig:struct:quotient:dendrogramme}, en fixant $\tau = 0.3$, deux classes émergent, à savoir $\{a, b\}$ (en bleu) et $\{c, d, e\}$ (en orange).
-Si le seuil est augmenté à $\tau = 0.5$, trois classes distinctes apparaissent, à savoir $\{a\}$, $\{b\}$ et $\{c, d, e\}$.
-En continuant d'augmenter le seuil, par exemple à $\tau = 0.7$, quatre classes distinctes seraient obtenues, à savoir $\{a\}$, $\{b\}$, $\{c, d\}$ et $\{e\}$.
-
-\begin{figure}[H]
+\begin{figure}[htb]
     \centering
     \begin{adjustbox}{max width=\linewidth}
         \begin{tikzpicture}[sloped]
@@ -1286,6 +1280,12 @@ En continuant d'augmenter le seuil, par exemple à $\tau = 0.7$, quatre classes 
     \caption{Exemple de dendrogramme pour le partitionnement hiérarchique}
     \label{fig:struct:quotient:dendrogramme}
 \end{figure}
+
+Une classification par un taux $\tau$ consiste à fusionner des classes tant que la similarité demeure supérieure à $\tau$.
+Visuellement, il est possible de tracer une droite sur le dendrogramme et de conserver toutes les classes situées en dessous de cette droite.
+Dans la figure~\ref{fig:struct:quotient:dendrogramme}, en fixant $\tau = 0.3$, deux classes émergent, à savoir $\{a, b\}$ (en bleu) et $\{c, d, e\}$ (en orange).
+Si le seuil est augmenté à $\tau = 0.5$, trois classes distinctes apparaissent, à savoir $\{a\}$, $\{b\}$ et $\{c, d, e\}$.
+En continuant d'augmenter le seuil, par exemple à $\tau = 0.7$, quatre classes distinctes seraient obtenues, à savoir $\{a\}$, $\{b\}$, $\{c, d\}$ et $\{e\}$.
 
 \subsection{Réécriture des arbres}
 \label{sec:struct:auto:rewrite}

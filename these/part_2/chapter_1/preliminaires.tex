@@ -113,6 +113,7 @@ Le principe des grammaires attribuées peut se résumer de la manière suivante 
 La définition suivante formalise cette notion.
 
 \begin{definition}[Grammaire attribuée]
+    \label{def:struct:G-attr}
     Une grammaire attribuée \cite{knuthSemanticsContextfreeLanguages1968}, ou grammaire avec attributs, est une \gls{cfg} $G = (N, T, R, S)$ à laquelle on ajoute, pour chaque règle de production $r \in R$ un ensemble de règles sémantiques noté $\Phi_r$ et pour chaque symbole $X \in (N \cup T)$ on associe un ensemble fini d'attributs $A(X)$ constitué de deux sous-ensembles disjoints d'attributs :
     \begin{itemize}
         \item $A_\uparrow(X)$ pour les attributs synthétisés où $\forall X \in T ~ A_\uparrow(X) = \emptyset$

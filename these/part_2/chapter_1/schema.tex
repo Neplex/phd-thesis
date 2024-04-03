@@ -99,14 +99,6 @@ Les arbres d'entités peuvent être assimilés au concept de \emph{sub-records} 
 Dans $I_t$, l'instance finale de la figure~\ref{fig:struct:general}, les groupes correspondent aux \emph{records} de~\cite{barretGenericAbstractionsData2021}, alors que dans les grammaires $G_i$ (obtenues dans le processus de construction de $G$ de la figure~\ref{fig:struct:general}), ils servent de formats intermédiaires.
 Le concept \textit{collection} est identique à celui introduit dans~\cite{barretGenericAbstractionsData2021}.
 
-%\subsection{Méta-grammaire}
-\paragraph{Méta-grammaire}
-La table~\ref{table:struct:meta} présente notre méta-grammaire $\mathbb{G}$.
-Il s'agit d'une grammaire attribuée qui définit tous les schémas (ou les structurations) valides pour nos données.
-Il est important de rappeler qu'ici un schéma de base de données est représenté par une grammaire hors contexte.
-Dans cette méta-grammaire $\mathbb{G}$ les méta-non-terminaux sont représentés par des termes entre chevrons $\langle \cdot \rangle$.
-Les règles sémantiques sont présentées dans la partie droite de la table~\ref{table:struct:meta}, entre crochets $[ \cdot ]$.
-
 \begin{landscape}
     \centering
     \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
@@ -142,6 +134,14 @@ Les règles sémantiques sont présentées dans la partie droite de la table~\re
     \captionof{table}[Méta-grammaire S-attribuée $\mathbb{G}$ au format \glsname*{bnf}]{Méta-grammaire S-attribuée $\mathbb{G}$ au format \glsname*{bnf}. Cette grammaire définit des grammaires qui seront vues comme des schémas de base de donnée \label{table:struct:meta}}
 \end{landscape}
 
+\paragraph{Méta-grammaire}
+La table~\ref{table:struct:meta} présente notre méta-grammaire $\mathbb{G}$.
+Il s'agit d'une grammaire attribuée qui définit tous les schémas (ou les structurations) valides pour nos données.
+Il est important de rappeler qu'ici un schéma de base de données est représenté par une grammaire hors contexte.
+Dans cette méta-grammaire $\mathbb{G}$ les méta-non-terminaux sont représentés par des termes entre chevrons $\langle \cdot \rangle$.
+Les règles sémantiques sont présentées dans la partie droite de la table~\ref{table:struct:meta}, entre crochets $[ \cdot ]$.
+
+\paragraph{}
 La première méta-règle de production de $\mathbb{G}$ (\ref{meta:start}) indique que la grammaire cible $G$ est définie par une règle initiale suivie par une liste de règles, éventuellement vide.
 La règle initiale engendrée par $\mathbb{G}$ (méta-règle~\ref{meta:root}) contient le symbole \emph{ROOT} (non-terminal initial de $G$) du côté gauche.
 Son côté droit est défini par les méta-règles \ref{meta:rootList:1}-\ref{meta:rootList:6} qui spécifie la construction d'une série de non-terminaux de $G$.

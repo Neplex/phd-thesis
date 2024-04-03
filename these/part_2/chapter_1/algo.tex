@@ -59,7 +59,7 @@ Le processus se termine lorsque nous trouvons une grammaire qui satisfait $\math
 
         \tcp{Identifier les relations}
         \lIf{$\simp = \textsc{False}$}{
-            $\simp \gets \ref{algo:struct:rewrite-findRelationship}(T, \tau, \text{minSupport})$
+            $\simp \gets \ref{algo:struct:rewrite-findRelationship}(T, \text{minSupport})$
         }
 
         \tcp{Identifier les collections de relations}
@@ -108,6 +108,7 @@ Cela est rendu possible, car les opérations de transformation s'appliquent excl
 Lorsque plus aucune transformation n'est possible, la grammaire résultante est par conséquent valide.
 L'utilisation de l'epoch assure la terminaison de la procédure, même si cela implique que certaines parties de l'arbre ne sont pas valides à la fin de l'exécution.
 
+\paragraph{}
 La procédure est constituée d'une boucle générale (ligne~\ref{algoEvol:while}) qui construit les instances successivement.
 À chaque itération, l'algorithme commence par appliquer les simplifications décrites dans la section~\ref{sec:struct:simplify} (page~\ref{sec:struct:simplify}) en utilisant la règle de réécriture \reduce (ligne~\ref{algo:struct:rewrite:reduce}).
 Dans la suite, on identifie les nœuds candidats pour représenter des groupes (opération \ref{algo:struct:rewrite-findGroups}).
@@ -119,7 +120,7 @@ En effet, on recommence le cycle pour recalculer les classes d'équivalences qui
 Dans la  procédure~\ref{algo:struct:rewrite}, les opérations sont listées en suivant un ordre logique, car, il faut d'abord détecter les groupes, les unifier, puis les regrouper en collections ensuite, il est possible d'identifier des relations entre les groupes et finalement des collections de relations.
 Par exemple, si à l'itération $i$ les opérations \ref{algo:struct:rewrite-findSubgroups} et \ref{algo:struct:rewrite-mergeGroups} ne font pas de transformations sur l'arbre $I_i$, alors, c'est l'opération suivante : \ref{algo:struct:rewrite-findCollections} qui sera exécuté.
 Si cette dernière modifie l'instance $I_i$, on passe à l'instance $I_{i+1}$ et on recommence la boucle.
-Ainsi, dans l'ordre, on retrouve les opérations suivantes :
+Ainsi, dans l'ordre, on retrouve les opérations suivantes :
 \begin{enumerate}
     \item \ref{algo:struct:rewrite-findSubgroups} pour construire des sous-groupes fréquents ;
     \item \ref{algo:struct:rewrite-mergeGroups} pour construire des groupes plus grands en incorporant d'autres informations, mais qui maintient sa similarité avec sa classe d'équivalence ainsi qu'une fréquence au-dessus de support minimum ;
@@ -143,27 +144,39 @@ Quand l'ensemble des nœuds présents au-dessus des entités ont été catégori
     Cela permet d'empêcher la construction d'associations (\emph{groupe} ou \emph{relation}) à travers de multiples phrases.
 \end{remark}
 
+Dans la suite, on étudie en détail l'implémentation des opérations de transformations mises en place.
 
-%\mhf{Il faut mettre une exemple ici de ce qui est dit dans le dernier paragraphe. Revoir le dernier paragraphe... l'ordre}
-
-
-Dans la suite, on étudie en détail l'implémentation des opérations de transformations mise en place.
-
+\FloatBarrier
 \subsection{Identification des groupes}
+Dans cette section on s'intéresse aux diverses opération utilisée pour identifier et réécrire les sous-arbres correspondant à un groupement d'entités.
+Pour rappel, un groupe est représenté par un sous-arbre contenant uniquement des sous-arbres d'entités de type distinct.
+Intuitivement, dans le modèle relationnel les groupes correspondent à un tuple où les types d'entités correspondent aux différents attributs de la table.
+L'identification les groupes est réalisé par trois procédures :
+\begin{itemize}
+    \item \ref{algo:struct:rewrite-findGroups} pour identifier les nœuds candidats dans l'arbre,
+    \item \ref{algo:struct:rewrite-findSubgroups} pour construire des sous groupes fréquents et maximiser le support et
+    \item \ref{algo:struct:rewrite-mergeGroups} pour fusionner des groupes et maximiser la taille des groupes.
+\end{itemize}
 
-\begin{procedure}
+\subsubsection{Trouver des groupes}
+La procédure~\ref{algo:struct:rewrite-findGroups} est utilisée pour identifier les groupements d'entités qui sont fréquents dans l'arbre.
+Pour cela, on commence par calculer le partitionnement des sous-arbres (ligne~\ref{algo:struct:rewrite-findGroups:1}) qui se trouvent au-dessus des sous-arbres entités (section~\ref{sec:struct:equiv-classes}).
+Comme on recherche des éléments fréquents (c'est-à-dire que leur support est supérieur à \emph{minSupport}), on filtre les partions obtenues qui ont un support trop faible.
+L'ensemble \emph{equivalent\_st} contient alors l'ensemble des classes d'équivalence de sous-arbres dont la cardinalité est supérieur à \emph{minSupport}.
+
+\begin{procedure}[htb]
     \caption{findGroups($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findGroups}
 
     \tcp{Identifier les clusters de sous-arbres équivalents et garder uniquement les fréquents}
-    $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/_{\equiv_\tau}, |equiv\_pos| \ge$ minSupport$\}$\;
+    $equivalent\_st \gets \{equiv\_pos \mid equiv\_pos \in D/\equiv_\tau, |equiv\_pos| \ge \text{minSupport}\}$ \label{algo:struct:rewrite-findGroups:1}\;
     $k \gets 0$\;
 
-    \While{$equivalent\_st \neq \emptyset$}{
+    \While{$equivalent\_st \neq \emptyset$ \label{algo:struct:rewrite-findGroups:2}}{
         $ST\_min \gets \findSTwithMinLeavesTree(equivalent\_st)$\;
         $equivalent\_st \gets equivalent\_st \setminus ST\_min$\;
 
-        \ForEach{$st \in ST\_min$ tel que $\{e \mid \forall e \in D, st \prec^* e \land l(e) \neq `GROUP`\} = \emptyset$}{
+        \ForEach{$st \in ST\_min$ tel que $\{e \mid e \in st, l(e) \neq `GROUP`\} = \emptyset$ \label{algo:struct:rewrite-findGroups:3}}{
             $j \gets 0$\;
             Construire $T_{GROUP} = (D_{GROUP}, t_{GROUP})$ un nouvel arbre avec $t_{GROUP}(\epsilon) = `GROUP_k`$\;
 
@@ -172,40 +185,134 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
                 $j \gets j + 1$\;
             }
 
-            $\insElem(T, t_{GROUP}, st + 1)$\;
-            $\delElem(T, st)$\;
+            Soit $u$ tel que $T|_u = st$\;
+            $\insElem(T, t_{GROUP}, u + 1)$ \label{algo:struct:rewrite-findGroups:4bis}\;
+            $\delElem(T, u)$ \label{algo:struct:rewrite-findGroups:4}\;
         }
         $k \gets k+1$\;
     }
 \end{procedure}
 
-% \nh{Something is not great here, in findSubgroups. We mixed a set of positions with a set of labels. The set contains trees but the combinaition should not allow a label to appear multiple times}
+La fonction \findSTwithMinLeavesTree renvoie la classe d'équivalence la plus grande dont la hauteur moyenne de ses sous-arbres est la plus faible.
+Intuitivement, on veut travailler avec les classes les plus fréquentes (donc les plus grandes) mais en partant du bas de l'arbre et en remontant vers la racine.
+La boucle \KwSty{pour chaque} de la ligne~\ref{algo:struct:rewrite-findGroups:3} à \ref{algo:struct:rewrite-findGroups:4}, construit, pour chaque sous-arbre $st$ appartenant à $ST\_min $, un nouveau sous-arbre $T_{GROUP}$ dont la racine est labellisée $GROUP_k$ (parfois réduit en $Grp_k$ dans les figures) où $GROUP$ est un symbole non-terminal et $k$ un attribut identifiant les regroupements équivalents (voir la définition~\ref{def:struct:G-attr} des grammaires attribuée).
+Les enfants du sous-arbre $T_{GROUP}$ sont exclusivement les sous-arbres d'entités originalement présents dans $st$.
+Néanmoins, il est important de noter que cette construction ne se fait pas à partir des sous-arbres ayant déjà un sous-arbre labellisé $GROUP$.
+La modification de l'arbre initiale est implémentée dans les lignes~\ref{algo:struct:rewrite-findGroups:4bis} (en insérant le nouveau sous-arbre $T_{GROUP}$ comme frère à droite de $st$) et~\ref{algo:struct:rewrite-findGroups:4} (en supprimant le sous-arbre $st$).
+Le choix de l'insertion avant la suppression est dû au caractère récursif de la suppression (règle \textsf{del\_elem}, figure~\ref{fig:sch:op:delElem}).
+Cela évite la disparition du nœud parent avant l'insertion, déjà prévue, du nouvel enfant dans le cas ou le parent ne contient qu'un seul enfant.
 
-\begin{procedure}
+\begin{example}
+    Prenons, comme exemple, l'arbre $T$ donné dans la figure~\ref{fig:rewrite:findgroupInit} ou chaque $E_i$ représente un sous-arbre d'entités.
+    Nous supposons :
+    \[
+        D/\equiv_\tau = \{\{0, 10, 2100\}, \{1\}, \{2\}, \{11\}, \{110, 211\} , \{21\} , \{210\} , \{21000\} \}
+    \]
+
+    Si $\text{minSupport} = 2$ alors $\text{equivalent\_st} = \{\{0, 10, 2100\}, \{110, 211\}\}$.
+    La boucle \KwSty{tant que}, à la ligne~\ref{algo:struct:rewrite-findGroups:2}, commence avec $ST\_min = \{110, 211\}$, choisi par la procédure \findSTwithMinLeavesTree, car le sous-arbre à la position $2100$ est le plus profond, ce qui augmente la moyenne de profondeurs de sa classe d'équivalence.
+    La procédure~\ref{algo:struct:rewrite-findGroups} modifie l'étiquette des nœuds $110$ et $211$ en $GROUP_0$.
+    On obtient alors l'arbre $T'$ donnée figure~\ref{fig:rewrite:findgroup1}.
+    La seconde classe d'équivalence choisie est $\{0, 10, 2100\}$.
+    Le label $GROUP_1$ est assigné à chaque position de cette classe équivalence (racine d'un sous-arbre).
+    Le nœud à la position $21000$ et supprimé conformément à la définition des sous-arbres groupes.
+    On obtient alors l'arbre $T''$ comme illustré dans la figure~\ref{fig:rewrite:findgroup2}
+\end{example}
+
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}[b]{.3\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [$\epsilon$ [$0$ [$E_1$]]
+                    [$1$ [$10$ [$E_2$]]
+                            [$11$ [$110$[$E_3$]]
+                                    [$E_4$]]]
+                    [$2$ [$E_5$]
+                            [$21$ [$210$ [$2100$ [$21000$ [$E_6$]]
+                                                    [$E_7$]]
+                                            [$E_8$]]
+                                    [$211$ [$E_9$]]]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre initial $T$}
+        \label{fig:rewrite:findgroupInit}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.3\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [$\epsilon$ [$0$ [$E_1$]]
+                    [$1$ [$10$ [$E_2$]]
+                            [$11$ [$Grp_0$ [$E_3$]]
+                                    [$E_4$]]]
+                    [$2$ [$E_5$]
+                            [$21$ [$210$ [$2100$ [$21000$ [$E_6$]]
+                                                    [$E_7$]]
+                                            [$E_8$]]
+                                    [$Grp_0$ [$E_9$]]]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre $T'$}
+        \label{fig:rewrite:findgroup1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.3\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [$\epsilon$ [$Grp_1$ [$E_1$]]
+                    [$1$ [$Grp_1$ [$E_2$]]
+                            [$11$ [$Grp_0$[$E_3$]]
+                                    [$E_4$]]]
+                    [$2$ [$E_5$]
+                            [$21$ [$210$ [$Grp_1$ [$E_6$]
+                                                    [$E_7$]]
+                                            [$E_8$]]
+                                    [$Grp_0$ [$E_9$]]]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre $T''$}
+        \label{fig:rewrite:findgroup2}
+    \end{subfigure}
+
+    \caption[Exemple d'application de la procédure~\ref*{algo:struct:rewrite-findGroups}]{Exemple d'application de la procédure~\ref{algo:struct:rewrite-findGroups}}
+    \label{fig:ExFindGroup}
+\end{figure}
+
+\FloatBarrier
+\subsubsection{Séparation en sous-groupes fréquents}
+
+\begin{procedure}[htb]
     \caption{findSubgroups($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findSubgroups}
 
     $\groupFound \gets \textsc{False}$\;
 
     \ForAll{sous-arbre \st tel que $\st = T|_u$ et $l(u) \notin \{`ENT`, `REL`, `COLL`\}$}{
-        $S_{ENT} \gets \{T|_{u.i} \mid \forall i \ l(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
+        $S_{ENT} \gets \{T|_{u.i} \mid \forall i \ l(u.i) = `ENT`\}$ \label{algo:struct:rewrite-findSubgroups:1} \tcp*{Ensemble des arbres d'entités enfants de \st}
         $group\_support \gets |[\st]_\tau|$\;
 
         $k \gets |S_{ENT}|$\;
-        \While{$k > 1$}{
+        \While{$k > 1$ \label{algo:struct:rewrite-findSubgroups:2}}{
             $j \gets 0$\;
 
-            \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S_{ENT}}$}
-            \ForEach{combinaison  $combi_j \in \combination(S_{ENT}, k)$}{
+            \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}(S_{ENT})$}
+            \ForEach{combinaison  $combi_j \in \combination(S_{ENT}, k)$\label{algo:struct:rewrite-findSubgroups:3}}{
                 $T_j \gets \text{copy}(T)$ \tcp*{$T_j$ est l'arbre où l'on remplace l'ensemble $combi_j$ par un groupe}
-
-                $\insElem(T_j, GROUP, u.0)$\;
-                \ForAll{$\st_E \in combi_j$}{
+                $l_{T_j}(u)=""$ \label{algo:struct:rewrite-findSubgroups:4}\;
+                $\insElem(T_j, GROUP, u.0)$\label{algo:struct:rewrite-findSubgroups:5}\;
+                \ForAll{$\st_E \in combi_j$\label{algo:struct:rewrite-findSubgroups:6}}{
                     $\delElem(T_j, u.i)$ tel que $T_j|_{u.i} = \st_E$\;
                     $\insElem(T_j, \st_E, u.0.0)$\;
                 }
 
-                $support_j \gets |[T_j|_{u.0}]_\tau|$ \tcp*{$[T_j|_{u.0}]_\tau$ est l'ensemble équivalent qui contient le sous-arbre $T_j|_{u.0}$}
+                $support_j \gets |[T_j|_{u.0}]|$ \label{algo:struct:rewrite-findSubgroups:7} \tcp*{$[T_j|_{u.0}]$ est l'ensemble équivalent qui contient le sous-arbre $T_j|_{u.0}$}
                 $j \gets j + 1$\;
             }
 
@@ -228,49 +335,116 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \Return \groupFound \;
 \end{procedure}
 
-\begin{figure}[htb]
-    \centering
-    \begin{adjustbox}{valign=c, max width=\textwidth}
-        \begin{forest}
-            where n children=0{tier=word}{}
-            [$\dots$
-                [GROUP
-                    [ENT\_1 [$\dots$]]
-                    [ENT\_2 [$\dots$]]
-                    [ENT\_3 [$\dots$]]
-                    [ENT\_4 [$\dots$]]
-                    [ENT\_5 [$\dots$]]
-                ]
-            ]
-        \end{forest}
-    \end{adjustbox}
-    \caption{Exemple d'instance}
-    \label{fig:struct:rewrite-findSubgroups}
-\end{figure}
+La procédure~\ref{algo:struct:rewrite-findGroups} identifie uniquement des nœuds déjà présents dans l'arbre.
+Cependant, il est possible que la structure interne ne soit pas suffisante et on peut alors obtenir des nœuds ayant beaucoup d'enfants et pouvant alors inclure un sous ensemble plus fréquent d'entités.
+Afin de minimiser le nombre de groupes distinct et de maximiser leurs fréquences, la procédure~\ref{algo:struct:rewrite-findSubgroups} est chargé d'identifié les sous ensembles d'entités qui pourrait former un groupe plus fréquent.
+En d'autres termes, \ref{algo:struct:rewrite-findSubgroups} s'assure qu'aucun groupe ne contient un autre groupe plus fréquent.
+%Le principal objectif de la fonction~\ref{algo:struct:rewrite-findSubgroups} est de s'assurer que la réduction du nombre de sous-arbres d'entités dans un sous-arbre $st$ étiqueté $GROUP$ ne donne pas lieu à un sous-arbre $st_i$ (qui respecte le $minSupport$) plus fréquent que $st$.
+De plus, cette transformation est également appliquée aux sous-arbres dont la racine n'a pas encore d'étiquette correspondant à un non-terminal de la grammaire.
+Si, pour un sous arbre $st$, il est possible de construire un sous-arbre $st_i$ plus fréquent à partir d'un sous ensemble des arbres d'entités qui sont des descendants de $st$, la transformation suivante est opérée : le sous-arbre $st$ est remplacé par un nouveau sous-arbre non étiqueté dont les enfants comprennent le nouveau sous-arbre $st_i$ ainsi que les sous-arbres présents dans $st$ mais absents dans le nouveau $st_i$.
+
+Pour faire cela, la procédure~\ref{algo:struct:rewrite-findSubgroups} récupère l'ensemble $S_{ENT}$ des sous-arbres entité de chaque sous-arbre $st$ à tester (ligne~\ref{algo:struct:rewrite-findSubgroups:1}).
+On construit ensuite tous les sous-ensembles possibles d'entités comportant au moins deux éléments (Le \enquote{power set} $\mathcal{P}$).
+Tous les ensembles de taille égale seront traités simultanément dans la boucle \KwSty{pour chaque} qui commence à la ligne~\ref{algo:struct:rewrite-findSubgroups:3}, en débutant par l'évaluation des ensembles les plus grands (ligne~\ref{algo:struct:rewrite-findSubgroups:2}).
+\combination construit pour l'ensemble $st$ l'ensemble des parties de taille $k$ de $st$.
+%$combinaison$ est le sous-ensemble des parties de taille $k$ des sous-arbres entité de $st$
+À chaque itération, nous créons une copie de l'arbre $T$ pour former un nouvel arbre $T_j$.
+Dans $T_j$, nous modifions $st$ en retirant l'étiquette de sa racine (ligne~\ref{algo:struct:rewrite-findSubgroups:4}), puis en lui ajoutant un nouvel enfant étiqueté $GROUP$.
+Ce nœud $GROUP$ devient le parent des sous-arbres entité présents dans \textsf{combinaison}.
+Parallèlement, tous les éléments de $combinaison$ sont retirés des enfants de $st$ (boucle à la ligne~\ref{algo:struct:rewrite-findSubgroups:5}).
+Ensuite, nous calculons la classe d'équivalence du nouveau sous-arbre groupe construit dans $T_j$ (ligne~\ref{algo:struct:rewrite-findSubgroups:7}).
+L'exemple ci-dessous illustre la situation.
 
 \begin{example}
-    Étant donné la figure~\ref{fig:struct:rewrite-findSubgroups}, la procédure~\ref{algo:struct:rewrite-findSubgroups}...
+    \label{ex:FindSG-1}
+    Considérons l'arbre $T$ représenté dans la figure~\ref{fig:rewrite:findsubgroup}, où la racine est étiquetée $U$.
+    Soit $st$ le sous-arbre de $T$ avec une racine étiquetée $GROUP$, dans lequel nous cherchons à déterminer si un sous-groupe pourrait être plus fréquent que le groupe initial.
+    Ici, le nombre de sous-arbres entité dans $st$ est de $4$.
+    Supposons que nous soyons à l'étape où $k=3$.
+    L'ensemble $\textsf{combinaison}$ est alors représenté par ${\{E_1, E_2, E_3\}, \{E_1, E_2, E_4\}, \{E_1, E_3, E_4\}, \{E_2, E_3, E_4\}}$.
+    Nous allons donc construire les quatre arbres illustrés dans la figure~\ref{fig:rewrite:findsubgroupTest}.
 \end{example}
 
-\begin{procedure}
+Il est important de souligner que chaque $T_j$ correspond à une analyse réalisée sur un sous-ensemble de $\textsf{combinaison}$.
+Une fois que tous les sous-ensembles de taille équivalente ont été examinés, nous identifions parmi tous les arbres $T_j$ celui que nous désignons comme $T_{j_{max}}$, qui présente la fréquence maximale pour le sous-arbre dont la racine est étiquetée $GROUP$.
+Si cette fréquence est supérieure à $minSupport$ et à la fréquence de $st$ dans $T$, alors $T$ est remplacé par $T_{j_{max}}$.
+Une fois le sous-arbre fréquent créer, les entités restantes sont remise en jeux.
+S'il n'est pas possible de construire un ensemble de $k$ entités fréquent alors on recommence avec $k-1$.
+
+\begin{example}
+    Poursuivant l'exemple~\ref{ex:FindSG-1}, imaginons que $T$ soit remplacé par $T_2$, indiquant ainsi que c'est l'ensemble $combi_2 = \{E_1, E_2, E_4\}$ que nous considérons comme un nouveau groupe.
+    Ce remplacement signifie que $T_2$ contient le sous-arbre $GROUP$ (correspondant à $combi_2$) le plus fréquent, en comparaison à ceux de $T_0$, $T_1$, et $T_3$, et que la fréquence de ce sous-arbre est supérieure à celle de $st$ dans $T$.
+\end{example}
+
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}[c]{0.9\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=2em}
+                [U [$...$] [$GROUP$[$E_1$] [$E_2$] [$E_3$] [$E_4$]] [$...$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbre initial}
+        \label{fig:rewrite:findsubgroupInit}
+    \end{subfigure}
+    \begin{subfigure}[c]{.9\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                for tree={s sep=2em}
+                [U [$...$] [$~~$ [$GROUP$ [$E_1$] [$E_2$] [$E_3$]] [$E_4$]] [$...$]]
+            \end{forest}
+            \hfill
+            \begin{forest}
+                for tree={s sep=2em}
+                [U [$...$] [$~~$ [$GROUP$ [$E_1$] [$E_2$] [$E_4$]] [$E_3$]] [$...$]]
+            \end{forest}
+            \hfill
+            \begin{forest}
+                for tree={s sep=2em}
+                [U [$...$] [$~~$ [$GROUP$ [$E_1$] [$E_3$] [$E_4$]] [$E_2$]] [$...$]]
+            \end{forest}
+            \hfill
+            \begin{forest}
+                for tree={s sep=2em}
+                [U [$...$] [$~~$ [$GROUP$ [$E_2$] [$E_3$] [$E_4$]] [$E_1$]] [$...$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Arbres $T_0, T_1, T_2, T_3$}
+        \label{fig:rewrite:findsubgroupTest}
+    \end{subfigure}
+
+    \caption{Exemple d'application de la fonction~\ref{algo:struct:rewrite-findSubgroups}}
+    \label{fig:rewrite:findsubgroup}
+\end{figure}
+
+\FloatBarrier
+\subsubsection{Fusionner en groupe fréquent}
+L'objectif de la fonction~\ref{algo:struct:rewrite-mergeGroups} est d'augmenter la taille des groupes par la fusion des groupes frères ou par l'ajout, dans un groupe, des sous-arbres entité qui sont frères de ce groupe.
+Tout comme pour la fonction précédente, l'objectif est d'effectuer des transformations uniquement si nous obtenons des sous-arbres plus fréquents que dans la version originale.
+Cette fusion sera tentée uniquement pour des groupes qui ne sont pas déjà dans une relation ou une collection (ligne~\ref{algo:struct:rewrite-mergeGroups:1}).
+
+\begin{procedure}[htb]
     \caption{mergeGroups($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-mergeGroups}
 
     $\groupFound \gets \textsc{False}$\;
 
-    \ForAll{sous-arbre \st tel que $\st = T|_u$ and $l(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
-        $S_{GROUP} = \{T|_{u.i} \mid \forall i ~ l(u.i) = `GROUP`\}$ \tcp*{Ensemble des arbres groupe enfants de \st}
-        $S_{ENT} = \{T|_{u.i} \mid \forall i ~ l(u.i) = `ENT`\}$ \tcp*{Ensemble des arbres d'entités enfants de \st}
+    \ForAll{sous-arbre \st tel que $\st = T|_u$ and $l(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$\label{algo:struct:rewrite-mergeGroups:1}}{
+        $S_{GROUP} = \{T|_{u.i} \mid \forall i ~ l(u.i) = `GROUP`\}$\label{algo:struct:rewrite-mergeGroups:2} \tcp*{Ensemble des arbres groupe enfants de \st}
+        $S_{ENT} = \{T|_{u.i} \mid \forall i ~ l(u.i) = `ENT`\}$\label{algo:struct:rewrite-mergeGroups:3} \tcp*{Ensemble des arbres d'entités enfants de \st}
 
-        $k \gets |S_{GROUP}/_{\equiv_\tau}| + |S_{ENT}|$\;
+        $k \gets |S_{GROUP}/\equiv_\tau| + |S_{ENT}|$\label{algo:struct:rewrite-mergeGroups:4}\;
         \While{$k > 1$}{
             $j \gets 0$\;
 
-            \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S_{GROUP} \cup S_{ENT}}$}
-            \ForAll{combinaison $combi_j \in \combination(S_{GROUP} \cup S_{ENT}, k)$}{
+            \tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}(S_{GROUP} \cup S_{ENT})$}
+            \ForAll{combinaison $combi_j \in \combination(S_{GROUP} \cup S_{ENT}, k)$\label{algo:struct:rewrite-mergeGroups:6}}{
                 %\tcp{Pour chaque sous-ensemble de taille $k$ dans $\mathcal{P}_{S}$}
                 $ST = \{x \mid \forall x~l(x) = `GROUP`\}$\;
-                $ST_{ENT} = \{T|_{u.i} \mid \forall x~l(x) = `ENT`\} \cup \{x \mid \forall g \in ST, \forall x \in g\}$\;
+                $ST_{ENT} = \{T|_{u.i} \mid \forall x~l(x) = `ENT`\} \cup \{x \mid \forall g \in ST, \forall x \in g\}$\label{algo:struct:rewrite-mergeGroups:7}\;
 
                 \lIf{$ST_{ENT}$ contient plusieurs fois la même entité}{\skip}
 
@@ -307,35 +481,102 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \Return \groupFound \;
 \end{procedure}
 
-\begin{figure}[htb]
-    \centering
-    \begin{adjustbox}{valign=c, max width=\textwidth}
-        \begin{forest}
-            where n children=0{tier=word}{}
-            [$\dots$
-                [NT
-                    [X [$\dots$]]
-                    [ENT\_1 [$\dots$]]
-                    [GROUP\_1 [$\dots$]]
-                    [ENT\_2 [$\dots$]]
-                    [GROUP\_2 [$\dots$]]
-                    [ENT\_6 [$\dots$]]
-                ]
-            ]
-        \end{forest}
-    \end{adjustbox}
-    \caption{Exemple d'instance}
-    \label{fig:struct:rewrite-mergeGroups}
-\end{figure}
+Pour chaque sous-arbre $st$ à tester, $S_{GROUP}$ (ligne~\ref{algo:struct:rewrite-mergeGroups:2}) représentera l'ensemble des enfants de $st$ étiquetés $GROUP$, tandis que $S_{ENT}$ (ligne~\ref{algo:struct:rewrite-mergeGroups:3}) sera l'ensemble des enfants de $st$ étiquetés $ENT$.
+Nous explorons toutes les combinaisons possibles entre les éléments de ces deux ensembles, en commençant par les plus grandes.
+À la ligne~\ref{algo:struct:rewrite-mergeGroups:4}, $|S_{GROUP}/\equiv_\tau|$ représente le nombre d'éléments dans $S_{GROUP}$ modulo ceux qui sont équivalents.
+En d'autres termes, nous n'essayons pas de fusionner des groupes qui appartiennent à la même classe d'équivalence
+À la ligne~\ref{algo:struct:rewrite-mergeGroups:6}, \textsf{combinaison} est l'ensemble des sous-ensembles de $ST_{ENT} \cup S_{GROUP}$ de taille $k$.
+À la ligne~\ref{algo:struct:rewrite-mergeGroups:7}, un nouvel ensemble $ST_{ENT}$ est construit.
+Il contient l'ensemble des sous-arbres entités présents dans $combi_j$ (le sous-ensemble de \textsf{combinaison} sur lequel on travaille).
+Il est important de remarquer que $ST_{ENT}$ n'est pas construit si plusieurs sous-arbres entité identiques existent dans $combi_j$.
+On construit un nouvel arbre $T_j$ de la manière suivante :
+\begin{enumerate}
+    \item $T_j$ est une copie de $T$ ;
+    \item Dans $T_j$, on remplace les sous-arbres qui apparaissent dans $combi_j$ par un seul nouveau sous-arbre dont la structure est la suivante :
+          \begin{enumerate}
+              \item La racine est étiquetée $GROUP$ ;
+              \item Les enfants sont tous les sous-arbres entités présents dans $ST_{ENT}$.
+          \end{enumerate}
+\end{enumerate}
+
+Comme dans la procédure précédente, chaque $T_j$ correspond à une analyse réalisée sur un sous-ensemble de $\textsf{combinaison}$.
+Une fois que tous les sous-ensembles de taille identique ont été examinés, nous identifions parmi tous les arbres $T_j$ celui que nous désignons comme $T_{j_{max}}$, qui présente la fréquence maximale pour le sous-arbre dont la racine est étiquetée $GROUP$.
+Si cette fréquence est supérieure à $minSupport$ et à la fréquence la plus élevée parmi celles des sous-arbres étiquetés $GROUP$ de $combi_j$, alors $T$ est remplacé par $T_{j_{max}}$.
 
 \begin{example}
-    Étant donné la figure~\ref{fig:struct:rewrite-mergeGroups}, la procédure~\ref{algo:struct:rewrite-mergeGroups}...
+    Soit un arbre $T$ contenant le sous-arbre $st$ qui est représenté dans la figure~\ref{fig:rewrite:mergegroupsInit}.
+    La racine du sous-arbre $st$ est à la position $u$ et son étiquette ne correspond pas encore à un symbole de la grammaire.
+    Nous allons essayer de fusionner des enfants de $st$
+    Nous avons $S_{GROUP}=\{u0, u1, u2\}$, $S_{ENT}=\{u3, u4\}$ et $k=4$.
+    Remarquer que $u0$ et $u2$ (les deux sous-arbres labellisés $GROUP_1$) sont dans la même classe d'équivalence.
+    Pour $k=3$ nous avons :
+    \begin{multline*}
+        \combination(S_{GROUP} \cup S_{ENT}, 3) = \{\{u0, u1, u3\},\{u0, u1, u4\}, \{u0, u3, u4\}, \{u1, u2, u3\},\\\{u1, u2, u4\}, \{u1, u3, u4\}, \{u2, u3, u4\} \}
+    \end{multline*}
+    
+    Nous allons tester toutes ses combinaisons en créant un nouvel arbre avec un nouveau groupe et en calculant la fréquence de ce nouveau groupe.
+    La figure~\ref{fig:rewrite:mergegroupsTest1} montre le sous-arbre $st_0$ créé pour la combinaison $\{u0, u1, u3\}$ avec $ST_{ENT}=\{E_1, E_2, E_3, E_4, E_5, E_9\}$ et la figure~\ref{fig:rewrite:mergegroupsTest2} celui pour la combinaison $\{u2, u3, u4\}$ avec $ST_{ENT}=\{E_6, E_7, E_8, E_9, E_{10}\}$.
+    L'arbre $T_0$ correspond  à l'arbre $T$ où le sous-arbre $st$ a été remplacé par $st_0$, idem pour $T_1$.
+    Si l'on suppose que l'on accepte la transformation proposée par l'arbre $T_0$, nous allons changer $T$ en $T_0$ et continuer la procédure~\ref{algo:struct:rewrite-mergeGroups} en tentant de fusionner $u1$ et $u2$ dans ce nouvel arbre.
 \end{example}
 
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}[b]{.6\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [U [$GROUP_1$[$E_1$] [$E_2$] [$E_3$]] [$GROUP_2$ [$E_4$] [$E_5$]] [$GROUP_1$[$E_6$] [$E_7$] [$E_8$]] [$E_9$] [$E_{10}$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Sous-arbre $st$ où tenter la fusion.}
+        \label{fig:rewrite:mergegroupsInit}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [U [$GROUP$[$E_1$] [$E_2$] [$E_3$] [$E_4$] [$E_5$] [$E_9$]] [$GROUP_2$ [$E_4$] [$E_5$]] [$E_{10}$]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Sous-arbre $st_0$ avec la combinaison $\{u0, u1, u3\}$ }
+        \label{fig:rewrite:mergegroupsTest1}
+    \end{subfigure}
+    \hfill
+	\begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [U [$GROUP$[$E_6$] [$E_7$] [$E_8$] [$E_9$] [$E_{10}$]][$GROUP_1$[$E_1$] [$E_2$] [$E_3$]] [$GROUP_2$ [$E_4$] [$E_5$]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Sous-arbres $st_1$ avec la combinaison $\{u2, u3, u4\}$}
+        \label{fig:rewrite:mergegroupsTest2}
+    \end{subfigure}
+    \caption{Exemple d'application de la fonction~\ref{algo:struct:rewrite-mergeGroups}}
+    \label{fig:rewrite:mergegroups}
+\end{figure}
+
+\FloatBarrier
 \subsection{Identification des relations}
 
-\begin{procedure}
-    \caption{findRelationship($T$ = ($D$, $l$), $\tau$, minSupport)}
+La fonction~\ref{algo:struct:rewrite-findRelationship} a pour objectif de créer des relations sur des sous-arbres non encore labellisés.
+Il existe deux manières de procéder à cette création :
+\begin{enumerate}
+    \item Le sous-arbre possède uniquement deux enfants labellisés $GROUP$.
+          Dans ce cas, la racine du sous-arbre sera labellisée $REL$.
+    \item Le sous-arbre possède un enfant labellisé $GROUP$ et un autre labellisé $COLL$.
+          Dans ce cas, le sous-arbre sera complètement restructuré.
+          Ses enfants auront pour racine un nœud étiqueté $REL$ et deux enfants : celui ayant pour racine le nœud $GROUP$ et un autre qui était initialement l'enfant du nœud labellisé $COLL$.
+          En effet, pour chaque sous-arbre $coll_i$, enfant du nœud étiqueté $COL$, nous créons un sous-arbre labellisé $REL$ ayant $coll_i$ comme l'un de ses enfants. Cette transformation peut être visualisée comme une opération de distributivité.
+\end{enumerate}
+Cette fonction est illustrée par la figure~\ref{fig:rewrite:findRelationShip}.
+
+\begin{procedure}[htb]
+    \caption{findRelationship($T$ = ($D$, $l$), minSupport)}
     \label{algo:struct:rewrite-findRelationship}
 
     $\relationshipFound \gets \textsc{False}$\;
@@ -351,9 +592,8 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
         \ElseIf{$(l(u.0) = `COLL`$ et $l(u.1) = `GROUP`)$ ou $(l(u.0) = `GROUP`$ et $l(u.1) = `COLL`)$}{
             $group \gets u.l$ tel que $l(u.l) = `GROUP`$\;
             $coll \gets u.m$ tel que $l(u.m) = `COLL`$\;
-
-            \ForAll{$i \in coll$}{
-                $pos \gets |T|_{coll}|$\;
+            $pos \gets 2$\;
+            \ForAll{$i \in [0, \dots, |T|_{coll}|[$}{
                 \tcp{Ajout d'une relation pour chaque paire $\langle group, T|_{coll.i} \rangle$}
                 $\insElem(T, `REL`, u.pos)$\;
                 $\insElem(T, T|_{group}, u.pos.0)$\;
@@ -369,45 +609,95 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
     \Return \relationshipFound \;
 \end{procedure}
 
-\subsection{Identification des collections}
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}[b]{.4\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [$\dots$ [$ $ [$Grp_1$ [...]] [$Grp_2$ [...]]]]
+            \end{forest}
+        	\begin{forest}
+                %for tree={s sep=4em}
+                [$\dots$ [$REL$ [$Grp_1$ [...]] [$Grp_2$ [...]]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Création d'une relation entre 2 groupes}
+        \label{fig:rewrite:findRelationShipCas1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.55\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [$\dots$ [$ $ [$Grp_1$ [...]] [$COLL$ [$Grp_2$ [...]] [$Grp_2$ [...]] ]]]
+            \end{forest}
+        	\begin{forest}
+                %or tree={s sep=4em}
+                [$\dots$ [$ $ [$REL$[$Grp_1$ [...]] [$Grp_2$ [...]]] [$REL$[$Grp_1$ [...]] [$Grp_2$ [...]]]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Création de relations entre 1 groupe et une collection}
+        \label{fig:rewrite:findRelationShipCas2}
+    \end{subfigure}
+   
+    \caption[Exemple de transformation en insérant des relations]{Exemple de transformation en insérant des relations (procédure~\ref{algo:struct:rewrite-findRelationship})}
+    \label{fig:rewrite:findRelationShip}
+\end{figure}
 
-\begin{procedure}
+\FloatBarrier
+\subsection{Identification des collections}
+Le rôle de la fonction~\ref{algo:struct:rewrite-findCollections} est de regrouper dans une collection des groupes (ou des relations) lorsqu'ils sont enfants d'un même nœud et font partie d'une même classe d'équivalence.
+Les explications qui vont suivre sont données pour créer des collections de groupes, mais elles sont les mêmes pour créer des collections de relations.
+Pour chaque sous-arbre $st$ non encore labellisé (par exemple celui de la figure~\ref{fig:rewrite:findCollection1}), la fonction va se réaliser à travers trois boucles :
+\begin{itemize}
+    \item La première boucle (ligne~\ref{algo:struct:rewrite-findCollections:1}) va créer un sous-arbre labellisé $COLL$ contenant comme enfant tous les sous-arbres de $st$ labellisés $GROUP$ contenus dans une même classe d'équivalence lorsqu'il y en a au moins deux (figure~\ref{fig:rewrite:findCollection2}).
+    \item La seconde boucle (ligne~\ref{algo:struct:rewrite-findCollections:2}) va regrouper dans une même collection des sous-arbres collection contenant des enfants issues de la même classe d'équivalence (figure~\ref{fig:rewrite:findCollection3}).
+    \item La troisième boucle (ligne~\ref{algo:struct:rewrite-findCollections:3}) va ajouter à un sous-arbre collection les groupes enfants de $st$ qui sont équivalents aux enfants de la collection (figure~\ref{fig:rewrite:findCollection4}).
+ \end{itemize}
+
+\begin{procedure}[htb]
     \caption{findCollections($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findCollections}
 
     $\collectionFound \gets \textsc{False}$\;
 
     \ForEach{sous-arbre \st tel que $\st = T|_u$ et $l(u) \notin \{`ENT`, `GROUP`, `REL`, `COLL`\}$}{
-    $pos \gets |st|$\;
+        $pos \gets |st|$\;
 
-    \tcp{Construction d'une collection de groupes ou de relations}
-    \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $t|_{u.i} \in [x]_\tau$, $l(u.i) \in \{`GROUP`, `REL`\}$ et $|\subSet| \ge 2$}{
-    $\collectionFound \gets \textsc{True}$\;
-    $\insElem(T, `COLL`, u.pos)$\;
-    \ForAll{$u.i \in \subSet$}{
-        $\insElem(T, T|_{u.i}, u.pos.0)$\;
-        $\delElem(T, \subPos)$\;
-    }
-    }
+        \tcp{Construction d'une collection de groupes ou de relations}
+        \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $t|_{u.i} \in [x]_{\tau}$, $l(u.i) \in \{`GROUP`, `REL`\}$ et $|\subSet| \ge 2$\label{algo:struct:rewrite-findCollections:1}}{
+            $\collectionFound \gets \textsc{True}$\;
+            $\insElem(T, `COLL`, u.pos)$\;
+            \ForAll{$u.i \in \subSet$}{
+                $\insElem(T, T|_{u.i}, u.pos.0)$\;
+            }
+            \ForAll{$u.i \in \subSet$ (en allant du plus grand au plus petit)}{
+                $\delElem(T, u.i)$\;
+            }
+            $pos \gets |st|$\;
+        }
 
-    \tcp{Fusion de collections}
-    \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $T|_{u.i} \in [x]_\tau$, $l(u.i) \in \{`COLL`\}$ et $|\subSet| \ge 2$}{
-    $\collectionFound \gets \textsc{True}$\;
-    $\insElem(T, `COLL`, u.pos)$\;
+        \tcp{Fusion de collections}
+        \ForEach{sous-ensemble \subSet tel que $\exists x \forall u.i \in \subSet$ où $T|_{u.i} \in [x]_{\tau}$, $l(u.i) \in \{`COLL`\}$ et $|\subSet| \ge 2$\label{algo:struct:rewrite-findCollections:2}}{
+            $\collectionFound \gets \textsc{True}$\;
+            $\insElem(T, `COLL`, u.pos)$\;
 
-    \ForAll{$u.i.j$ tel que $u.i \in \subSet$}{
-        $\insElem(T, T|_{u.i.j}, u.pos.0)$\;
-        $\delElem(T, u.i.j)$\;
-    }
-    }
+            \ForAll{$u.i.j$ tel que $u.i \in \subSet$}{
+                $\insElem(T, T|_{u.i.j}, u.pos.0)$\;
+                $\delElem(T, u.i.j)$\;
+            }
+        }
 
-    \tcp{Ajout d'éléments à une collection}
-    \ForAll{$group, coll$ tel que $\exists x, i, j$ où $l(u.i) = `GROUP`$, $l(u.j) = `COLL`$, $T|_{u.i} \in [x]_\tau$ et $\forall k T|_{u.j,k} \in [x]_\tau$}{
-    $\collectionFound \gets \textsc{True}$\;
-    $group\_pos = |T|_{u.j}|$\;
-    $\insElem(T, T|_{u.i}, u.j.group\_pos)$\;
-    $\delElem(T, u.i)$\;
-    }
+        \tcp{Ajout d'éléments à une collection}
+        \ForAll{$group, coll$ tel que $\exists x, i, j$ où $l(u.i) = `GROUP`$, $l(u.j) = `COLL`$, $T|_{u.i} \in [x]_{\tau}$ et $\forall k T|_{u.j,k} \in [x]_{\tau}$\label{algo:struct:rewrite-findCollections:3}}{
+            $\collectionFound \gets \textsc{True}$\;
+            $group\_pos = |T|_{u.j}|$\;
+            $\insElem(T, T|_{u.i}, u.j.group\_pos)$\;
+            $\delElem(T, u.i)$\;
+        }
     }
 
     \Return \collectionFound \;
@@ -415,65 +705,105 @@ Dans la suite, on étudie en détail l'implémentation des opérations de transf
 
 \begin{figure}[htb]
     \centering
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
-                where n children=0{tier=word}{}
-                [$\dots$
-                    [U
-                        [GROUP\_1 [$\dots$]]
-                        [GROUP\_1 [$\dots$]]
-                        [COLL\_1 [
-                            [GROUP\_1 [$\dots$]]
-                            [GROUP\_1 [$\dots$]]
-                        ]]
-                        [Y [$\dots$]]
-                        [COLL\_2 [
-                            [GROUP\_2 [$\dots$]]
-                            [GROUP\_2 [$\dots$]]
-                        ]]
-                        [COLL\_2 [
-                            [GROUP\_2 [$\dots$]]
-                            [GROUP\_2 [$\dots$]]
-                        ]]
-                        [Z [$\dots$]]
-                    ]
-                ]
+                %for tree={s sep=4em}
+                [U [$G_1$[...]] [$G_2$[...]] [$G_1$[...]] [$G_3$[...]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]]] [$COLL$[$G_2$[...]] [$G_2$[...]]]]
             \end{forest}
         \end{adjustbox}
+        \caption{Sous-arbre par la création de collection}
+        \label{fig:rewrite:findCollection1}
     \end{subfigure}
-    \begin{subfigure}{.45\textwidth}
+    \hfill
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
-                where n children=0{tier=word}{}
-                [$\dots$
-                    [U
-                        [COLL\_1 [
-                            [GROUP\_1 [$\dots$]]
-                            [GROUP\_1 [$\dots$]]
-                            [GROUP\_1 [$\dots$]]
-                            [GROUP\_1 [$\dots$]]
-                        ]]
-                        [Y [$\dots$]]
-                        [COLL\_2 [
-                            [GROUP\_2 [$\dots$]]
-                            [GROUP\_2 [$\dots$]]
-                            [GROUP\_2 [$\dots$]]
-                            [GROUP\_2 [$\dots$]]
-                        ]]
-                        [Z [$\dots$]]
-                    ]
-                ]
+                %for tree={s sep=4em}
+                [U [$G_2$[...]] [$G_3$[...]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]]] [$COLL$[$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]]]]
             \end{forest}
         \end{adjustbox}
+        \caption{Sous-arbre après la première boucle}
+        \label{fig:rewrite:findCollection2}
     \end{subfigure}
-    
-    \caption{Exemple d'instance}
-    \label{fig:struct:rewrite-findCollections}
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [U [$G_2$[...]] [$G_3$[...]] [$COLL$[$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Sous-arbre après la seconde boucle}
+        \label{fig:rewrite:findCollection3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{.45\textwidth}
+        \centering
+        \begin{adjustbox}{valign=c, max width=\textwidth}
+            \begin{forest}
+                %for tree={s sep=4em}
+                [U [$G_3$[...]] [$COLL$[$G_2$[...]] [$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]]]]
+            \end{forest}
+        \end{adjustbox}
+        \caption{Sous-arbre à la fin de la procédure}
+        \label{fig:rewrite:findCollection4}
+    \end{subfigure}
+
+    \caption[Exemple de transformation en insérant des collections]{Exemple de transformation en insérant des collections (procédure~\ref{algo:struct:rewrite-findCollections})}
+    \label{fig:rewrite:findCollections}
 \end{figure}
 
 \begin{example}
-    Étant donné la figure~\ref{fig:struct:rewrite-findCollections}, la procédure~\ref{algo:struct:rewrite-findCollections} cherche à construire, agrandir ou fusionner des collections existents.
-\end{example}
+    La figure~\ref{fig:rewrite:findCollection1} montre un sous-arbre dans lequel la fonction~\ref{algo:struct:rewrite-findCollections} va faire des transformations.
+    Dans cet exemple, les indices correspondent aux différentes classes d'équivalence.
+    Lors de la première boucle de la fonction il y a la création d'un nouveau sous-arbre collection contenant les deux groupes qui sont équivalents figure~\ref{fig:rewrite:findCollection2}.
+    La figure~\ref{fig:rewrite:findCollection3} montre la transformation du sous-arbre après la seconde boucle, les deux collections contenant des groupes équivalents sont regroupés en un sous-arbre.
+    La figure~\ref{fig:rewrite:findCollection4} montre que le groupe $G_2$ équivalent aux groupes d'une des collections va être ajouté à celle-ci.
+\end{example} 
+
+% \begin{figure}[htb]
+%     \centering
+%     \begin{subfigure}[c]{0.9\textwidth}
+%         \centering
+%         \begin{adjustbox}{valign=c, max width=\textwidth}
+%             \begin{forest}
+%                 for tree={s sep=4em}
+%                 [$\lambda$ [$COLL$[$F_0$]] [$ $[$F_1$]] [$GROUP$[$F_2$]] [$ $[$F_3$]] [$ $ [$COLL$[$REL$[$GROUP$ [$F_4$]] [$GROUP$ [$F_5$]]] [$REL$[$GROUP$ [$F_6$]] [$GROUP$ [$F_7$]]]]]]
+%             \end{forest}
+%         \end{adjustbox}
+%         \caption{Arbre dans lequel toutes les transformations ont été faites jusqu'à la ligne 12 de la procédure rewrite.}
+%         \label{fig:rewrite:fin1}
+%     \end{subfigure}
+    
+% 	\begin{subfigure}[c]{0.9\textwidth}
+%         \centering
+%         \begin{adjustbox}{valign=c, max width=\textwidth}
+%             \begin{forest}
+%                 for tree={s sep=4em}
+%                 [$\lambda$ [$COLL$[$F_0$]] [$F_1$] [$GROUP$[$F_2$]] [$F_3$] [$COLL$[$REL$[$GROUP$ [$F_4$]] [$GROUP$ [$F_5$]]] [$REL$[$GROUP$ [$F_6$]] [$GROUP$ [$F_7$]]]]]
+%             \end{forest}
+%         \end{adjustbox}
+%         \caption{Arbre transformé après l'exécution de la première boucle à la fin de rewrite.}
+%         \label{fig:rewrite:fin2}
+%     \end{subfigure}
+       
+% 	\begin{subfigure}[c]{0.9\textwidth}
+%         \centering
+%         \begin{adjustbox}{valign=c, max width=\textwidth}
+%             \begin{forest}
+%                 for tree={s sep=4em}
+%                 [$\lambda$ [$COLL$[$F_0$]] [$ $[$F_1$]] [$GROUP$[$F_2$]] [$ $[$F_3$]] [$ $ [$COLL$[$REL$[$GROUP$ [$F_4$]] [$GROUP$ [$F_5$]]] [$REL$[$GROUP$ [$F_6$]] [$GROUP$ [$F_7$]]]]]]
+%             \end{forest}
+%         \end{adjustbox}
+%         \caption{Arbre transformé après l'exécution de la seconde boucle à la fin de rewrite.}
+%         \label{fig:rewrite:fin2}
+%     \end{subfigure}
+    
+%     \caption{Exemple de transformations réalisées par les deux boucles (ligne 12 et 15) à la fin de la procédure rewrite (procédure~\ref{algo:struct:rewrite-findCollections})}
+%     \label{fig:rewrite:fin}
+% \end{figure}
 
 \FloatBarrier
