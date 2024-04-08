@@ -198,12 +198,6 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
     Soit un sous-arbre $t = T|_u$, on note $t' = P_i^t$ le $i$-éme sous-arbre parent de $t$ tel que $t' = T|_v$,  $u = vw$ et $|w| = i$.
 \end{definition}
 
-La figure~\ref{fig:struct:tree-ex} illustre un arbre $T = (D, l)$ ordonné où $D=\{\epsilon, 0, 1, 1.0, 1.1\}$.
-Dans la figure, les positions sont représentées entre parenthèses.
-Nous avons par exemple $l(0) = child1$.
-$T|_{1} = (D', l')$ est un sous-arbre de $T$.
-Remarquez que $T|_{1} $ n'est pas un arbre, car $D'= \{1, 1.0, 1.1\}$ ne respecte pas les conditions requises (définition~\ref{def:struct:tree}).
-
 \begin{figure}[htb]
     \centering
     \begin{adjustbox}{max width=\linewidth}
@@ -221,6 +215,14 @@ Remarquez que $T|_{1} $ n'est pas un arbre, car $D'= \{1, 1.0, 1.1\}$ ne respect
     \caption{Exemple d'un arbre ordonné}
     \label{fig:struct:tree-ex}
 \end{figure}
+
+\begin{example}
+    La figure~\ref{fig:struct:tree-ex} illustre un arbre $T = (D, l)$ ordonné où $D=\{\epsilon, 0, 1, 1.0, 1.1\}$.
+    Dans la figure, les positions sont représentées entre parenthèses.
+    Nous avons par exemple $l(0) = child1$.
+    $T|_{1} = (D', l')$ est un sous-arbre de $T$.
+    Remarquez que $T|_{1} $ n'est pas un arbre, car $D'= \{1, 1.0, 1.1\}$ ne respecte pas les conditions requises (définition~\ref{def:struct:tree}).
+\end{example}
 
 \subsection{Textes et arbres}
 
@@ -343,7 +345,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
         \hfill
         \begin{subfigure}[c]{0.1\textwidth}
             \centering
-            \huge{$\longrightarrow$}
+            \Large{$\longrightarrow$}
         \end{subfigure}
         \hfill
         \begin{subfigure}[c]{0.4\textwidth}

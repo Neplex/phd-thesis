@@ -105,7 +105,7 @@ La découverte d'ontologie nécessite souvent une intervention humaine \cite{nav
 Ici on s'intéresse principalement à l'apprentissage d'ontologie à partir de textes \cite{konysKnowledgeRepositoryOntology2019,watrobskiOntologyLearningMethods2020,al-aswadiAutomaticOntologyConstruction2020}.
 Comme pour l'annotation sémantique, on trouve des approches à base de règles et d'apprentissage automatique.
 
-Historiquement, on trouve des approches à base de motifs syntaxiques (comme \enquote{$X$ is a $Y$}) \cite{morinAutomaticAcquisitionSemantic1999} mais aussi des approches basées sur l'analyse des arbres syntaxiques et de dépendances \cite{gamalloMappingSyntacticDependencies2002,nivreIncrementalityDeterministicDependency2004}.
+Historiquement, on trouve des approches, similaires à l'annotation sémantique, à base de motifs syntaxiques (comme \enquote{$X$ is a $Y$}) \cite{morinAutomaticAcquisitionSemantic1999} mais aussi des approches basées sur l'analyse des arbres syntaxiques et de dépendances \cite{gamalloMappingSyntacticDependencies2002,nivreIncrementalityDeterministicDependency2004}.
 Ces approches s'intéressent notamment à l'extraction des triplets sujets / verbe / objet.
 \cite{budanitskyLexicalSemanticRelatedness1999}, utilise la fréquence de co-occurrence entre les unités lexicale pour identifier les concepts et les relations.
 Ces approches peuvent ensuite être complétées par du raisonnement logique pour identifier la hiérarchie des concepts, les relations ou construire des règles d'inférences \cite{zelleLearningSemanticGrammars1993}.
@@ -121,11 +121,12 @@ Il est essentiel, en particulier dans le domaine médical, d'être capable d'exp
 Bien que de nombreux travaux tentent de répondre à cette problématique avec l'intelligence artificielle explicative, ce sujet ne sera pas détaillé ici.
 Une approche plus conventionnelle permet à un humain, même en cas d'automatisation totale, de vérifier et d'intervenir si nécessaire pour corriger les données à chaque étape du processus.
 Les travaux présentés dans cette thèse se concentrent également sur la construction d'un système adaptable à différents domaines (\gls{ennov} couvrant un large éventail d'utilisations différentes), évitant ainsi de dépendre de l'apprentissage pour un domaine spécifique.
-De plus, la demande en données d'apprentissage est souvent élevée pour les approches basées sur les réseaux de neurones.
-Dans le cadre d'\gls{ennov} on travaille avec des données du domaine médical contenant des informations sensibles, telles que des données de patients ou des secrets industriels.
+De plus, pour les approches basées sur les réseaux de neurones, la demande en données d'apprentissage est souvent élevée comme leur cout financier et environnemental \cite{strubellEnergyPolicyConsiderations2019}.
+Dans le cadre d'\gls{ennov}, les solutions mise en place concerne des données du domaine médical contenant des informations sensibles, telles que des données de patients ou des secrets industriels.
 L'utilisation de l'apprentissage à partir de ces données présente des risques liés à la protection de la vie privée et au secret de fabrication \cite{fredriksonModelInversionAttacks2015,songPrivacyRisksSecuring2019}.
 Dans ce contexte, la compartimentation des données est cruciale, mais la construction d'un modèle par source de données n'est pas envisageable.
 Une pratique courante consiste donc à construire un modèle générique et à le raffiner pour chaque utilisateur/source de données \cite{ribeiroWhyShouldTrust2016}.
+Cette solution permet également de réduire les couts et c'est ce qu'on retrouve avec les modèles comme \gls{bert} \cite{devlinBERTPretrainingDeep2019} ou \gls{gpt} \cite{radfordImprovingLanguageUnderstanding2018, brownLanguageModelsAre2020}. 
 Cependant, cela pose les mêmes problématiques d'accès aux données énoncées précédemment et le modèle générique doit alors être construit sur des données publiques ou artificielles qui ne sont pas toujours disponibles.
 
 Dans le cadre des textes, les ontologies peuvent être considérées comme un schéma universel d'annotation, permettant ainsi de rendre les informations extraites depuis les textes interopérables, c'est-à-dire compatibles et échangeables entre différents systèmes et applications.
@@ -137,9 +138,9 @@ De plus, compte tenu de l'intervention humaine quasi systématique dans le proce
 \paragraph{\textsc{Abstra}}
 \textsc{Abstra} \cite{barretAbstraGenericAbstractions2022} est un système conçu pour présenter un ensemble de jeux de données de manière homogène à un utilisateur, dans le but de l'aider à mieux les comprendre et de lui permettre de choisir celui à utiliser et comment il est structuré.
 L'objectif principal est de représenter les jeux de données comme un ensemble de classes de haut niveau et les relations entre elles.
-Le système est capable d'analyser un grand nombre de modèles de données structurés ou semi-structurés, tels que \acrshort{rdf}, JSON, \gls{xml}, CSV, des bases relationnelles ou des graphes de propriétés.
+Le système est capable d'analyser un grand nombre de modèles de données structurés ou semi-structurés, tels que \acrshort{rdf}, JSON, \acrshort{xml}, CSV, des bases relationnelles ou des graphes de propriétés.
 Le système \textsc{Abstra} se compose de trois parties principales.
-La première partie vise à représenter les jeux de données de manière homogène en introduisant une structure intermédiaire inspirée du modèle d'entité-association.
+La première partie vise à représenter les jeux de données de manière homogène en introduisant une structure intermédiaire inspirée du \gls{mea} \cite{chenEntityrelationshipModelUnified1976}.
 Cette structure comprend des sous-enregistrements (\enquote{sub-record}) qui représentent les données, des enregistrements (\enquote{record}) représentant des objets et des collections.
 Un exemple de cette structure est illustré dans la figure~\ref{fig:struct:abstra-ex}.
 Dans un deuxième temps, le système identifie les nœuds de données importants ainsi que les collections principales.

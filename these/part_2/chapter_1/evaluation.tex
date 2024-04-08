@@ -24,6 +24,46 @@ L'implémentation a été réalisée en \gls{python} et utilise \gls{corenlp} po
 Le code source du projet nécessaire pour la reproduction des expériences est disponible sur \gls{git}~\cite{}.
 Pour le corpus, \cite{grabarCASFrenchCorpus2018} donne les modalités d'accès aux données.
 
+\begin{figure}[htb]
+    \centering
+    \begin{tikzpicture}
+        \begin{groupplot}[
+                group style={
+                        group size=1 by 2,
+                        xlabels at=edge bottom,
+                        xticklabels at=edge bottom,
+                        vertical sep=0pt
+                    },
+                enlarge x limits=.01,
+                xmin=1,
+                xmax=50,
+                xlabel={Etapes},
+                xtick align=outside,
+                ytick align=outside,
+                tickpos=left,
+                width=\textwidth,
+            ]
+            \nextgroupplot[ylabel={Nombre de production}, height=.25\textheight]]
+            
+            \addplot+[mark=*, cycle list shift=0] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_prod.csv}; \label{figure:struct:xp:prod:prod}
+            \addlegendentry{Règles de productions}
+            
+            \addplot+[mark=triangle*, cycle list shift=1] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_unlabelled.csv}; \label{figure:struct:xp:prod:unlabelled}
+            \addlegendentry{Non-terminaux sans étiquette}
+
+            % Tendances
+            \addplot+[dashed, cycle list shift=0] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_prod.csv}; \label{figure:struct:xp:prod:prod-trend}
+            \addplot+[dashed, cycle list shift=1] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_unlabelled.csv}; \label{figure:struct:xp:prod:unlabelled-trend}
+            
+            \nextgroupplot[ybar, ymin=0, ymax=9, ylabel={Opération}, pattern=crosshatch, height=.15\textheight, bar width=.5em], legend style={ at={(0.5,-0.5)}, anchor=north}
+            
+            \addplot+[nodes near coords, cycle list shift=2, fill] table [x=step, y expr={1 + \thisrow{value}}, col sep=comma] {these/part_2/chapter_1/eval/edit_op.csv}; \label{figure:struct:xp:prod:op}
+        \end{groupplot}
+    \end{tikzpicture}
+    \caption{Nombre de règles de productions qui compose la grammaire pour chaque étape de la procédure}
+    \label{figure:struct:xp:prod}
+\end{figure}
+
 À la fin de chaque itération de la procédure, on recherche (sans modifier la structure de l'arbre) les nœuds candidats pour être des \emph{relations} (des nœuds ayant exactement deux \emph{groupes} distincts comme enfants) ou des \emph{collections} (des nœuds ayant uniquement comme enfant des nœuds \emph{groupes} équivalents) qui ne nécessite pas de réécriture (il s'agit d'un simple nommage d'une structure valide).
 La recherche des nœuds \emph{relations} et \emph{collections} permet de mesurer à chaque itération leur nombre potentiel même si l'opération de réécriture associée ne s'est pas déclenchée.
 Pour la première itération, seul l'opération \ref{algo:struct:rewrite-findGroups} est effectuée pour permettre de comparer l'instance avant et après réécriture par les différentes opérations.
@@ -42,44 +82,6 @@ On rappelle que la procédure~\ref{algo:struct:rewrite} (page~\pageref{algo:stru
         \item \textsf{reduce} (top)
     \end{enumerate}
 \end{multicols}
-
-\begin{figure}[htb]
-    \centering
-    \begin{tikzpicture}
-        \begin{groupplot}[
-                group style={
-                        group size=1 by 2,
-                        xlabels at=edge bottom,
-                        xticklabels at=edge bottom,
-                        vertical sep=0pt
-                    },
-                enlarge x limits=.01,
-                xmin=1,
-                xmax=50,
-                xlabel={Etapes},
-                xtick align=outside,
-                ytick align=outside,
-                tickpos=left,
-                legend columns=-1,
-                legend style={draw=none, at={(0.5,-0.2)}, anchor=north},
-                width=\textwidth,
-            ]
-            \nextgroupplot[ylabel={Nombre de production}, height=.25\textheight]
-            
-            \addplot+[mark=*, cycle list shift=0] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_prod.csv}; \label{figure:struct:xp:prod:prod}
-            \addplot+[dashed, cycle list shift=0] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_prod.csv}; \label{figure:struct:xp:prod:prod-trend}
-            
-            \addplot+[mark=triangle*, cycle list shift=1] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_unlabelled.csv}; \label{figure:struct:xp:prod:unlabelled}
-            \addplot+[dashed, cycle list shift=1] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_unlabelled.csv}; \label{figure:struct:xp:prod:unlabelled-trend}
-            
-            \nextgroupplot[ybar, ymin=0, ymax=9, ylabel={Opération}, pattern=crosshatch, height=.15\textheight, bar width=.5em]
-            
-            \addplot+[nodes near coords, cycle list shift=2, fill] table [x=step, y expr={1 + \thisrow{value}}, col sep=comma] {these/part_2/chapter_1/eval/edit_op.csv}; \label{figure:struct:xp:prod:op}
-        \end{groupplot}
-    \end{tikzpicture}
-    \caption{Nombre de règles de productions qui compose la grammaire pour chaque étape de la procédure}
-    \label{figure:struct:xp:prod}
-\end{figure}
 
 Comme on traite un ensemble de phrases représentées par des arbres syntaxiques distincts, notre instance est vue comme une forêt enracinée.
 On applique les opérations de réécriture pour chaque phrase de façon indépendante.
@@ -110,22 +112,27 @@ Aux étapes \numlist{23;24;29;30;31;32}, le nombre de règles de productions rem
                 ytick align=outside,
                 tickpos=left,
                 legend columns=-1,
-                legend style={draw=none, at={(0.5,-0.2)}, anchor=north},
+                legend style={at={(0.5,-0.25)}, anchor=north},
                 width=\textwidth,
-                ylabel={Nombre},
+                ylabel={Nombre moyen d'instance},
                 height=.3\textheight
             ]
-            \addplot+[mark=*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_equiv_subtrees.csv}; \label{figure:struct:xp:ratio:equiv}
-            %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_equiv_subtrees.csv}; \label{figure:struct:xp:ratio:equiv-trend}
 
-            \addplot+[mark=triangle*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/group_ratio.csv}; \label{figure:struct:xp:ratio:group}
+            \addplot+[mark=*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/group_ratio.csv}; \label{figure:struct:xp:ratio:group}
             %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/group_ratio.csv}; \label{figure:struct:xp:ratio:group-trend}
+            \addlegendentry{Groupes}
 
-            \addplot+[mark=square*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/rel_ratio.csv}; \label{figure:struct:xp:ratio:rel}
+            \addplot+[mark=triangle*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/rel_ratio.csv}; \label{figure:struct:xp:ratio:rel}
             %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/rel_ratio.csv}; \label{figure:struct:xp:ratio:rel-trend}
+            \addlegendentry{Relations}
 
-            \addplot+[mark=+] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/coll_ratio.csv}; \label{figure:struct:xp:ratio:coll}
+            \addplot+[mark=square*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/coll_ratio.csv}; \label{figure:struct:xp:ratio:coll}
             %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/coll_ratio.csv}; \label{figure:struct:xp:ratio:coll-trend}
+            \addlegendentry{Collections}
+
+            \addplot+[mark=+] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_equiv_subtrees.csv}; \label{figure:struct:xp:ratio:equiv}
+            %\addplot+[dashed] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_equiv_subtrees.csv}; \label{figure:struct:xp:ratio:equiv-trend}
+            \addlegendentry{Classes d'équivalences}
         \end{axis}
     \end{tikzpicture}
     \caption{Nombre d'individus moyen pour chaque catégorie (\emph{groupe}, \emph{relation}, \emph{collection})}
@@ -162,19 +169,22 @@ Dans l'idéal ce nombre devrait être à \num{1}, signifiant que toutes les coll
                 ytick align=outside,
                 tickpos=left,
                 legend columns=-1,
-                legend style={draw=none, at={(0.5,-0.2)}, anchor=north},
+                legend style={at={(0.5,-0.25)}, anchor=north},
                 width=\textwidth,
                 ylabel={Nombre de structure},
                 height=.3\textheight
             ]
             \addplot+[mark=*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_group.csv}; \label{figure:struct:xp:nbElems:group}
             %\addplot+[dashed, red] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_group.csv}; \label{figure:struct:xp:nbElems:group-trend}
+            \addlegendentry{Groupes}
 
             \addplot+[mark=triangle*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_rel.csv}; \label{figure:struct:xp:nbElems:rel}
             %\addplot+[dashed, green] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_rel.csv}; \label{figure:struct:xp:nbElems:rel-trend}
+            \addlegendentry{Relations}
 
             \addplot+[mark=square*] table [x expr={1 + \thisrow{step}}, y=value, col sep=comma] {these/part_2/chapter_1/eval/nb_coll.csv}; \label{figure:struct:xp:nbElems:coll}
             %\addplot+[dashed, blue] table [x expr={1 + \thisrow{step}}, y={create col/linear regression={y=value}}, col sep=comma] {these/part_2/chapter_1/eval/nb_coll.csv}; \label{figure:struct:xp:nbElems:coll-trend}
+            \addlegendentry{Collections}
         \end{axis}
     \end{tikzpicture}
     \caption{Nombre de structures remarquable différentes pour chaque catégorie (\emph{groupe}, \emph{relation}, \emph{collection})}
@@ -300,3 +310,5 @@ Si l'instance structurée donnée est suffisamment représentée pour être cons
 Dans un premier temps, on effectue une évaluation sans ajouter d'informations supplémentaires et on ajoutera par la suite une instance structurée.
 Afin d'obtenir un schéma plus intuitif, nous expérimentons ensuite la procédure sur une instance comprenant à la fois des textes et une structure déjà existante.
 Cette situation pourrait représenter une problématique d'intégration de données, où l'on tente d'intégrer différentes instances possédant des schémas différents.
+
+\FloatBarrier

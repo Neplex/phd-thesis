@@ -708,6 +708,13 @@ La simplification des arbres est faite en deux étapes:
           Pour ce faire, on utilise successivement la règle de réécriture \textsf{reduce} présentée dans la figure~\ref{fig:sch:op:reduce}.
 \end{enumerate}
 
+\begin{example}
+    Dans l'arbre donné dans la figure~\ref{fig:struct:enrichissement:3}, on remarque que pour le nœud \emph{ENT\_PERSON} le nœud parent \emph{NP} peut être supprimé.
+    Le sous-arbre du nœud \emph{VBZ} ne contient aucune entité et peut donc être supprimé.
+    Sa suppression rend le nœud parent \emph{VP} supprimable à son tour, car il ne possède alors plus qu'un seul enfant.
+    En appliquant le raisonnement à tout l'arbre, on obtient l'arbre donné dans la figure~\ref{fig:struct:simplification}.
+\end{example}
+
 \begin{figure}[htb]
     \centering
     \begin{minipage}[c]{.4\textwidth}
@@ -767,13 +774,7 @@ La simplification des arbres est faite en deux étapes:
     \end{minipage}%
 \end{figure}
 
-\begin{example}
-    Dans l'arbre donné dans la figure~\ref{fig:struct:enrichissement:3}, on remarque que pour le nœud \emph{ENT\_PERSON} le nœud parent \emph{NP} peut être supprimé.
-    Le sous-arbre du nœud \emph{VBZ} ne contient aucune entité et peut donc être supprimé.
-    Sa suppression rend le nœud parent \emph{VP} supprimable à son tour, car il ne possède alors plus qu'un seul enfant.
-    En appliquant le raisonnement à tout l'arbre, on obtient l'arbre donné dans la figure~\ref{fig:struct:simplification}.
-\end{example}
-
+\FloatBarrier
 \subsection{Extraction de la grammaire}
 \label{sec:struct:steps:grammar}
 
