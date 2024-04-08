@@ -59,7 +59,7 @@ Le processus se termine lorsque nous trouvons une grammaire qui satisfait $\math
 
         \tcp{Identifier les relations}
         \lIf{$\simp = \textsc{False}$}{
-            $\simp \gets \ref{algo:struct:rewrite-findRelationship}(T, \text{minSupport})$
+            $\simp \gets \ref{algo:struct:rewrite-findRelationship}(T, \tau, \text{minSupport})$
         }
 
         \tcp{Identifier les collections de relations}
@@ -195,7 +195,7 @@ L'ensemble \emph{equivalent\_st} contient alors l'ensemble des classes d'équiva
 
 La fonction \findSTwithMinLeavesTree renvoie la classe d'équivalence la plus grande dont la hauteur moyenne de ses sous-arbres est la plus faible.
 Intuitivement, on veut travailler avec les classes les plus fréquentes (donc les plus grandes) mais en partant du bas de l'arbre et en remontant vers la racine.
-La boucle \KwSty{pour chaque} de la ligne~\ref{algo:struct:rewrite-findGroups:3} à \ref{algo:struct:rewrite-findGroups:4}, construit, pour chaque sous-arbre $st$ appartenant à $ST\_min $, un nouveau sous-arbre $T_{GROUP}$ dont la racine est labellisée $GROUP_k$ (parfois réduit en $Grp_k$ dans les figures) où $GROUP$ est un symbole non-terminal et $k$ un attribut identifiant les regroupements équivalents (voir la définition~\ref{def:struct:G-attr} des grammaires attribuée).
+La boucle \KwSty{pour chaque} de la ligne~\ref{algo:struct:rewrite-findGroups:3} à \ref{algo:struct:rewrite-findGroups:4}, construit, pour chaque sous-arbre $st$ appartenant à $ST\_min $, un nouveau sous-arbre $T_{GROUP}$ dont la racine est labellisée $GROUP_k$ (parfois réduit en $G_k$ dans les figures) où $GROUP$ est un symbole non-terminal et $k$ un attribut identifiant les regroupements équivalents (voir la définition~\ref{def:struct:G-attr} des grammaires attribuée).
 Les enfants du sous-arbre $T_{GROUP}$ sont exclusivement les sous-arbres d'entités originalement présents dans $st$.
 Néanmoins, il est important de noter que cette construction ne se fait pas à partir des sous-arbres ayant déjà un sous-arbre labellisé $GROUP$.
 La modification de l'arbre initiale est implémentée dans les lignes~\ref{algo:struct:rewrite-findGroups:4bis} (en insérant le nouveau sous-arbre $T_{GROUP}$ comme frère à droite de $st$) et~\ref{algo:struct:rewrite-findGroups:4} (en supprimant le sous-arbre $st$).
@@ -248,13 +248,13 @@ Cela évite la disparition du nœud parent avant l'insertion, déjà prévue, du
                 %for tree={s sep=4em}
                 [$\epsilon$ [$0$ [$E_1$]]
                     [$1$ [$10$ [$E_2$]]
-                            [$11$ [$Grp_0$ [$E_3$]]
+                            [$11$ [$G_0$ [$E_3$]]
                                     [$E_4$]]]
                     [$2$ [$E_5$]
                             [$21$ [$210$ [$2100$ [$21000$ [$E_6$]]
                                                     [$E_7$]]
                                             [$E_8$]]
-                                    [$Grp_0$ [$E_9$]]]]]
+                                    [$G_0$ [$E_9$]]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Arbre $T'$}
@@ -266,15 +266,15 @@ Cela évite la disparition du nœud parent avant l'insertion, déjà prévue, du
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [$\epsilon$ [$Grp_1$ [$E_1$]]
-                    [$1$ [$Grp_1$ [$E_2$]]
-                            [$11$ [$Grp_0$[$E_3$]]
+                [$\epsilon$ [$G_1$ [$E_1$]]
+                    [$1$ [$G_1$ [$E_2$]]
+                            [$11$ [$G_0$[$E_3$]]
                                     [$E_4$]]]
                     [$2$ [$E_5$]
-                            [$21$ [$210$ [$Grp_1$ [$E_6$]
+                            [$21$ [$210$ [$G_1$ [$E_6$]
                                                     [$E_7$]]
                                             [$E_8$]]
-                                    [$Grp_0$ [$E_9$]]]]]
+                                    [$G_0$ [$E_9$]]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Arbre $T''$}
@@ -346,7 +346,7 @@ Si, pour un sous arbre $st$, il est possible de construire un sous-arbre $st_i$ 
 Pour faire cela, la procédure~\ref{algo:struct:rewrite-findSubgroups} récupère l'ensemble $S_{ENT}$ des sous-arbres entité de chaque sous-arbre $st$ à tester (ligne~\ref{algo:struct:rewrite-findSubgroups:1}).
 On construit ensuite tous les sous-ensembles possibles d'entités comportant au moins deux éléments (Le \enquote{power set} $\mathcal{P}$).
 Tous les ensembles de taille égale seront traités simultanément dans la boucle \KwSty{pour chaque} qui commence à la ligne~\ref{algo:struct:rewrite-findSubgroups:3}, en débutant par l'évaluation des ensembles les plus grands (ligne~\ref{algo:struct:rewrite-findSubgroups:2}).
-\combination construit pour l'ensemble $st$ l'ensemble des parties de taille $k$ de $st$.
+\combination construit, pour l'ensemble $st$, l'ensemble des parties de taille $k$ de $st$.
 %$combinaison$ est le sous-ensemble des parties de taille $k$ des sous-arbres entité de $st$
 À chaque itération, nous créons une copie de l'arbre $T$ pour former un nouvel arbre $T_j$.
 Dans $T_j$, nous modifions $st$ en retirant l'étiquette de sa racine (ligne~\ref{algo:struct:rewrite-findSubgroups:4}), puis en lui ajoutant un nouvel enfant étiqueté $GROUP$.
@@ -383,7 +383,7 @@ S'il n'est pas possible de construire un ensemble de $k$ entités fréquent alor
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 for tree={s sep=2em}
-                [U [$...$] [$GROUP$[$E_1$] [$E_2$] [$E_3$] [$E_4$]] [$...$]]
+                [$\dots$ [$GROUP$ [$E_1$] [$E_2$] [$E_3$] [$E_4$]]]
             \end{forest}
         \end{adjustbox}
         \caption{Arbre initial}
@@ -394,22 +394,22 @@ S'il n'est pas possible de construire un ensemble de $k$ entités fréquent alor
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 for tree={s sep=2em}
-                [U [$...$] [$~~$ [$GROUP$ [$E_1$] [$E_2$] [$E_3$]] [$E_4$]] [$...$]]
+                [$\dots$ [$~~$ [$GROUP$ [$E_1$] [$E_2$] [$E_3$]] [$E_4$]]]
             \end{forest}
             \hfill
             \begin{forest}
                 for tree={s sep=2em}
-                [U [$...$] [$~~$ [$GROUP$ [$E_1$] [$E_2$] [$E_4$]] [$E_3$]] [$...$]]
+                [$\dots$ [$~~$ [$GROUP$ [$E_1$] [$E_2$] [$E_4$]] [$E_3$]]]
             \end{forest}
             \hfill
             \begin{forest}
                 for tree={s sep=2em}
-                [U [$...$] [$~~$ [$GROUP$ [$E_1$] [$E_3$] [$E_4$]] [$E_2$]] [$...$]]
+                [$\dots$ [$~~$ [$GROUP$ [$E_1$] [$E_3$] [$E_4$]] [$E_2$]]]
             \end{forest}
             \hfill
             \begin{forest}
                 for tree={s sep=2em}
-                [U [$...$] [$~~$ [$GROUP$ [$E_2$] [$E_3$] [$E_4$]] [$E_1$]] [$...$]]
+                [$\dots$ [$~~$ [$GROUP$ [$E_2$] [$E_3$] [$E_4$]] [$E_1$]]]
             \end{forest}
         \end{adjustbox}
         \caption{Arbres $T_0, T_1, T_2, T_3$}
@@ -513,8 +513,8 @@ Si cette fréquence est supérieure à $minSupport$ et à la fréquence la plus 
     \begin{multline*}
         \combination(S_{GROUP} \cup S_{ENT}, 3) = \{\{u0, u1, u3\},\{u0, u1, u4\}, \{u0, u3, u4\}, \{u1, u2, u3\},\\\{u1, u2, u4\}, \{u1, u3, u4\}, \{u2, u3, u4\} \}
     \end{multline*}
-    
-    Nous allons tester toutes ses combinaisons en créant un nouvel arbre avec un nouveau groupe et en calculant la fréquence de ce nouveau groupe.
+
+    Toutes ses combinaisons sont testées en créant un nouvel arbre contenant le nouveau groupe et en calculant le support de ce dernier.
     La figure~\ref{fig:rewrite:mergegroupsTest1} montre le sous-arbre $st_0$ créé pour la combinaison $\{u0, u1, u3\}$ avec $ST_{ENT}=\{E_1, E_2, E_3, E_4, E_5, E_9\}$ et la figure~\ref{fig:rewrite:mergegroupsTest2} celui pour la combinaison $\{u2, u3, u4\}$ avec $ST_{ENT}=\{E_6, E_7, E_8, E_9, E_{10}\}$.
     L'arbre $T_0$ correspond  à l'arbre $T$ où le sous-arbre $st$ a été remplacé par $st_0$, idem pour $T_1$.
     Si l'on suppose que l'on accepte la transformation proposée par l'arbre $T_0$, nous allons changer $T$ en $T_0$ et continuer la procédure~\ref{algo:struct:rewrite-mergeGroups} en tentant de fusionner $u1$ et $u2$ dans ce nouvel arbre.
@@ -527,7 +527,7 @@ Si cette fréquence est supérieure à $minSupport$ et à la fréquence la plus 
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [U [$GROUP_1$[$E_1$] [$E_2$] [$E_3$]] [$GROUP_2$ [$E_4$] [$E_5$]] [$GROUP_1$[$E_6$] [$E_7$] [$E_8$]] [$E_9$] [$E_{10}$]]
+                [$\dots$ [$~~$ [$GROUP_1$ [$E_1$] [$E_2$] [$E_3$]] [$GROUP_2$ [$E_4$] [$E_5$]] [$GROUP_1$[$E_6$] [$E_7$] [$E_8$]] [$E_9$] [$E_{10}$]]]
             \end{forest}
         \end{adjustbox}
         \caption{Sous-arbre $st$ où tenter la fusion.}
@@ -538,7 +538,7 @@ Si cette fréquence est supérieure à $minSupport$ et à la fréquence la plus 
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [U [$GROUP$[$E_1$] [$E_2$] [$E_3$] [$E_4$] [$E_5$] [$E_9$]] [$GROUP_2$ [$E_4$] [$E_5$]] [$E_{10}$]]
+                [$\dots$ [$~~$ [$GROUP$ [$E_1$] [$E_2$] [$E_3$] [$E_4$] [$E_5$] [$E_9$]] [$GROUP_2$ [$E_4$] [$E_5$]] [$E_{10}$]]]
             \end{forest}
         \end{adjustbox}
         \caption{Sous-arbre $st_0$ avec la combinaison $\{u0, u1, u3\}$ }
@@ -550,13 +550,13 @@ Si cette fréquence est supérieure à $minSupport$ et à la fréquence la plus 
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [U [$GROUP$[$E_6$] [$E_7$] [$E_8$] [$E_9$] [$E_{10}$]][$GROUP_1$[$E_1$] [$E_2$] [$E_3$]] [$GROUP_2$ [$E_4$] [$E_5$]]]
+                [$\dots$ [$~~$ [$GROUP$ [$E_6$] [$E_7$] [$E_8$] [$E_9$] [$E_{10}$]][$GROUP_1$[$E_1$] [$E_2$] [$E_3$]] [$GROUP_2$ [$E_4$] [$E_5$]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Sous-arbres $st_1$ avec la combinaison $\{u2, u3, u4\}$}
         \label{fig:rewrite:mergegroupsTest2}
     \end{subfigure}
-    \caption{Exemple d'application de la fonction~\ref{algo:struct:rewrite-mergeGroups}}
+    \caption[Exemple d'application de la procédure~\ref*{algo:struct:rewrite-mergeGroups}]{Exemple d'application de la procédure~\ref{algo:struct:rewrite-mergeGroups}}
     \label{fig:rewrite:mergegroups}
 \end{figure}
 
@@ -576,7 +576,7 @@ Il existe deux manières de procéder à cette création :
 Cette fonction est illustrée par la figure~\ref{fig:rewrite:findRelationShip}.
 
 \begin{procedure}[htb]
-    \caption{findRelationship($T$ = ($D$, $l$), minSupport)}
+    \caption{findRelationship($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findRelationship}
 
     $\relationshipFound \gets \textsc{False}$\;
@@ -616,11 +616,12 @@ Cette fonction est illustrée par la figure~\ref{fig:rewrite:findRelationShip}.
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [$\dots$ [$ $ [$Grp_1$ [...]] [$Grp_2$ [...]]]]
+                [$\dots$ [$ $ [$G_1$ [...]] [$G_2$ [...]]]]
             \end{forest}
+            \hspace{2em}
         	\begin{forest}
                 %for tree={s sep=4em}
-                [$\dots$ [$REL$ [$Grp_1$ [...]] [$Grp_2$ [...]]]]
+                [$\dots$ [$REL$ [$G_1$ [...]] [$G_2$ [...]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Création d'une relation entre 2 groupes}
@@ -632,11 +633,12 @@ Cette fonction est illustrée par la figure~\ref{fig:rewrite:findRelationShip}.
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [$\dots$ [$ $ [$Grp_1$ [...]] [$COLL$ [$Grp_2$ [...]] [$Grp_2$ [...]] ]]]
+                [$\dots$ [$ $ [$G_1$ [...]] [$COLL$ [$G_2$ [...]] [$G_2$ [...]] ]]]
             \end{forest}
+            \hspace{2em}
         	\begin{forest}
                 %or tree={s sep=4em}
-                [$\dots$ [$ $ [$REL$[$Grp_1$ [...]] [$Grp_2$ [...]]] [$REL$[$Grp_1$ [...]] [$Grp_2$ [...]]]]]
+                [$\dots$ [$ $ [$REL$[$G_1$ [...]] [$G_2$ [...]]] [$REL$[$G_1$ [...]] [$G_2$ [...]]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Création de relations entre 1 groupe et une collection}
@@ -658,7 +660,7 @@ Pour chaque sous-arbre $st$ non encore labellisé (par exemple celui de la figur
     \item La troisième boucle (ligne~\ref{algo:struct:rewrite-findCollections:3}) va ajouter à un sous-arbre collection les groupes enfants de $st$ qui sont équivalents aux enfants de la collection (figure~\ref{fig:rewrite:findCollection4}).
  \end{itemize}
 
-\begin{procedure}[htb]
+ \begin{procedure}[htb]
     \caption{findCollections($T$ = ($D$, $l$), $\tau$, minSupport)}
     \label{algo:struct:rewrite-findCollections}
 
@@ -710,7 +712,7 @@ Pour chaque sous-arbre $st$ non encore labellisé (par exemple celui de la figur
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [U [$G_1$[...]] [$G_2$[...]] [$G_1$[...]] [$G_3$[...]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]]] [$COLL$[$G_2$[...]] [$G_2$[...]]]]
+                [$\dots$ [$G_1$[...]] [$G_2$[...]] [$G_1$[...]] [$G_3$[...]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]]] [$COLL$[$G_2$[...]] [$G_2$[...]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Sous-arbre par la création de collection}
@@ -722,7 +724,7 @@ Pour chaque sous-arbre $st$ non encore labellisé (par exemple celui de la figur
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [U [$G_2$[...]] [$G_3$[...]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]]] [$COLL$[$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]]]]
+                [$\dots$ [$G_2$[...]] [$G_3$[...]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]]] [$COLL$[$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Sous-arbre après la première boucle}
@@ -733,7 +735,7 @@ Pour chaque sous-arbre $st$ non encore labellisé (par exemple celui de la figur
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [U [$G_2$[...]] [$G_3$[...]] [$COLL$[$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]]]]
+                [$\dots$ [$G_2$[...]] [$G_3$[...]] [$COLL$[$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Sous-arbre après la seconde boucle}
@@ -745,7 +747,7 @@ Pour chaque sous-arbre $st$ non encore labellisé (par exemple celui de la figur
         \begin{adjustbox}{valign=c, max width=\textwidth}
             \begin{forest}
                 %for tree={s sep=4em}
-                [U [$G_3$[...]] [$COLL$[$G_2$[...]] [$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]]]]
+                [$\dots$ [$G_3$[...]] [$COLL$[$G_2$[...]] [$G_2$[...]] [$G_2$[...]]] [$COLL$[$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]] [$G_1$[...]]]]
             \end{forest}
         \end{adjustbox}
         \caption{Sous-arbre à la fin de la procédure}
@@ -761,7 +763,7 @@ Pour chaque sous-arbre $st$ non encore labellisé (par exemple celui de la figur
     Dans cet exemple, les indices correspondent aux différentes classes d'équivalence.
     Lors de la première boucle de la fonction il y a la création d'un nouveau sous-arbre collection contenant les deux groupes qui sont équivalents figure~\ref{fig:rewrite:findCollection2}.
     La figure~\ref{fig:rewrite:findCollection3} montre la transformation du sous-arbre après la seconde boucle, les deux collections contenant des groupes équivalents sont regroupés en un sous-arbre.
-    La figure~\ref{fig:rewrite:findCollection4} montre que le groupe $G_2$ équivalent aux groupes d'une des collections va être ajouté à celle-ci.
+    La figure~\ref{fig:rewrite:findCollection4} montre que le groupe $GROUP_2$ équivalent aux groupes d'une des collections va être ajouté à celle-ci.
 \end{example} 
 
 % \begin{figure}[htb]

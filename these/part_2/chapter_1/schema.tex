@@ -44,8 +44,6 @@ Le processus consiste en plusieurs itérations et est résumé visuellement dans
 \end{itemize}
 
 L'axe horizontal de la figure~\ref{fig:struct:general} représente la progression du processus de l'étape $i$ à l'étape $i+1$. Cette progression est basée sur le raisonnement suivant :
-
-
 \begin{description}
     \item[Initialisation] Le processus commence par la transformation des phrases en arbres syntaxique, ce qui donne lieu à une instance désignée par $I_0$.
 
@@ -78,7 +76,8 @@ L'axe horizontal de la figure~\ref{fig:struct:general} représente la progressio
                            &               & $\searrow$    &        & $\downarrow$  &          &          & $\swarrow$                            \\
         \multicolumn{9}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}
     \end{tabular}
-    \caption{\label{fig:struct:general}}
+    \caption{Procéssus itératif pour la structuration automatique}
+    \label{fig:struct:general}
 \end{figure}
 
 L'objectif de la méta-grammaire $\mathbb{G}$ est d'établir la description générale des grammaires qui serviront pour structurer des textes.
@@ -94,10 +93,10 @@ Lorsqu'on considère une instance $I$, les non-terminaux d'une grammaire $G$ son
     \item[Collection] Un arbre de profondeur $3$ n'ayant pour enfants que des groupes équivalents ou un arbre de profondeur $4$ n'ayant pour enfants que des relations équivalentes.
 \end{description}
 
-Il est intéressant de remarquer que ces concepts s'alignent sur l'approche présentée dans~\cite{barretGenericAbstractionsData2021}.
+Il est intéressant de remarquer que ces concepts s'alignent sur l'approche présentée dans~\cite{barretAbstraGenericAbstractions2022}.
 Les arbres d'entités peuvent être assimilés au concept de \emph{sub-records} qui se réfèrent à une paire attribut-valeur.
-Dans $I_t$, l'instance finale de la figure~\ref{fig:struct:general}, les groupes correspondent aux \emph{records} de~\cite{barretGenericAbstractionsData2021}, alors que dans les grammaires $G_i$ (obtenues dans le processus de construction de $G$ de la figure~\ref{fig:struct:general}), ils servent de formats intermédiaires.
-Le concept \textit{collection} est identique à celui introduit dans~\cite{barretGenericAbstractionsData2021}.
+Dans $I_t$, l'instance finale de la figure~\ref{fig:struct:general}, les groupes correspondent aux \emph{records} de~\cite{barretAbstraGenericAbstractions2022}, alors que dans les grammaires $G_i$ (obtenues dans le processus de construction de $G$ de la figure~\ref{fig:struct:general}), ils servent de formats intermédiaires.
+Le concept \textit{collection} est identique à celui introduit dans~\cite{barretAbstraGenericAbstractions2022}.
 
 \begin{landscape}
     \centering

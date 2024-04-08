@@ -6,7 +6,7 @@ Le modèle de graphe doit mettre en avant ces relations entre les valeurs nulles
 \begin{figure}[htb]
     \centering
     \begin{adjustbox}{width=.8\linewidth}
-        \begin{tikzpicture}[shorten >=3pt,->,node distance=16em,on grid,every text node part/.style={align=center}]
+        \begin{tikzpicture}[shorten >=3pt,-latex,node distance=16em,on grid,every text node part/.style={align=center}]
             \node[draw] (a) {\textbf{:Atom}\\\textit{symbol}: $P$\\\textit{terms}: $\{t_1, \dots, t_n\}$};        % Atom
             \node[draw,circle,left = of a] (nc) {\textbf{:Element}\\\textbf{:Constant}\\\textit{value}: $t_i$};   % Element/Constant
             \node[draw,circle,right = of a] (nn) {\textbf{:Element}\\\textbf{:Null}\\\textit{value}: $t_j$};      % Element/Null
