@@ -43,6 +43,22 @@ Le processus consiste en plusieurs itérations et est résumé visuellement dans
     \item Une grammaire d'arbre $G_{i}$ (pour les arbres dans $I_i$) dérivée de l'arbre quotient $S_i$.
 \end{itemize}
 
+\begin{figure}[htb]
+    \centering
+    \begin{tabular}{llllllll|l}
+        Données textuelles & $\rightarrow$
+                           & $I_0$         & $\rightarrow$ & $ I_1$ & $\rightarrow$ & $ \dots$ & $I_t$    & Instances (arbres)                    \\
+                           &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
+                           &               & $S_0$         &        & $S_1$         &          & $ \dots$ & $S_t$              & Arbres quotients \\
+                           &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
+                           &               & $G_0$         &        & $G_1$         &          & $ \dots$ & $G$                & Grammaires       \\
+                           &               & $\searrow$    &        & $\downarrow$  &          &          & $\swarrow$                            \\
+        \multicolumn{9}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}
+    \end{tabular}
+    \caption{Procéssus itératif pour la structuration automatique}
+    \label{fig:struct:general}
+\end{figure}
+
 L'axe horizontal de la figure~\ref{fig:struct:general} représente la progression du processus de l'étape $i$ à l'étape $i+1$. Cette progression est basée sur le raisonnement suivant :
 \begin{description}
     \item[Initialisation] Le processus commence par la transformation des phrases en arbres syntaxique, ce qui donne lieu à une instance désignée par $I_0$.
@@ -63,22 +79,6 @@ L'axe horizontal de la figure~\ref{fig:struct:general} représente la progressio
                     Le processus se termine lorsque nous trouvons une grammaire qui satisfait $\mathbb{G}$.
           \end{enumerate}
 \end{description}
-
-\begin{figure}[htb]
-    \centering
-    \begin{tabular}{llllllll|l}
-        Données textuelles & $\rightarrow$
-                           & $I_0$         & $\rightarrow$ & $ I_1$ & $\rightarrow$ & $ \dots$ & $I_t$    & Instances (arbres)                    \\
-                           &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
-                           &               & $S_0$         &        & $S_1$         &          & $ \dots$ & $S_t$              & Arbres quotients \\
-                           &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
-                           &               & $G_0$         &        & $G_1$         &          & $ \dots$ & $G$                & Grammaires       \\
-                           &               & $\searrow$    &        & $\downarrow$  &          &          & $\swarrow$                            \\
-        \multicolumn{9}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}
-    \end{tabular}
-    \caption{Procéssus itératif pour la structuration automatique}
-    \label{fig:struct:general}
-\end{figure}
 
 L'objectif de la méta-grammaire $\mathbb{G}$ est d'établir la description générale des grammaires qui serviront pour structurer des textes.
 Lorsqu'on considère une instance $I$, les non-terminaux d'une grammaire $G$ sont définis pour représenter les concepts suivants, qui seront appliqués aux arbres de $I$ :
@@ -183,7 +183,7 @@ Dans l'exemple de la figure~\ref{table:struct:meta:ex}, si $gL' = {A}$ et $gL = 
     Les méta-règles~\ref{meta:ruleList:1}-\ref{meta:ruleList:6} permettent de définir un ensemble de règles.
     En effet, le méta-non-terminal $\langle ruleList \rangle$ a déjà été utilisé dans \ref{meta:start}.
     Chaque règle produite permet de définir un non-terminal de $G$.
-    Dans la suite, nous verrons que les règles sémantiques poseront des contraintes, obligeant que chaque non-terminal de notre grammaire cible $G$ soit définit afin de construire une grammaire valide.
+    Les règles sémantiques poseront des contraintes, obligeant que chaque non-terminal de notre grammaire cible $G$ soit définit afin de construire une grammaire valide.
     Dans notre exemple, nous avons $GROUP_A \rightarrow  \langle entList \rangle$ et ensuite $GROUP_A \rightarrow ENT_1$.
 \end{example}
 

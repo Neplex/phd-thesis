@@ -138,12 +138,14 @@ L'algorithme construit les instances en commençant par le bas de l'arbre et en 
 Quand l'ensemble des nœuds présents au-dessus des entités ont été catégorisés, la ligne~\ref{algo:struct:rewrite:reduce-top} supprime alors l'ensemble des niveaux supérieurs qui n'ont pas été catégorisée en tant qu'\emph{entité}, \emph{groupe}, \emph{relation} ou \emph{collection}.
 
 \begin{remark}
-    Seul le niveau de profondeur $2$ est supprimé.
-    Ce choix permet de conserver la séparation entre les phrases (de profondeur $1$).
-    Passé ce point, seul les collections peuvent être fusionnées.
-    Cela permet d'empêcher la construction d'associations (\emph{groupe} ou \emph{relation}) à travers de multiples phrases.
+    Dans notre approche, chaque instance est considérée comme une forêt enracinée, composée d'arbres syntaxiques distincts pour chaque phrase.
+    Les opérations, correspondant à une réécriture, sont appliquées individuellement à chaque phrase, bien que le calcul des classes d'équivalence et du support soit réalisé sur l'ensemble de la forêt.
+    Pour l'opération à la ligne~\ref{algo:struct:rewrite:reduce-top}, seul le niveau de profondeur $2$ est supprimé, conservant ainsi la séparation entre les phrases (représentées par la profondeur $1$).
+    Au-delà, seule l'opération~\ref{algo:struct:rewrite-findCollections} peut construire des collections entre plusieurs phrases.
+    Ce traitement indépendant des phrases assure que les regroupements se font au sein d'une même phrase et donc d'une même unité sémantique, évitant ainsi la construction de regroupements inter-phrases non alignés sur la sémantique du texte
 \end{remark}
 
+\noindent
 Dans la suite, on étudie en détail l'implémentation des opérations de transformations mises en place.
 
 \FloatBarrier

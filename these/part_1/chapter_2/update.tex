@@ -8,7 +8,7 @@ Ainsi, la nouvelle instance de base de données est définie comme $\mathcal{D}'
 \subsection{Insertion}
 \label{sec:update:insert}
 On définit la procédure~\ref{algo:update:insert} qui permet l'insertion d'un ensemble d'atomes instanciés $I$ dans l'instance de la base de données $\mathcal{D}$ selon l'ensemble de contraintes $\mathbb{C}$ de façon incrémentale.
-Cette procédure commence par calculer les effets de bord résultant de l'insertion de l'ensemble $I$ d'atomes instanciés dans $\mathcal{D}$, en utilisant le mécanisme du \gls{chase} (ligne~\ref{algo:update:insert:chase}).
+Cette procédure commence par calculer les effets de bord résultants de l'insertion de l'ensemble $I$ d'atomes instanciés dans $\mathcal{D}$, en utilisant le mécanisme du \gls{chase} (ligne~\ref{algo:update:insert:chase}).
 Le \gls{core} de l'ensemble $\mathcal{D} \cup ToIns$ est ensuite calculé (ligne~\ref{algo:update:insert:core}) en prenant en compte uniquement :
 \begin{enumerate*}[label=(\alph*)]
     \item les valeurs nulles stockées dans \textsc{NullBucket} (récupérées via $Q_{bucket}$, ligne~\ref{algo:update:insert:bucket}) et
@@ -68,7 +68,7 @@ Si cette condition est satisfaite, les degrés des valeurs nulles sont remis à 
     \end{align*}
 
     Étant donné qu'aucune valeur nulle ne dépasse le degré maximum (ligne~\ref{algo:update:insert:testNull}), la nouvelle instance est validée.
-    Il est à noté que comme le dégré des valeurs nulles n'est utilisé que durant le \gls{chase}, il est remis à $0$ à la ligne~\ref{algo:update:insert:setDegree} avant de retourner l'instance modifiée.
+    Il est à noté que comme le degré des valeurs nulles n'est utilisé que durant le \gls{chase}, il est remis à $0$ à la ligne~\ref{algo:update:insert:setDegree} avant de retourner l'instance modifiée.
 \end{example}
 
 \subsection{Suppression}

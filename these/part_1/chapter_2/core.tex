@@ -36,17 +36,17 @@ Cet ensemble est la limite de la séquence $(\textsf{LinkedNull}^k_{I,N})_{k \ge
 	Comme $I$ est fini, la séquence a une unique limite qui est un sous-ensemble de $I$ noté $\textsf{LinkedNull}_{I,N}$.
 \end{proposition}
 
-La proposition~\ref{prop:update:core:linkednulls} montre que la redondance peut être uniquement vérifiée sur l'ensemble d'atomes défini par $\bigcup_{N \in \nu_0}\textsf{LinkedNull}_{I,N}$ et l'ensemble $\nu$ de valeurs nulles dans cet ensemble.
+La proposition~\ref{prop:update:core:linkednulls} montre que la redondance peut être uniquement vérifiée sur l'ensemble d'atomes défini par $\bigcup_{N \in \nu_0}\textsf{LinkedNull}_{I,N}$ et l'ensemble $\nu$ de valeurs nulles de cet ensemble.
 
 % \paragraph{\gls{cypher}}
 \subsection{Requête sur le graphe}
-L'ensemble $\textsf{LinkedNull}_{\mathcal{D}}$ (où $\mathcal{D}$ est la base de données) est calculé à l'aide de la requête \gls{cypher} présenté dans l'extrait~\ref{fig:update:core:query}.
-Il s'agit d'une requête paramétrée, reconnaissable par la présence d'une variable préfixé du symbole \verb|$|.
+L'ensemble $\textsf{LinkedNull}_{\mathcal{D}}$ (où $\mathcal{D}$ est la base de données) est calculé à l'aide de la requête \gls{cypher} présentée dans l'extrait~\ref{fig:update:core:query}.
+Il s'agit d'une requête paramétrée, reconnaissable par la présence d'une variable préfixée du symbole \verb|$|.
 L'opérateur \verb|UNWIND| (ligne~\ref{fig:update:core:query:unwind}) permet de convertir une variable de type liste en une table de résultat.
 Le \verb|MATCH| (ligne~\ref{fig:update:core:query:match}) recherche, dans le graphe, les homomorphismes du motif décrit.
-Ici, on recherche un nœud, que l'on stockera dans la variable \verb|nullValueNode|, ayant les labels \textbf{:Element} et \textbf{:Nulls} et ayant comme valeur de la propriété \textit{value} la valeur stocké dans la variable \verb|nullPredName|.
+Ici, on recherche un nœud, que l'on stockera dans la variable \verb|nullValueNode|, ayant les labels \textbf{:Element} et \textbf{:Null} et ayant comme valeur de la propriété \textit{value} la valeur stockée dans la variable \verb|nullPredName|.
 La suite du motif (ligne~\ref{fig:update:core:query:range}) recherche un chemin \verb|pathP| de taille $n$, où $1 \leq n \leq \verb|maxPathLength|$, partant du nœud précédent.
-\verb|maxPathLength| est défini comme le double du nombre de valeurs nulles dans la base et permet d'empêcher le parcours de chemins que l'on sait d'avance inutile.
+\verb|maxPathLength| est défini comme le double du nombre de valeurs nulles dans la base et permet d'empêcher le parcours de chemins que l'on sait d'avance inutile (un chemin étant composé d'une alternance de nœuds \textbf{:Atom} et de nœuds \textbf{:Null}, un chemin plus long inclue soit des nœuds \textbf{:Constant}, soit un cycle).
 La condition exprimée par l'opérateur \verb|WHERE|, vérifie que le nœud final du chemin soit différent du nœud de départ et qu'aucun nœud du chemin \verb|nodes(pathP)| n'ai le label \textbf{:Constant}.
 
 \begin{lstlisting}[name=qcore, language=cypher, caption=Requête Cypher pour calculer l'ensemble $\textsf{LinkedNull}_{\mathcal{D}}$, label={fig:update:core:query}, escapechar=|, float, floatplacement=htb]
@@ -65,8 +65,8 @@ L'opérateur \verb|WITH| (ligne~\ref{fig:update:core:query:collect}) permet de f
 Sa combinaison avec l'opérateur \verb|COLLECT| permet de regrouper les variables \verb|endNode| dans une variable \verb|linkedNodes| de type liste en fonction de la variable \verb|nullValueNode|.
 Cette combinaison est similaire à l'opérateur \verb|GROUP BY| en \gls{sql}.
 Intuitivement, on recherche pour chaque nulle l'ensemble des nœuds connectés uniquement par des nœuds \textit{Atomes} ou des nœuds \textit{Nulles}.
-Les ensembles de nœuds sont séparés (ligne~\ref{fig:update:core:query:with}) en deux listes \verb|linkedAtoms| et \verb|linkedNulls| contenant respectivement l'ensemble des nœuds \textit{Atomes} liés par des valeurs nulles et l'ensemble des noeuds \textit{Nulles} liant cet ensemble d'atomes.
-L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requête chaque atome associé à l'ensemble des valeurs nulles auquel ils sont attachés.
+Les ensembles de nœuds sont séparés (ligne~\ref{fig:update:core:query:with}) en deux listes \verb|linkedAtoms| et \verb|linkedNulls| contenant respectivement l'ensemble des nœuds \textit{Atomes} liés par des valeurs nulles et l'ensemble des nœuds \textit{Nulles}, liant cet ensemble d'atomes.
+L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requête chaque atome associé à l'ensemble des valeurs nulles auquel il est attaché.
 
 \begin{example}
 	Dans le graphe d'instance donné dans la Figure~\ref{fig:update:db:runex}, la récupération de l'ensemble $\textsf{LinkedNull}_{\mathcal{D}, N_1}$ en utilisant la requête de l'extrait~\ref{fig:update:core:query} se traduit par l'exécution pas à pas suivante :
@@ -113,7 +113,7 @@ L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requ�
 			      \end{tabular}
 		      \end{center}
 
-		\item Pour finir on retourne l'ensemble des atomes associé à l'ensemble \textsf{LinkedNull} auquel ils appartiennent.
+		\item Pour finir on retourne l'ensemble des atomes associés à l'ensemble \textsf{LinkedNull} auquel ils appartiennent.
 		      L'opérateur \verb|UNWIND| transpose la liste \verb|linkedAtoms| en lignes de la table dupliquant les autres attributs de la table d'origine pour chaque entrée (ici, \verb|linkedNulls|).
 		      \begin{center}
 			      \begin{tabular}{lll}
@@ -134,13 +134,13 @@ L'opérateur \verb|UNWIND| final permet de retourner comme résultat de la requ�
 
 % \paragraph{Simplification}
 \subsection{Simplification}
-La procédure pour éliminer la redondance sur un ensemble d'atomes $I$ en fonction d'un ensemble de valeurs nulles $\nu_0$ est donné par la procédure~\ref{algo:update:core} (page~\pageref{algo:update:core}).
-À la ligne~\ref{algo:update:core:pset}, les ensembles d'atomes, liée par des valeurs nulles et qui contiennent au moins une valeur nulle présente dans $\nu_0$, sont calculés.
+La procédure pour éliminer la redondance sur un ensemble d'atomes $I$ en fonction d'un ensemble de valeurs nulles $\nu_0$ est donnée par la procédure~\ref{algo:update:core} (page~\pageref{algo:update:core}).
+À la ligne~\ref{algo:update:core:pset}, les ensembles d'atomes, liés par des valeurs nulles et qui contiennent au moins une valeur nulle présente dans $\nu_0$, sont calculés.
 % L'ensemble des valeurs nulles de $PSet$ est donc l'ensemble $\nu$.
 À la ligne~\ref{algo:update:core:qcore}, pour chaque ensemble d'atomes $P$, on construit la requête $Q_{core}(X) \gets \phi(X)$ où $\phi$ est l'ensemble des atomes de $P$ dans lequel chaque valeur nulle $N_i$ est remplacé par la variable correspondante $x_i$.
 La requête $Q_{core}$ retourne l'ensemble des homomorphismes sur les valeurs nulles de $P$.
 Si plusieurs homomorphismes sont retournés par la requête, cela signifie qu'il existe plusieurs instanciations possibles de $P$ et qu'il faut le simplifier, car $P$ est redondant.
-Dans ce cas, il faut choisir l'instanciation (ou homomorphisme) la \textit{plus spécifique} (ligne~\ref{algo:update:core:mostspecific}) et supprimer les atomes redondants (ligne~\ref{algo:update:core:select}).
+Dans ce cas, il faut choisir l'instanciation (ou l'homomorphisme) la \textit{plus spécifique} (ligne~\ref{algo:update:core:mostspecific}) et supprimer les atomes redondants (ligne~\ref{algo:update:core:select}).
 Si l'on ne prend pas l'instanciation la \textit{plus spécifique} il faudra la simplifier à nouveau.
 La situation est illustrée par l'exemple suivant.
 
@@ -162,7 +162,7 @@ La situation est illustrée par l'exemple suivant.
 
 \begin{example}
 	\label{ex:update:core:tableau}
-	En prenant comme exemple l'instance $I = \{B(N_1, N_2), B(a, N_2), B(a, b), C(N_2, N_2),$ $C(N_2, N_3), C(a, b)\}$, avec $P = {B(N_1, N_2), B(a, N_2), C(N_2, N_2), C(N_2, N_3)}$ pour $P \in \textsf{LinkedNull}_{I,N_1}$.
+	En prenant comme exemple l'instance $I = \{B(N_1, N_2), B(a, N_2), B(a, b), C(N_2, N_2),$ $C(N_2, N_3), C(a, b)\}$, avec $P = \{B(N_1, N_2), B(a, N_2), C(N_2, N_2), C(N_2, N_3)\}$ pour $P \in \textsf{LinkedNull}_{I,N_1}$.
 	On commence par la construction de la requête $Q_{core}^{[P]}(I) \gets B(x_1, x_2), B(a, x_2), C(x_2, x_2), C(x_2, x_3)$, dont les réponses sont présentées dans la table $H_P$ suivante :
 
 	\begin{center}
@@ -177,7 +177,7 @@ La situation est illustrée par l'exemple suivant.
 	\end{center}
 \end{example}
 
-Étant donné deux homomorphismes $h_1$ et $h_2$ sur le même alphabet $\Sigma$ : $h_1$ est dit \textit{moins spécifique} que $h_2$, noté $h_1 \prec h_2$, s'il existe un homomorphisme $h$ sur $\Sigma$ tel que $h \circ h_1 = h_2$ (c.-à-d. qu'il existe une transformation de $h_1$ vers $h_2$ nommée $h$).
+Étant donnés deux homomorphismes $h_1$ et $h_2$ sur le même alphabet $\Sigma$ : $h_1$ est dit \textit{moins spécifique} que $h_2$, noté $h_1 \prec h_2$, s'il existe un homomorphisme $h$ sur $\Sigma$ tel que $h \circ h_1 = h_2$ (c.-à-d. qu'il existe une transformation de $h_1$ vers $h_2$ nommée $h$).
 Soit, $p$ le nombre de valeurs nulles $N_j$ distinctes dans $P = \textsf{LinkedNull}_{I,N}$ et $q$ le nombre d'homomorphismes $h_i$ retournés par la requête $Q_{core}$ avec $h_1$ étant l'identité de $P$.
 Il est important de noter qu'il peut exister plusieurs homomorphismes plus spécifiques.
 Le choix n'est pas important et il suffit de récupérer l'un des homomorphismes les plus spécifiques.
@@ -190,7 +190,7 @@ Dans la table $H_P$, $h_i \preceq h_{i'}$ si et seulement si, pour tout $j$ :
 \end{itemize}
 
 À partir de la table $H_P$, il est possible de calculer l'homomorphisme le plus spécifique en calculant le nombre de valeurs nulles et de constantes.
-La preuve et la méthode de calcul sont détaillées dans \cite{chabinIncrementalConsistentUpdating2023} et donnée dans l'annexe~\ref{appendice:most-specific}.
+La preuve et la méthode de calcul sont détaillées dans \cite{chabinIncrementalConsistentUpdating2023} et données dans l'annexe~\ref{appendice:most-specific}.
 De plus, il est montré dans \cite{chabinIncrementalConsistentUpdating2023} que les homomorphismes $h_i$ les plus spécifiques respectent les propriétés suivantes :
 
 \begin{enumerate}

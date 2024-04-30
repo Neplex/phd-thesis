@@ -19,14 +19,14 @@ La création de nœuds ou d'arêtes reste impossible contrairement à ce qui est
 
 \begin{example}
       En prenant comme exemple le graphe figure~\ref{fig:update:discussion:g1} et la contrainte $C: Document(x) \to AuthorOf(y, x)$.
-      Les \gls{ged} ne permettrais pas de corriger l'instance contrairement à une approche comme \gls{setup} qui autorise de rajouter le nœud $Person$ et l'arête $AuthorOf$ manquante pour obtenir l'instance figure~\ref{fig:update:discussion:g2} qui est cohérente par rapport à la contrainte $C$.
+      Les \gls{gfd} ne permettrais pas de corriger l'instance contrairement à une approche comme \gls{setup} qui autorise de rajouter le nœud $Person$ et l'arête $AuthorOf$ manquante pour obtenir l'instance figure~\ref{fig:update:discussion:g2} qui est cohérente par rapport à la contrainte $C$.
 
       \begin{figure}[htb]
             \centering
             \begin{subfigure}[c]{.35\textwidth}
                   \centering
                   \begin{tikzpicture}[->, -latex, auto, on grid, node distance=4cm, thick, main node/.style={draw}]
-                        \node[main node] (x) {Document: $x$};
+                        \node[main node] (x) {Document: A};
                   \end{tikzpicture}
                   \caption{Instance d'origine non cohérente}
                   \label{fig:update:discussion:g1}
@@ -40,8 +40,8 @@ La création de nœuds ou d'arêtes reste impossible contrairement à ce qui est
             \begin{subfigure}[c]{.45\textwidth}
                   \centering
                   \begin{tikzpicture}[->, -latex, auto, on grid, node distance=4cm, thick, main node/.style={draw}]
-                        \node[main node] (y) {Person: $y$};
-                        \node[main node] (x) [right of=1] {Document: $x$};
+                        \node[main node] (y) {Person: B};
+                        \node[main node] (x) [right of=1] {Document: A};
                         \path[every node/.style={font=\sffamily\small}]
                         (y) edge node {AuthorOf} (x);
                   \end{tikzpicture}
@@ -52,6 +52,7 @@ La création de nœuds ou d'arêtes reste impossible contrairement à ce qui est
       \end{figure}
 \end{example}
 
+\pagebreak
 Dans cette thèse, nous travaillons sur les principes établis dans \cite{chabinConsistentUpdatingDatabases2020} où les contraintes sont plus générales et non dirigées vers un modèle spécifique (comme les graphes d'attributs ou les graphes \gls{rdf}).
 Dans ces travaux, visualiser la correction d'une base par l'introduction de nouveaux nœuds ou arêtes reste envisageable.
 \cite{chabinConsistentUpdatingDatabases2020} introduit une sémantique formelle basée sur \gls{fol} pour mettre à jour des bases de données incomplètes contenant des valeurs nulles liées, en suivant les principes énoncés dans la sémantique de Reiter~\cite{reiterSoundSometimesComplete1986} (section \ref{reiterSemantic}).

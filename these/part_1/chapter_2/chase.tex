@@ -1,5 +1,5 @@
 L'algorithme du \gls{chase} \cite{ahoTheoryJoinsRelational1979,maierTestingImplicationsData1979} est utilisé pour saturer une base en fonction des \glspl{tgd}.
-Dans ces travaux nous utilisons la version du chase presenté dans \cite{chabinConsistentUpdatingDatabases2020}.
+Dans ces travaux nous utilisons la version du chase presentée dans \cite{chabinConsistentUpdatingDatabases2020}.
 Une contrainte est appliquée, c.-à-d. que l'on génère un nouvel atome instancié correspondant à la tête, quand le corps de la contrainte peux être instancié par des atomes dans la base.
 L'algorithme du \gls{chase} se termine quand plus aucune règle ne peut être instanciée ou que plus aucun nouvel atome n'est généré.
 Notre version incrémentale de l'algorithme consiste à considérer uniquement les règles et leur instanciation sur l'ensemble d'atomes mis à jour.
@@ -22,7 +22,7 @@ Notre version incrémentale de l'algorithme consiste à considérer uniquement l
     L'application de $h_1($\ref{ex:update:chase:forward:c1}$)$ génére un nouvel atome $B(c, N_1)$.
     Comme il existe déjà une instanciation plus spécifique dans la base : $B(c, b)$, ce nouvel atome n'a pas besoin d'etre ajouté.
     L'application de $h_2($\ref{ex:update:chase:forward:c1}$)$ génére un nouvel atome $B(d, N_1)$.
-    Comme il n'existe pas dans $\mathcal{D}$, on l'ajoute et on recommence l'algo ave cles nouveux atomes insérés.
+    Comme il n'existe pas dans $\mathcal{D}$, on l'ajoute et on recommence l'algo avec les nouveaux atomes insérés.
     Avec l'insertion de $B(d, N_1)$, on declenche \ref{ex:update:chase:forward:c2} avec l'instanciation $h_3 = \langle x \mapsto d, y \mapsto N_1 \rangle$ qui genere a son tour l'atome $C(N_1)$.
     Plus aucun atome ne peux etre généré et on obtient donc l'ensemble $\mathcal{D}' = \{A(a),$ $B(a, b),$ $A(c),$ $B(c, b),$ $C(b),$ $A(d),$ $B(d, N_1),$ $C(N_1)\}$.
 \end{example}
@@ -49,15 +49,15 @@ On fixe donc un degré maximal $\delta_{max}$ qui permet l'interruption du \gls{
         \end{enumerate}
     \end{multicols}
 
-    L'application de la regle \ref{ex:update:chase:infini:c1} avec l'instanciation $h_1 = \langle x \mapsto a, y \mapsto b \rangle$ génére l'atome $B(b, N_1^0)$.
+    L'application de la règle \ref{ex:update:chase:infini:c1} avec l'instanciation $h_1 = \langle x \mapsto a, y \mapsto b \rangle$ génére l'atome $B(b, N_1^0)$.
     Ce dernier permet l'application de la contrainte \ref{ex:update:chase:infini:c2} avec l'instanciation $h_2 = \langle x \mapsto b, y \mapsto N_1^0 \rangle$ et qui génére l'atome $A(N_1^0, N_2^1)$, qui permet la génération de $B(N_2^1, N_3^2)$ via \ref{ex:update:chase:infini:c1}.
     Il est facile de voir que la génération des atomes est infinie.
     Cependant, comme le degré de $N_3^2$ depasse le degrée maximal $\delta_{max}$ on arrete cette branche de la génération.
     Si d'autres régles peuvent étres appliquées on continue la génération de ces derniéres.
-    L'ensemble resultat $I'$ est invalide car une valeur nulle dépasse le degrée maximal.
+    L'ensemble resultat $I'$ est invalide car une valeur nulle dépasse le degré maximal.
 \end{example}
 
-Dans la suite, avant de rejeter une mise à jour $I$, a cause d'un degré trop élevé, nous versifierons si l'ensemble obtenu après l'application du chasse $I'$ n'est pas simplifiable.
+Dans la suite, avant de rejeter une mise à jour $I$, à cause d'un degré trop élevé, nous verifierons si l'ensemble obtenu après l'application du chasse $I'$ n'est pas simplifiable.
 Si la simplification de $I'$ engendre un ensemble $I''$ où les valeurs nulles "invalides" ont été supprimées, alors $I''$ peut être considéré et la mise à jour acceptée.
 Si $I''$ reste invalide malgré la simplification, alors la mise à jour devra être rejetée.
 
@@ -95,7 +95,7 @@ La boucle (ligne~\ref{algo:update:chase:insert:while}) correspond à l'applicati
     \caption{Chase4Insert($\mathcal{D}$, $\mathbb{C}$, $\delta_{max}$, $I$)}
     \label{algo:update:chase:insert}
     $ToIns := I$ \;
-    \While{\label{algo:update:chase:insert:while} il existe une contrainte $c \in \mathbb{C}$ et un homomorphisme $h$ tel que $h(body(c)) \in \mathcal{D}$ et qui respecte les conditions :
+    \While{\label{algo:update:chase:insert:while} il existe une contrainte $c \in \mathbb{C}$ et un homomorphisme $h$ tel que $h(body(c)) \subseteq \mathcal{D} \cup ToIns$ qui respecte les conditions :
         \begin{itemize}
             \item[\normalfont\ref{algo:update:chase:insert:c1}] $h(body(c)) \cap ToIns \neq \emptyset$
             \item[\normalfont\ref{algo:update:chase:insert:c3}] $\nexists h'' \supseteq h$ tel que $h''(head(c)) \in \mathcal{D} \cup ToIns$
@@ -109,7 +109,7 @@ La boucle (ligne~\ref{algo:update:chase:insert:while}) correspond à l'applicati
 
 \paragraph{\gls{cypher}}
 Soit une contrainte $c : L_1(\alpha_1), \dots, L_m(\alpha_m) \implies L_0(\alpha_0)$.
-Nous introduisons les notations suivantes : $\alpha$ est l'ensemble des variables du corps de la contrainte, $\alpha^*$ est l'ensemble des variables substituées, $\alpha_i \subseteq \alpha$ est un sous-ensemble, $\alpha|_i \in \alpha$ denote le nom de la $i$-éme variable de $\alpha$ et $\textsc{const}$ est l'ensemble des constantes distincte dans $c$.
+Nous introduisons les notations suivantes : $\alpha$ est l'ensemble des variables du corps de la contrainte, $\alpha^*$ est l'ensemble des variables substituées, $\alpha_i \subseteq \alpha$ est un sous-ensemble, $\alpha|_i \in \alpha$ denote le nom de la $i$-éme variable de $\alpha$ et $\textsc{const}$ est l'ensemble des constantes distinctes dans $c$.
 La recherche de l'application de $c$ dans la base $\mathcal{D}$ se traduit par une requête $Q_{chase}^{[c]}(\mathcal{D})$ présentée dans l'extrait~\ref{algo:update:chase:query} qui :
 \begin{enumerate*}[label=(\roman*)]
     \item verifie l'existance d'une instance dans $\mathcal{D}$ et
@@ -213,20 +213,20 @@ AND NOT EXISTS {
 \subsection{Chase en arriére}
 Il peut arriver que la suppression d'un atome instancié $a$ rende la base de données incohérente lorsqu'il est une conséquence d'une contrainte $c$.
 En effet, pour toute contrainte $c$, s'il existe un homomorphisme $h$ tel que $h(head(c)) = a$ et une extension de $h$ notée $h'$ tel que $h'(body(c)) \subseteq \mathcal{D}$, la suppression de $a$ engendre une incohérence.
-Comme la base ne respecte plus la contrainte $c$, on doit regenerer la tête en utilisant le \gls{chase} afin de maintenir la cohérence.
-Cependant, il est possible que l'on regenere un atome que l'on veux supprimer.
-Dans ce cas on utilise le \gls{chase} en arriére pour supprimer recursivement les atomes qui interviennent dans le corps pour empecher le declenchement de la contrainte.
+Comme la base ne respecte plus la contrainte $c$, on doit regénérer la tête en utilisant le \gls{chase} afin de maintenir la cohérence.
+Cependant, il est possible que l'on regénère un atome que l'on veux supprimer.
+Dans ce cas on utilise le \gls{chase} en arriére pour supprimer récursivement les atomes qui interviennent dans le corps pour empêcher le déclenchement de la contrainte.
 Pour éviter le non-déterminisme, il est supposé que l'atome à supprimer a été marqué du symbol `$-$' lors de la conception de la règle.
 
 Comme pour les insertions, la procédure~\ref{algo:update:chase:delete} calcule, de manière incrémentale, les effets de bord.
-$ToDel$ represente l'ensemble des atomes à supprimer et $ToIns$ l'ensemble des nouveaux atomes à insérer.
+$ToDel$ représente l'ensemble des atomes à supprimer et $ToIns$ l'ensemble des nouveaux atomes à insérer.
 L'idée est de vérifier si $c$ génère un atome isomorphe à un atome en cours de suppression (ligne~\ref{algo:update:chase:delete:while}).
 Pour ce faire, on utilise la requête $Q_{chase}^{[c]}$ où l'on instancie la tête de la régle au lieu du corps.
 Si on génère un atome isomorphe à un atome dans $ToDel$, au moins un atome dans $h(body(c))$ doit être supprimé afin d'empêcher $c$ d'être déclenchée.
 Cet atome est ensuite ajouté à l'ensemble des atomes à supprimer $ToDel$ (ligne~\ref{algo:update:chase:delete:delete1}).
-Lorque l'application de la régle donne un nouvel atome $a'$ non-isomorphe à $a$, il est inséré et peux à son tour declencher d'autre régles.
+Lorque l'application de la régle donne un nouvel atome $a'$ non-isomorphe à $a$, il est inséré et peux à son tour déclencher d'autre régles.
 Les effets de bord sont calculés à l'aide d'un \gls{chase} en avant (ligne~\ref{algo:update:chase:delete:chaseforward}) avec la procédure~\ref{algo:update:chase:insert} et stockés dans l'ensemble $NewToIns$.
-Ligne~\ref{algo:update:chase:delete:delta}, si les effets de bord contiennent un atome de $ToDel$ a supprimer et/ou que le degré maximal $\delta_{max}$ est depassé : l'application de la contrainte $c$ est invalide et l'atome à supprimer dans le coprs est ajouté à $ToDel$ (ligne~\ref{algo:update:chase:delete:delete2}).
+Ligne~\ref{algo:update:chase:delete:delta}, si les effets de bord contiennent un atome de $ToDel$ à supprimer et/ou que le degré maximal $\delta_{max}$ est dépassé : l'application de la contrainte $c$ est invalide et l'atome à supprimer dans le coprs est ajouté à $ToDel$ (ligne~\ref{algo:update:chase:delete:delete2}).
 Sinon, les nouveaux atomes sont ajoutés à $ToIns$ (ligne~\ref{algo:update:chase:delete:insert}).
 
 \begin{procedure}[htb]

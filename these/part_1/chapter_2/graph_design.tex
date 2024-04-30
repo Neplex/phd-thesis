@@ -46,9 +46,9 @@ Dans \gls{neo4j}, la reconnaissance de motifs est réalisée par un parcours du 
     \item pour chaque nœud, vérifier la valeur de la propriété représentant le symbole de prédicat
 \end{enumerate}
 
-Si un nœud \textit{Élément} se retrouve lié a beaucoup de nœud \textit{Atomes} (c.-à-d. qu'il possède un grand nombre d'arêtes) alors, cette opération peut devenir couteuse.
+Si un nœud \textit{Élément} se retrouve lié a beaucoup de nœud \textit{Atomes} (c.-à-d. s'il possède un grand nombre d'arêtes) alors, cette opération peut devenir couteuse.
 Malheureusement, ceci ne peut pas être résolu par l'utilisation d'un index permettant de parcourir uniquement les arcs nécessaires car, aujourd'hui, \gls{neo4j} permet uniquement la création d'index globaux (au graphe) permettant de récupérer, par exemple, l'ensemble des \textit{Atomes} ayant $P$ pour symbole de prédicat.
-Pour répondre au besoin, il faudrait un index local à chaque nœud (récupérer le sous ensemble correspondant de l'index global) et qui hériterais des attributs des éléments connectés (l'arrête doit récupérer le symbole de prédicat du nœud \textit{Atome} associé).
+Pour répondre au besoin, il faudrait un index local à chaque nœud (récupérer le sous ensemble correspondant de l'index global) et qui hériterait des attributs des éléments connectés (l'arrête doit récupérer le symbole de prédicat du nœud \textit{Atome} associé).
 
 % \paragraph{Optimisations}
 \paragraph{}
@@ -75,7 +75,7 @@ Dans ce contexte, des redondances d'informations et des index sont introduits af
                         & forPatho(\text{résection}, \text{cancer}), leadsTo(\text{cancer}, \text{métastase}), concernAna(\text{cancer}, \text{prostate}) \}
     \end{align*}
 
-    En utilisant la modélisation présentée précédemment, l'atome $Patient(N_1, \text{homme}, 78)$ est alors représenté par le graphe de propriétés suivant où le nœud $n_26$ représente l'atome et les nœuds $n_1$, $n_6$ et $n_7$ représente ces termes.
+    En utilisant la modélisation présentée précédemment, l'atome $Patient(N_1, \text{homme}, 78)$ est alors représenté par le graphe de propriétés suivant où le nœud $n_{26}$ représente l'atome et les nœuds $n_1$, $n_6$ et $n_7$ représentent ses termes.
     La figure~\ref{fig:update:db:runex} montre une vue complète de l'instance $\mathcal{D}$.
 
     \begin{center}

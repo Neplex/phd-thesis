@@ -7,9 +7,9 @@ Certaines approches se focalisent sur l'application de règles au moment de l'in
 Toutefois, maintenir la cohérence dès les mises à jour réduit la nécessité de calculs fréquents lors de l'intérogation, car les mises à jour sont estimées moins régulières.
 De plus, une base de données cohérente offre une plus grande facilité d'analyse. %et convient à l'intégration de données.
 Cela garantit un niveau de qualité de données uniforme pour tous les utilisateurs, même si cela implique une certaine limitation de la flexibilité.
-En effet, contrairement aux approches qui vise à appliquer un ensemble de contraintes lors de la requête,les contraintes imposées ne sont plus adaptées pour chaque utilisateur mais sont fixées et ne peuvent pas être modifiées.
+En effet, contrairement aux approches qui vise à appliquer un ensemble de contraintes lors de la requête, les contraintes imposées ne sont plus adaptées pour chaque utilisateur mais sont fixées et ne peuvent pas être modifiées.
 Cela permet tout de même d'avoir un ensemble de contraintes pour chaque exigence métier.
-Dans ce contexte, cette thèse s'intéresse au maintin de la cohérence (par rapport à des contraintes globales) lors des mise à jours d'une base de donnée avec des informations incomplétes.
+Dans ce contexte, cette thèse s'intéresse au maintin de la cohérence (par rapport à des contraintes globales) lors des mises à jour d'une base de données avec des informations incomplétes.
 
 \paragraph{}
 L'importance de pouvoir gérer l'incomplétude se révèle dans l'intégration d'informations provenant de sources textuelles.
@@ -19,10 +19,10 @@ Pour l'intégration de bases de données, les valeurs manquantes peuvent résult
 Ainsi, lorsque l'on intègre une base de médicaments ou de patients, les interactions entre les entités, telles que définies par les règles métiers, peuvent ne pas être explicitées.
 À titre d'exemple, une contrainte exprimée par la \gls{tgd} $c1$ : $Pat(x),$ $SOSY(x, y) \rightarrow PrescExam(x, z)$ stipule que si un patient $x$ présente un symptôme $y$, alors il doit avoir subit un examen $z$ qui a mis en evidence ce symptôme.
 Ainsi, lorsque la base contient une entrée pour une patiente nommée Lea souffrant de douleurs aux mains ($Pat(Lea)$ et $ SOSY(Lea,$ $\textit{douleur aux mains})$), pour étre cohérente, la base de données doit également inclure l'atome $PrescExam(Lea, N_1)$.
-Ici, $N_1$ represente une valeur inconnu et cet atome indique qu'un examen a été prescrit à Lea, même si l'examen n'est pas encore connu.
+Ici, $N_1$ represente une valeur inconnue et cet atome indique qu'un examen a été prescrit à Lea, même si l'examen n'est pas encore connu.
 Reiter propose une sémantique pour les valeurs nulles en utilisant la \gls{fol}.
 Il les décrit comme des individus existants mais inconnus \hyphentextcquote{english}[p.1]{reiterSoundSometimesComplete1986}{\label{reiterSemantic}\textelp{} these nulls represent existing but unknown individuals}.
-Ces valeurs inconnues peuvent alors étres représentées par des valeurs nulles marquées (ou nommées), permettant leur référencement multiple.
+Ces valeurs inconnues peuvent alors étre représentées par des valeurs nulles marquées (ou nommées), permettant leur référencement multiple.
 Pour illustrer, prenons l'exemple d'une instance de base de données $\mathcal{D}_1= \{PrescExam(Lea, N_1),$ $ExamResult(Lea, N_1, N_2)\}$.
 Cette instance indique qu'un examen non spécifié, symbolisé par $N_1$, a été prescrit à Lea, et qu'un résultat inconnu, représenté par $N_2$, est associé.
 Ces valeurs nulles reflètent une information partielle et se conforment à l'approche du \gls{cwa} où toute information non presente est considérée comme fausse.
@@ -44,7 +44,7 @@ Dans ce scénario, l'instance obtenue se présenterait comme $\mathcal{D}'_1 = \
 \paragraph{Contributions}
 Basée sur le cadre conceptuel de \gls{fol} exposé dans \cite{chabinConsistentUpdatingDatabases2020}, les travaux présentés ici :
 \begin{enumerate}
-    \item visent à appliquer cette approche de manière \emph{incrémentale} à des \emph{base de données graphes}.
+    \item visent à appliquer cette approche de manière \emph{incrémentale} à des \emph{bases de données graphes}.
     \item capitalisent sur les avantages inhérents aux fonctionnalités d'accès, de manipulation et de gestion de données offertes par les \glspl{sgbd} orientés graphes contrairement à une version en mémoire présentée dans \cite{chabinConsistentUpdatingDatabases2020}.
     \item améliorent la création des ensembles d'atomes liés par des valeurs nulles pour le calcul du \gls{core}, processus qui permet d'eliminier la redondance d'information et constitue une étape coûteuse dans \cite{chabinConsistentUpdatingDatabases2020}.
 \end{enumerate}

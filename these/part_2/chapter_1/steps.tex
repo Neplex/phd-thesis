@@ -54,7 +54,7 @@ Les entités représentent les unités d'information, les données, qui seront s
     $L_{tokens}(E)$ correspond à la séquence de tokens faisant partie de l'entité, définie comme $L_{tokens}(E) = [startToken, \dots, endToken]$.
 \end{definition}
 
-La figure~\ref{fig:struct:flow} illustre, à l'aide d'un diagramme de flux, les différentes étapes mise en œuvres pour structurer les données textuelles, c'est-à-dire pour obtenir une grammaire représentant le schéma de nos données.
+La figure~\ref{fig:struct:flow} illustre, à l'aide d'un diagramme de flux, les différentes étapes mises en œuvres pour structurer les données textuelles, c'est-à-dire pour obtenir une grammaire représentant le schéma de nos données.
 La première étape constitue une phase de préparation des arbres syntaxiques afin d'incorporer les entités et les relations au sein de l'arbre syntaxique.
 Cette étape vise aussi la simplification de ses arbres en supprimant les structures redondantes.
 Comme indiqué dans la section~\ref{sec:struct:meta}, une seconde étape cruciale consiste à vérifier que nous sommes en mesure de construire un schéma valide qui couvre l'ensemble de nos arbres.
@@ -69,8 +69,7 @@ Dans la suite, nous presentons de façon en detailée les différentes étapes p
 \subsection{Enrichissement des arbres}
 \label{sec:struct:auto:text}
 L'étape de préparation des textes constitue une phase importante.
-Les arbres de syntaxe enrichie et simplifié obtenue apres cette phase sont la base de la structuration automatique.
-L'ensemble des opérations définie pour cette étapes ont été conçus de maniére empirique.
+Les arbres de syntaxe enrichie et simplifié obtenue après cette phase sont la base de la structuration automatique.
 La representation des arbres d'entités et les simplification effectuée sont guidée par la structure que l'on souhaite obtenir.
 
 \begin{procedure}[htb]
@@ -109,7 +108,8 @@ La representation des arbres d'entités et les simplification effectuée sont gu
     }
 \end{procedure}
 
-La procèdure~\ref{algo:struct:enrichTree} résume les transformations nécessaires au nettoyage et à l'insertion des ensembles d'entités ($Ents$) au sein d'un arbre syntaxiques ($T$) afin de construire un arbre enrichis.
+\paragraph{}
+La procèdure~\ref{algo:struct:enrichTree} résume les transformations nécessaires au nettoyage et à l'insertion des ensembles d'entités ($Ents$) au sein d'un arbre syntaxiques ($T$) afin de construire un arbre enrichi.
 La procédure commence par réécrire les arbres en simplifiant les sous-arbres de coordination (ligne~\ref{algo:struct:inslist:coord}).
 Le tri à la ligne~\ref{algo:struct:inslist:sort} permet de traiter correctement les entités imbriquées afin que leur insertion se fasse du haut vers le bas de l'arbre.
 La ligne~\ref{algo:struct:inslist:ent} se charge d'ajouter les entités dans l'arbre et la ligne~\ref{algo:struct:inslist:unnest} convertie les entités imbriquées.
@@ -123,7 +123,7 @@ Plus particulièrement, on s'intéresse à la représentation des conjonctions d
 La figure~\ref{fig:struct:conj} illustre la disparité structurelle entre le français (\ref{fig:struct:conj:fr}) et l'anglais (\ref{fig:struct:conj:en}) dans laes banques d'arbres utilisées.
 Le français est annoté avec une structure en profondeur, tandis que l'anglais présente une structure à plat qui sépare bien les composants de la coordination en les mettant au même niveau.
 Ainsi, la structure de l'anglais se rapproche davantage de la représentation des collections, lesquels sont représentées par un sous-arbre où chaque enfant constitue un élément de la collection.
-Une première étape dans la préparation des textes implique par conséquent la transformation (pour le français) des conjonctions vers la structure, plus adaptée, de l'anglais.
+Une première étape dans la préparation des textes implique la transformation (pour le français) des conjonctions vers la structure, plus adaptée, de l'anglais.
 
 \begin{figure}[ht]
     \centering
@@ -928,12 +928,12 @@ Elle a pour objectif d'associer à chaque classe successeur de $C$ une position 
     Dans ce cas, nous aurons différentes positions associées à $C_a$.
 \end{remark}
 
-Étant donné un arbre $T$, la fonction~\ref{algo:struct:quotient:QT} construit l'arbre quotient, noté $Q_T$.
+Étant donné un arbre $T$, la fonction~\ref{algo:struct:quotient:QT} construit l'arbre quotient, noté $Q_T = (Q_D, Q_l)$.
 Cette construction commence par la racine qui représente la classe d'équivalence $C_{\lambda}$.
 Un ensemble $classes$ contenant des couples de la forme \textit{(classe d'équivalence, position dans $Q_T$)} guide la construction (ligne~\ref{algo:struct:quotient:QT:classes}).
 Ainsi, initialement, $classes$ contient le couple $(C_{\lambda}, \epsilon)$ et, par conséquent, l'arbre quotient est un nœud à la positon $\epsilon$ avec l'étiquette $\lambda$.
-Ensuite, pour chaque couple $(CL, u)$ extrait de $classes$, la fonction~\ref{algo:struct:quotient:QDom} calcule l'ensemble de ses couples successeurs, l'ajoute à l'ensemble $classes$ à la ligne~\ref{QT-ligne:updClasses}.
-La nouvelle position $u$ est ajoutée au domaine de $Q_T$.
+Ensuite, pour chaque couple $(CL, u)$ extrait de $classes$, la fonction~\ref{algo:struct:quotient:QDom} calcule l'ensemble de ses couples successeurs et les ajoutes à l'ensemble $classes$ (ligne~\ref{algo:struct:quotient:QT:updClasses}).
+La nouvelle position $u$ est ajoutée a $Q_D$, le domaine de $Q_T$.
 Dans les lignes~\ref{algo:struct:quotient:QT:plus} à~\ref{algo:struct:quotient:QT:fin} la fonction vérifie si la classe d'équivalence $CL$ contient plusieurs positions ayant le même père.
 C'est le cas, dans l'exemple~\ref{ex:struct:quotient:1}, de $C_X=\{0, 1\}$ qui contient deux positions dont le père est à la position $\epsilon$.
 Dans ce cas, l'étiquette associée à la positon $u$ sera $l(u)$ décorée du symbole $+$ (ici, $X^+$).
@@ -941,7 +941,7 @@ Dans ce cas, l'étiquette associée à la positon $u$ sera $l(u)$ décorée du s
 Comme on cherche à construire une \gls{cfg} condensée, si dans un arbre de dérivation, des nœuds frères sont étiquetés par le même non-terminal, cela doit être indiqué dans l'arbre quotient de manière condensée, à l'aide du symbole ${}^+$.
 Pour cela, il est nécessaire de vérifier si la classe d'équivalence d'un non-terminal $N$ possède plusieurs positions ayant le même parent.
 Cette démarche implique également une \textit{fusion} des éventuelles dérivations distinctes de $N$.
-Comme le non-terminal $N$ peut être associé à des règles de production différentes, en fusionnant ces dérivations, on accepte des arbres de dérivation incomplet.
+Comme le non-terminal $N$ peut être associé à des règles de production différentes, en fusionnant ces dérivations, on accepte des arbres de dérivation incomplets.
 L'exemple suivant illustre la construction de l'arbre quotient.
 
 \begin{function}[htb]
@@ -960,7 +960,7 @@ L'exemple suivant illustre la construction de l'arbre quotient.
         \tcp{L'ensemble est mis à jour : $classes \gets classes \setminus \{(CL, u)\}$}
 
         $successeurs \gets$ \qdom{$C$, $u$} \label{algo:struct:quotient:QT:newpos} \tcp*[l]{ensemble des couples classe-position qui succèdent à $CL$}
-        $classes \gets classes \cup successeurs$\label{algo:struct:quotient:QT:updClasses}\;
+        $classes \gets classes \cup successeurs$ \label{algo:struct:quotient:QT:updClasses}\;
 
         \BlankLine
         $Q_D = Q_D \cup \{u\}$\;
@@ -999,7 +999,7 @@ L'exemple suivant illustre la construction de l'arbre quotient.
         \textsf{QDom}(C_b, 01) & = \emptyset                           & \textsf{QDom}(C_c, 02) & = \emptyset
     \end{align*}
 
-    En construisant le domaine de $Q_T$ il est facile de se rendre compte que le nœud correspondant à la classe $C_a$ sera dupliqué dans l'arbre, car il est lié à deux positions : $00$ et $10$.
+    En construisant le domaine $Q_D$, il est facile de se rendre compte que le nœud correspondant à la classe $C_a$ sera dupliqué dans l'arbre, car il est lié à deux positions : $00$ et $10$.
     Avec le domaine construit par $QDom$ on peut construire l'arbre donné en figure~\ref{fig:struct:quotient:ex:quotient}.
     Dans l'arbre de la figure~\ref{fig:struct:quotient:ex:tree} le non-terminal $X$ apparaît dans l'arbre $T$ dans deux positions distinctes et indique des dérivations différentes.
     Le nœud correspondant à la classe d'équivalence $C_X$ dans $Q_T$ se voit donc attribué le symbole `${}^+$' signifiant que le symbole $X$ peut être répété plusieurs fois comme enfant de $\lambda$ (voir la définition~\ref{def:struct:pre:cfg} des \gls{cfg} condensée).
@@ -1054,7 +1054,7 @@ Les arbres syntaxiques de ces phrases ne seront pas identiques.
 Néanmoins, les deux représentent un \emph{traitement}.
 Dans notre approche, nous allons considérer qu'ils sont équivalents.
 
-Pour déterminer l'équivalence entre deux sous-arbres, il n'est pas suffisant de considérer uniquement l'ensemble des arbres d'entités présent dans chacun des sous-arbres les arbres d'entités.
+Pour déterminer l'équivalence entre deux sous-arbres, il n'est pas suffisant de considérer uniquement l'ensemble des étiquettes des entités présentes dans les sous-arbres.
 La langue naturelle est ambiguë et une même forme de surface (et donc un même arbre d'entité) peux représenter deux objets différents.
 Il est donc nécessaire de prendre aussi en compte le contexte.
 Pour ce faire nous utilisons le concept d'équivalence régulière comme introduite par~\cite{whiteGraphSemigroupHomomorphisms1983} pour les graphes.
@@ -1065,7 +1065,7 @@ Afin de définir la relation d'équivalence, nous définissons une mesure de sim
 On note $\mathbb{T}$ l'ensemble de tous les arbres et $\mathbb{ST}$ l'ensemble de tous les sous-arbres.
 Une mesure de similarité est une fonction symétrique $f : \mathbb{ST} \times \mathbb{ST} \to [0,1]$ où $f(x, x) = 1$ pour tout $x \in \mathbb{ST}$.
 Plusieurs mesures $f$ de similarité peuvent être utilisés comme Jaccard, Levenshtein, Jaro, ou encore la distance d'edition pour les arbres \cite{zhangSimpleFastAlgorithms1989}.
-La similarité contextuelle d'arbres est notée $sim_f(x, y)$, entre deux sous-arbres enrichis $x = T|_u$ et $y = T'|v$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous-arbre parent.
+La similarité contextuelle d'arbres est notée $sim_f(x, y)$, entre deux sous-arbres enrichis $x = T|_u$ et $y = T'|_v$, est définie comme une moyenne pondérée des similarités donnée récursivement par la fonction $f$ pour chaque sous-arbre parent.
 Les poids sont inversement proportionnels à la distance entre les sous-arbres parents et les sous-arbres $x$ et $y$.
 L'idée sous-jacente est que plus un sous-arbre est distant d'un autre, moins il a de valeur dans son contexte.
 La mesure $sim_f(x, y)$ est donnée par l'équation~\ref{eq:struct:sim} où $P^x_i$ (respectivement $P^y_i$) est le $i$-éme sous-arbre parent de $x$ (respectivement $y$) et $depth_{min}$ est la profondeur minimum entre les sous-arbres $x$ et $y$ tel que $depth_{min} = \min\{|u|, |v|\}$.
@@ -1170,7 +1170,7 @@ La décision de ce taux n'est pas arbitraire et il doit être déterminé pour c
 
 \begin{definition}[Equivalence de sous-arbres]
     \label{def:struct:equiv}
-    Soient deux arbres enrichis $T_1$ et $T_2$ avec deux sous-arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et la relation de $\tau$-similarité définie précédemment (\ref{def:struct:sim}).
+    Soient deux arbres enrichis $T_1$ et $T_2$ avec deux sous-arbres respectifs $st_1 = T_1|_u$ et $st_2 = T_2|_v$ et la relation de $\tau$-similarité définie précédemment (définition~\ref{def:struct:sim}).
     On définit la relation de $\tau$-équivalence entre $st_1$ et $st_2$ notée $st_1 \equiv_\tau st_2$ tel que $st_1$ est $\tau$-équivalent à $st_2$ si $st_1$ est $\tau$-similaires à $st_2$ ou si $st_1$ est  $\tau$-équivalent à un sous-arbre $st_3$ lui même $\tau$-équivalent à $st_2$.
     La proposition est synthétisée par l'équation~\ref{eq:struct:equiv}.
     \begin{equation}
@@ -1198,7 +1198,7 @@ La décision de ce taux n'est pas arbitraire et il doit être déterminé pour c
 
     Soient $st_1$, $st_2$ et $st_3$ trois sous-arbres enrichis et supposons que $st_1 \equiv_\tau st_2$ et $st_2 \equiv_\tau st_3$.
     Par symétrie, nous avons $st_1 \equiv_\tau st_2$ et $st_3 \equiv_\tau st_2$.
-    En utilisant la définition de la $\tau$-équivalence (\ref{eq:struct:equiv}), nous pouvons remplacer $z$ par $st_2$.
+    En utilisant la définition de la $\tau$-équivalence (équation~\ref{eq:struct:equiv}), nous pouvons remplacer $z$ par $st_2$.
     On obtient alors, par définition, $st_1 \equiv_\tau st_3$.
     On peut conclure que $(st_1 \equiv_\tau st_2 \land st_2 \equiv_\tau st_3) \implies st_1 \equiv_\tau st_3$.
     La $\tau$-équivalence est donc \emph{transitive}.
@@ -1238,7 +1238,7 @@ Il s'agit d'un arbre binaire décrivant les fusions de classes, où les classes 
 
 \begin{figure}[htb]
     \centering
-    \begin{adjustbox}{max width=\linewidth}
+    \begin{adjustbox}{max width=.7\linewidth}
         \begin{tikzpicture}[sloped]
             \node (a) at (-6,0) {a};
             \node (b) at (-3,0) {b};

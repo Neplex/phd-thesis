@@ -175,7 +175,7 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
     Le domaine $D$ d'un arbre est un sous ensemble de $(\mathbb{N})^*$ (c.-à-d. un ensemble de séquence d'entier de la forme $x.y.z$) qui respecte les propriétés suivantes :
     \begin{enumerate}
         \item $D$ est clos sur les préfixes, c'est-à-dire que pour $u, u' \in (\mathbb{N})^*$ si $u$ est un préfixe de $u'$ et $u' \in D$, alors $u \in D$, et
-        \item Pour tout $u \in (\mathbb{N})*$ et $j \in \mathbb{N}$ si $u.j \in D$ alors pour tous $i \in \mathbb{N}$ tel que $0 \leq i \leq j$ on a $u.i \in D$.
+        \item Pour tout $u \in (\mathbb{N})*$ et $j \in \mathbb{N}$ si $u.j \in D$ alors pour tous $i \in \mathbb{N}$ tel que $0 \leq i < j$ on a $u.i \in D$.
     \end{enumerate}
     Chaque élément de $D$ est appelé \emph{position}.
     Pour un nœud $n$ à la position $p$, $|p|$ définit la longueur de la séquence, aussi appelée \emph{profondeur} de $n$.
@@ -192,7 +192,7 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
 \begin{definition}[Sous-arbre]
     Étant donné un arbre $T = (D, l)$, un sous-arbre de $T$ à la position $u \in D$ est noté $T|_u = (D', l')$ et respecte les propriétés suivantes :
     \begin{enumerate}
-        \item $D' \subseteq D$ tel que $\forall v \in D' ~ u \preceq v$ et
+        \item $D' \subseteq D$ tel que $\forall v \in D' ~ u \preceq^* v$ et
         \item $l' = \langle v \mapsto l(v) \mid v \in D' \rangle $.
     \end{enumerate}
     Soit un sous-arbre $t = T|_u$, on note $t' = P_i^t$ le $i$-éme sous-arbre parent de $t$ tel que $t' = T|_v$,  $u = vw$ et $|w| = i$.
@@ -221,7 +221,8 @@ Elles sont souvent plus adaptées pour des tâches de compilation ou d'analyse s
     Dans la figure, les positions sont représentées entre parenthèses.
     Nous avons par exemple $l(0) = child1$.
     $T|_{1} = (D', l')$ est un sous-arbre de $T$.
-    Remarquez que $T|_{1} $ n'est pas un arbre, car $D'= \{1, 1.0, 1.1\}$ ne respecte pas les conditions requises (définition~\ref{def:struct:tree}).
+    Remarquez que $T|_{1}$ n'est pas un arbre, car $D'= \{1, 1.0, 1.1\}$ ne respecte pas les conditions requises (définition~\ref{def:struct:tree}).
+    Ici, $P_1^{T|_{1}}$ coïncide avec $T$.
 \end{example}
 
 \subsection{Textes et arbres}
@@ -305,7 +306,7 @@ Pour les arbres de dépendance, \gls{ud}\footnote{\url{https://universaldependen
 
 \begin{definition}[Haie]
     Une haie est définie comme une séquence d'arbres, qui peut éventuellement être vide, représentée sous la forme $h = [t_0, \dots , t_n]$ où $|h|$ représente le nombre d'arbres contenus dans cette haie (ici $|h| = n + 1$).
-    Une substitution, notée $\sigma$, est une application bijective d'un ensemble de variables $V$ vers un ensemble de haies et d'un ensemble de labels vers un ensemble de sousarbres, étendue de manière homomorphique aux arbres.
+    Une substitution, notée $\sigma$, est une application bijective d'un ensemble de variables $V$ vers un ensemble de haies et d'un ensemble de labels vers un ensemble de sous-arbres, étendue de manière homomorphique aux arbres.
 \end{definition}
 
 \begin{definition}[Règle de réécriture]
@@ -514,3 +515,5 @@ Si l'on se retrouve à devoir supprimer l'arbre au complet (figure~\ref{fig:sch:
         \label{fig:sch:op:delElem}
     \end{minipage}%
 \end{figure}
+
+\FloatBarrier

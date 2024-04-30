@@ -1,39 +1,113 @@
-Dans cette section, nous entreprenons une évaluation préliminaire critique de notre stratégie.
-Il est essentiel de noter qu'il n'existe pas de modèle universel pour évaluer la qualité d'une stratégie donnée.
-Comme mentionné précédemment, les approches discutées dans la littérature ne sont souvent pas directement comparables.
-De plus, l'accès au code source ou aux données utilisées pour reproduire ces expériences est souvent difficile, voire impossible.
-Par conséquent, notre objectif principal dans cette section est d'évaluer la stratégie que nous avons définie précédemment.
-Nous commençons par valider les procédures utilisées par rapport à cette stratégie en étudiant le comportement de la procédure~\ref{algo:struct:rewrite} dans la section~\ref{sec:struct:eval:algo}.
-Dans la suite, nous procédons à une analyse critique des résultats obtenus dans la section~\ref{sec:struct:eval:schema}.
-Cette analyse nous permettra d'identifier les points forts et les points faibles de notre approche.
+Dans cette section, nous entreprenons une évaluation critique, préliminaire, de notre stratégie.
+Il est important de souligner qu'il n'existe pas de modèle universel pour évaluer une stratégie et que, souvent, les approches décrites dans la littérature ne sont pas directement comparables.
+Notre évaluation critique est donc fondée sur l'observation du comportement de notre prototype par rapport aux objectifs que nous voulons atteindre.
+Dans la suite, la section~\ref{sec:struct:eval:algo} présente une étude du comportement de la procédure~\ref{algo:struct:rewrite} et la section~\ref{sec:struct:eval:schema} analyse la grammaire obtenue après application de la procédure sur notre jeu de données utilisé comme preuve de concept.
+Cette analyse nous permettra d'identifier des points forts et des points faibles de notre approche.
 
-\subsection{Comportement de la réécriture}
-\label{sec:struct:eval:algo}
-
-L'analyse discutée ici utilise le corpus CAS~\cite{grabarCASFrenchCorpus2018}, un corpus textuel composé de cas cliniques réels et fictifs.
-Ce corpus est annoté manuellement par différents annotateurs avec \num{0} entités nommées réparties en \num{0} catégories.
+L'évaluation de notre approche est faite sur un cas d'usage que nous utilisons comme preuve de concept.
+On utilise le corpus CAS~\cite{grabarCASFrenchCorpus2018}, un corpus textuel composé de cas cliniques réels et fictifs.
+Un cas clinique est un récit concis détaillant l'historique médical, les symptômes, les diagnostics et les traitements d'un patient depuis son admission à l'hôpital ou sa consultation médicale.
+Ce corpus est annoté manuellement par différents annotateurs et se compose de \num{100} textes, \num{8098} entités nommées réparties en \num{10} catégories.
 Les entités peuvent être imbriquées les unes dans les autres.
+La figure~\ref{fig:struct:cas} montre un extrait du corpus avec les annotations représentées par des boites.
+Dans les textes on retrouve la description d'examen avec le résultat obtenu, la détection de symptômes, les traitements et prescriptions réalisés.
 L'analyse repose sur les paramètres d'expérience suivants :
-\begin{enumerate*}[label=(\roman*)]
-    \item on exécute l'algorithme sur un sous-ensemble du corpus composé de \num{150} phrases et \num{0} entités ;
-    \item on utilise l'indice de Jaccard comme présenté dans la section~\ref{sec:struct:equiv-classes} pour notre mesure de similarité avec
-    \item $\tau$ fixé à \num{0.5} et, pour finir,
+\begin{itemize}
+    \item on exécute l'algorithme sur un sous-ensemble du corpus composé de \num{150} phrases et \num{457} entités ;
+    \item on utilise l'indice de Jaccard comme présenté dans la section~\ref{sec:struct:equiv-classes} pour notre mesure de similarité ;
+    \item on fixe $\tau$ à \num{0.5} ;
     \item on autorise \num{50} itérations de l'algorithme.
-\end{enumerate*}
+\end{itemize}
 L'implémentation a été réalisée en \gls{python} et utilise \gls{corenlp} pour l'analyse syntaxique.
 Le code source du projet nécessaire pour la reproduction des expériences est disponible sur \gls{git}~\cite{}.
 Pour le corpus, \cite{grabarCASFrenchCorpus2018} donne les modalités d'accès aux données.
+
+\begin{figure}[htb]
+    \begin{displaycquote}[filehtml-24-cas]{grabarCASFrenchCorpus2018}
+        Lors de la première visite médicale à 11 semaines de sa deuxième grossesse, la patiente souffrait de \fbox{nausées} et de \fbox{vomissements} \fbox{depuis une dizaine de jours}.
+        Une \fbox{perfusion intraveineuse} continue de \fbox{solution saline à \SI{0.9}{\percent}} avec du \fbox{dextrose à \SI{5}{\percent}} avait permis de la réhydrater.
+        Elle était repartie avec une ordonnance de \fbox{doxylamine} et de \fbox{pyridoxine} (six comprimés \fbox{par jour}).
+        \fbox{Une semaine plus tard}, la patiente s'est présentée au service d'urgence pour une récidive des \fbox{nausées} avec une moyenne de \fbox{quatre épisodes de \fbox{vomissements} par jour}.
+    \end{displaycquote}
+    \caption{Extrait d'un document du corpus CAS}
+    \label{fig:struct:cas}
+\end{figure}
+
+Pour analyser notre approche, il est nécessaire de rappeler les idées majeures qui ont guidé notre démarche.
+Notre structuration des données textuelles consiste à proposer une grammaire qui joue le rôle d'un schéma, indiquant les informations essentielles à stocker.
+Les non-terminaux de cette grammaire offrent une manière de regrouper ces informations essentielles.
+Notre objectif est donc d'agréger des informations similaires, sur la base d'une notion de similarité préétablie, afin d'obtenir comme résultat un schéma compréhensible et une instance valide, résumant les informations du texte initial.
+Pour atteindre cet objectif, notre procédure~\ref{algo:struct:rewrite} (page~\pageref{algo:struct:rewrite}) construit itérativement l'instance en agrégeant ou en séparent les branches de l'arbre.
+Pour ce faire, elle applique successivement un ensemble d'opérations qui sont numérotées comme suit :
+\begin{multicols}{2}
+    \begin{enumerate}
+        \item \ref{algo:struct:rewrite-findSubgroups}
+        \item \ref{algo:struct:rewrite-mergeGroups}
+        \item \ref{algo:struct:rewrite-findCollections} (groupes)
+        \item \ref{algo:struct:rewrite-findRelationship}
+        \item \ref{algo:struct:rewrite-findCollections} (relations)
+        \item \textsf{reduce} (bottom)
+        \item \textsf{reduce} (top)
+    \end{enumerate}
+\end{multicols}
+
+Il est important de remarquer que ces opérations sont ordonnées en fonction de leur niveau de généralisation.
+Au cours des différentes itérations de la procédure~\ref{algo:struct:rewrite}, nous alternons entre des étapes nécessitant des modifications pour rendre les détails visibles, imposant ainsi des spécialisations et des étapes où des agrégations sont nécessaires pour proposer des généralisations.
+Le comportement de la procédure~\ref{algo:struct:rewrite} peut donc être caractérisé par des allers-retours entre ces deux actions : réduire le nombre de règles de production pour généraliser, puis augmenter ce nombre (au besoin, en annulant certaines agrégations précédentes) pour mieux spécifier avant de proposer d'autres généralisations.
+
+La procédure~\ref{algo:struct:rewrite} continue à l'itération suivante si une modification est appliquée à l'arbre d'instance.
+Cela implique que pour une étape $i$, si on construit de nouveaux groupes, la détection de relations et de collections ne pourra se faire qu'à l'étape $i + 1$.
+Afin de pouvoir étudier l'évolution de l'arbre en comparant une à une les itérations, on ajoute les aspects suivants :
+\begin{itemize}
+    \item L'instance initiale $I_0$ ne contient pas de structures remarquables (\emph{groupes}, \emph{relations} et \emph{collections}).
+    Afin de comparer l'impact des réécritures, l'itération \num{1} représente l'arbre $I_0$ sur lequel on applique seulement l'opération \ref{algo:struct:rewrite-findGroups}.
+
+    \item À la fin de chaque itération de la procédure, on annote les nœuds candidats pour être des \emph{relations} ou des \emph{collections} qui ne nécessite pas de réécriture (cela inclue l'itération \num{1}).
+    Par exemple, un nœud ayant exclusivement des nœuds \emph{groupes} équivalents comme enfant sera alors annoté comme une \emph{collection}.
+    C'est-à-dire que l'on annote uniquement des nœuds qui ont déjà une structure valide par rapport à la méta-grammaire, mais qui ne sont pas encore étiquetés.
+    La recherche des nœuds \emph{relations} et \emph{collections} permet de mesurer à chaque itération leur nombre potentiel même si l'opération de réécriture associée ne s'est pas déclenchée.
+    Cet étiquetage est normalement à appliquer uniquement à la fin de l'exécution de la procédure.
+\end{itemize}
+
+\paragraph{}
+Dans ce contexte, nous devons réfléchir au type des résultats que nous cherchons à obtenir.
+Pour cela, les aspects suivants servent de guide pour analyser le comportement de la procédure~\ref{algo:struct:rewrite} et du résultat obtenu :
+\begin{enumerate}
+    \item \label{asp1} Une grammaire compréhensible doit être concise par rapport à une version initiale qui exprime l'instance originale elle-même.
+    Autrement dit, notre procédure doit réduire le nombre de règles de production signifiant que l'instance a été unifiée.
+    Il est donc important de surveiller l'impact de notre procédure sur le nombre de règles de production.
+
+    \item \label{asp2} Nos agrégations reposent sur les concepts de \emph{groupes}, \emph{relations} et \emph{collections}, qui constituent les structures génériques et fondamentales de notre schéma.
+    On s'attend alors à ce que le nombre d'instances de ces structures augmente au fur et à mesure des itérations.
+    Il est donc important d'évaluer le nombre d'instances associées à chacune d'entre elles.
+    Cela implique de déterminer combien de fois, par exemple, le nom terminal $GROUP_9$ apparaît dans l'arbre (notre instance).
+    Habituellement, il serait naturel de considérer qu'une structure est justifiée si elle présente un nombre significatif d'instances.
+    Toutefois, le nombre d'instances peut varier considérablement et des structures relativement peu courantes peuvent s'avérer essentielles.
+    On s'intéresse alors à surveiller l'impact de notre procédure sur le nombre moyen d'instances associées à nos structures génériques.
+    
+    \item\label{asp3} Nos structures fondamentales suivent une hiérarchie définie.
+    Par exemple, une \emph{collection} représente une agrégation de groupes, offrant ainsi une généralisation plus poussée.
+    % On peut supposer un schéma idéal comme étant celui capable d'incorporer un nombre important de ces généralisations fortes.
+    % Cependant, cette mesure n'est pas totalement objective.
+    % Étant donné que les données de base sont textuelles, il est fréquent d'avoir certains composants (sous-arbres) très spécifiques, ne présentant pas de similitudes avec d'autres composants, ce qui rendrait possible une généralisation plus étendue.
+    Nous estimons qu'il est donc important d'observer l'impact de notre procédure sur le nombre de structures différentes pour chaque catégorie que nous avons, à savoir les \emph{groupes}, les \emph{relations} et les \emph{collections}.
+\end{enumerate}
+
+Dans le reste de cette section, nous présentons les résultats de nos observations sur ces trois aspects.
+
+\subsection{Comportement de la procédure de réécriture}
+\label{sec:struct:eval:algo}
 
 \begin{figure}[htb]
     \centering
     \begin{tikzpicture}
         \begin{groupplot}[
                 group style={
-                        group size=1 by 2,
-                        xlabels at=edge bottom,
-                        xticklabels at=edge bottom,
-                        vertical sep=0pt
-                    },
+                    group size=1 by 2,
+                    xlabels at=edge bottom,
+                    xticklabels at=edge bottom,
+                    vertical sep=0pt
+                },
                 enlarge x limits=.01,
                 xmin=1,
                 xmax=50,
@@ -64,41 +138,21 @@ Pour le corpus, \cite{grabarCASFrenchCorpus2018} donne les modalités d'accès a
     \label{figure:struct:xp:prod}
 \end{figure}
 
-À la fin de chaque itération de la procédure, on recherche (sans modifier la structure de l'arbre) les nœuds candidats pour être des \emph{relations} (des nœuds ayant exactement deux \emph{groupes} distincts comme enfants) ou des \emph{collections} (des nœuds ayant uniquement comme enfant des nœuds \emph{groupes} équivalents) qui ne nécessite pas de réécriture (il s'agit d'un simple nommage d'une structure valide).
-La recherche des nœuds \emph{relations} et \emph{collections} permet de mesurer à chaque itération leur nombre potentiel même si l'opération de réécriture associée ne s'est pas déclenchée.
-Pour la première itération, seul l'opération \ref{algo:struct:rewrite-findGroups} est effectuée pour permettre de comparer l'instance avant et après réécriture par les différentes opérations.
-La figure~\ref{figure:struct:xp:prod} montre le nombre de règles de production de la grammaire $G_i$ (\ref{figure:struct:xp:prod:prod}) avec la droite de tendance (\ref{figure:struct:xp:prod:prod-trend}).
-La courbe \ref{figure:struct:xp:prod:unlabelled} montre le nombre de nœuds non catégorisés et \ref{figure:struct:xp:prod:unlabelled-trend} est la droite de tendance.
+\paragraph{}
+La figure~\ref{figure:struct:xp:prod} illustre le comportement de la procédure~\ref{algo:struct:rewrite} par rapport au nombre de règles de production.
+Elle montre le nombre de règles de production de la grammaire $G_i$ (\ref{figure:struct:xp:prod:prod}) avec sa droite de tendance (\ref{figure:struct:xp:prod:prod-trend}).
+La courbe \ref{figure:struct:xp:prod:unlabelled} montre le nombre de nœuds non catégorisés et \ref{figure:struct:xp:prod:unlabelled-trend} est sa droite de tendance.
 La partie basse du graphique indique l'opération de transformation appliquée pour chaque étape $i$ (\ref{figure:struct:xp:prod:op}).
-On rappelle que la procédure~\ref{algo:struct:rewrite} (page~\pageref{algo:struct:rewrite}) applique successivement un ensemble d'opérations qui sont numérotées comme suit et quelles sont classée par ordre de destruction :
-\begin{multicols}{2}
-    \begin{enumerate}
-        \item \ref{algo:struct:rewrite-findSubgroups}
-        \item \ref{algo:struct:rewrite-mergeGroups}
-        \item \ref{algo:struct:rewrite-findCollections} (groupes)
-        \item \ref{algo:struct:rewrite-findRelationship}
-        \item \ref{algo:struct:rewrite-findCollections} (relations)
-        \item \textsf{reduce} (bottom)
-        \item \textsf{reduce} (top)
-    \end{enumerate}
-\end{multicols}
+On observe que la procédure~\ref{algo:struct:rewrite} progresse efficacement vers l'objectif de minimiser la taille de la grammaire tout en structurant l'instance.
+Nous passons ainsi de \num{178} règles de production différentes à \num{68}.
+Au terme des \num{50} itérations, seulement \num{34} nœuds n'ont pas pu être catégorisés, par rapport à \num{155} initialement.
 
-Comme on traite un ensemble de phrases représentées par des arbres syntaxiques distincts, notre instance est vue comme une forêt enracinée.
-On applique les opérations de réécriture pour chaque phrase de façon indépendante.
-Le calcul des classes d'équivalence et du support est réalisé sur l'ensemble de la forêt.
-Seule l'opération~\ref{algo:struct:rewrite-findCollections} est capable de fusionner des collections entre plusieurs phrases.
-Traiter les phrases de façon indépendante permet de s'assurer que les groupements se font au sein d'une même phrase et donc d'une même unité sémantique.
-On ne construit donc pas des regroupements inter-phrases qui ne serait alors pas aligné sur la sémantique du texte.
-
-On remarque que la procédure proposée tend bien vers l'objectif de minimiser la taille de la grammaire de schéma tout en structurant l'instance.
-On passe ainsi de \num{178} règles de production différentes à \num{68}.
-Au terme des \num{50} itérations, seule \num{34} nœuds n'ont pas pu être catégorisés contre \num{155} au départ.
-À chaque plateau, c'est-à-dire quand, le nombre de règles de production reste stable, on peut voir qu'une opération plus destructrice (identifié par un nombre plus élevé) est utilisée.
-Ce phénomène se produit notamment aux étapes \numlist{22;26;27;28}.
-Les opérations les plus destructrices réduisent considérablement le nombre de règles de productions.
-% Cela est dû au fait que ces opérations suppriment des niveaux entiers non annotés de l'arbre d'instance, créant ainsi des sous-arbres ayant beaucoup d'enfants.
+Une analyse approfondie de la figure~\ref{figure:struct:xp:prod} nous permet de remarquer des moments où le nombre de règles de production reste relativement constant.
+Ce phénomène se produit, par exemple, aux itérations \numlist{21;25}.
+Dans ces circonstances, la procédure~\ref{algo:struct:rewrite} applique des opérations que nous pouvons qualifier de plus \emph{généralistes} qui se remarque par un changement important du nombre de règles de productions.
 Cependant, le résultat de ces opérations ne produit pas d'arbres valides ou fréquents et une restructuration est alors nécessaire.
-Aux étapes \numlist{23;24;29;30;31;32}, le nombre de règles de productions remonte alors rapidement, car la procédure ajoute les structures nécessaires à la bonne structuration, notamment par l'identification de collections au sein des sous-arbres nouvellement construits, ajoutant alors de nouvelles structures.
+C'est à ce stade que nous observons le va-et-vient discuté précédemment.
+Aux étapes \numlist{24;30;31}, le nombre de règles de productions augmente rapidement, car la procédure ajoute les structures plus spécifiques (c'est-à-dire, elle modifie des sous-arbres, en les spécifiant différemment, et pour cela, elle augmente le nombre de règles de production), pour permettre de reconnaître, lors d'une itération suivante, une structure plus générique, comme une collection.
 
 \begin{figure}[htb]
     \centering
@@ -135,27 +189,24 @@ Aux étapes \numlist{23;24;29;30;31;32}, le nombre de règles de productions rem
             \addlegendentry{Classes d'équivalences}
         \end{axis}
     \end{tikzpicture}
-    \caption{Nombre d'individus moyen pour chaque catégorie (\emph{groupe}, \emph{relation}, \emph{collection})}
+    \caption{Nombre moyen d'instances pour chaque catégorie (\emph{groupe}, \emph{relation}, \emph{collection})}
     \label{figure:struct:xp:ratio}
 \end{figure}
 
-La figure~\ref{figure:struct:xp:ratio} permet de mettre en évidence la stratégie adoptée et de valider que l'algorithme tend bien vers l'objectif.
-La courbe~\ref{figure:struct:xp:ratio:equiv} montre le nombre de classes d'équivalences qui sont construite à chaque étape. %  (et la droite de tendance~\ref{figure:struct:xp:ratio:equiv-trend})
-On remarque que ce nombre diminue avec le temps (passant de \num{25} classes d'équivalence à \num{17}) ce qui signifie que les structures s'unifie au fur et à mesure des étapes et que les transformations opérées on permit de rapprocher deux groupes distincts.
-%Cela nous permet de voir que les groupes identifiés au démarrage continue de se retrouver dans la suite, mais avec des structures unifiées et montre que la procédure proposée, avec les paramètres choisis, maintient le partitionnement initial des données.
+\paragraph{}
+La figure~\ref{figure:struct:xp:ratio} illustre le comportement de la procédure~\ref{algo:struct:rewrite} par rapport au nombre d'instances associées à chacune des structures (aspect~\ref{asp2} ci-dessus).
+La courbe~\ref{figure:struct:xp:ratio:equiv} montre le nombre de classes d'équivalence qui sont construites à chaque étape.
+On remarque que ce nombre diminue avec le temps (passant de \num{25} classes d'équivalence à \num{17}) ce qui signifie que les structures s'unifient au fur et à mesure des étapes et que les transformations opérées permettent de rapprocher des groupes distincts.
 
-Les courbes~\ref{figure:struct:xp:ratio:group}, \ref{figure:struct:xp:ratio:rel} et \ref{figure:struct:xp:ratio:coll} montre respectivement le nombre d'individus moyen pour chaque groupe, relation et collections. % (et leur droite de tendance associée~\ref{figure:struct:xp:ratio:group-trend}, \ref{figure:struct:xp:ratio:rel-trend} et \ref{figure:struct:xp:ratio:coll-trend})
-Malgré, la diminution du nombre de nœuds non étiquetés, on remarque que leur nombre reste plutôt stable.
-% La légère diminution du nombre d'individus pour les groupes peut s'expliquer par l'augmentation du nombre d'instances pour les relations.
-Au démarrage le nombre moyen d'individu est de \num{34.2} pour les groupes et de \num{2.2} pour les relations.
-À la fin de l'exécution, on obtient \num{29.8} individus en moyenne pour les groupes et \num{3} pour les relations.
-La diminution du nombre d'individus pour les groupes peut s'expliquer par leur promotion au rang de relations augmentant ainsi le nombre d'individus moyen par relation.
-Concernant la baisse du nombre d'individus pour les collections, cela s'explique par la fusion successive des collections.
-Au bout des \num{50} itérations, on obtient \num{1.4} individu par collections en moyenne.
-Dans l'idéal ce nombre devrait être à \num{1}, signifiant que toutes les collections ont bien été fusionnée les unes avec les autres.
-
-% Cela est corrélé avec le nombre de classes d'équivalence : moins de classes implique que les individus sont catégorisés dans une autre classe.
-% Cependant, l'augmentation générale montre aussi que la procédure ne construit pas une classe ou tout les indivis se retrouvent, mais qu'ils se repartissent bien entre les différents groupes créés.
+Les courbes~\ref{figure:struct:xp:ratio:group}, \ref{figure:struct:xp:ratio:rel} et \ref{figure:struct:xp:ratio:coll} illustrent respectivement le nombre moyen d'instances pour chaque \emph{groupe}, \emph{relation} et \emph{collection}.
+Ces nombres restent plutôt stables, malgré la diminution du nombre de nœuds non étiquetés.
+Au début de l'exécution, le nombre moyen d'instances est de \num{34.2} pour les groupes et de \num{2.2} pour les relations.
+À la fin de l'exécution, on observe en moyenne \num{29.8} instances pour les groupes et \num{3} pour les relations.
+La diminution du nombre d'instances pour les groupes peut s'expliquer par leur promotion au rang de relations, augmentant ainsi le nombre moyen d'instances par relation.
+Concernant la baisse du nombre d'instances pour les collections, cela s'explique par la fusion successive des collections.
+Après \num{50} itérations, on obtient en moyenne \num{1.4} instances par collection.
+Dans l'idéal, le schéma ne devrait contenir qu'une seule collection par \emph{groupe} et par \emph{relation}.
+On devrait alors obtenir \num{1} instance par collection, signifiant que toutes les collections ont bien été fusionnées les unes avec les autres.
 
 \begin{figure}[htb]
     \centering
@@ -191,20 +242,24 @@ Dans l'idéal ce nombre devrait être à \num{1}, signifiant que toutes les coll
     \label{figure:struct:xp:nbElems}
 \end{figure}
 
-La figure~\ref{figure:struct:xp:nbElems} montre le nombre de structures différentes pour chaque catégorie d'objets.
-C'est-à-dire que \ref{figure:struct:xp:nbElems:group} représente le nombre de groupes, \ref{figure:struct:xp:nbElems:rel} le nombre de relations et pour finir \ref{figure:struct:xp:nbElems:coll} le nombre de collections.
-Durant la première étape de la procédure, on est donc capable de construire \num{10} groupes différents et d'annoter \num{6} relations et \num{0} collections.
+\paragraph{}
+La figure~\ref{figure:struct:xp:nbElems} met en lumière le comportement de la procédure~\ref{algo:struct:rewrite} par rapport au nombre de structures différentes pour chaque catégorie (aspect~\ref{asp3} ci-dessus).
+Ainsi, dans la figure~\ref{figure:struct:xp:nbElems}, \ref{figure:struct:xp:nbElems:group} représente le nombre de groupes, \ref{figure:struct:xp:nbElems:rel} le nombre de relations et \ref{figure:struct:xp:nbElems:coll} le nombre de collections.
+
+Dans l'instance $I_0$ (à la première itération), il est possible de construire \num{10} groupes différents et d'annoter \num{6} relations et \num{0} collections.
 Au bout de l'itération \num{28}, la procédure a construit \num{11} groupes, \num{8} relations et \num{15} collections.
-Il s'agit de l'itération qui contient le moins de règle de productions.
-Les itérations \numlist{29;30} fusionne les collections après la réduction de l'arbre par le haut exécuté durant l'itération \num{28}.
-On constate une chute importante du nombre de relations ou uniquement \num{2} relations sont identifiée avant qu'une troisième ne soit découverte à l'itération \num{31}.
-Cela peut s'expliquer par le changement au niveau des groupes, à l'itération \num{29} on passe de \num{15} à \num{10} groupes.
-La suppression de ces groupes implique la suppression des relations associées.
-Inversement le nombre d'individus moyen par relations augmente ce qui implique que deux classes d'équivalence correspondantes à das groupes ont fusionnées, entrainant alors la fusion de relations (on a donc moins de relations différentes, mais plus d'individus de cette relation).
-On constate le même phénomène à l'itération \num{21}.
-La procédure se termine avec \num{10} groupes, \num{3} relations et \num{12} collections.
-Passé les premières étapes, on remarque que le nombre de groupes et de collections reste stable.
-Cela montre que l'on a identifié une structure qui représente bien les données et que les étapes suivantes servent uniquement à supprimer ou à réécrire des structures dans l'instance sans impact majeur sur le schéma obtenue.
+Il s'agit de l'itération qui contient le moins de règles de production.
+Les itérations \numlist{29;30} fusionnent les collections après la réduction de l'arbre par le haut (comme expliquer dans la section~\ref{sec:struct:implem}, page~\pageref{sec:struct:implem}), exécutée durant l'itération \num{28}.
+On observe alors une chute significative du nombre de relations, où seulement \num{2} relations sont identifiées avant qu'une troisième ne soit découverte à l'itération \num{31}.
+Cela peut s'expliquer par le changement au niveau des groupes : à l'itération \num{29}, nous passons de \num{15} à \num{10} groupes.
+La suppression de ces groupes entraîne également la suppression des relations associées.
+En revanche, le nombre moyen d'instances par relation augmente, ce qui implique que deux classes d'équivalence correspondant à des groupes ont fusionné, entraînant ainsi la fusion de relations (nous avons donc moins de relations différentes, mais plus d'instances pour chaque relation).
+Nous observons le même phénomène à l'itération \num{21}.
+Cela est caractéristique de l'unification de l'instance.
+
+La procédure se termine avec la construction de \num{10} groupes, \num{3} relations et \num{12} collections (on obtient alors quasiment une collection pour chaque groupe et relation).
+Nous remarquons que le nombre de groupes et de collections reste stable après l'itération \num{31}.
+Cela indique que nous avons identifié une structure qui représente bien les données et que les étapes suivantes servent uniquement à supprimer ou à réécrire l'instance sans avoir d'impact significatif sur le schéma obtenu.
 
 \paragraph{Stratégie}
 La stratégie employée, qui vise à repérer les éléments fréquents, semble converger vers une solution satisfaisante.
@@ -212,9 +267,9 @@ Cependant, elle est particulièrement sensible aux paramètres sélectionnés, t
 La figure~\ref{fig:struct:eval:ex} illustre un exemple de l'échec de cette méthode sur le même jeu de données, avec $\tau = 0.7$ plutôt que $\tau=0.5$ comme mentionné précédemment.
 De manière intuitive, on pourrait espérer que l'opération \ref{algo:struct:rewrite-mergeGroups} fusionne le groupe 7 avec l'entité \emph{Anatomie}.
 Cependant, même si la structure de l'arbre suggère cette association, elle n'est pas réalisée.
-L'intégration de l'entité éloigne trop le nouveau groupe des autres instances, créant ainsi une autre catégorie d'équivalence dont le support est trop faible.
-Cela est notamment dû au fait que les éditions sont traité individuellement et non comme un ensemble.
-En effet, si l'ensemble des groupes de la classe d'équivalence était modifiées simultanément, cette association aurait peut-être était réalisée.
+L'intégration de l'entité \emph{Anatomie} dans le groupe 7 éloigne trop le nouveau groupe des autres instances, créant ainsi un autre ensemble équivalent dont le support est trop faible.
+Cela est notamment dû au fait que les éditions sont traitées individuellement et non comme un ensemble.
+En effet, si l'ensemble des groupes de la classe d'équivalence était modifié simultanément, cette association aurait peut-être était réalisée.
 
 \begin{figure}[H]
     \centering
@@ -237,78 +292,140 @@ En effet, si l'ensemble des groupes de la classe d'équivalence était modifiée
     \label{fig:struct:eval:ex}
 \end{figure}
 
+\noindent
 Dans la suite, nous étudions la grammaire de schéma obtenue à l'issue de la procédure~\ref{algo:struct:rewrite}.
 
 \subsection{Étude critique de la grammaire obtenue}
 \label{sec:struct:eval:schema}
 
-Nous nous attardons ici sur une étude critique de la grammaire de schéma obtenue par réécriture successive des arbres syntaxiques.
-Avec les paramètres définis dans la section précédente, nous obtenons la grammaire de schéma suivante.
-Notez que ce schéma est obtenu à partir de l'instance construite par la procédure~\ref{algo:struct:rewrite} à laquelle on a supprimé les nœuds non étiquetés ainsi que les entités orphelines n'étant pas rattachées à un nœud \emph{groupe}.
-La grammaire est obtenue à l'aide de la procédure décrite dans la section~\ref{sec:struct:steps:grammar}.
-
+Dans notre approche, la procédure~\ref{algo:struct:rewrite} effectue des modifications sur l'arbre afin de construire l'instance cible à partir de laquelle la grammaire (ou le schéma) cible est extraite, comme expliqué dans la section~\ref{sec:struct:steps:grammar}.
+Notez que cette grammaire est obtenue après suppression des nœuds non étiquetés ainsi que les entités orphelines n'étant pas rattachées à un nœud \emph{groupe}.
+Après l'exécution étudiée dans la section précédente avec les paramètres d'expériences définis, nous obtenons la grammaire suivante :
 \begin{align*}
-    COLL_0                      \to & ~ GROUP_0^+                    & COLL_1                     \to & ~ GROUP_1^+                     \\
-    COLL_2                      \to & ~ GROUP_2^+                    & COLL_3                     \to & ~ GROUP_3^+                     \\
-    COLL_4                      \to & ~ GROUP_4^+                    & COLL_6                     \to & ~ GROUP_6^+                     \\
-    COLL_8                      \to & ~ GROUP_8^+                    & COLL_9                     \to & ~ GROUP_9^+                     \\
-    COLL_{10}                   \to & ~ GROUP_{10}^+                 & COLL_{11}                  \to & ~ GROUP_{11}^+                  \\
-    COLL_{11 \leftrightarrow 8} \to & ~ REL_{11 \leftrightarrow 8}^+ & COLL_{2 \leftrightarrow 6} \to & ~ REL_{2 \leftrightarrow 6}^+   \\
-    GROUP_0                     \to & ~ ENT_{Dose} ~ ENT_{Frequence} & GROUP_1                    \to & ~ ENT_{Examen} ~ ENT_{Valeur}   \\
-                                    & ~ ENT_{Mode} ~ ENT_{Substance}   & GROUP_2                    \to & ~ ENT_{Frequence}               \\
-                                    & ~ ENT_{Sosy} ~ ENT_{Traitement}  & GROUP_4                    \to & ~ ENT_{Anatomie} ~ ENT_{Examen} \\
-    GROUP_3                     \to & ~ ENT_{Dose} ~ ENT_{Examen}    &                                & ~ ENT_{Sosy}                      \\
-                                    & ~ ENT_{Sosy} ~ ENT_{Substance}   & GROUP_6                    \to & ~ ENT_{Dose}                    \\
-    GROUP_8                     \to & ~ ENT_{Examen} ~ ENT_{Sosy}    & GROUP_9                    \to & ~ ENT_{Mode}                    \\
-    GROUP_{10}                  \to & ~ ENT_{Substance}              & GROUP_{11}                 \to & ~ ENT_{Anatomie}                \\
-    REL_{10 \leftrightarrow 9}  \to & ~ GROUP_{10} ~ GROUP_9         & REL_{11 \leftrightarrow 8} \to & ~ GROUP_{11} ~ GROUP_8          \\
+    COLL_0                      \to & ~ GROUP_0^+                     & COLL_1                     \to & ~ GROUP_1^+                     \\
+    COLL_2                      \to & ~ GROUP_2^+                     & COLL_3                     \to & ~ GROUP_3^+                     \\
+    COLL_4                      \to & ~ GROUP_4^+                     & COLL_6                     \to & ~ GROUP_6^+                     \\
+    COLL_8                      \to & ~ GROUP_8^+                     & COLL_9                     \to & ~ GROUP_9^+                     \\
+    COLL_{10}                   \to & ~ GROUP_{10}^+                  & COLL_{11}                  \to & ~ GROUP_{11}^+                  \\
+    COLL_{11 \leftrightarrow 8} \to & ~ REL_{11 \leftrightarrow 8}^+  & COLL_{2 \leftrightarrow 6} \to & ~ REL_{2 \leftrightarrow 6}^+   \\
+    GROUP_0                     \to & ~ ENT_{Dose} ~ ENT_{Frequence}  & GROUP_1                    \to & ~ ENT_{Examen} ~ ENT_{Valeur}   \\
+                                    & ~ ENT_{Mode} ~ ENT_{Substance}  & GROUP_2                    \to & ~ ENT_{Frequence}               \\
+                                    & ~ ENT_{Sosy} ~ ENT_{Traitement} & GROUP_4                    \to & ~ ENT_{Anatomie} ~ ENT_{Examen} \\
+    GROUP_3                     \to & ~ ENT_{Dose} ~ ENT_{Examen}     &                                & ~ ENT_{Sosy}                    \\
+                                    & ~ ENT_{Sosy} ~ ENT_{Substance}  & GROUP_6                    \to & ~ ENT_{Dose}                    \\
+    GROUP_8                     \to & ~ ENT_{Examen} ~ ENT_{Sosy}     & GROUP_9                    \to & ~ ENT_{Mode}                    \\
+    GROUP_{10}                  \to & ~ ENT_{Substance}               & GROUP_{11}                 \to & ~ ENT_{Anatomie}                \\
+    REL_{10 \leftrightarrow 9}  \to & ~ GROUP_{10} ~ GROUP_9          & REL_{11 \leftrightarrow 8} \to & ~ GROUP_{11} ~ GROUP_8          \\
     REL_{2 \leftrightarrow 6}   \to & ~ GROUP_2 ~ GROUP_6
 \end{align*}
 
-On remarque que le schéma obtenu, bien que peut intuitif, reste cependant cohérent avec les données.
-Le schéma est aussi valide par rapport à la méta-grammaire, on ne s'attardera donc pas sur les collections qui sont correctement construites.
-Pour chaque groupe une collection est bien construite, mais pour les relations, il manque la collection associée à la relation $REL_{10 \leftrightarrow 9}$.
+En raison de l'utilisation de noms peu expressifs, le schéma obtenu peut sembler non intuitif.
+Néanmoins, il est valide conformément à la méta-grammaire.
 
-En analysant les groupes, nous constatons des associations prévisibles, telles que le groupe 1 (\emph{Examen}, \emph{Valeur}) qui représente le résultat d'un examen.
-%Ces entités sont souvent associées, comme illustré dans la phrase \enquote{} et peuvent parfois être imbriquées, comme dans la phrase \enquote{}.
-Certains groupes correspondent en réalité à ce qui serait intuitivement interprété comme une relation, par exemple le groupe 8 (\emph{Examen}, \emph{Sosy}) et le groupe 4 (\emph{Anatomie}, \emph{Examen}, \emph{Sosy}) qui représentent le lien entre un examen (groupe 1) et un symptôme.
-L'\emph{Anatomie} peut faire référence à la localisation de l'examen ou du symptôme.
-Étant donné que ces informations sont souvent interdépendantes et qu'il existe peu d'autres liens avec d'autres entités dans le corpus, il est cohérent de les regrouper ensemble.
-Cependant, il serait préférable de construire deux groupes distincts : un premier pour représenter l'examen (\emph{Examen}, \emph{Anatomie}) et un second pour représenter le symptôme (\emph{Sosy}, \emph{Anatomie}).
-Le lien entre ces deux groupes serait alors représenté par une relation.
-Les groupes 0 et 3 représentent tous deux une prescription médicale.
-Intuitivement, une prescription se compose d'un ensemble d'éléments (\emph{Traitement} ou \emph{Substance}, \emph{Dose}, \emph{Mode}, \emph{Fréquence}) pour un symptôme ou une maladie (\emph{Sosy}).
-Dans le corpus, un traitement est presque systématiquement associé à un symptôme.
-Si l'on considère les phrases de manière isolée, il est donc naturel de retrouver des phrases qui évoquent un examen montrant un symptôme (groupe 8) et des phrases explicites sur un traitement mis en place pour un symptôme (groupe 0).
-Du point de vue des bases de données, le symptôme pourrait être représenté comme une entité distincte et nous pourrions établir une relation entre l'examen et le symptôme, ainsi qu'entre le symptôme et le traitement.
-Sans information supplémentaire, il est approprié de regrouper ces éléments, étant donné que le symptôme est généralement représenté par une seule entité (parfois associée à une \emph{Anatomie} ou à une \emph{Valeur}).
-Cependant, si le symptôme était plus souvent représenté par un ensemble d'entités, la procédure de réécriture aurait pu favoriser la création de ce groupe et donc de relations par la suite.
-Cela serait d'autant plus probable si les symptômes pouvaient apparaître seuls, sans autres contextes.
-Cependant, il est à noter qu'un grand nombre de groupes sont unitaires.
-Pour les groupes 9 (\emph{Mode}), 10 (\emph{Substance}) et 11 (\emph{Anatomie}), cela reste cohérent, car il s'agit d'un ensemble fini de valeurs qui pourraient, dans un modèle relationnel, être enregistrées dans une table distincte et référencées par des clés étrangères.
-Cependant, cette observation est plus problématique pour les entités \emph{Dose} et \emph{Fréquence}.
+\paragraph{Groupes}
+En analysant en détails les différents groupes identifiés et en considérant leur sémantique, nous constatons des associations prévisibles telles que : le groupe 1 (\emph{Examen}, \emph{Valeur}) représentant le résultat d'un examen, le groupes 0 (\emph{Dose}, \emph{Frequence}, \emph{Mode}, \emph{Substance}, \emph{Sosy}, \emph{Traitement}) représentant un traitement ou encore les groupes \numlist{1;3;8;4} représentant un résultat d'examen.
+On identifie les points suivants :
+\begin{enumerate}
+    \item Il est intéressant de noter que certains groupes correspondent à ce qui serait intuitivement interprété comme une relation.
+    Par exemple, le groupe 8 (\emph{Examen}, \emph{Sosy}) et le groupe 4 (\emph{Anatomie}, \emph{Examen}, \emph{Sosy}) représentent une relation entre un examen (groupe 1) et un symptôme.
+    Dans ce cas, l'entité \emph{Anatomie} peut faire référence à la localisation de l'examen ou du symptôme.
+    Avec une connaissance du domaine d'application, il serait préférable de construire deux groupes distincts : un premier pour représenter l'examen (\emph{Examen}, \emph{Anatomie}) et un second pour représenter le symptôme (\emph{Sosy}, \emph{Anatomie}).
+    Le lien entre ces deux groupes serait alors représenté par une relation.
+    Cependant, en analysant le corpus, on remarque que ces informations sont souvent interdépendantes et qu'il existe peu d'autres liens avec d'autres entités dans le corpus.
+    Il est alors cohérent de les regrouper systématiquement dans un unique groupe, pour minimiser la taille de la grammaire, remplaçant ainsi le besoin de construire deux groupes distincts et une relation.
 
-Seules trois relations ont été identifiées.
-La relation entre l'entité \emph{Anatomie} et le groupe 8 (\emph{Examen}, \emph{Sosy}), notée $11 \leftrightarrow 8$, correspond en réalité au groupe 4.
-Les relations $10 \leftrightarrow 9$ entre les entités \emph{Dose} et \emph{Substance}, ainsi que la relation $2 \leftrightarrow 6$ entre \emph{Fréquence} et \emph{Dose}, font référence à un traitement et auraient dû être traitées comme le groupe 0.
-Cependant, en raison des différences significatives dans les ensembles d'entités (notamment l'intégration de l'entité \emph{Sosy} au sein du groupe 0), cette association n'a pas pu être établie.
-Cette observation met en lumière une limitation de la procédure de réécriture, qui permet d'identifier des structures selon leurs usages plutôt que leur sémantique.
-Cette limitation est particulièrement marquée ici, car le regroupement intuitif correspondant à un traitement contient de nombreuses entités, dont certaines ne sont pas toujours présentes.
-Ainsi, bien que leur sémantique soit similaire, leur similarité est relativement faible.
-L'utilisation d'une mesure de similarité contextuelle permet de corriger ce problème pour certains groupes, mais le groupe correspondant au traitement est souvent beaucoup plus large que son contexte.
-Il serait donc intéressant d'expérimenter d'autres mesures de similarité pour tenter de résoudre cette difficulté.
-De plus, l'application de la procédure de réécriture sur un jeu de données où les groupements sont plus petits et plus équilibrés pourrait conduire à de meilleurs résultats.
+    \item Une prescription se compose intuitivement d'un ensemble d'éléments (\emph{Traitement} ou \emph{Substance}, \emph{Dose}, \emph{Mode}, \emph{Fréquence}) pour un symptôme ou une maladie (\emph{Sosy}).
+    Dans le corpus, un traitement est presque systématiquement associé à un symptôme.
+    Il est donc naturel de retrouver le groupe 0 qui représente un traitement associé a un symptôme.
+    La critique à faire ici est que, du point de vue des bases de données, le symptôme pourrait être représenté comme un groupe distinct, ce qui permettrait d'établir des relations entre l'examen et le symptôme, ainsi qu'entre le symptôme et le traitement.
+    Néanmoins, notre approche n'intègre pas cette connaissance du domaine.
+    Il est donc tout à fait naturel qu'en suivant le raisonnement implémenté, et étant donné que le symptôme est généralement représenté par une seule entité (parfois associée à une \emph{Anatomie} ou à une \emph{Valeur}), que l'on retrouve cette association.
+    Comme pour le point précédent, cette construction permet de minimiser la taille de la grammaire en évitant la construction d'une relation supplémentaire.
+    Il est à noter que si notre corpus comptait avec plus d'instances de l'entité \emph{Sosy} isolée, la procédure~\ref{algo:struct:rewrite} aurait pu favoriser la création du groupe \emph{Sosy} et donc des relations par la suite.
 
-Il convient de souligner que la procédure s'exécute sans connaissance préalable des données ni de leur sémantique intrinsèque, se fondant uniquement sur la structure de l'arbre.
-Les associations générées demeurent cohérentes par rapport aux textes et permettent de produire une structure homogène qui pourrait être interrogée ou utilisée pour des analyses ultérieures.
-De plus, cette instance peut être intégrée dans une base existence via un mappage de schéma.
-Il serait intéressant, dans le cadre de travaux futurs, de proposer des modifications à ces opérations, s'appuyant également sur les données afin d'éviter certaines redondances induites par le schéma produit.
-Il s'agit ici de détecter automatiquement si une entité correspond à un domaine infini ou à une collection finie auquel cas on s'intéresserait à construire des relations plutôt que des groupes.
+    \item On remarque que les groupes \numlist{1;3;8;4} exprime sémantiquement la même chose : un résultat d'examen.
+    Mais chaque groupe a une forme de surface différente.
+    On pourrait critiquer que ces groupes n'ont pas été rapprochés sémantiquement (sous un unique non-terminal) mais il est aussi possible de reconnaître qu'il s'agit en réalité de type d'examen différent.
+    Certains sont simplement évoqué (groupe 4), certains résulte en une valeur (groupe 1) et d'autres mesures une certaines doses (groupe 3).
+    En particulier, le groupe 3 est ambigu et peut représenter également un traitement suite à un examen dans certaines phrases.
+    Pour faire le lien avec le point précédent, la présence de l'entité \emph{Sosy} pourrait être également représenté par une relation.
 
-Comme l'algorithme travail directement sur l'instance, il est possible de guider la procédure vers un schéma donné en considérant une forêt composée d'arbre syntaxique enrichie issue de texte et d'arbre d'instance déjà structuré selon la modélisation souhaitée.
-Si l'instance structurée donnée est suffisamment représentée pour être considérée fréquente, la procédure tentera alors d'unifier l'instance issue du texte vers cette structure en ajoutant si besoin des éléments manquants.
-Dans un premier temps, on effectue une évaluation sans ajouter d'informations supplémentaires et on ajoutera par la suite une instance structurée.
-Afin d'obtenir un schéma plus intuitif, nous expérimentons ensuite la procédure sur une instance comprenant à la fois des textes et une structure déjà existante.
-Cette situation pourrait représenter une problématique d'intégration de données, où l'on tente d'intégrer différentes instances possédant des schémas différents.
+    \item Nous remarquons qu'un grand nombre de groupes sont unitaires.
+    Les groupes 9 (\emph{Mode}), 10 (\emph{Substance}) et 11 (\emph{Anatomie}) correspondent à des entités associées à un ensemble fini de valeur.
+    Il est donc assez naturel de les isolés, malgré le fait qu'on retrouve également ces entités dans des groupes plus larges.
+    Par contre, les entités \emph{Dose} et \emph{Fréquence} ne sont pas associé à un domaine fini.
+\end{enumerate}
+
+\paragraph{Relations}
+En ce qui concerne les relations, on remarque qu'uniquement trois relations ont été identifiées.
+La première relation, $11 \leftrightarrow 8$, relie l'entité \emph{Anatomie} et le groupe 8 (\emph{Examen}, \emph{Sosy}).
+Elle correspond en réalité à une forme plus structurée du groupe 4, qui n'a pas été unifiée.
+
+Les relations $10 \leftrightarrow 9$ entre les entités \emph{Dose} et \emph{Substance}, ainsi que la relation $2 \leftrightarrow 6$ entre \emph{Fréquence} et \emph{Dose}, représentent un sous-ensemble des entités associées au traitement (groupe 0) et auraient pu être intuitivement représentées par le même non-terminal.
+Cette constatation met en lumière la principale limitation de la procédure~\ref{algo:struct:rewrite} : elle identifie les structures en fonction de leurs usages plutôt que de leur sémantique.
+Cette limitation est particulièrement notable dans ce cas, car le regroupement intuitif correspondant à un traitement contient de nombreuses entités, dont certaines ne sont pas toujours présentes.
+Ainsi, bien que leur sémantique soit similaire, la similarité des sous-arbres correspondants est relativement faible.
+
+L'utilisation d'une mesure de similarité contextuelle a été pensée pour cette situation, mais le groupe correspondant au traitement est souvent beaucoup plus large que son contexte (c'est-à-dire les entités qui gravitent autour du sous-arbre).
+Il serait pertinent d'explorer d'autres mesures de similarité pour tenter de répondre a cette problématique.
+L'application de la procédure~\ref{algo:struct:rewrite} sur un jeu de données où les groupements sont plus petits et mieux équilibrés pourrait alors conduire à de meilleurs résultats.
+
+\paragraph{}
+En conclusion de cette évaluation critique, il est important de souligner que la composante principale de notre stratégie est syntaxique.
+Le prototype fonctionne en utilisant uniquement la structure de l'arbre, tandis que les informations sémantiques se limitent aux entités nommées.
+Le résultat obtenu est intéressant, car les associations générées sont cohérentes par rapport aux textes et permettent de produire une structure homogène qui pourrait être interrogée ou utilisée pour des analyses ultérieures.
+Plusieurs pistes peuvent être envisagées pour enrichir ou améliorer cette première version de notre approche :
+
+\begin{itemize}
+    \item Prendre en considération des contraintes comme les dépendances fonctionnelles entre des entités qui viendraient améliorer le schéma obtenu en évitant des redondances dans l'instance de la base.
+    Par exemple, supposons que la dépendance fonctionnelle $ENT_{Substance} \rightarrow ENT_{Mode}$ est valable dans notre domaine d'application.
+    La règle associée à $GROUP_0$ pourrait être récrites en supprimant $ENT_{Substance} ~ ENT_{Mode}$ de son côté droit.
+    Ensuite, il serait nécessaire d'ajouter une nouvelle relation entre $GROUP_0$ et le non-terminal qui regrouperait les deux entités supprimées.
+    Il est intéressant de remarquer que des contraintes moins restrictives que les dépendances fonctionnelles pourraient donner lieu à la même modification.
+    Pour évaluer si une telle modification serait intéressante, il serait nécessaire d'observer le nombre de valeurs identiques (ici, associés à la paire $ENT_{Substance} ~ ENT_{Mode}$) par rapport au nombre d'instances de $GROUP_0$.
+
+    \item Explorer de nouvelles fonctions objectif pourrait être bénéfique.
+    Par exemple, plutôt que de se concentrer uniquement sur la minimisation de la taille de la grammaire, il pourrait être avantageux de chercher à maximiser la similarité au sein des groupes.
+    Il est aussi possible de combiner plusieurs objectifs.
+\end{itemize}
+
+\subsection{Intégration de données}
+\label{sec:struct:implem:integration}
+
+L'algorithme opère sur des arbres quelconques, ce qui permet l'insertion de données préalablement structurées.
+Par conséquent, outre la structuration de données semi-structurées, il est possible d'intégrer de manière itérative de nouvelles données à une base existante.
+En se basant sur l'implémentation proposée qui repose sur la fréquence d'apparition des différentes structures, on peut supposer que les nouvelles données seront structurées de manière cohérente avec les données existantes dès lors que nous disposons d'un nombre suffisant d'exemples et que le nombre de nouvelles données est inférieur à celui des données existantes.
+Pour vérifier cette théorie, nous considérons une instance composée des groupes suivants :
+\begin{align*}
+    \emph{SOSY} &= \{ENT_{Sosy}, ENT_{Anatomie}, ENT_{Substance}\} \\
+    \emph{Traitement} &= \{ENT_{Dose}, ENT_{Frequence}, ENT_{Mode}, ENT_{Substance}\} \\
+    \emph{Examen} &= \{ENT_{Examen}, ENT_{Anatomie}\}
+\end{align*}
+L'instance comprend également des relations entre les entités \emph{SOSY} et \emph{Traitement}, ainsi que des relations entre les groupes \emph{Examen} et \emph{SOSY}.
+Finalement, l'instance est composée de \num{50} exemples de chaque structure et nous cherchons à structurer \num{10} phrases supplémentaires.
+Les phrases prisent en compte ne concerne que des traitements, il n'y a donc pas de mention d'examen ou de résultats.
+Il est important de noter que les regroupements dans l'instance initiale contiennent toujours l'ensemble de toutes les entités, ce qui diminue la similarité par rapport aux textes ou certaines entités peuvent être manquantes.
+Pour tenter de corriger cela, on utilise un taux relativement faible ($\tau = 0.2$) et un support minimum de \num{30}.
+
+Après exécution de la procédure, on obtient la grammaire de schéma suivante :
+\begin{align*}
+    COLL_0                     \to & ~ GROUP_0^+                     & COLL_1                     \to & ~ GROUP_1^+                    \\
+    COLL_2                     \to & ~ GROUP_2^+                     & COLL_3                     \to & ~ GROUP_3^+                    \\
+    COLL_4                     \to & ~ GROUP_4^+                                                                                       \\
+    COLL_{0 \leftrightarrow 1} \to & ~ REL_{0 \leftrightarrow 1}^+   & COLL_{1 \leftrightarrow 2} \to & ~ REL_{1 \leftrightarrow 2}^+  \\
+    GROUP_0                    \to & ~ ENT_{Dose} ~ ENT_{Frequence}  & GROUP_1                    \to & ~ ENT_{Anatomie} ~ ENT_{Sosy}  \\
+                                   & ~ ENT_{Mode} ~ ENT_{Substance}  &                                & ~ ENT_{Substance}              \\
+    GROUP_2                    \to & ~ ENT_{Examen} ~ ENT_{Anatomie} & GROUP_3                    \to & ~ ENT_{Mode} ~ ENT_{Substance} \\
+    GROUP_4                    \to & ~ ENT_{Substance}                                                                                 \\
+    REL_{0 \leftrightarrow 1}  \to & ~ GROUP_0 ~ GROUP_1             & REL_{1 \leftrightarrow 2}  \to & ~ GROUP_1 ~ GROUP_2
+\end{align*}
+
+\paragraph{}
+On observe que les groupes et les relations fournis en entrée sont bien retrouvés.
+De plus, \num{12} nouvelles instances du groupe $1$ sont identifiées, parmi lesquelles \num{9} contiennent l'entité \emph{SOSY} et \num{3} incluent le couple \emph{Anatomie-SOSY}.
+De nouveaux regroupements sont également découverts, avec \num{7} instances du $GROUP_4$ composées uniquement de l'entité \emph{Substance}, et \num{2} instances du $GROUP_3$, l'une contenant l'entité \emph{Mode} et l'autre le couple \emph{Mode-Substance}.
+On remarque également que le $GROUP_3$ aurait pu être identifié comme $GROUP_0$ car il correspond à un sous-ensemble.
+Pour le $GROUP_4$, le fait de séparer l'entité \emph{Substance} n'est pas illogique, car elle peut être ambiguë entre $GROUP_0$ et $GROUP_1$.
+Ces résultats mettent en lumière le potentiel de la structuration de nouvelles données dans une instance existante.
 
 \FloatBarrier

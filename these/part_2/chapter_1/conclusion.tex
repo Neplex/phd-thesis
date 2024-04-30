@@ -1,25 +1,42 @@
-Dans ce chapitre, nous avons exploré une approche hybride reposant sur la réécriture d'arbre pour résoudre le défi de la structuration automatique de l'information en vue de son enregistrement dans une base de données.
-Une des contributions principale est à formalisation d'un schéma de base de données valide à l'aide d'une méta-grammaire S-attribuée.
-Nous avons proposé une succession d'étapes clés pour la structuration automatique de données et la conception d'un schéma de base de données valide.
-Nous avons également développé une implémentation de ces étapes avec comme critère objectif la minimisation de la grammaire.
-Pour atteindre cet objectif, l'implémentation cherche à optimiser la taille des groupes identifiés tout en réduisant la variabilité à l'aide d'une mesure de fréquence.
-Enfin, nous avons procédé à une analyse critique de cette implémentation, confirmant sa capacité à atteindre l'objectif fixé tout en évaluant la qualité du schéma de base de données produit.
+Dans ce chapitre, nous avons exploré une approche reposant sur la réécriture d'arbre pour résoudre le défi de la structuration automatique de l'information en vue de son enregistrement dans une base de données.
+Notre approche peut se résumer aux contributions suivantes :
+\begin{itemize}
+    \item La formalisation d'un schéma de base de données valide à l'aide d'une méta-grammaire S-attribuée.
+    
+    \item La proposition d'un algorithme itératif, composé d'étapes clés pour la structuration automatique des données et l'extraction d'une grammaire cible correspondant au schéma envisagé pour une base de données.
+    
+    %\item L'adoption d'une approche hybride, où une vision bottom-up (débutant par l'analyse des phrases) est combinée à une vision top-down (utilisant des entités nommées préalablement définies pour enrichir les arbres).
+    %Cette méthode est également hybride par l'intégration de techniques statistiques pour guider la sélection des règles d'écriture à appliquer.
+    \item L'adoption d'une approche symbolique hybride intégrant des techniques statistiques pour guider la sélection des règles de réécriture à appliquer.
+ 
+    \item Le développement d'un prototype mettant en œuvre notre approche, avec pour objectif la minimisation de la taille de la grammaire.
+    Pour cela, l'implémentation vise à optimiser la taille des groupes identifiés tout en réduisant leur variabilité à l'aide d'une mesure de fréquence.
 
-Bien que ces travaux portent sur la structuration de données textuelles, la polyvalence de la structure intermédiaire utilisée peut donc également être adaptée pour représenter divers formats de données (comme illustré dans l'évaluation et dans \cite{barretAbstraGenericAbstractions2022}).
-Cette caractéristique confère au système une capacité d'intégration de données structurées ou semi-structurées, ouvrant ainsi la voie à des applications potentielles dans le domaine de l'intégration de données.
-De plus, l'évaluation de l'implémentation proposée a mis en évidence les avantages de l'approche reposant sur une mesure de fréquence, permettant une adaptation continue du processus de structuration à mesure que les données sont corrigées et intégrées dans la base.
-Néanmoins, des limitations persistent, notamment en termes d'efficacité pour le traitement de volumes de données importants.
-Des travaux supplémentaires sont donc nécessaires pour améliorer la performance de l'implémentation, tout en explorant de nouvelles fonctions objectif.
+    \item La réalisation d'une preuve de concept, accompagnée d'une analyse critique de notre approche, confirmant sa capacité à atteindre l'objectif fixé tout en évaluant la qualité du schéma de base de données produit.
+\end{itemize}
 
+\paragraph{}
 L'approche développée dans ce chapitre représente une étape significative pour l'intégration structurée de données textuelles dans une base de données.
 Sa caractéristique principale réside dans sa capacité à être déployée sans nécessiter de données d'apprentissage, la rendant ainsi facilement adaptable à divers domaines d'application.
 De plus, sa transparence permet à l'utilisateur de suivre et de valider chaque étape du processus de structuration, permettant d'assurer la confiance dans le système et la qualité des données produite.
-Toutefois, malgré la cohérence générale du schéma obtenu, notre évaluation a révélé la présence d'erreurs, appuyé par le manque de mesures quantitatives pour évaluer la qualité des schémas construits.
-Pour améliorer cette qualité, plusieurs pistes de recherche sont envisageables, telles que la prise en compte de règles métier spécifiques ou l'incorporation d'un processus de détection automatique de dépendances fonctionnelles \cite{papenbrockFunctionalDependencyDiscovery2015}.
-En outre, l'approche se base uniquement sur les entités extraites depuis le texte et suppose que l'annotation sémantique et la résolution de la co-référence a déjà été effectuée.
-Cependant, il serait possible d'incorporer les relations extraites dans le processus.
 
 La structuration automatique de données peut parfois aboutir à des instances incomplètes, où certaines entités peuvent manquer dans l'instance d'un groupe.
 Cette incomplétude peut être imputée à divers facteurs tels que des omissions dans le texte ou des erreurs lors du processus d'extraction.
 Cette notion d'instances incomplètes est alors représentée en utilisant des valeurs nulles, ce qui fait écho avec le concept de mise à jour de base de données incomplète présenté dans le chapitre~\ref{chp:update:algos}.
 Les méthodes mises en œuvre pour garantir la cohérence dans le chapitre~\ref{chp:update:algos} ajoutent ainsi une étape supplémentaire visant à assurer la qualité de l'instance obtenue.
+
+\paragraph{Perspectives}
+Il est possible d'améliorer la procédure actuelle, comme déjà mentionné, par différentes extensions.
+Par exemple, en prenant en considération des règles métier spécifiques, en intégrant un processus de détection automatique des dépendances fonctionnelles~\cite{papenbrockFunctionalDependencyDiscovery2015} ou en incorporant des relations entre les entités, extraites au préalable (aujourd'hui, l'approche se base uniquement sur les entités extraites depuis le texte et suppose que l'annotation sémantique et la résolution de la coréférence a déjà été effectuée).
+En outre, notre approche laisse prévoir des perspectives que nous illustrons dans la suite :
+\begin{itemize}
+    \item La structure de l'arbre obtenu à la fin de l'application de la procédure~\ref{algo:struct:rewrite} est générique (c.-à-d., quelles n'est pas dépendante d'un modèle de données).
+    Elle peut ainsi être utilisée pour représenter des données dans différents formats (semi-structurées ou structurées), de manière proche de ce qui est proposée dans~\cite{barretAbstraGenericAbstractions2022}.
+    Cela ouvre la possibilité d'utiliser cette approche dans le cadre de l'intégration des données.
+
+    \item L'instance obtenue grâce à notre méthode peut être intégrée dans une base de données existante en utilisant un mapping de schéma.
+
+    \item Dans la section~\ref{sec:struct:implem:integration}, nous avons exploré la possibilité de mettre en œuvre un processus incrémental d'intégration de données.
+    On suppose l'existence d'une grammaire $G$ conforme à la méta-grammaire et d'une instance volumineuse et valide par rapport à $G$ représentée par l'arbre $T$/
+    Il suffit alors d'appliquer la procédure~\ref{algo:struct:rewrite} sur un nouvel arbre $T'$ construit à partir de l'arbre existant $T$, auquel de nouveaux sous-arbres sont ajoutés pour représenter de nouvelles données.
+\end{itemize}

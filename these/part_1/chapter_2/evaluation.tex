@@ -17,7 +17,7 @@ Les performances de la mise à jour incrémentale sont évaluées à l'aide de b
     Veuillez trouver les attributions et les réserves pertinentes sur leur site web \url{https://ldbcouncil.org/}.
 \end{remark}
 
-Les détails de la construction de ces jeux de données sont présentés dans l'annexe~\ref{appendice:datasets}.
+%Les détails de la construction de ces jeux de données sont présentés dans l'annexe~\ref{appendice:datasets}.
 La table~\ref{table:update:xp:datasets}, montre les 9 instances qui ont été générées dont 8 qui contiennent des valeurs nulles.
 \textbf{Social} est un jeu de données qui ne contient, initialement, aucune valeur nulle.
 Cela a permis de construire des instances contenant un nombre variable de valeurs nulles afin de mesurer l'impact du nombre de valeurs nulles sur les performances.
@@ -44,10 +44,10 @@ Cela a permis de construire des instances contenant un nombre variable de valeur
     \label{table:update:xp:datasets}
 \end{table}
 
-Les benchmarks se composent d'un ensemble d'exécution ayant chacune un jeu de paramètres différents.
-Ces exécutions sont construites pour chacune des instances dans la table~\ref{table:update:xp:datasets} en faisant varier le type de mise à jour (insertion ou suppression) et sa taille (\numlist{1;5;10;20} atomes).
+Les benchmarks se composent d'un ensemble d'exécutions ayant chacune un jeu de paramètres différents.
+Ces exécutions sont construites pour chacune des instances de la table~\ref{table:update:xp:datasets} en faisant varier le type de mise à jour (insertion ou suppression) et sa taille (\numlist{1;5;10;20} atomes).
 La taille de l'instance est aussi variable, en augmentant artificiellement le nombre d'atomes en les dupliquant $n$-fois (échelle \numlist{1;2;5}), avec renommage des termes (on obtient donc des graphes à $n$ composantes connexes).
-Les exécutions sont réalisées \num{10} fois après \num{3} itérations de préchauffage afin de précharger le système, les index et le cache de la base de données qui ne sont pas mesurées.
+Les exécutions sont réalisées \num{10} fois après \num{3} itérations de préchauffage afin de précharger le système, les index et le cache de la base de données qui ne sont pas mesurés.
 Entre chaque itération, l'instance est remise à zéro et la mémoire est nettoyée pour assurer une cohérence dans le temps d'exécution.
 L'ensemble du code nécessaire pour reproduire ces tests de performances est disponible sur le dépôt \gls{git}~\cite{chabinUpdateChase2023}.
 
@@ -55,14 +55,14 @@ L'ensemble du code nécessaire pour reproduire ces tests de performances est dis
 Ces benchmarks sont implémentés en Java et exécutés avec {Java 16}, avec une base de données \gls{neo4j} 4.4.
 Le programme a été exécuté dans des conteneurs \gls{docker} installé en version 20.10.21 sur une machine virtuelle \gls{rocky} 8.7 avec \num{4} vCPU et \SI{16}{\giga\byte} de mémoire primaire (\SI{8}{\giga\byte} réservés pour la base de données et \SI{5}{\giga\byte} pour la procédure) et avec \SI{1}{\giga\byte\per\second} de débit en lecture/écriture sur le disque.
 La base de données et la procédure de mise à jour s'exécutent sur le même serveur.
-Bien que cette configuration permet de comparer différentes instances et implémentations, les résultats obtenus ne sont pas représentatifs des performances en conditions réelles.
+Bien que cette configuration permet de comparer différentes instances et implémentations, les résultats obtenus ne sont pas représentatifs des performances en conditions réelles sur un serveur plus performant, sans virtualisation et où le \gls{sgbd} serait isolé.
 
 \subsection{Implémentation sur un modèle relationnel}
 \label{sec:update:evaluation:mysql}
 À des fins de comparaison, les algorithmes ont aussi été implémentés sous \gls{mysql} 8.
 L'implémentation de la procédure en \gls{fol} sous un modèle relationnel est triviale : étant donné un atome instancié $P(t_1, \dots, t_n)$, notre modèle relationnel consiste à créer une table dont le schéma est $R_P[A_1, \dots, A_n]$ où chaque attribut $A_i$ est une valeur textuelle.
-C'est-à-dire que chaque symbole de prédicat correspond à une table, chaque atome représente un tuple de la table et chaque terme est représenté par un attribut textuel préfixé du symbole `\_' pour les valeurs nulles.
-La traduction des requêtes logique vers \gls{sql} est triviale.
+C'est-à-dire que chaque symbole de prédicat correspond à une table, chaque atome représente un tuple de la table et chaque terme est représenté par un attribut textuel, préfixé du symbole `\_' pour les valeurs nulles.
+La traduction des requêtes logiques vers \gls{sql} est triviale.
 La requête $Q_{chase}^{[c]}$ suit l'idée décrite pour les graphes (section~\ref{sec:update:chase}) et s'écrit en \gls{sql} avec la clause \verb|NOT EXIST|.
 
 \begin{remark}
@@ -141,7 +141,7 @@ Cependant, l'utilisation d'un graphe éclaté complexifie la recherche de motif 
 Cette baisse de performance était attendue, mais elle s'avère plus importante que le gain obtenu sur l'extraction des ensembles \textsf{LinkedNull}.
 
 \paragraph{Analyse détaillée des performances}
-Dans les figures suivantes, on analyse les performances des algorithmes incrémentaux en fonction du nombre de valeurs nulles dans la base (en abscisse), de la taille totale de l'instance (indiqué par \ref{figure:update:xp:nbfacts}) sur l'axe de droite et du tau $\tau$ de valeurs nulles par faits (indiqué par \ref{figure:update:xp:tau}).
+Dans les figures suivantes, on analyse les performances des algorithmes incrémentaux en fonction du nombre de valeurs nulles dans la base (en abscisse), de la taille totale de l'instance (indiqué par \ref{figure:update:xp:nbfacts}) sur l'axe de droite et du taux ($\tau$) de valeurs nulles par faits (indiqué par \ref{figure:update:xp:tau}).
 Les courbes indiquent les valeurs moyennes obtenues pour toutes les itérations correspondantes.
 Pour améliorer la lisibilité, les graphiques ne tiennent pas compte des résultats pour les occurrences de \textbf{GOT} avec plus de \num{17000} valeurs nulles.
 Les figures~\ref{figure:update:xp:mysql} et~\ref{figure:update:xp:neo4j} montre respectivement les résultats obtenus pour \gls{mysql} et \gls{neo4j}.
@@ -174,11 +174,11 @@ On remarque que le type de mise à jour (insertion ou suppression) et le taux de
             \label{figure:update:xp:tau}
         \end{axis}
     \end{tikzpicture}
-    \caption{Nombre de requêtes émissent par nombre de valeurs nulles dans l'instance}
+    \caption{Nombre de requêtes émisses par nombre de valeurs nulles dans l'instance}
     \label{figure:update:xp:query}
 \end{figure}
 
-La figure~\ref{figure:update:xp:query} montre l'évolution du nombre de requêtes soumissent à la base de données.
+La figure~\ref{figure:update:xp:query} montre l'évolution du nombre de requêtes soumisses à la base de données.
 Le nombre de requêtes augmente avec le nombre de valeurs nulles dans la base, à l'exception de trois pics où la taille de l'instance est très petite.
 C'est le cas pour la base de données \textbf{Movies} : les pics coïncident avec les situations où seule cette base de données est concernée et on note quand même une augmentation du nombre de requêtes avec un plus grand nombre de valeurs nulles.
 Cette proportionnalité par rapport au nombre de valeurs nulles s'explique par le fait que la préservation de la cohérence implique la génération de nouvelles données liées par leurs valeurs nulles.

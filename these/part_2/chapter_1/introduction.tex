@@ -6,17 +6,20 @@ C'est notamment le cas dans le domaine médical avec les résumés de cas cliniq
 Dans ce contexte, le \gls{tal} est un domaine qui joue un rôle fondamental en utilisant des approches syntaxiques, sémantiques ou a base d'apprentissages, pour extraire de l'information dans des textes.
 Cela regroupe notamment : la reconnaissance d'entités nommées, l'extraction de relations, les liaisons d'entités nommées avec des individus d'une base de données, l'identification de la coréférence, de la temporalité et de la causalité.
 Bien que tout cela constitue une étape majeure, ce n'est pas suffisant pour structurer l'information afin de l'exploiter dans des bases de données traditionnelles.
-La structuration des données textuelles présente plusieurs avantages, notamment l'amélioration des capacités de recherche, la facilitation de l'analyse des données, l'amélioration de la qualité des données grâce à une vérification de cohérence, l'intégration et la réutilisation des informations, la promotion de la collaboration au sein des équipes et la facilitation de la visualisation des données à l'aide de graphiques ou de diagrammes.
+La structuration des données textuelles présente plusieurs avantages, notamment l'amélioration des capacités de recherche, la simplification de l'analyse des données, l'amélioration de la qualité des données grâce à une vérification de cohérence, l'intégration et la réutilisation des informations, la promotion de la collaboration au sein des équipes et la visualisation simplifiée des données à l'aide de graphiques ou de diagrammes.
 
 \paragraph{Organisation}
 La section~\ref{sec:struct:related-works} présente un aperçu des diverses approches dans la littérature qui tentent de répondre à cette problématique.
 La section~\ref{sec:struct:pre} définit l'ensemble des concepts nécessaire à la formalisation des travaux présentés ici.
-Le chapitre continue ensuite par la définition formelle de l'extraction de schéma (section~\ref{sec:struct:meta}) et la description, étape par étapes, du processus proposée pour l'extraction de schéma et la structuration automatique d'information (section~\ref{sec:struct:steps}).
-Une proposition d'implémentation du processus est proposé dans la section~\ref{sec:struct:implem} et une évaluation critique des résultats obtenus est réalisée dans la section~\ref{sec:struct:eval}.
-Pour finir, la section~\ref{sec:struct:conclusion} conclus ce chapitre.
+Le chapitre continue ensuite par la définition formelle de l'extraction de schéma (section~\ref{sec:struct:meta}) et la description, étape par étape, du processus proposé pour l'extraction de schéma et la structuration automatique d'information (section~\ref{sec:struct:steps}).
+Une proposition d'implémentation du processus est proposée dans la section~\ref{sec:struct:implem} et une évaluation critique des résultats obtenus est réalisée dans la section~\ref{sec:struct:eval}.
+La section~\ref{sec:struct:conclusion} conclus ce chapitre.
 
 \section{Des textes aux graphes}
 \label{sec:struct:related-works}
+
+Dans cette section, nous abordons succinctement diverses méthodes de représentation de l'information textuelle sous forme de graphe.
+Nous débutons par des approches où le graphe est simplement une annotation sur le texte, puis examinons des propositions visant à généraliser des informations contenues dans le texte.
 
 Une première façon intuitive de représenter un texte comme un graphe est de visualiser uniquement la syntaxe.
 Une phrase est composée d'une séquence de mots qu'il est alors possible de représenter sous forme de graphe.
@@ -62,40 +65,39 @@ Sur ces graphes, en cumulant plusieurs phrases, il est ensuite possible de retro
     \caption{Représentations syntaxiques d'un texte en graphe}
 \end{figure}
 
-Afin d'apporter plus d'information que la séquence de mot, le \gls{tal} apporte aussi un ensemble d'outils pour la représentation de textes sous forme de graphes.
+Pour apporter plus d'information que la séquence de mot, le \gls{tal} apporte aussi un ensemble d'outils pour la représentation de textes sous forme de graphes.
 L'arbre de syntaxe représente la structure grammaticale d'une phrase en organisant les mots en fonction de leurs rôles syntaxiques et de leurs relations hiérarchiques.
 D'autre part, l'arbre de dépendance (figure~\ref{fig:struct:dep-graph}) modélise les relations de dépendance entre les mots d'une phrase, où chaque nœud représente un mot et les arêtes indiquent les relations de gouverneur-dépendant.
-Il est à noté que ces structures sont différentes pour la langue étudiée.
+Il est à noté que ces structures sont différentes selon la langue étudiée.
 Certains travaux, tendent vers une construction des arbres de dépendance agnostique à la langue du texte à l'aide de \gls{ud} \cite{nivreUniversalGrammarNatural2015}.
 
-Afin d'apporter de la sémantique dans ces graphes, il est aussi possible de s'appuyer sur les techniques d'extraction d'information (\acrshort{ie}) comme la détection d'entité nommée \cite{patel-schneiderUsingDescriptionLogics2015}.
-On peut imaginer représenter un document comme un nœud connectés à un ensemble de nœuds représentants les entités identifiées.
-Selon la granularité voulue, on peut ajouter le découpage en phrase et en mots par exemple.
+Afin d'ajouter de la sémantique dans ces graphes, il est aussi possible de s'appuyer sur les techniques d'extraction d'information (\acrshort{ie}) comme la détection d'entité nommée \cite{patel-schneiderUsingDescriptionLogics2015}.
+On peut imaginer représenter un document comme un nœud connecté à un ensemble de nœuds représentants les entités identifiées.
+Selon la granularité voulue, on pourrait ajouter le découpage du texte en phrase et en mots.
 Cette approche permet de capturer les relations entre les entités et leur contexte textuel et permet de construire des liens entre les phrases par les entités qui y sont présentes.
 La puissance des graphes réside dans leur multidimensionnalité, qui permet de représenter simultanément différente modélisation.
 Cette combinaison d'approches permet une compréhension plus profonde des textes en utilisant de nombreux facteurs.
-Malheureusement, ces graphes ne sont pas optimaux pour leur sauvegarde dans une base de données traditionnelle, car ils manquent de structure claire.
 
 \paragraph{Ontologies}
 Les ontologies sont un ensemble de concepts interconnectés par des relations permettant de représenter et de raisonner sur un domaine de connaissance spécifique et sont le fondement du web sémantique.
 Elles se composent d'un ensemble de prédicats utilisé pour représenter les données dans un graphe de connaissance \acrshort{rdf} (section~\ref{sec:update:pre:graph}, page~\pageref{sec:update:pre:graph}).
-Dans ce contexte, on retrouve la tache d'annotation sémantique (\enquote{entity linking}) qui consiste à liée des parties d'un texte (en leur attribuant des \acrshortpl{uri}) à des entités dans une ontologie.
+Dans ce contexte, la tache d'annotation sémantique (\enquote{entity linking}) consiste à lier des parties d'un texte (en leur attribuant des \acrshortpl{uri}) à des entités dans une ontologie.
 Cette opération peut être réalisée de façon indépendante ou dans la continuité de l'extraction d'entités \cite{al-moslmiNamedEntityExtraction2020} (nous étudierons différentes techniques dans le chapitre~\ref{chp:tal} pour réaliser cette tâche).
 On retrouve notamment des techniques à base de similarité et de règles \cite{liuDBpediaBasedEntityLinking2018,amaviNaturalLanguageQuerying2020} et d'apprentissage automatique \cite{shenProbabilisticModelLinking2014,fanLinkingEntitiesRelations2024} dont beaucoup des approches récentes se basant sur des réseaux de neurones \cite{mondalMedicalEntityLinking2019,sakorFalconEntityRelation2020,liEfficientOnePassEndtoEnd2020,bellatrecheNewTrendsDatabase2021,navigliWordSenseDisambiguation2024}.
 Le processus est souvent le même :
 \begin{enumerate}
-    \item Identifier les mentions (partie du texte) qui peut être réalisé via l'extraction d'entité nommée ;
+    \item Identifier les mentions (partie du texte) qui peuvent être réalisés via l'extraction d'entité nommée ;
     \item Identifier les entités candidates dans la base de connaissances ;
     \item Classement des entités.
 \end{enumerate}
-On retrouve des approches qui traite les entités une à une ou des approches plus globales qui peuvent aider pour la désambiguïsation.
+On retrouve des approches qui traitent les entités une à une ou des approches plus globales qui peuvent aider pour la désambiguïsation.
 La littérature tend à passer des approches séquentielles plus classiques à un processus unique d'annotation via l'apprentissage profond.
 Ces nouvelles approches ne s'intéressent souvent qu'à l'identification des mentions d'entité et non aux relations.
 Elles décorrèlent aussi le lien sémantique important entre les entités et la base de connaissance \cite{huEntityLinkingSymmetrical2019}.
 Ces systèmes sont souvent très dépendants de la qualité des bases de connaissances utilisées dans lesquels il qui manque souvent des informations et dont les données ne sont pas toujours nettoyées \cite{weichselbraunMiningLeveragingBackground2018}.
-De plus, les bases de connaissances sont dynamiques et volatile, les approches statiques à base d'apprentissage ne permettent pas toujours la mise à jour rapide des modèles.
+De plus, les bases de connaissances sont dynamiques et volatiles, les approches statiques à base d'apprentissage ne permettent pas toujours la mise à jour rapide des modèles.
 
-Les techniques présentées précédemment s'appuient sur des bases de connaissances utilisant des ontologies préétablies et relativement fixe.
+Toutes ces techniques s'appuient sur des bases de connaissances utilisant des ontologies préétablies et relativement fixe.
 Cependant, il n'est pas toujours possible de représenter l'information avec ces ontologies.
 Pour surmonter la complexité et le cout de leur création manuelle, une branche de l'intelligence artificielle s'intéresse à l'apprentissage d'ontologie.
 La construction d'une ontologie consiste à identifier automatiquement ou semi-automatiquement des termes et des concepts pertinents, leur hiérarchie ainsi que leurs relations.
@@ -106,23 +108,23 @@ Ici on s'intéresse principalement à l'apprentissage d'ontologie à partir de t
 Comme pour l'annotation sémantique, on trouve des approches à base de règles et d'apprentissage automatique.
 
 Historiquement, on trouve des approches, similaires à l'annotation sémantique, à base de motifs syntaxiques (comme \enquote{$X$ is a $Y$}) \cite{morinAutomaticAcquisitionSemantic1999} mais aussi des approches basées sur l'analyse des arbres syntaxiques et de dépendances \cite{gamalloMappingSyntacticDependencies2002,nivreIncrementalityDeterministicDependency2004}.
-Ces approches s'intéressent notamment à l'extraction des triplets sujets / verbe / objet.
-\cite{budanitskyLexicalSemanticRelatedness1999}, utilise la fréquence de co-occurrence entre les unités lexicale pour identifier les concepts et les relations.
+Ces approches s'intéressent notamment à l'extraction des triplets sujet / verbe / objet.
+\cite{budanitskyLexicalSemanticRelatedness1999}, utilise la fréquence de co-occurrence entre les unités lexicales pour identifier les concepts et les relations.
 Ces approches peuvent ensuite être complétées par du raisonnement logique pour identifier la hiérarchie des concepts, les relations ou construire des règles d'inférences \cite{zelleLearningSemanticGrammars1993}.
 \cite{al-aswadiAutomaticOntologyConstruction2020} présente une vue détaillée des différents outils disponibles.
 L'approche présentée dans cette thèse s'appuie sur certaines de ces techniques.
 Cependant, les approches classiques comme {Text-to-Onto} \cite{maedcheTexttoontoOntologyExtraction2001}, {Text2Onto} \cite{cimianoText2Onto2005}, et {TextStorm} \cite{alvesAutomaticReadingLearning2002} dépendent beaucoup de l'intervention humaine et ne sont finalement que des outils d'aide plus que des processus automatiques.
-De plus, les techniques qui se basent sur des motifs prédéfinis offre de bonnes performances \cite{savaryRelationExtractionClinical2022}, mais reste limitées, car ces motifs sont souvent dépendants du domaine étudié.
+De plus, les techniques qui se basent sur des motifs prédéfinis offrent de bonnes performances \cite{savaryRelationExtractionClinical2022}, mais restent limitées, car ces motifs sont souvent dépendants du domaine étudié.
 
 À partir de 2010, de nombreux travaux ont émergé, mettant l'accent sur les techniques d'apprentissage profond.
 Ces systèmes offrent généralement des performances supérieures aux systèmes historiques, comme documenté par \cite{al-aswadiAutomaticOntologyConstruction2020}.
-Cependant, dans cette thèse, nous n'approfondirons pas ces systèmes, car ils sont souvent considérés comme des boîtes noires.
+Dans cette thèse, nous ne nous intéressons pas à ces systèmes, car ils sont souvent considérés comme des boîtes noires.
 Il est essentiel, en particulier dans le domaine médical, d'être capable d'expliquer les prises de décision et de fournir un système en lequel les utilisateurs peuvent avoir confiance \cite{ribeiroWhyShouldTrust2016}.
 Bien que de nombreux travaux tentent de répondre à cette problématique avec l'intelligence artificielle explicative, ce sujet ne sera pas détaillé ici.
 Une approche plus conventionnelle permet à un humain, même en cas d'automatisation totale, de vérifier et d'intervenir si nécessaire pour corriger les données à chaque étape du processus.
-Les travaux présentés dans cette thèse se concentrent également sur la construction d'un système adaptable à différents domaines (\gls{ennov} couvrant un large éventail d'utilisations différentes), évitant ainsi de dépendre de l'apprentissage pour un domaine spécifique.
+Les travaux présentés dans cette thèse ont également l'ambition de viser la construction d'un système adaptable à différents domaines (\gls{ennov} couvrant un large éventail d'utilisations différentes), évitant ainsi de dépendre de l'apprentissage pour un domaine spécifique.
 De plus, pour les approches basées sur les réseaux de neurones, la demande en données d'apprentissage est souvent élevée comme leur cout financier et environnemental \cite{strubellEnergyPolicyConsiderations2019}.
-Dans le cadre d'\gls{ennov}, les solutions mise en place concerne des données du domaine médical contenant des informations sensibles, telles que des données de patients ou des secrets industriels.
+Dans le cadre d'\gls{ennov}, les solutions mises en place concernent des données du domaine médical contenant des informations sensibles, telles que des données de patients ou des secrets industriels.
 L'utilisation de l'apprentissage à partir de ces données présente des risques liés à la protection de la vie privée et au secret de fabrication \cite{fredriksonModelInversionAttacks2015,songPrivacyRisksSecuring2019}.
 Dans ce contexte, la compartimentation des données est cruciale, mais la construction d'un modèle par source de données n'est pas envisageable.
 Une pratique courante consiste donc à construire un modèle générique et à le raffiner pour chaque utilisateur/source de données \cite{ribeiroWhyShouldTrust2016}.
@@ -184,6 +186,8 @@ Enfin, \textsc{Abstra} classe les collections principales (les types d'objets) p
 \end{figure}
 
 Dans \textsc{Abstra} et dans nos travaux, on s'intéresse à l'extraction de schéma.
-Toutefois, contrairement à l'approche présentée dans \cite{barretAbstraGenericAbstractions2022}, qui vise à identifier un schéma résumé des données, notre objectif est de structurer automatiquement les données semi-structurées issues du texte de manière à ce qu'elles soient conformes à un schéma valide et ainsi pouvoir les enregistrer dans une base de données.
+Toutefois, contrairement à l'approche présentée dans \cite{barretAbstraGenericAbstractions2022}, qui vise à identifier un schéma résumé de données structurées ou semi-structurées, notre objectif est de structurer automatiquement des données non-structurées issues du texte de manière à ce qu'elles soient conformes à un schéma valide et ainsi pouvoir les enregistrer dans une base de données.
 Cette tâche consiste alors, non seulement à identifier le schéma, mais aussi à construire l'instance associée.
 Bien que les travaux de \cite{barretAbstraGenericAbstractions2022} diffèrent de ceux présentés dans cette thèse, nous constaterons dans la section~\ref{sec:struct:meta} que la structure de données intermédiaire utilisée dans \textsc{Abstra} est similaire à celle proposée dans notre approche.
+Cette ressemblance témoigne de la nécessité actuelle d'envisager des méta-modèles en tant qu'abstraction pour différents modèles de données.
+Ce concept apparaît aussi dans \cite{gonzalezlopezdemurillasConnectingDatabasesProcess2019} et \cite{maliFACTDMFrameworkAutomated2024}.
