@@ -12,26 +12,167 @@ Les axes de discussion de \gls{doing} se concentrent sur deux problématiques pr
     \item Le développement de méthodes intelligentes pour le traitement et la maintenance de ces bases de données, incluant de nouvelles formes de requêtes pour l'analyse efficaces, flexibles et sécurisés adaptés à l'utilisateur, ainsi que des garanties de qualité et de protection de la vie privée.
 \end{itemize}
 
-\paragraph{}
 Les travaux exposés dans cette thèse coïncidente avec l'action \gls{doing}, le projet de recherche ayant étant initié simultanément à la mise en place de cette action.
 Les multiples collaborations entreprises dans le cadre de ces travaux sont principalement liées à cette action.
-Le projet de recherche se focalise sur les bases de données graphes, mais s'intéresse en particulier aux données issues du domaine médical.
+
+\paragraph{}
+Par ailleurs, ce projet de recherche est mené en collaboration avec la société \gls{ennov}, un éditeur de logiciels spécialisé dans le secteur médical.
+\gls{ennov} propose une suite logicielle basée sur une \gls{ged} conçue pour aider les entreprises pharmaceutiques et biomédicales à gérer leurs contenus, automatiser leurs processus métier et se conformer aux normes réglementaires internationales.
+Cette suite logicielle permet de réduire les risques, faciliter la conformité et améliorer la prise de décision.
+\gls{ennov} est un fournisseur majeur de solutions pour le \gls{rim} et l'\gls{idmp}.
+Sa suite logicielle comprend des fonctionnalités de gestion de processus et de contenu pour la qualité, les affaires réglementaires, les études cliniques et la pharmacovigilance.
+\gls{ennov} est intéressé à offrir une meilleure automatisation des tâches répétitives, une visibilité accrue dans toute l'organisation et une facilité de mise en œuvre.
+
+\section{Axes de recherche}
+
+Le projet de recherche se focalise sur les bases de données graphes et s'intéresse en particulier aux données issues du domaine médical.
 Le projet s'articule autour de deux axes principaux.
 
-Dans un premier temps, il est nécessaire de préciser que les bases de données graphes se distinguent par leur flexibilité intrinsèque.
-Cette flexibilité permet de représenter des données à différents niveaux d'abstraction sans imposer de structure fixe.
-Dans le cadre de cette thèse, l'accent est mis sur la garantie d'un niveau de qualité suffisant des données.
-En particulier, notre intérêt se porte sur les bases de données capables de stocker des données incomplètes.
-L'incomplétude des données peut provenir de diverses sources, mais nous explorerons dans cette thèse comment l'exploitation des données textuelles rend nécessaire la prise en compte et la représentation de cette incomplétude.
-On s'intéresse alors aux questions suivantes : comment imposer un ensemble de contraintes aux bases de données graphes ? Et comment garantir la cohérence de ces bases tout au long de leur évolution constante ?
+\paragraph{}
+Dans un premier temps, notre intérêt se focalise sur les bases de données contenant des informations incomplètes.
+L'incomplétude des données peut provenir de diverses sources.
+Dans le cadre de cette thèse, où l'exploitation des données textuelles est centrale, il est essentiel de prendre en compte cette incomplétude.
+Dans ce cadre, on s'intéresse à maintenance d'une base de données cohérente par rapport à un ensemble de règles.
+Dans cette optique, nous souhaitons suivre la politique de mise à jour proposée dans~\cite{chabinConsistentUpdatingDatabases2020}.
+Notre objectif est d'étudier la mise en œuvre cette politique de manière efficace sur un modèle de données de type graphe.
+On se pose alors les questions suivantes : Comment imposer un ensemble de contraintes aux bases de données graphe ? Comment garantir la cohérence de ces bases tout au long de leur évolution ? Et comment implémenter cette politique en interaction avec des \gls{sgbd} ?
 
-Le deuxième volet du projet de recherche se concentre sur les données textuelles, qui sont abondamment présentes, notamment dans les descriptions de cas cliniques et dans le domaine de la pharmacovigilance/cosmétovigilance.
+Bien qu'il existe des approches proposant des contraintes spécifiques pour les graphes, telles que celles présentées dans~\cite{fanDependenciesGraphs2019}, nous avons opté pour une modélisation du graphe de données qui correspond à la définition logique de nos règles.
+Cela nous permet de mettre en œuvre la politique de~\cite{chabinConsistentUpdatingDatabases2020} en conservant le pouvoir d'expression des règles tout en améliorant les performances des opérations coûteuses, par rapport au modèle relationnel.
+La flexibilité intrinsèque des bases de données graphes nous permet en effet de représenter les mêmes données de différentes manières, permettant d'optimiser les interrogations subséquentes.
+
+\begin{example}
+    Supposons l'existence des prédicats suivants : $getTreatment$, qui associe un patient à un traitement, $forPatho$, qui associe un traitement à la pathologie qu'il concerne et le prédicat $hasPatho$, indiquant qu'un patient a une pathologie.
+    Dans cet exemple, nous pouvons considérer les règles suivantes :
+    \begin{enumerate}[label=\textbf{$r_\arabic*$ :},ref=$r_\arabic*$]
+        \item $getTreatment(x, y) \to forPatho(y, z)$ \label{ex:intro:r1}
+        \item $getTreatment(x, y), forPatho(y, z) \to hasPatho(x, z)$ \label{ex:intro:r2}
+    \end{enumerate}
+    La règle~\ref{ex:intro:r1} stipule qu'un traitement est obligatoirement lié à une pathologie, tandis que la règle~\ref{ex:intro:r2} établit que si un patient $x$ reçoit un traitement pour une pathologie $z$, alors ce patient est atteint de cette pathologie ($hasPatho(x, z)$).
+    
+    Considérons le graphe suivant représentant l'ensemble de faits ${getTreatment(\text{alice}, \text{résection})}$.
+    \begin{center}
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=5cm,on grid]
+                \node[draw] (x) {alice};
+                \node[draw, right=of x] (y) {résection};
+
+                \path
+                (x) edge node[anchor=center, fill=white] {getTreatment} (y);
+            \end{tikzpicture}
+        \end{adjustbox}
+    \end{center}
+
+    Dans ce contexte, le graphe ne satisfait pas la règle \ref{ex:intro:r1}.
+    Pour respecter cette règle, il faudrait ajouter le fait $forPatho(\text{résection}, N_1)$.
+    Remarquons que $N_1$ est une valeur nulle, ce qui signifie qu'une pathologie existe, mais sa valeur exacte est inconnue.
+    Cependant, cet ensemble de faits ne respecterait pas non plus la règle \ref{ex:intro:r2}.
+    Pour obtenir un ensemble de faits cohérent avec les règles énoncées, il serait nécessaire de construire l'ensemble ${getTreatment(\text{alice}, \text{résection}), forPatho(\text{résection}, N_1), hasPatho(\text{alice}, N_1)}$, représenté par le graphe suivant :
+    \begin{center}
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=5cm,on grid]
+                \node[draw] (x) {alice};
+                \node[draw, right=of x] (y) {résection};
+                \node[draw, right=of y] (z) {$N_1$};
+
+                \path
+                (x) edge node[anchor=center, fill=white] {getTreatment} (y)
+                (y) edge node[anchor=center, fill=white] {forPatho} (z)
+                (x) edge [bend right=20] node[anchor=center, fill=white] {hasPatho} (z);
+            \end{tikzpicture}
+        \end{adjustbox}
+    \end{center}
+\end{example}
+
+\paragraph{}
+Le deuxième volet du projet de recherche se concentre sur les données textuelles, qui sont largement présentes, notamment dans les descriptions de cas cliniques et dans le domaine de la pharmacovigilance/cosmétovigilance.
 Les cas cliniques fournissent un historique détaillé de la santé d'un patient dès son admission à l'hôpital, comprenant ses antécédents médicaux, les symptômes observés, les diagnostics établis et les traitements recommandés.
-La pharmacovigilance consiste quant à elle à surveiller en continu les effets indésirables des médicaments après leur commercialisation, en se basant principalement sur les retours d'expérience des patients ou des professionnels de santé.
-Ce volet vise à intégrer ces données textuelles dans notre base de données graphes.
-Plus précisément, les questions suivantes sont explorées : comment repérer et extraire les données pertinentes présentes dans le texte ? Et comment structurer ces informations de manière à les rendre exploitables et les sauvegarder dans une base de données ?
+Quant à la pharmacovigilance, elle consiste à surveiller en continu les effets indésirables des médicaments après leur commercialisation, en se basant principalement sur les retours des patients ou des professionnels de santé.
+L'objectif consiste à rendre les informations contenues dans les textes exploitables en facilitant leur interrogation et leur analyse.
+Pour cela, il est nécessaire de structurer et d'agréger les données textuelles selon des abstractions générales qui correspondent à des entités dans une base de données.
+Dans ce cadre, nous explorons les questions suivantes : Comment repérer et extraire les données pertinentes présentes dans le texte ? Comment structurer ces informations de manière à les rendre exploitables et enregistrable dans une base de données ? Et en particulier, quelles abstractions génériques (intermédiaires) nous permettront de passer d'une vision détaillée et multiforme représentée par le texte à une vision plus globale et uniforme requise par une base de données ?
 
-De plus, nous nous concentrons sur les contraintes suivantes :
+Dans cette thèse, nous partons du principe que notre instance initiale est constituée d'un ensemble de textes qui respectent une grammaire.
+L'objectif est de faire évoluer cette grammaire en la généralisant vers une autre grammaire qui représente des abstractions structurantes correspondant à un schéma de données.
+Cette évolution est réalisée par une suite de transformation appliquée à l'instance.
+
+\begin{example}
+    \label{ex:runex}
+    Prenons en compte le texte suivant, extrait d'un cas clinique du corpus CAS~\cite{grabarCASFrenchCorpus2018} :
+    \begin{displayquote}
+        Un patient de 78 ans suivi pour cancer prostatique avec métastases ganglionnaires ayant déjà subi une résection endoscopique prostatique avec pulpectomie a été admis en urgence pour insuffisance rénale aiguë obstructive à 330 mmol/l de créatinine avec fièvre et urétérohydronéphrose bilatérale à l'échographie.
+    \end{displayquote}
+
+    Notre méthode consiste à extraire les informations du texte, telles que les entités nommées.
+    Par exemple, nous pouvons identifier des symptômes tels que \enquote{insuffisance rénale}, \enquote{fièvre} ou encore \enquote{urétérohydronéphrose}.
+    En supposant que les informations sont déjà structurées par le texte lui-même, notre objectif est de les restructurer afin d'obtenir une représentation uniforme.
+    Par exemple, à partir du texte \enquote{Un patient de 78 ans}, nous pourrions construire le fait $Patient(N_1, \text{homme}, 78)$.
+    En continuant avec l'extrait de texte précédent, nous pourrions construire l'ensemble de faits suivant et qui pourrait être représenté par le graphe attribué dans la figure~\ref{fig:runex:graph} :
+    \begin{align*}
+        & CasClinique(\textit{c-2-3})                             & & exam(p_1, e_1, et_1, \textit{01-01-01})                      \\
+        & hasPatient(\textit{c-2-3}, p1)                          & & paramClinique(e_1, creatine, \textit{330mmol/L})             \\
+        & Patient(p_1, 78, H)                                     & & reveal(e_1, \textit{insuffisance rénale})                    \\
+        & hasPatho(p_1, cancer)                                   & & exam(p_1, e_2, et_2, \textit{01-01-01})                      \\
+        & concernsAnat(cancer, prostate)                          & & paramClinique(e_2, temperature, t_1)                         \\
+        & Anatomy(prostate)                                       & & reveal(e_2, fievre)                                          \\
+        & exam(p_1, e_3, \textit{echographie}, \textit{01-01-01}) & & leadTo(cancer, \textit{métastases ganglionnaires})           \\
+        & paramClinique(e_3, param_1, res_1)                      & & getTreatment(p_1, \textit{résection endoscopique}, prostate) \\
+        & reveal(e_3, \textit{urétérohydronéphrose bilatérale})   & & forPatho(\textit{résection endoscopique}, cancer)
+    \end{align*}
+
+    \begin{figure}[htb]
+        \small
+        \centering
+        \begin{adjustbox}{varwidth=\linewidth,max height=\textheight}
+            \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 5cm,on grid]
+                \node[labeled node] (patient) {Patient \nodepart{two} name: \emph{$p_1$}\\sex: \emph{H}\\age: \emph{78}};
+                \node[labeled node, below=of patient] (exam1) {Exam \nodepart{two} name: \emph{constantes}};
+                \node[labeled node, below=of exam1] (param1) {ParamClinique \nodepart{two} name: \emph{créatinine}\\value: \emph{330 mmol/l}};
+                \node[labeled node, below=of param1] (sosy1) {SOSY \nodepart{two} name: \emph{insuffisance}\\~~~~~~~~~~\emph{rénale}};
+                \node[labeled node, right=of exam1] (exam2) {Exam \nodepart{two} name: \emph{échographie}};
+                \node[labeled node, below=of exam2] (param2) {ParamClinique \nodepart{two} name: \emph{unknown}\\ value: \emph{unknown}};
+                \node[labeled node, below=of param2] (sosy2) {SOSY \nodepart{two} name: \emph{urétérohydronéphrose}\\~~~~~~~~~~\emph{bilatérale}};
+                \node[labeled node, left=of param1] (param3) {ParamClinique \nodepart{two} name: \emph{temperature}\\ value: \emph{unknown}};
+                \node[labeled node, below=of param3] (sosy3) {SOSY \nodepart{two} name: \emph{fièvre}};
+                \node[labeled node, above=of param3] (cas) {CasClinique \nodepart{two} doc: \emph{c-2-3}};
+                \node[labeled node, above=of cas] (testicule) {Anatomie \nodepart{two} name: \emph{testicule}};
+                \node[labeled node, above=of patient] (traitement) {Traitement};
+                \node[labeled node, above=of traitement] (traitmentType) {TraitmentType \nodepart{two} name: \emph{résection}\\~~~~~~~~~~\emph{endoscopique}};
+                \node[labeled node, above=of testicule] (traitement2) {Traitement};
+                \node[labeled node, above=of traitement2] (traitmentType2) {TraitmentType \nodepart{two} name: \emph{pulpectomie}};
+                \node[labeled node, above=of exam2] (metastase) {Symptom \nodepart{two} name: \emph{métastases}\\~~~~~~~~~~\emph{ganglionnaires}};
+                \node[labeled node, above=of metastase] (cancer) {Pathologie \nodepart{two} name: \emph{cancer}};
+                \node[labeled node, above=of cancer] (prostate) {Anatomie \nodepart{two} name: \emph{prostate}};
+    
+                \path
+                (cas) edge node[labeled edge, anchor=center] {hasPatient} (patient)
+                (patient) edge node[labeled edge, anchor=center] {hasPatho} (cancer)
+                (patient) edge node[labeled edge, anchor=center] {getTreatment} (traitement)
+                (cancer) edge node[labeled edge, anchor=center] {concernsAnat} (prostate)
+                (patient) edge node[labeled edge, anchor=center] {getTreatment} (traitement2)
+                (cancer) edge node[labeled edge, anchor=center] {leadTo} (metastase)
+                (traitement) edge node[labeled edge, anchor=center] {forPatho} (cancer)
+                (traitement) edge node[labeled edge, anchor=center] {concernsAnat} (prostate)
+                (traitement) edge node[labeled edge, anchor=center] {hasType} (traitmentType)
+                (traitement2) edge node[labeled edge, anchor=center] {concernsAnat} (testicule)
+                (traitement2) edge node[labeled edge, anchor=center] {hasType} (traitmentType2)
+                (patient) edge node[labeled edge, anchor=center] {passExam} (exam1)
+                (exam1) edge node[labeled edge, anchor=center] {reveal} (param1)
+                (param1) edge node[labeled edge, anchor=center] {show} (sosy1)
+                (patient) edge node[labeled edge, anchor=center] {passExam} (exam2)
+                (exam2) edge node[labeled edge, anchor=center] {reveal} (param2)
+                (param2) edge node[labeled edge, anchor=center] {show} (sosy2)
+                (exam1) edge node[labeled edge, anchor=center] {reveal} (param3)
+                (param3) edge node[labeled edge, anchor=center] {show} (sosy3)
+                ;
+            \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Instance sous forme de graphe}
+        \label{fig:runex:graph}
+    \end{figure}
+\end{example}
+
+Il convient de noter que le choix des outils de \gls{tal} utilisés à cette étape, s'est fait en prenant en considération les contraintes spécifiques à notre domaine d'application :
 \begin{itemize}
     \item Les défis liés à la sensibilité des données médicales, qui imposent souvent des restrictions strictes sur leur accès et leur disponibilité.
     Ces restrictions visent à protéger la vie privée des patients et à prévenir tout accès non autorisé ou usage malveillant de ces informations cruciales pour la santé.
@@ -46,55 +187,40 @@ De plus, nous nous concentrons sur les contraintes suivantes :
     Favoriser cette transparence contribue à créer une confiance dans le système et à maintenir l'utilisateur au centre du processus décisionnel.
 \end{itemize}
 
-\paragraph{}
-Ce projet de recherche est mené en collaboration avec la société \gls{ennov}, un éditeur de logiciels spécialisé dans le secteur médical.
-\gls{ennov} propose une suite logicielle basée sur une \gls{ged} conçue pour aider les entreprises pharmaceutiques et biomédicales à gérer leurs contenus, automatiser leurs processus métier et se conformer aux normes réglementaires internationales.
-Cette suite logicielle permet de réduire les risques, faciliter la conformité et améliorer la prise de décision.
-\gls{ennov} est un fournisseur majeur de solutions pour le \gls{rim} et l'\gls{idmp}.
-Sa suite logicielle comprend des fonctionnalités de gestion de processus et de contenu pour la qualité, les affaires réglementaires, les études cliniques et la pharmacovigilance.
-\gls{ennov} est intéressé à offrir une meilleure automatisation des tâches répétitives, une visibilité accrue dans toute l'organisation et une facilité de mise en œuvre. 
-
-\section{Exemple}
-\input{these/motivating_example.tex}
 \FloatBarrier
-
 \section{Contributions et organisation du manuscrit}
 
 \noindent
 Les contributions importantes de nos travaux s'organisent de la manière suivante :
 
 \begin{description}
-    \item[Mise à jour cohérente] Présentée dans la partie~\ref{part:update}, la mise à jour cohérente des bases de données revêt une importance capitale pour garantir la qualité des données.
+    \item[\nameref*{part:update}] Présentée dans la partie~\ref{part:update}, la mise à jour cohérente des bases de données revêt une importance capitale pour garantir la qualité des données.
     Le chapitre~\ref{chp:update:intro} offre une vue d'ensemble de la notion de cohérence dans le contexte des bases de données.
     Alors que certaines approches se concentrent sur l'application de règles lors de l'interrogation, nous mettons l'accent sur la cohérence dès les mises à jour.
     Une base de données maintenue cohérente facilite l'analyse et l'interrogation en garantissant un niveau uniforme de qualité des données.
-    Nous nous intéressons particulièrement aux bases de données graphes pouvant inclure des données incomplètes représentées par des valeurs nulles liés.
-    Le chapitre~\ref{chp:update:intro} s'attarde en particulier sur deux travaux qui tente de répondre à cette problématique : \acrfull{setup}~\cite{chabinUsingGraphGrammar2019} et \acrfull{gfd}~\cite{fanDependenciesGraphs2019}.
-
-    Bien que des travaux existent sur les données incomplètes et sur les graphes, nous n'avons connaissance d'aucun travail qui combine ces deux aspects en donnant priorité à la mise à jour.
-    Le chapitre~\ref{chp:update:algos} présente nos travaux sur cet aspect, qui font suite à des travaux précédents \cite{chabinConsistentUpdatingDatabases2020} concernant des mises à jour en mémoire nécessitant de recalculer l'ensemble de la base pour garantir la cohérence.
-    Nous proposons une méthode de mise à jour itérative reposant sur un \gls{sgbd} graphe et qui garantit le respect des contraintes tout en assurant qu'il n'y a aucune redondance d'information.
+    Nous nous intéressons particulièrement aux bases de données graphes incomplètes, c'est-à-dire, celles comportant des valeurs nulles liées.
+    Le chapitre~\ref{chp:update:algos} propose une méthode de mise à jour incrémentale reposant sur un \gls{sgbd} graphe et qui garantit le respect des contraintes tout en assurant qu'il n'y a aucune redondance d'information.
     Ce chapitre présente également une suite d'expérimentations permettant de mesurer les performances de notre solution.
 
-    \item Le domaine médical repose sur une grande diversité d'information, qu'il s'agisse d'images, de modèles 3D ou encore de rapports textuels sur des cas cliniques ou de pharmacovigilance.
-    Notre travail se concentre sur la valorisation des données textuelles abondantes dans l'écosystème d'\gls{ennov}.
-    Structurer ces données textuelles présente plusieurs avantages, notamment l'amélioration des capacités de recherche et la simplification de l'analyse des données.
-    Nous nous concentrons particulièrement sur la structuration des données contenues dans les textes en vue de leur enregistrement dans une base de données graphes.
+    \item[\nameref*{part:texts}] Nous nous concentrons sur la structuration des données textuelles en vue de l'enregistrement, dans une base de données graphes, des informations essentielles qu'elles apportent.
+    En effet, pouvoir structurer et regrouper des informations de manière cohérente pour les maintenir dans un \gls{sgbd} présente plusieurs avantages, notamment l'amélioration des capacités de recherche et la simplification de l'analyse des données.
     Le chapitre~\ref{chp:struct} présente une solution développée pour répondre à la problématique de structuration automatique des données textuelles.
-    Plus précisément, nous nous penchons sur la définition d'une structure valide et sur les méthodes pour la construire automatiquement.
+    Plus précisément, nous nous penchons sur la définition d'une structure valide par rapport aux bases de données et sur les méthodes pour la construire automatiquement à partir de données textuelles.
     Pour finir, le chapitre propose une évaluation critique de la solution proposée.
 
-    \item[Extraction d'information] L'extraction d'information (\acrshort{ie}) est un domaine étroitement lié au \gls{tal}.
+    L'extraction d'information (\acrshort{ie}) est un domaine étroitement lié au \gls{tal}.
     Elle implique généralement l'identification d'entités nommées, leur résolution ou Entity Linking (c'est-à-dire l'association de la mention à un identifiant unique) et l'extraction de relations entre ces entités.
     Dans le chapitre~\ref{chp:tal}, nous examinons plusieurs travaux réalisés en collaboration avec des chercheurs spécialisés dans le \gls{tal}.
     Nous présentons les différentes solutions développées dans cette thèse et mises en œuvre au sein d'\gls{ennov}.
-    Enfin, ce chapitre se conclura par la présentation de deux cas d'application concrets illustrant l'application pratique des méthodes discutées.
+    Il est important de souligner que notre intérêt pour les données textuelles découle de notre partenariat avec \gls{ennov}.
+    Le domaine médical englobe une vaste gamme d'informations, allant des images aux modèles 3D, en passant par les rapports textuels sur les cas cliniques ou la pharmacovigilance.
+    Cependant, l'écosystème d'\gls{ennov} est principalement axé sur les textes.
+    Le chapitre~\ref{chp:tal} termine avec la présentation de deux cas d'application concrets illustrant l'application pratique des méthodes discutées.
 \end{description}
 
-\section{Publications}
+\subsection{Publications}
 
 Les travaux présentés dans cette thèse reposent sur une série de collaborations interdisciplinaires, notamment dans le domaine du \gls{tal}.
-Dans un souci de reproductibilité des résultats, ces travaux ont conduit à la conception de logiciels et de jeux de données accessibles publiquement.
 Ils ont également donnés lieux aux publications suivantes :
 
 \begin{bibunit}[alphaurl]
@@ -105,6 +231,21 @@ Ils ont également donnés lieux aux publications suivantes :
     \nocite{hiotDOINGDEFTUtilisation2021}
     \nocite{savaryRelationExtractionClinical2022}
     \nocite{chabinManagingLinkedNulls2023}
+
+    \renewcommand{\bibname}{}
+    \renewcommand{\section}[1]{}
+    \putbib[these/biblio]
+\end{bibunit}
+
+\subsection{Logiciels}
+
+Ces travaux ont abouti à la création de logiciels et de jeux de données pour les expérimentations.
+Pour garantir la reproductibilité des résultats, tous les logiciels et jeux de données associés sont rendus disponibles publiquement :
+
+\begin{bibunit}[alphaurl]
+    \nocite{chabinSetUpSchemaEvolution2020}
+    \nocite{chabinDataFix2023}
+    \nocite{chabinArchiTXT2024}
 
     \renewcommand{\bibname}{}
     \renewcommand{\section}[1]{}

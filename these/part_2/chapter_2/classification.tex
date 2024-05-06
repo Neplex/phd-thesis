@@ -4,8 +4,8 @@ Lorsque l'on traite des documents textuels, la représentation vectorielle ne pa
 La méthode souvent retenue est celle du sac de mots, l'idée est de sélectionner un ensemble de mots de taille $n$ qui représenteront les dimensions de notre espace vectoriel.
 Ainsi, chaque document est représenté par un vecteur de booléen (représentant l'apparition du mot ou non dans le texte) ou un vecteur d'entier représentant le nombre d'occurrences des termes dans le texte.
 
-Afin de travailler sur un espace à dimensions réduites, une sélection des mots les plus révélateurs de chaque classe est nécessaire.
-Chaque terme est trié selon un certain critère et de sélectionner les $m$ éléments ayant le score le plus élevé.
+Pour travailler dans un espace à dimensions réduites, il est essentiel de sélectionner les mots les plus représentatifs de chaque classe.
+Pour ce faire, on trie chaque terme selon un critère spécifique, puis on choisit les $m$ éléments ayant le score le plus élevé.
 Une mesure simple est le \gls{tfidf} \cite{sparckjonesStatisticalInterpretationTerm1972}.
 Intuitivement, cette mesure est un ratio entre la fréquence d'apparition du terme dans une classe donnée et sa fréquence dans l'ensemble du corpus qui repose sur la loi de Zipf \cite{zipfPsychobiologyLanguage1935} (un terme a plus de chance d'être révélateur d'une classe s'il y est souvent présent ; au contraire, si un terme est trop fréquent dans le corpus, il n'est pas assez discriminant).
 Dans \cite{wengMedicalSubdomainClassification2017}, les auteurs cherchent à extraire le domaine médical auquel appartiennent un ensemble de documents.
@@ -113,7 +113,7 @@ La F-mesure maximale a été obtenue avec une fréquence de \num{1000}.
 
 \subsection{Négation et incertitude}
 \label{sec:class:neg}
-La négation est un phénomène linguistique complexe et très présent, elle porteuse de sens comme l'information elle-même.
+La négation est un phénomène linguistique complexe et très présent, elle est porteuse de sens comme l'information elle-même.
 Les cas cliniques font parfois référence à l'absence de symptômes, comme un résultat d'examen négatif.
 Dans le cas de la classification, ces termes sont reconnus par les lexiques, mais ne doivent pas êtres signalés comme marqueur d'une classe.
 La négation peut prendre différentes formes et être explicite ou implicite, mais est souvent portée par un mot (\enquote{non}, \enquote{pas}, \dots), un groupe de mot (par exemple \enquote{ne \textelp{} pas}) ou un affixe (\enquote{faire / \emph{dé}-faire}, \enquote{possible / \emph{im}-possible}, \dots).

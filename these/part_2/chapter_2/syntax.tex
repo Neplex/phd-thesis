@@ -28,7 +28,12 @@ Certaines parties du corpus ont été annotées manuellement à partir de zéro 
     \label{fig:tal:nested-ents}
 \end{figure}
 
-\begin{wraptable}{r}{.5\textwidth}
+Le corpus contient des annotations pour \num{13} types d'entités : \num{2} pour les expressions temporelles (\emph{Date}, \emph{Moment}), \num{4} pour les objets et faits médicaux (\emph{Anatomie}, \emph{Examen}, \emph{Pathologie} et \emph{Signe ou Symptôme - SOSY}), et \num{7} pour le traitement des patients (\emph{Dose}, \emph{Durée}, \emph{Fréquence}, \emph{Mode}, \emph{Substance}, \emph{Traitement} et \emph{Valeur}).
+Des entités plus courtes peuvent être imbriquées dans des entités plus grandes, par exemple une entité \emph{Examen} peut contenir la partie du corps (\emph{Anatomie}) sur laquelle l'examen est réalisé (figure~\ref{fig:tal:nested-ents}).
+Le tableau~\ref{tab:tal:ent} montre le nombre d'entités de chaque type et montre les imbrications possibles.
+On ne s'intéresse pas aux entités temporelles ici.
+
+\begin{table}[htb]
     \centering
     \begin{adjustbox}{max width=\linewidth}
         \begin{tabular}{c|c|c}
@@ -36,7 +41,7 @@ Certaines parties du corpus ont été annotées manuellement à partir de zéro 
             \hline
             \hline
             \multirow{2}{*}{\emph{SOSY}} & \multirow{2}{*}{\num{1831}} & \emph{Substance}, \emph{Examen},  \\
-                                        &                             & \emph{Anatomie}, \emph{Valeur}    \\
+                                         &                             & \emph{Anatomie}, \emph{Valeur}    \\
             \emph{Anatomie}              & \num{1608}                  &                                   \\
             \emph{Examen}                & \num{1218}                  & \emph{Substance}, \emph{Anatomie} \\
             \emph{Substance}             & \num{1024}                  &                                   \\
@@ -51,12 +56,7 @@ Certaines parties du corpus ont été annotées manuellement à partir de zéro 
     \end{adjustbox}
     \caption{Nombre d'entités par type dans le corpus d'entraînement}
     \label{tab:tal:ent}
-\end{wraptable}
-
-Le corpus contient des annotations pour \num{13} types d'entités : \num{2} pour les expressions temporelles (\emph{Date}, \emph{Moment}), \num{4} pour les objets et faits médicaux (\emph{Anatomie}, \emph{Examen}, \emph{Pathologie} et \emph{Signe ou Symptôme - SOSY}), et \num{7} pour le traitement des patients (\emph{Dose}, \emph{Durée}, \emph{Fréquence}, \emph{Mode}, \emph{Substance}, \emph{Traitement} et \emph{Valeur}).
-Des entités plus courtes peuvent être imbriquées dans des entités plus grandes, par exemple une entité \emph{Examen} peut contenir la partie du corps (\emph{Anatomie}) sur laquelle l'examen est réalisé (figure~\ref{fig:tal:nested-ents}).
-Le tableau~\ref{tab:tal:ent} montre le nombre d'entités de chaque type et montre les imbrications possibles.
-On ne s'intéresse pas ua entités temporelles ici.
+\end{table}
 
 Dans le tableau \ref{tab:tal:imb}, nous présentons les imbrications les plus fréquentes dans le corpus.
 La première colonne contient le type de l'entité englobante, la deuxième colonne le type de l'entité imbriquée, la troisième colonne le nombre de fois où ces deux entités sont imbriquées et les deux dernières colonnes le pourcentage d'entités imbriquées par rapport au nombre d'entités 1 ou 2 dans le corpus tel que :

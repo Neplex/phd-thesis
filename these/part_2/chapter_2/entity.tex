@@ -1,7 +1,7 @@
 L'extraction d'informations dans un texte implique souvent l'identification et la classification des entités nommées \cite{alshaikhdeebBiomedicalNamedEntity2016,goyalRecentNamedEntity2018,nasarNamedEntityRecognition2021}.
 Elles représentent des éléments spécifiques dans un texte qui ont un nom propre ou une désignation particulière.
 Ces éléments peuvent inclure des personnes, des lieux, des organisations, des dates, des quantités, des mesures, etc.
-Une entité nommée est alors représenté par une plage de texte ainsi qu'un type.
+Une entité nommée est alors représentée par une plage de texte ainsi qu'un type.
 Dans ce cadre, l'annotation sémantique est un processus du \gls{tal} qui vise à associer une valeur aux entités, notamment des références dans une base de connaissances ou une base de données, mais aussi des valeurs numériques ou encore des dates.
 
 Les approches récentes dans la littérature pour l'extraction d'entités se reposent généralement sur l'apprentissage automatique \cite{nasarNamedEntityRecognition2021}.
@@ -49,7 +49,7 @@ Nous verrons aussi dans la section~\ref{sec:tal:nl-query} que, selon l'usage, l'
 \end{definition}
 
 Cette représentation permet aussi la représentation de la conjonction de coordination \textquote{ou}.
-Deux entités $E_1 = (\mathcal{V}_1, \mathcal{T}_1, m_1)$ et $E_2 = (\mathcal{V}_2, \mathcal{T}_2, m_2)$ liées par une conjonction \textquote{ou}, peuvent alors êtres représentés comme une seule entité $E = (\mathcal{V}_1 \cup \mathcal{V}_2, \mathcal{T}_1 \cup \mathcal{T}_2, m_1 \circ m_2)$.
+Deux entités $E_1 = (\mathcal{V}_1, \mathcal{T}_1, m_1)$ et $E_2 = (\mathcal{V}_2, \mathcal{T}_2, m_2)$ liées par une conjonction \textquote{ou}, peuvent alors être représentés comme une seule entité $E = (\mathcal{V}_1 \cup \mathcal{V}_2, \mathcal{T}_1 \cup \mathcal{T}_2, m_1 \circ m_2)$.
 Les entités sont extraites en utilisant différentes stratégies de façon indépendante.
 En particulier, si plusieurs approches identifient des entités se chevauchant (mais pas nécessairement avec les mêmes bornes), nous ne conservons que l'entité résultant de l'union de ces entités pour représenter l'ambiguïté causée par l'extraction.
 On peut aussi utiliser le même phénomène pour accentuer la précision en gardant alors l'intersection des entités.
@@ -192,7 +192,7 @@ Cette approche permet de sélectionner les plus grands lexèmes qui sont plus di
             C1     & Aggravation transitoire des symptômes  & \{aggrav,  transitoir, symptom\} \\
             C2     & Aggravation passagère des symptômes    & \{aggrav,  passager,   symptom\} \\
         \end{tabular}
-        \caption{Liste de lexèmes avec leur classe associée et la liste des tokens obtenus avec la fonction \textit{token}}
+        \caption{Liste de lexèmes, leur classe associée et la liste des tokens obtenus avec la fonction \textit{token}}
         \label{tab:fst-ex}
     \end{table}
 

@@ -122,14 +122,8 @@ Dans cette thèse, nous ne nous intéressons pas à ces systèmes, car ils sont 
 Il est essentiel, en particulier dans le domaine médical, d'être capable d'expliquer les prises de décision et de fournir un système en lequel les utilisateurs peuvent avoir confiance \cite{ribeiroWhyShouldTrust2016}.
 Bien que de nombreux travaux tentent de répondre à cette problématique avec l'intelligence artificielle explicative, ce sujet ne sera pas détaillé ici.
 Une approche plus conventionnelle permet à un humain, même en cas d'automatisation totale, de vérifier et d'intervenir si nécessaire pour corriger les données à chaque étape du processus.
-Les travaux présentés dans cette thèse ont également l'ambition de viser la construction d'un système adaptable à différents domaines (\gls{ennov} couvrant un large éventail d'utilisations différentes), évitant ainsi de dépendre de l'apprentissage pour un domaine spécifique.
+Les travaux présentés dans cette thèse ont également l'ambition de viser la construction d'un système adaptable à différents domaines, évitant ainsi de dépendre de l'apprentissage pour un domaine spécifique.
 De plus, pour les approches basées sur les réseaux de neurones, la demande en données d'apprentissage est souvent élevée comme leur cout financier et environnemental \cite{strubellEnergyPolicyConsiderations2019}.
-Dans le cadre d'\gls{ennov}, les solutions mises en place concernent des données du domaine médical contenant des informations sensibles, telles que des données de patients ou des secrets industriels.
-L'utilisation de l'apprentissage à partir de ces données présente des risques liés à la protection de la vie privée et au secret de fabrication \cite{fredriksonModelInversionAttacks2015,songPrivacyRisksSecuring2019}.
-Dans ce contexte, la compartimentation des données est cruciale, mais la construction d'un modèle par source de données n'est pas envisageable.
-Une pratique courante consiste donc à construire un modèle générique et à le raffiner pour chaque utilisateur/source de données \cite{ribeiroWhyShouldTrust2016}.
-Cette solution permet également de réduire les couts et c'est ce qu'on retrouve avec les modèles comme \gls{bert} \cite{devlinBERTPretrainingDeep2019} ou \gls{gpt} \cite{radfordImprovingLanguageUnderstanding2018, brownLanguageModelsAre2020}. 
-Cependant, cela pose les mêmes problématiques d'accès aux données énoncées précédemment et le modèle générique doit alors être construit sur des données publiques ou artificielles qui ne sont pas toujours disponibles.
 
 Dans le cadre des textes, les ontologies peuvent être considérées comme un schéma universel d'annotation, permettant ainsi de rendre les informations extraites depuis les textes interopérables, c'est-à-dire compatibles et échangeables entre différents systèmes et applications.
 Leur valeur réside dans leur capacité à connecter diverses sources de données et à exprimer la connaissance en établissant des liens sémantiques entre les différents concepts et informations.

@@ -35,9 +35,11 @@ On obtient alors deux entités distinctes ayant le type \emph{Auteur}.
 Si on part de la phrase \textquote{écrit par Alice ou Bob}, la conjonction \textquote{ou} est vu comme un marqueur d'ambiguïté.
 On obtient alors une seule entité regroupant les valeurs de l'entité \emph{Alice} et de l'entité \emph{Bob}.
 
-Pour réaliser la contextualisation des entités, nous proposons deux approches.
-La section~\ref{sec:tal:ctx:rule} présente une première approche basée sur des règles.
-La seconde approche (section~\ref{sec:tal:ctx:crf}) se base sur l'idée de la cascade de \glspl{crf} présenté dans la section~\ref{sec:tal:crf}.
+Pour réaliser la contextualisation des entités, nous proposons deux approches :
+\begin{itemize}
+      \item Une première approche basée sur des règles ;
+      \item Une seconde approche basée sur l'idée de la cascade de \glspl{crf} présenté dans la section~\ref{sec:tal:crf}.
+\end{itemize}
 
 \subsubsection{Utilisation de règles}
 \label{sec:tal:ctx:rule}
@@ -75,5 +77,5 @@ L'identification de la portée d'un contexte correspond aussi à détecter la po
 L'idée est donc de construire un \gls{crf} utilisant comme attributs les entités présentes dans le texte pour identifier la portée des contextes.
 Une entité de référence est ensuite associé à un contexte si elle se situe dans la séquence annotée.
 Comme le contexte est majoritairement porté par un verbe, on ajoute comme attribut le lemme du premier verbe parent dans l'arbre de dépendance.
-Comme il n'est pas possible d'annoter un mot avec différent label quand on utilise un \gls{crf}, il est nécessaire de traiter chaque contexte de façon indépendante ?
+Comme il n'est pas possible d'annoter un mot avec différent label quand on utilise un \gls{crf}, il est nécessaire de traiter chaque contexte de façon indépendante.
 Cependant, cela ne permet pas de traiter le cas de la conjonction \textquote{ou}.

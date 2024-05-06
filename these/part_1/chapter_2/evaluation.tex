@@ -1,4 +1,4 @@
-Les performances de la mise à jour incrémentale sont évaluées à l'aide de benchmarks sur trois jeux de données décrits de façon complète dans l'annexe~\ref{appendice:datasets} et accessibles sur le dépôt \gls{git}~\cite{chabinUpdateChase2023} :
+Les performances de la mise à jour incrémentale sont évaluées à l'aide de benchmarks sur trois jeux de données décrits de façon complète dans l'annexe~\ref{appendice:datasets} et accessibles sur le dépôt \gls{git}~\cite{chabinDataFix2023} :
 \begin{description}
     \item[Movie]\footnote{\url{https://github.com/neo4j-graph-examples/movies}} est une base de données fournie par \gls{neo4j} ;
           C'est un graphe de propriété représentant des nœuds films associé à des nœuds représentants des acteurs et des réalisateurs.
@@ -49,7 +49,7 @@ Ces exécutions sont construites pour chacune des instances de la table~\ref{tab
 La taille de l'instance est aussi variable, en augmentant artificiellement le nombre d'atomes en les dupliquant $n$-fois (échelle \numlist{1;2;5}), avec renommage des termes (on obtient donc des graphes à $n$ composantes connexes).
 Les exécutions sont réalisées \num{10} fois après \num{3} itérations de préchauffage afin de précharger le système, les index et le cache de la base de données qui ne sont pas mesurés.
 Entre chaque itération, l'instance est remise à zéro et la mémoire est nettoyée pour assurer une cohérence dans le temps d'exécution.
-L'ensemble du code nécessaire pour reproduire ces tests de performances est disponible sur le dépôt \gls{git}~\cite{chabinUpdateChase2023}.
+L'ensemble du code nécessaire pour reproduire ces tests de performances est disponible sur le dépôt \gls{git}~\cite{chabinDataFix2023}.
 
 \paragraph{Système}
 Ces benchmarks sont implémentés en Java et exécutés avec {Java 16}, avec une base de données \gls{neo4j} 4.4.
