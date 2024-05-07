@@ -5,7 +5,7 @@ Une entité nommée est alors représentée par une plage de texte ainsi qu'un t
 Dans ce cadre, l'annotation sémantique est un processus du \gls{tal} qui vise à associer une valeur aux entités, notamment des références dans une base de connaissances ou une base de données, mais aussi des valeurs numériques ou encore des dates.
 
 Les approches récentes dans la littérature pour l'extraction d'entités se reposent généralement sur l'apprentissage automatique \cite{nasarNamedEntityRecognition2021}.
-Bien que ces approches offrent généralement de bonnes performances, elles nécessitent d'avoir de grands volumes de données annotés pour leur apprentissage.
+Bien que ces approches offrent généralement de bonnes performances, elles nécessitent d'avoir de grands volumes de données annotées pour leur apprentissage.
 Depuis quelques années, les modèles basés sur l'apprentissage profond, tels que les \gls{cnn} et les modèles à base de transformateurs comme \gls{bert} \cite{devlinBERTPretrainingDeep2019} ou les \glspl{llm} tels que \gls{gpt} \cite{radfordImprovingLanguageUnderstanding2018, brownLanguageModelsAre2020}, ont montré des résultats prometteurs dans une variété de tâches de traitement automatique du langage naturel.
 Cependant, l'utilisation de modèles génériques peut poser des défis dans des domaines spécifiques tels que le médical, où le vocabulaire peut être plus complexe et où des données annotées sont souvent rares et coûteuses à obtenir.
 Dans cette thèse, nous explorons l'idée d'associer des solutions génériques pour l'extraction d'informations avec des approches plus \emph{traditionnelles} adaptées au domaine médical.
@@ -17,7 +17,7 @@ Certaines études comme \cite{passosLexiconInfusedPhrase2014} s'intéresse à ut
 Les lexiques ont l'intérêt d'être peut couteux, de ne pas nécessiter d'entrainement et sont d'autant plus intéressant quand on travaille sur un domaine ou le vocabulaire est contrôlé comme pour le médical \cite{camposBiomedicalNamedEntity2012}.
 Ainsi, la variation linguistique est réduite et les ressources souvent déjà disponibles.
 Ces lexiques sont essentiellement des répertoires comprenant des termes spécifiques et leurs variations lexicales associées.
-Par exemple, on pourrait créer un lexique des noms de maladies avec leurs acronymes ou encore construire une liste de personne associée à leur nom, leur prénom, leur adresse email, etc.
+Par exemple, on pourrait créer un lexique des noms de maladies avec leurs acronymes ou encore construire une liste de personnes associées à leur nom, leur prénom, leur adresse email, etc.
 
 Dans la section~\ref{sec:ie:lexicon}, nous listerons certaines ressources disponibles pour le domaine médical.
 Nous présenterons également une méthode efficace pour rechercher et identifier des entités dans le texte en s'appuyant sur ces lexiques.
@@ -29,9 +29,9 @@ Cette approche repose sur la définition de règles syntaxiques et grammaticales
 Par exemple, une grammaire locale peut être construite pour identifier des dates sous la forme \textquote{jour / mois / année} ou encore des valeurs sous la forme \textquote{nombre unité}.
 L'utilisation de grammaires locales pour l'extraction d'entités a été largement étudiée dans la littérature scientifique.
 
-Nous commençons cette section par une description des entités utilisées dans cette thèse puis, nous présenterons les méthodes mise en place pour l'enrichissement des entités.
+Nous commençons cette section par une description des entités utilisées dans cette thèse puis, nous présenterons les méthodes mises en place pour l'enrichissement des entités.
 
-\subsection{Entités multi-valuée}
+\subsection{Entités multi-valuées}
 
 L'ambiguïté inhérente aux textes constitue un défi majeur pour les systèmes de traitement automatique du langage, qui doivent être capables de comprendre précisément le sens des énoncés.
 Lors de la phase d'extraction des entités, l'ambiguïté peut concerner le type (par exemple \textit{Paris} peut se référer à une ville ou à une personne) ou la valeur (par exemple, plusieurs personnes dans la base de données ont le même nom).
@@ -49,7 +49,7 @@ Nous verrons aussi dans la section~\ref{sec:tal:nl-query} que, selon l'usage, l'
 \end{definition}
 
 Cette représentation permet aussi la représentation de la conjonction de coordination \textquote{ou}.
-Deux entités $E_1 = (\mathcal{V}_1, \mathcal{T}_1, m_1)$ et $E_2 = (\mathcal{V}_2, \mathcal{T}_2, m_2)$ liées par une conjonction \textquote{ou}, peuvent alors être représentés comme une seule entité $E = (\mathcal{V}_1 \cup \mathcal{V}_2, \mathcal{T}_1 \cup \mathcal{T}_2, m_1 \circ m_2)$.
+Deux entités $E_1 = (\mathcal{V}_1, \mathcal{T}_1, m_1)$ et $E_2 = (\mathcal{V}_2, \mathcal{T}_2, m_2)$ liées par une conjonction \textquote{ou}, peuvent alors être représentées comme une seule entité $E = (\mathcal{V}_1 \cup \mathcal{V}_2, \mathcal{T}_1 \cup \mathcal{T}_2, m_1 \circ m_2)$.
 Les entités sont extraites en utilisant différentes stratégies de façon indépendante.
 En particulier, si plusieurs approches identifient des entités se chevauchant (mais pas nécessairement avec les mêmes bornes), nous ne conservons que l'entité résultant de l'union de ces entités pour représenter l'ambiguïté causée par l'extraction.
 On peut aussi utiliser le même phénomène pour accentuer la précision en gardant alors l'intersection des entités.
@@ -62,11 +62,11 @@ Ils sont souvent utilisés pour faciliter la communication et la compréhension 
 Les lexiques permettent aux professionnels d'articuler leur discours de manière précise, de prévenir les éventuels malentendus, et d'assurer une compréhension commune des sujets et des enjeux relatifs à leur domaine d'expertise.
 Ils constituent une ressource riche pour l'extraction d'entités.
 
-Un lexique se compose d'un ensemble d'entrée chacune composée d'un identifiant unique et d'une liste de lexèmes représentant cette entrée.
+Un lexique se compose d'un ensemble d'entrées chacune composée d'un identifiant unique et d'une liste de lexèmes représentant cette entrée.
 Les lexiques peuvent être construits à partir de thésaurus, de terminologies ou de bases de connaissances qui représentent des ressources riches qui s'enrichissent avec le temps (souvent semi-automatiquement à partir de corpus annotés) et qui sont très souvent surveillées par une autorité qui vérifie les informations et se charge du nettoyage des entrées.
 % On retrouve un grand nombre de projets communautaires de lexiques ou base de connaissances (\gls{wikidata}, \gls{geonames}, \dots).
 Nous pouvons prendre comme exemple la base \gls{geonames} qui contient un ensemble d'informations sur les lieux géographiques.
-À partir de cette ressource, un lexique pourrait être constitué d'une collection d'identifiants uniques pour chaque lieu auxquels on associe l'ensemble de ses noms possibles.
+À partir de cette ressource, un lexique pourrait être constitué d'une collection d'identifiants uniques pour chaque lieu auquel on associe l'ensemble de ses noms possibles.
 La ville de Paris\footnote{\url{http://www.geonames.org/2988507/paris.html}} se voit donc associée l'ensemble de lexèmes suivant : Paris, Île-de-France, Paname, \dots
 
 \subsubsection{Lexiques médicaux}
@@ -76,7 +76,7 @@ Parmi les ressources de l'\gls{umls} on peut notamment citer \gls{mesh}, \gls{me
 
 \paragraph{MeSH}
 Le \glsreset{mesh}\gls{mesh} \cite{lipscombMedicalSubjectHeadings2000} est un thésaurus du domaine biomédical, à l'origine en anglais, qui est géré par la \gls{nlm}.
-Il permet entre autres d'indexer et d'interroger des bases de données comme MEDLINE/PubMed.
+Il permet entre autre d'indexer et d'interroger des bases de données comme MEDLINE/PubMed.
 Une traduction du \gls{mesh} en français, mise à jour chaque année, a été réalisée par l'\gls{inserm}.
 La version bilingue anglais-français peut être interrogée depuis une interface en ligne (\url{http://mesh.inserm.fr/FrenchMesh/}), et il est également possible de télécharger le thésaurus au format \acrshort{xml}.
 Le \gls{mesh} est organisé en \num{16} catégories thématiques :
@@ -110,7 +110,7 @@ Le \gls{mesh} est organisé en \num{16} catégories thématiques :
 \paragraph{MedDRA}
 \glsreset{meddra}\gls{meddra}\footnote{La marque \gls{meddra} est enregistrée par l'\acs{ifpma} au nom du \acs{cih}.}~\cite{brownMedicalDictionaryRegulatory1999} est un dictionnaire terminologique médical développé par le \gls{cih} et utilisé par les autorités réglementaires et l'industrie bio-pharmaceutique.
 \gls{meddra} est disponible en plusieurs langues, dont le français.
-Il contient aussi bien des termes référant à des symptômes, des examens ou encore des traitements, structurés en 5 niveaux qui regroupe les termes par étiologie, site de manifestation, etc.
+Il contient aussi bien des termes référant à des symptômes, des examens ou encore des traitements, structurés en 5 niveaux qui regroupent les termes par étiologie, site de manifestation, etc.
 Le niveau le plus haut étant une classification par discipline médicale.
 Il existe 26 classes, par exemple \textit{Affections vasculaires}, \textit{Affections du rein et des voies urinaires} ou \textit{Affections du système immunitaire}.
 
@@ -124,7 +124,7 @@ DrugBank \cite{wishartDrugBankKnowledgebaseDrugs2008,wishartDrugBankMajorUpdate2
 Fournit par l'université de l'Alberta au Canada, elle est accessible gratuitement en version publique, avec une version professionnelle disponible pour les chercheurs et les professionnels de la santé.
 
 \paragraph{HeTOP}
-Le projet \gls{cismef} fournit le portail \gls{hetop} pour accéder à une ontologie en multilingues qui regroupe beaucoup de ressources comme l'\gls{umls}.
+Le projet \gls{cismef} fournit le portail \gls{hetop} pour accéder à une ontologie multilingue qui regroupe beaucoup de ressources comme l'\gls{umls}.
 
 \subsubsection{Transducteurs finis}
 
@@ -176,7 +176,7 @@ La liste de tokens est ensuite passée dans le transducteur afin d'extraire l'en
 Si plusieurs valeurs sont trouvées pour un même mot de $L$, les multiples valeurs sont sélectionnées et on produit alors une entité multi-valuée.
 Cependant, si deux lexèmes différents se recoupent (ex : \emph{aggravation transitoire des symptômes} et \emph{symptômes cardiovasculaires}) seule les valeurs associées au plus grand lexème (ici, \emph{aggravation transitoire des symptômes}) sont gardées.
 Les tokens restants (\emph{cardiovasculaires}) sont remis en jeux (au cas où ils pourraient former un autre mot de $L$).
-Cette approche permet de sélectionner les plus grands lexèmes qui sont plus discriminant de par leur taille.
+Cette approche permet de sélectionner les plus grands lexèmes qui sont plus discriminants de par leur taille.
 
 \begin{example}
     \label{ex:fst}
@@ -245,9 +245,9 @@ Nous obtenons ainsi les niveaux suivants :
     \end{enumerate}
 \end{multicols}
 
-La figure \ref{tab:tal:cascade} donne un aperçu du fonctionnement de la cascade pour la phrase \textquote{La fonction rénale était normale et une rhabdomyolyse était éliminée, les CPK étant normales}.
+La table~\ref{tab:tal:cascade} donne un aperçu du fonctionnement de la cascade pour la phrase \textquote{La fonction rénale était normale et une rhabdomyolyse était éliminée, les CPK étant normales}.
 La première colonne montre la liste des tokens et les colonnes suivantes, la liste des étiquettes considérées pour chacun des niveaux correspondants au format \gls{bio} \cite{ramshawTextChunkingUsing1995}.
-La méthode proposée dans \cite{minardDOINGDEFTCascade2020} à montrée une bonne précision mesurée à \num{0.839}, avec un rappel plus faible de \num{0.613} pour une mesure F1 de \num{0.708}.
+La méthode proposée dans \cite{minardDOINGDEFTCascade2020} a montrée une bonne précision mesurée à \num{0.839}, avec un rappel plus faible de \num{0.613} pour une mesure F1 de \num{0.708}.
 
 \begin{table}[htb]
     \centering
@@ -280,6 +280,6 @@ La méthode proposée dans \cite{minardDOINGDEFTCascade2020} à montrée une bon
 Les \acrshortpl*{crf} nécessitent une quantité conséquente de données annotées pour leur apprentissage.
 Quand il n'est pas possible de récupérer suffisamment de données, on utilise un \gls{dsl} pour générer artificiellement des exemples.
 Un \gls{dsl} est un langage de programmation spécifique à un domaine.
-Dans cette thèse, on utilise Chatette~\cite{ChatetteDatasetGenerator2024} qui permet de construire une grammaire pour générer facilement de construire une grande variété d'exemples synthétiques représentant différentes variations des entités attendues.
-Cela permet d'avoir des exemples pour les entités annotés qui sont utilisées comme attribut du \gls{crf} et permet de construire également des jeux de tests recouvrant l'ensemble des entités.
-Les exemples de valeurs pour les entités associés à des lexiques sont automatiquement généré.
+Dans cette thèse, on utilise Chatette~\cite{ChatetteDatasetGenerator2024} qui permet de construire une grammaire pour générer facilement une grande variété d'exemples synthétiques représentant différentes variations des entités attendues.
+Cela permet d'avoir des exemples pour les entités annotées qui sont utilisées comme attribut du \gls{crf} et permet de construire également des jeux de tests recouvrant l'ensemble des entités.
+Les exemples de valeurs pour les entités associés à des lexiques sont automatiquement générés.

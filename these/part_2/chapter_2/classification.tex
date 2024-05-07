@@ -8,7 +8,7 @@ Pour travailler dans un espace à dimensions réduites, il est essentiel de sél
 Pour ce faire, on trie chaque terme selon un critère spécifique, puis on choisit les $m$ éléments ayant le score le plus élevé.
 Une mesure simple est le \gls{tfidf} \cite{sparckjonesStatisticalInterpretationTerm1972}.
 Intuitivement, cette mesure est un ratio entre la fréquence d'apparition du terme dans une classe donnée et sa fréquence dans l'ensemble du corpus qui repose sur la loi de Zipf \cite{zipfPsychobiologyLanguage1935} (un terme a plus de chance d'être révélateur d'une classe s'il y est souvent présent ; au contraire, si un terme est trop fréquent dans le corpus, il n'est pas assez discriminant).
-Dans \cite{wengMedicalSubdomainClassification2017}, les auteurs cherchent à extraire le domaine médical auquel appartiennent un ensemble de documents.
+Dans \cite{wengMedicalSubdomainClassification2017}, les auteurs cherchent à extraire le domaine médical auquel appartient un ensemble de documents.
 Ils comparent une approche utilisant des réseaux de neurones et une approche utilisant des sacs de mots pondérés par \gls{tfidf} avec un classifieur \gls{svm}.
 Ils montrent des résultats similaires pour les deux approches avec un gain en explicabilité pour l'approche sac de mots.
 D'autres mesures de pondération existent comme l'index de Jaccard \cite{jaccardDistributionFloreAlpine1901}.
@@ -17,10 +17,10 @@ D'autres mesures de pondération existent comme l'index de Jaccard \cite{jaccard
 \paragraph{}
 Cependant, dans un cadre ou les données nécessaires à l'apprentissage de tels modèles ne sont pas toujours accessible, des alternatives sont nécessaires.
 Les différents outils d'extraction d'informations décrits dans ce chapitre répondent à cette problématique et sont aussi efficaces pour la classification de cas cliniques.
-Cette section présente un système développé pour l'identification du profil clinique du patient \cite{hiotDOINGDEFTUtilisation2021} lors d'une participation à \gls{deft} 2021~\footnote{\url{https://deft.lisn.upsaclay.fr/2021/}} \cite{grouinClassificationCasCliniques2021} qui a obtenue les meilleurs résultats pour la tâche n°1.
+Cette section présente un système développé pour l'identification du profil clinique du patient \cite{hiotDOINGDEFTUtilisation2021} lors d'une participation à \gls{deft} 2021~\footnote{\url{https://deft.lisn.upsaclay.fr/2021/}} \cite{grouinClassificationCasCliniques2021} qui a obtenu les meilleurs résultats pour la tâche n°1.
 La tâche consistait à identifier les types de maladies d'un patient décrit dans un cas clinique et correspondant aux entrées génériques du chapitre \ref{mesh:C} du \gls{mesh}, un thésaurus bilingue anglais-français du domaine médical fournit par la \gls{nlm}.
 Chaque document décrivant le cas clinique d'un patient, l'extraction des classes du \gls{mesh} peut être vue comme un problème de classification (pour chaque classe du \gls{mesh} on cherche à savoir si la classe est représentée dans le cas ou non).
-Bien que certaines des remarques discutées dans cette section sont spécifiques a la tache de \gls{deft} et à la particularité des documents de cas cliniques, cette technique est applicable à d'autres types de document médicaux, mais aussi d'autres domaines.
+Bien que certaines des remarques discutées dans cette section sont spécifiques a la tâche de \gls{deft} et à la particularité des documents de cas cliniques, cette technique est applicable à d'autres types de documents médicaux, mais aussi d'autres domaines.
 
 \subsection{Système de classification basé sur l'extraction par lexiques}
 Le système, présenté dans la figure~\ref{fig:class:sys-sch}, utilise une méthode symbolique, basée sur l'extraction par lexique présentée section~\ref{sec:ie:lexicon}.
@@ -101,11 +101,10 @@ Par exemple "diabète gestationnel" est associé aux classes \ref{mesh:C:13}, \r
     \label{tab:mesh:C}
 \end{table}
 
-
 Bien que la ressource \gls{mesh} soit assez riche, le lexique peux être complété avec des lexèmes supplémentaires obtenus dans \gls{meddra} grâce aux correspondances établies entre les classes dans l'\gls{umls}.
 Au total, \num{13} classes de \gls{meddra} ont été considérées, ajoutant \num{58071} termes au lexique.
-Le \gls{mesh} contient un certains nombres de termes trop générique (par exemple \emph{maladie}) ou ambigus (par exemple \emph{pris}).
-En suivant la loi de Zipf, ces termes peuvent être éliminés en utilisant un corpus de termes fréquent extérieur au domaine médical.
+Le \gls{mesh} contient un certains nombres de termes trop génériques (par exemple \emph{maladie}) ou ambigus (par exemple \emph{pris}).
+En suivant la loi de Zipf, ces termes peuvent être éliminés en utilisant un corpus de termes fréquents, extérieurs au domaine médical.
 Le corpus \gls{wikipedia} FR2008 \cite{REDACCorpusTexte2008} fournit une liste des termes avec leur fréquence dans l'ensemble du corpus.
 L'ensemble des lexèmes présent dans le corpus et qui sont suffisamment fréquents peuvent ainsi êtres supprimés pour nettoyer le lexique.
 Une évaluation a montré un meilleur rappel avec une fréquence maximum d'apparition de \num{5000} et une meilleure précision avec une fréquence de \num{100}.
@@ -118,7 +117,7 @@ Les cas cliniques font parfois référence à l'absence de symptômes, comme un 
 Dans le cas de la classification, ces termes sont reconnus par les lexiques, mais ne doivent pas êtres signalés comme marqueur d'une classe.
 La négation peut prendre différentes formes et être explicite ou implicite, mais est souvent portée par un mot (\enquote{non}, \enquote{pas}, \dots), un groupe de mot (par exemple \enquote{ne \textelp{} pas}) ou un affixe (\enquote{faire / \emph{dé}-faire}, \enquote{possible / \emph{im}-possible}, \dots).
 De plus, elle n'est pas aussi stricte qu'en logique, la négation d'un fait n'est pas obligatoirement égale à son opposé dans le langage naturel.
-C'est le cas de la double négation comme \enquote{Il n'est pas impossible que \textelp{}} qui ne signifie pas que c'est possible.
+C'est le cas de la double négation comme \enquote{Il n'est pas impossible que \textelp{}} qui ne signifie pas que c'est impossible.
 
 \cite{blancoIssuesDetectingNegation2011} présente la complexité de la détection de la négation.
 Les auteurs étudient aussi la problématique de la portée de la négation.
@@ -130,18 +129,18 @@ En outre, l'élimination des faux négatifs est considérée comme ayant un impa
 
 \subsection{Évaluation}
 
-Les résultats de l'évaluation sont montré dans la table~\ref{tab:class:result}.
+Les résultats de l'évaluation sont montrés dans la table~\ref{tab:class:result}.
 L'évaluation est réalisée à partir du corpus de tests utilisé dans la campagne \gls{deft} 2021 et est réalisée sur différentes versions du système proposé.
 L'exécution ne contenant que le lexique \gls{mesh}, nous permet d'obtenir des bons résultats et supérieurs à la médiane de la tâche.
 La table~\ref{tab:class:result} permet de mettre en évidence l'impact de la préparation des lexiques et des post-traitements sur les performances du système.
 Nous observons que le post-traitement lié à l'identification du genre du patient permet une amélioration importante des performances (+ \num{0,036} pour la F-mesure).
-Le filtrage par fréquence des mots trop générique dans les lexiques permet une augmentation attendue de la précision.
+Le filtrage par fréquence des mots trop génériques dans les lexiques permet une augmentation attendue de la précision.
 Un gain important est également observé avec l'utilisation des annotations du corpus d'entrainement pour enrichir le lexique.
 C'est cette version qui a obtenue la meilleure F-mesure à \num{0,814}.
 Pour finir, nous avons également utilisé \gls{meddra} pour augmenter le lexique de façon considérable (+\num{58071} termes).
 Cette augmentation permet d'augmenter un peu le rappel par rapport aux deux versions précédentes, mais fait chuter la précision à \num{0,679}.
 
-Les classes pour lesquelles nous avons obtenues les moins bons résultats sont la classe \emph{blessures} (F-mesure \numrange{0,49}{0,55}), \emph{chimiques} (F-mesure \numrange{0,36}{0,54}) et \emph{virales} (1 classe sur 4 a été identifiée dans le corpus de test).
+Les classes pour lesquelles nous avons obtenu les moins bons résultats sont les classes \emph{blessures} (F-mesure \numrange{0,49}{0,55}), \emph{chimiques} (F-mesure \numrange{0,36}{0,54}) et \emph{virales} (1 classe sur 4 a été identifiée dans le corpus de test).
 
 \begin{table}[htb]
     \centering
@@ -162,6 +161,6 @@ Les classes pour lesquelles nous avons obtenues les moins bons résultats sont l
 \end{table}
 
 Une analyse d'erreur rapide nous a permis de mettre en évidence que la plupart des erreurs étaient dues à l'absence de certains termes dans le lexique (e.g. \emph{kystes biliaires hépatiques}), ou au fait que certains termes présents ne sont pas reliés à la classe identifiée manuellement (e.g. \emph{fistule} et \emph{fistule cutanée} sont contenus dans la classe \emph{etatsosy} et \emph{peau} pour le deuxième, mais pas dans la classe \emph{tumeur}, contrairement à ce qui a été annoté manuellement).
-Nous observons aussi quelques cas qui nécessitent un raisonnement, par exemple \emph{violente chute} qui induit des blessures.
+Nous observons aussi quelques cas qui nécessitent un raisonnement, par exemple \emph{violente chute} qui peut induire des blessures et donc être associée à la classe \ref{mesh:C:26}.
 
 \FloatBarrier

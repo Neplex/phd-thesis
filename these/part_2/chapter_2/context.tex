@@ -4,20 +4,20 @@ L'enrichissement est opéré généralement en deux étapes, la première où l'
 On identifie les catégories d'entités suivantes :
 \begin{description}
     \item[Une entité de référence] est celle qui est choisie pour être enrichie.
-          Elle correspond à une valeur d'instance dans une base de données (noms de personnes, titres de documents, dates, etc.)
+          Elle correspond à une valeur d'instance dans une base de données (nom de personnes, titre d'un documents, date, etc.)
     \item[Un opérateur] ajoute des précisions sur la valeur de l'entité.
           Les opérateurs sont des marqueurs de comparaisons \textquote{commence par}, \textquote{contient}, etc ou de négation.
     \item[Un marqueur de contexte] est une entité qui porte l'information de contexte.
 \end{description}
 
 \begin{definition}[Entité enrichie]
-      Une entité enrichie est définie comme un ensemble d'entité mono-valuée associée à un opérateur tel que :
+      Une entité enrichie est définie comme un ensemble d'entités mono-valuées associées à un opérateur tel que :
       $E_e$ est une entité enrichie de la forme $\{(v, \mathcal{T}, op)\}$ où $v$ est une unique valeur d'entité, $\mathcal{T}$ est un ensemble de types associé à la valeur et $op$ est un opérateur de comparaison sur la valeur (par défaut $=$).
       Une entité multi-valuée $E = (\mathcal{V}, \mathcal{T}, m)$ se traduit par une entité enrichie $E_e = \{(v, m(v), =) \mid \forall v \in \mathcal{V}\}$.
 \end{definition}
 
-Pour une même valeur, l'ensemble des types associée s'appliquent.
-L'ambiguïté n'est représenté que par l'ensemble de tuple dans l'entité enrichie.
+Pour une même valeur, l'ensemble des types associés s'appliquent.
+L'ambiguïté n'est représenté que par l'ensemble de tuples dans l'entité enrichie.
 Ainsi, l'entité $E_e = \{ (\text{:alice}, \{Person\}, =),$ $(\text{:bob}, \{Person\}, =) \}$ possède une ambiguïté sur sa valeur (\emph{:alice} ou \emph{bob}).
 Il est aussi possible de représenter l'ambiguïté sur le type, par exemple, l'entité $E_e = \{ (\text{:paris}, \{Person\}, =),$ $(\text{:paris}, \{City\}, =) \}$ à une ambiguïté sur le type de \emph{Paris} qui peut être une personne ou une ville.
 
@@ -26,8 +26,8 @@ Dans la phrase \textquote{écrit par Alice}, \emph{Alice} pourrait représenter 
 Elle aurait le type \emph{Personne} et pour valeur, un (ou plusieurs) identifiant dans une base de données.
 Ici, \textquote{écrit} pourrait être le marqueur du contexte \emph{Auteur}.
 L'enrichissement consisterait alors à ajouter le type correspondant au contexte (ici, \emph{Auteur}) à l'entité de référence (ici, \emph{Alice}).
-Ce processus itératif permet de découper la tache d'extraction de l'information.
-Dans le cas ou plusieurs valeurs sont possibles pour l'entité \emph{Alice} (par exemple si plusieurs individus de la base partage le même prénom), l'identification de type plus précis peut permettre de réduire l'ambiguïté.
+Cette approche itérative permet de découper le processus d'extraction de l'information.
+Dans le cas ou plusieurs valeurs sont possibles pour l'entité \emph{Alice} (par exemple si plusieurs individus de la base partagent le même prénom), l'identification de type plus précis peut permettre de réduire l'ambiguïté.
 
 Un autre facteur important dans les textes sont les conjonctions de coordinations, en particulier les conjonctions \textquote{ou} et \textquote{et}.
 Par exemple, dans la phrase \textquote{écrit par Alice et Bob}, la conjonction de coordination \textquote{et} est utilisée pour indiquer que le marqueur du contexte \emph{Auteur} s'applique à la fois à l'entité \emph{Alice} et a l'entité \emph{Bob}.
@@ -47,8 +47,8 @@ Pour réaliser la contextualisation des entités, nous proposons deux approches 
 En analysant les textes avec lesquels on travaille, on remarque que le contexte est généralement porté par un mot précis et principalement le verbe.
 Intuitivement, l'approche basique consiste alors à identifier le marqueur de contexte comme une entité.
 Pour cela on utilise les mêmes approches que présenté précédemment, en particulier l'extraction par lexique.
-Une entité contexte à pour type \emph{Contexte} et pour valeur, un ensemble de types qu'il représente.
-Une fois le marqueur identifiée, il faut déterminer sa portée, c'est-à-dire les entités qui sont impacté par ce dernier.
+Une entité contexte est associée au type \emph{Contexte} et a pour valeur, l'ensemble de types qu'il représente.
+Une fois le marqueur identifié, il faut déterminer sa portée, c'est-à-dire les entités qui sont impactées par ce dernier.
 Pour ce faire, on utilise l'arbre de dépendance et on identifie les situations suivantes :
 \begin{enumerate}
     \item Il existe un lien direct, vers la droite entre le contexte et l'entité de référence (par exemple si l'entité est l'objet du verbe) ;
@@ -62,7 +62,7 @@ Pour ce faire, on utilise l'arbre de dépendance et on identifie les situations 
     \item Si une entité de référence se trouve dans la portée d'un contexte, elle hérite aussi de tous les contextes conjoints. \label{ctx:rule:2}
 \end{enumerate}
 
-On remarque avec les règles~\ref{ctx:rule:1} et \ref{ctx:rule:2} que la portée n'est pas toujours trivial et on se rend compte que la détection de la portée est plus compliquée dès lors qu'on ajoute de multiples contextes, des conjonctions de coordinations.
+On remarque avec les règles~\ref{ctx:rule:1} et \ref{ctx:rule:2} que la portée n'est pas toujours triviale et on se rend compte que la détection de la portée est plus compliquée dès lors qu'on ajoute de multiples contextes, des conjonctions de coordinations.
 De plus, cet ensemble de règles ne couvre pas toutes les structures possibles.
 Par exemple, dans la phrase \textquote{écrit par Alice et signé ou relus par Bob avant le 10 mars}, on s'attend à avoir les entités $E_1 = (\text{:alice}, \{Auteur\})$, $E_2 = (\text{:bob}, \{Signataire, Relecteur\})$ et $E_3 = (10/03, \{DateSignature, DateRelecture\})$.
 Cependant, la règle~\ref{ctx:rule:1} ne permet pas d'associer les contextes \emph{DateSignature} et \emph{DateRelecture} à l'entité date à cause de sa distance avec le marqueur de contexte \textquote{signé ou relus}.
@@ -75,7 +75,7 @@ Nous avons vu dans la section~\ref{sec:tal:crf}, que les \glspl{crf} peuvent êt
 Un \gls{crf} est utilisé pour annoter une portion du texte.
 L'identification de la portée d'un contexte correspond aussi à détecter la portion du texte impacté.
 L'idée est donc de construire un \gls{crf} utilisant comme attributs les entités présentes dans le texte pour identifier la portée des contextes.
-Une entité de référence est ensuite associé à un contexte si elle se situe dans la séquence annotée.
+Une entité de référence est ensuite associée à un contexte si elle se situe dans la séquence annotée.
 Comme le contexte est majoritairement porté par un verbe, on ajoute comme attribut le lemme du premier verbe parent dans l'arbre de dépendance.
 Comme il n'est pas possible d'annoter un mot avec différent label quand on utilise un \gls{crf}, il est nécessaire de traiter chaque contexte de façon indépendante.
 Cependant, cela ne permet pas de traiter le cas de la conjonction \textquote{ou}.

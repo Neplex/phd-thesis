@@ -1,7 +1,7 @@
 Ce chapitre synthétise les travaux menés simultanément à l'approche présentée dans le chapitre~\ref{chp:struct}, qui se concentre sur la structuration automatique des données textuelles.
 Les travaux de ce chapitre portent sur l'extraction d'informations à partir des textes, notamment la reconnaissance des entités nommées.
 L'extraction ou la reconnaissance d'entités nommées \cite{patel-schneiderUsingDescriptionLogics2015}, \gls{ner} en anglais, est une tâche commune du \gls{tal} qui consiste à identifier la partie d'un texte non structuré qui représente une entité nommée.
-Cette tâche peut être réalisée soit par des techniques basées sur des grammaires, soit par un modèle statistique tel que l'apprentissage automatique (voir \cite{jurafskySpeechLanguageProcessing2009} pour une introduction complète dans ce domaine).
+Cette tâche peut être réalisée soit par des techniques basées sur des grammaires, soit par un modèle statistique tel que l'apprentissage automatique (voir \cite{jurafskySpeechLanguageProcessing2008} pour une introduction complète dans ce domaine).
 Les approches statistiques sont largement utilisées dans l'industrie, car elles offrent de bons résultats.
 Cependant, ces approches nécessitent beaucoup de données pour leur apprentissage, ce qui implique des coûts élevés pour leur récupération, leur annotation et l'apprentissage.
 Dans le cadre d'\gls{ennov}, les solutions mises en place concernent des données du domaine médical contenant des informations sensibles, telles que des données de patients ou des secrets industriels.
@@ -9,14 +9,14 @@ L'utilisation de l'apprentissage à partir de ces données présente des risques
 Dans ce contexte, la compartimentation des données est cruciale.
 Une approche fréquemment adoptée consiste à créer un modèle générique et à l'affiner pour chaque utilisateur ou source de données \cite{ribeiroWhyShouldTrust2016}.
 Cette pratique permet également de réduire les coûts, ce qui explique son adoption courante, notamment avec des modèles tels que \gls{bert} \cite{devlinBERTPretrainingDeep2019} ou \gls{gpt} \cite{radfordImprovingLanguageUnderstanding2018, brownLanguageModelsAre2020}.
-Cependant, cette approche soulève les mêmes problématiques en matière d'accès aux données, car le modèle générique doit être construit sur des données publiques ou synthétiques qui ne sont pas toujours disponibles.
+Cette approche soulève les mêmes problématiques en matière d'accès aux données, car le modèle générique doit être construit sur des données publiques ou synthétiques qui ne sont pas toujours disponibles.
 Dans ce contexte, l'apprentissage fédéré émerge comme une solution potentielle, permettant la création d'un modèle global à partir d'entraînements locaux.
-Cependant, la construction de modèles locaux par source de données se heurte au manque de données annotées disponible localement.
+Cependant, la construction de modèles locaux par source de données se heurte au manque de données annotées disponibles localement.
 Une solution possible consiste à combiner l'utilisation de modèles d'analyse génériques avec des approches symboliques spécifiques.
 Cette approche offre l'avantage d'utiliser un système réutilisable, mais en capacité d'être localement spécialisé.
 
 \paragraph{Extraction itérative d'entités}
-L'extraction d'entités peut représenter une tâche complexe en raison de la diversité des types d'entités, de leurs valeurs, de leurs tailles ou de leur imbrication.
+L'extraction d'entités peut représenter une tâche complexe en raison de la diversité des types d'entités, de leur valeur, de leur taille ou de leur imbrication.
 Dans cette thèse, nous proposons de décomposer le processus d'extraction en sous-tâches plus simples, permettant d'exploiter une combinaison de diverses méthodes.
 Initialement, on se focalise sur l'extraction d'informations basiques à l'aide de grammaires ou de lexiques.
 Puis, progressivement, au travers d'une série d'étapes, on s'attelle à la combinaison, la correction, le filtrage et l'enrichissement de ces entités élémentaires afin de parvenir à des entités enrichie sémantiquement.
@@ -31,6 +31,6 @@ La section~\ref{sec:tal:entity} présente les techniques mise en œuvres pour la
 Enfin, le chapitre se termine sur la présentation de deux cas d'usage direct des techniques présentées dans ce chapitre :
 \begin{itemize}
     \item la classification de cas cliniques (section~\ref{sec:tal:classification}) et
-    \item les interface d'interrogation en langue naturelle (section~\ref{sec:tal:nl-query}).
+    \item les interfaces d'interrogation en langue naturelle (section~\ref{sec:tal:nl-query}).
 \end{itemize}
 La section~\ref{sec:tal:conclusion} conclue ce chapitre.

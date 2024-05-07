@@ -9,7 +9,7 @@ Cette modélisation permet une exploitation efficace de ces relations en vue de 
 Les axes de discussion de \gls{doing} se concentrent sur deux problématiques principales :
 \begin{itemize}
     \item L'extraction d'informations à partir de données textuelles et leur représentation dans des bases de connaissances.
-    \item Le développement de méthodes intelligentes pour le traitement et la maintenance de ces bases de données, incluant de nouvelles formes de requêtes pour l'analyse efficaces, flexibles et sécurisés adaptés à l'utilisateur, ainsi que des garanties de qualité et de protection de la vie privée.
+    \item Le développement de méthodes intelligentes pour le traitement et la maintenance de ces bases de données, incluant de nouvelles formes de requêtes pour l'analyse efficaces, flexibles et sécurisées adaptées à l'utilisateur, ainsi que des garanties de qualité et de protection de la vie privée.
 \end{itemize}
 
 Les travaux exposés dans cette thèse coïncidente avec l'action \gls{doing}, le projet de recherche ayant étant initié simultanément à la mise en place de cette action.
@@ -32,9 +32,9 @@ Le projet s'articule autour de deux axes principaux.
 Dans un premier temps, notre intérêt se focalise sur les bases de données contenant des informations incomplètes.
 L'incomplétude des données peut provenir de diverses sources.
 Dans le cadre de cette thèse, où l'exploitation des données textuelles est centrale, il est essentiel de prendre en compte cette incomplétude.
-Dans ce cadre, on s'intéresse à maintenance d'une base de données cohérente par rapport à un ensemble de règles.
+On s'intéresse à la maintenance d'une base de données cohérente par rapport à un ensemble de règles.
 Dans cette optique, nous souhaitons suivre la politique de mise à jour proposée dans~\cite{chabinConsistentUpdatingDatabases2020}.
-Notre objectif est d'étudier la mise en œuvre cette politique de manière efficace sur un modèle de données de type graphe.
+Notre objectif est d'étudier la mise en œuvre de cette politique de manière efficace sur un modèle de données de type graphe.
 On se pose alors les questions suivantes : Comment imposer un ensemble de contraintes aux bases de données graphe ? Comment garantir la cohérence de ces bases tout au long de leur évolution ? Et comment implémenter cette politique en interaction avec des \gls{sgbd} ?
 
 Bien qu'il existe des approches proposant des contraintes spécifiques pour les graphes, telles que celles présentées dans~\cite{fanDependenciesGraphs2019}, nous avons opté pour une modélisation du graphe de données qui correspond à la définition logique de nos règles.
@@ -107,69 +107,79 @@ Cette évolution est réalisée par une suite de transformation appliquée à l'
     Par exemple, nous pouvons identifier des symptômes tels que \enquote{insuffisance rénale}, \enquote{fièvre} ou encore \enquote{urétérohydronéphrose}.
     En supposant que les informations sont déjà structurées par le texte lui-même, notre objectif est de les restructurer afin d'obtenir une représentation uniforme.
     Par exemple, à partir du texte \enquote{Un patient de 78 ans}, nous pourrions construire le fait $Patient(N_1, \text{homme}, 78)$.
-    En continuant avec l'extrait de texte précédent, nous pourrions construire l'ensemble de faits suivant et qui pourrait être représenté par le graphe attribué dans la figure~\ref{fig:runex:graph} :
-    \begin{align*}
-        & CasClinique(\textit{c-2-3})                             & & exam(p_1, e_1, et_1, \textit{01-01-01})                      \\
-        & hasPatient(\textit{c-2-3}, p1)                          & & paramClinique(e_1, creatine, \textit{330mmol/L})             \\
-        & Patient(p_1, 78, H)                                     & & reveal(e_1, \textit{insuffisance rénale})                    \\
-        & hasPatho(p_1, cancer)                                   & & exam(p_1, e_2, et_2, \textit{01-01-01})                      \\
-        & concernsAnat(cancer, prostate)                          & & paramClinique(e_2, temperature, t_1)                         \\
-        & Anatomy(prostate)                                       & & reveal(e_2, fievre)                                          \\
-        & exam(p_1, e_3, \textit{echographie}, \textit{01-01-01}) & & leadTo(cancer, \textit{métastases ganglionnaires})           \\
-        & paramClinique(e_3, param_1, res_1)                      & & getTreatment(p_1, \textit{résection endoscopique}, prostate) \\
-        & reveal(e_3, \textit{urétérohydronéphrose bilatérale})   & & forPatho(\textit{résection endoscopique}, cancer)
-    \end{align*}
+    En continuant avec l'extrait de texte précédent, nous pourrions construire l'ensemble de faits suivants :
+    \begin{multicols}{2}
+        \begin{itemize}
+            \item $CasClinique(\textit{c-2-3})$
+            \item $hasPatient(\textit{c-2-3}, p_1)$
+            \item $Patient(p_1, \text{homme}, 78)$
+            \item $hasPatho(p_1, \text{cancer})$
+            \item $concernsAnat(\text{cancer}, \text{prostate})$
+            \item $leadTo(\text{cancer}, \text{métastases ganglionnaires})$
+            \item $getTreatment(p_1, \text{résection endoscopique})$
+            \item $concernsAnat(\text{résection endoscopique}, \text{prostate})$
+            \item $getTreatment(p_1, \text{pulpectomie})$
+            \item $passExam(p_1, e_1)$
+            \item $measure(e_1, \text{créatinine}, \SI{330}{\milli\mol\per\L}) $
+            \item $reveal(e_1, \text{insuffisance rénale})$
+            \item $passExam(p_1, e_2)$
+            \item $reveal(e_2, \text{fièvre})$
+            \item $passExam(p_1, \textit{echographie})$
+            \item $reveal(\textit{echographie}, \textit{urétérohydronéphrose})$
+        \end{itemize}
+    \end{multicols}
+
+    Ces informations peuvent être représentées par le graphe attribué présenté dans la figure~\ref{fig:runex:graph}.
+    Notez que, dans cet exemple, le prédicat $measure$ est promus comme attributs de la relation $exam$.
 
     \begin{figure}[htb]
-        \small
         \centering
         \begin{adjustbox}{varwidth=\linewidth,max height=\textheight}
+            \small
             \begin{tikzpicture}[shorten >=2pt,thick,-Latex,node distance=3cm and 5cm,on grid]
-                \node[labeled node] (patient) {Patient \nodepart{two} name: \emph{$p_1$}\\sex: \emph{H}\\age: \emph{78}};
-                \node[labeled node, below=of patient] (exam1) {Exam \nodepart{two} name: \emph{constantes}};
-                \node[labeled node, below=of exam1] (param1) {ParamClinique \nodepart{two} name: \emph{créatinine}\\value: \emph{330 mmol/l}};
-                \node[labeled node, below=of param1] (sosy1) {SOSY \nodepart{two} name: \emph{insuffisance}\\~~~~~~~~~~\emph{rénale}};
-                \node[labeled node, right=of exam1] (exam2) {Exam \nodepart{two} name: \emph{échographie}};
-                \node[labeled node, below=of exam2] (param2) {ParamClinique \nodepart{two} name: \emph{unknown}\\ value: \emph{unknown}};
-                \node[labeled node, below=of param2] (sosy2) {SOSY \nodepart{two} name: \emph{urétérohydronéphrose}\\~~~~~~~~~~\emph{bilatérale}};
-                \node[labeled node, left=of param1] (param3) {ParamClinique \nodepart{two} name: \emph{temperature}\\ value: \emph{unknown}};
-                \node[labeled node, below=of param3] (sosy3) {SOSY \nodepart{two} name: \emph{fièvre}};
-                \node[labeled node, above=of param3] (cas) {CasClinique \nodepart{two} doc: \emph{c-2-3}};
-                \node[labeled node, above=of cas] (testicule) {Anatomie \nodepart{two} name: \emph{testicule}};
-                \node[labeled node, above=of patient] (traitement) {Traitement};
-                \node[labeled node, above=of traitement] (traitmentType) {TraitmentType \nodepart{two} name: \emph{résection}\\~~~~~~~~~~\emph{endoscopique}};
-                \node[labeled node, above=of testicule] (traitement2) {Traitement};
-                \node[labeled node, above=of traitement2] (traitmentType2) {TraitmentType \nodepart{two} name: \emph{pulpectomie}};
-                \node[labeled node, above=of exam2] (metastase) {Symptom \nodepart{two} name: \emph{métastases}\\~~~~~~~~~~\emph{ganglionnaires}};
-                \node[labeled node, above=of metastase] (cancer) {Pathologie \nodepart{two} name: \emph{cancer}};
+                \node[labeled node] (patient) {Patient \nodepart{two} name: \emph{$p_1$}\\sex: \emph{homme}\\age: \emph{78}};
+                \node[labeled node, left=of patient] (cas) {CasClinique \nodepart{two} doc: \emph{c-2-3}};
+                \node[labeled node, above=of patient] (traitement) {Traitement \nodepart{two} name: \emph{résection}\\~~~~~~~~~~\emph{endoscopique}};
+                \node[labeled node, left=of traitement] (traitement2) {Traitement \nodepart{two} name: \emph{pulpectomie}};
+                \node[labeled node, right=of traitement] (cancer) {Pathologie \nodepart{two} name: \emph{cancer}};
                 \node[labeled node, above=of cancer] (prostate) {Anatomie \nodepart{two} name: \emph{prostate}};
+                \node[labeled node, below=of cancer] (metastase) {Symptom \nodepart{two} name: \emph{métastases}\\~~~~~~~~~~\emph{ganglionnaires}};
+
+                \node[labeled node, below=3.5cm of cas] (exam1) {Exam \nodepart{two} name: $e_1$};
+                \node[labeled node, right=of exam1] (exam2) {Exam \nodepart{two} name: $e_2$};
+                \node[labeled node, right=of exam2] (exam3) {Exam \nodepart{two} name: \emph{échographie}};
+                \node[labeled node, below=of exam1] (sosy1) {SOSY \nodepart{two} name: \emph{insuffisance}\\~~~~~~~~~~\emph{rénale}};
+                \node[labeled node, below=of exam2] (sosy2) {SOSY \nodepart{two} name: \emph{urétérohydronéphrose}\\~~~~~~~~~~\emph{bilatérale}};
+                \node[labeled node, below=of exam3] (sosy3) {SOSY \nodepart{two} name: \emph{fièvre}};
     
                 \path
                 (cas) edge node[labeled edge, anchor=center] {hasPatient} (patient)
                 (patient) edge node[labeled edge, anchor=center] {hasPatho} (cancer)
                 (patient) edge node[labeled edge, anchor=center] {getTreatment} (traitement)
-                (cancer) edge node[labeled edge, anchor=center] {concernsAnat} (prostate)
                 (patient) edge node[labeled edge, anchor=center] {getTreatment} (traitement2)
+                (patient) edge node[labeled edge, anchor=center] {passExam} (exam1)
+                (patient) edge node[labeled property edge, anchor=center] {passExam \nodepart{two} name: \emph{créatinine}\\value: \emph{\SI{330}{\milli\mol\per\L}}} (exam2)
+                (patient) edge node[labeled edge, anchor=center] {passExam} (exam3)
+                (cancer) edge node[labeled edge, anchor=center] {concernsAnat} (prostate)
                 (cancer) edge node[labeled edge, anchor=center] {leadTo} (metastase)
                 (traitement) edge node[labeled edge, anchor=center] {forPatho} (cancer)
                 (traitement) edge node[labeled edge, anchor=center] {concernsAnat} (prostate)
-                (traitement) edge node[labeled edge, anchor=center] {hasType} (traitmentType)
-                (traitement2) edge node[labeled edge, anchor=center] {concernsAnat} (testicule)
-                (traitement2) edge node[labeled edge, anchor=center] {hasType} (traitmentType2)
-                (patient) edge node[labeled edge, anchor=center] {passExam} (exam1)
-                (exam1) edge node[labeled edge, anchor=center] {reveal} (param1)
-                (param1) edge node[labeled edge, anchor=center] {show} (sosy1)
-                (patient) edge node[labeled edge, anchor=center] {passExam} (exam2)
-                (exam2) edge node[labeled edge, anchor=center] {reveal} (param2)
-                (param2) edge node[labeled edge, anchor=center] {show} (sosy2)
-                (exam1) edge node[labeled edge, anchor=center] {reveal} (param3)
-                (param3) edge node[labeled edge, anchor=center] {show} (sosy3)
+                (exam1) edge node[labeled edge, anchor=center] {reveal} (sosy1)
+                (exam2) edge node[labeled edge, anchor=center] {reveal} (sosy2)
+                (exam3) edge node[labeled edge, anchor=center] {reveal} (sosy3)
                 ;
             \end{tikzpicture}
         \end{adjustbox}
         \caption{Instance sous forme de graphe}
         \label{fig:runex:graph}
     \end{figure}
+
+    \begin{remark}
+        Le graphe proposé ici n'est donné qu'à titre d'exemple et n'est qu'une des nombreuses représentations sous forme de graphe possibles.
+        Par exemple, les relations $getTreatment$ peuvent être décomposées en un nœud $Treatment$ et $TreatmentType$.
+        Cette représentation permettrait de séparer l'instance de son type et faciliterait la construction de relations autour du type.
+        Un raisonnement similaire peut être appliqué pour les examens et les pathologies.
+    \end{remark}
 \end{example}
 
 Il convient de noter que le choix des outils de \gls{tal} utilisés à cette étape, s'est fait en prenant en considération les contraintes spécifiques à notre domaine d'application :
@@ -183,7 +193,7 @@ Il convient de noter que le choix des outils de \gls{tal} utilisés à cette ét
     L'aide à la prise de décision doit être appuyée par des méthodes claires et compréhensibles, surtout étant donné que les décisions prises par les systèmes informatiques peuvent avoir des conséquences directes sur la santé et la vie des patients.
     Une explication claire de la manière dont ces décisions sont prises est essentielle.
     Cela permet aux médecins et aux patients de comprendre pourquoi une recommandation spécifique a été faite.
-    De plus, les approches explicables permettent de retracer les décisions et de déterminer partie du processus est responsable en cas d'erreur.
+    De plus, les approches explicables permettent de retracer les décisions et de déterminer la partie du processus qui est responsable en cas d'erreur.
     Favoriser cette transparence contribue à créer une confiance dans le système et à maintenir l'utilisateur au centre du processus décisionnel.
 \end{itemize}
 
@@ -202,7 +212,7 @@ Les contributions importantes de nos travaux s'organisent de la manière suivant
     Le chapitre~\ref{chp:update:algos} propose une méthode de mise à jour incrémentale reposant sur un \gls{sgbd} graphe et qui garantit le respect des contraintes tout en assurant qu'il n'y a aucune redondance d'information.
     Ce chapitre présente également une suite d'expérimentations permettant de mesurer les performances de notre solution.
 
-    \item[\nameref*{part:texts}] Nous nous concentrons sur la structuration des données textuelles en vue de l'enregistrement, dans une base de données graphes, des informations essentielles qu'elles apportent.
+    \item[\nameref*{part:texts}] Nous nous concentrons sur la structuration des données textuelles en vue de l'enregistrement, dans une base de données graphe, des informations essentielles qu'elles apportent.
     En effet, pouvoir structurer et regrouper des informations de manière cohérente pour les maintenir dans un \gls{sgbd} présente plusieurs avantages, notamment l'amélioration des capacités de recherche et la simplification de l'analyse des données.
     Le chapitre~\ref{chp:struct} présente une solution développée pour répondre à la problématique de structuration automatique des données textuelles.
     Plus précisément, nous nous penchons sur la définition d'une structure valide par rapport aux bases de données et sur les méthodes pour la construire automatiquement à partir de données textuelles.
@@ -221,7 +231,7 @@ Les contributions importantes de nos travaux s'organisent de la manière suivant
 \subsection{Publications}
 
 Les travaux présentés dans cette thèse reposent sur une série de collaborations interdisciplinaires, notamment dans le domaine du \gls{tal}.
-Ils ont également donnés lieux aux publications suivantes :
+Ils ont également donné lieu aux publications suivantes :
 
 \begin{bibunit}[alphaurl]
     \nocite{amaviNaturalLanguageQuerying2020}

@@ -9,6 +9,9 @@
 
 \pdfinclusioncopyfonts=1
 \pdfgentounicode=1
+\pdfminorversion=5 
+\pdfcompresslevel=9
+\pdfobjcompresslevel=2
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages :
@@ -78,7 +81,6 @@
 \usepackage[inline]{enumitem}
 \usepackage{siunitx}
 \usepackage[linesnumbered,ruled,vlined,boxed,frenchkw,onelanguage]{algorithm2e}
-\usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
 \usepackage{adjustbox}
 \usepackage{pdflscape}
 \usepackage{afterpage}
@@ -148,6 +150,16 @@
   },
   labeled edge/.style={
     rectangle split, rectangle split parts=1,
+    rectangle split draw splits=false,
+    rounded corners,
+    very thick,
+    draw=orange!60,
+    rectangle split part fill={orange!60, white},
+    align=left,
+    font=\sffamily\bfseries\boldmath\small
+  },
+  labeled property edge/.style={
+    rectangle split, rectangle split parts=2,
     rectangle split draw splits=false,
     rounded corners,
     very thick,

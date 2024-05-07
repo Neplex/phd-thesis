@@ -1,15 +1,15 @@
 Les systèmes d'interrogation de bases de données graphes visant les \emph{experts du domaine} plutôt que les experts dans des bases de données, suscitent un intérêt grandissant, car ce sont ces utilisateurs auxquels profite le plus l'information et qui sont les plus aptes à la transformer en connaissance.
 Il est donc crucial de rendre ces systèmes plus conviviaux et accessibles aux utilisateurs sans compétences techniques avancées.
 Malgré la puissance des langages d'interrogation comme \acrshort{sql}, \acrshort{sparql} ou encore \gls{cypher}, leur utilisation nécessite une compréhension de la structure des données et de leurs interactions.
-Afin d'améliorer l'accessibilité à l'information sauvegardée dans ces \gls{sgbd}, la recherche sur les \gls{nli} a suscité beaucoup d'intérêt ces dernières années \cite{zhengQuestionAnsweringKnowledge2018,wangCrossdomainNaturalLanguage2019,xuMirrorNaturalLanguage2023,vargas-solarTranslatingDataScience2023,vargas-solarConversationalDataExploration2023}.
+Afin d'améliorer l'accessibilité à l'information sauvegardée dans ces \glspl{sgbd}, la recherche sur les \gls{nli} a suscité beaucoup d'intérêt ces dernières années \cite{zhengQuestionAnsweringKnowledge2018,wangCrossdomainNaturalLanguage2019,xuMirrorNaturalLanguage2023,vargas-solarTranslatingDataScience2023,vargas-solarConversationalDataExploration2023}.
 L'intérêt fondamental des interfaces en langage naturel réside dans la capacité à permettre aux utilisateurs de se concentrer sur la signification de leurs requêtes, plutôt que sur les mécanismes sous-jacents de recherche d'information.
 
 Certains travaux se concentrent sur l'augmentation du pouvoir d'expression des requêtes, tandis que d'autres se concentrent sur l'indépendance par rapport au domaine.
-Par exemple, dans~\cite{zhengQuestionAnsweringKnowledge2018}, les auteurs proposent d'utiliser des modèles binaires plutôt que des analyses sémantiques pour mieux comprendre les requêtes complexes, tandis que~\cite{wangCrossdomainNaturalLanguage2019} propose un \gls{nli} inter-domaines avec basé sur un étiquetage générique des questions proposées.
+Par exemple, dans~\cite{zhengQuestionAnsweringKnowledge2018}, les auteurs proposent d'utiliser des modèles binaires plutôt que des analyses sémantiques pour mieux comprendre les requêtes complexes, tandis que~\cite{wangCrossdomainNaturalLanguage2019} propose un \gls{nli} inter-domaines basé sur un étiquetage générique des questions proposées.
 Plusieurs études \cite{zouNaturalLanguageQuestion2014,faderOpenQuestionAnswering2014,amsterdamerNaturalLanguageInterface2015} s'intéressent aux systèmes de questions-réponses, ou \gls{qa}, où les utilisateurs posent des questions en langage naturel sur une base de données \acrshort{rdf}.
 Les requêtes d'agrégation sont examinées dans~\cite{huNaturalLanguageAggregate2018} : les auteurs proposent une méthode pour identifier automatiquement l'agrégation et la transformer en une instruction d'agrégation \acrshort{sparql}.
 Les méthodes utilisées varient aussi considérablement.
-Dans \cite{vargas-solarTranslatingDataScience2023}, les auteurs cherche à construire des requêtes pour l'analyse de données à partir d'une requête formulée en langage naturel.
+Dans \cite{vargas-solarTranslatingDataScience2023}, les auteurs cherchent à construire des requêtes pour l'analyse de données à partir d'une requête formulée en langage naturel.
 \cite{vargas-solarConversationalDataExploration2023} propose un système pour l'exploration de donnée pour des graphes de propriétés en mode conversationnel.
 Dans \cite{zafarFormalQueryGeneration2018,zhengQuestionAnsweringKnowledge2018,steinmetzNaturalLanguageQuestions2019}, les auteurs fondent leur approche sur des techniques de \gls{tal} avec l'extraction d'entités et des grammaires, tandis que dans \cite{utamaEndtoendNeuralNatural2018,wangCrossdomainNaturalLanguage2019}, ils utilisent des réseaux neuronaux.
 
@@ -23,7 +23,7 @@ La recherche par facette consiste à filtrer une collection de données basée s
 Il s'agit d'une requête conjonctive sur une unique classe appelée \emph{classe cible}.
 
 Dans cette section, on présente la transformation d'une requête exprimée en langage naturel (nommée NL-query) en une requête de base de données (dénommée DB-query).
-Cette proposition, faite dans \cite{amaviNaturalLanguageQuerying2020}, repose sur le formalisme établi dans la section~\ref{sec:update:pre:db}, page~\pageref{sec:update:pre:db} basé sur \gls{fol}.
+Cette proposition, faite dans \cite{amaviNaturalLanguageQuerying2020}, repose sur le formalisme établi dans la section~\ref{sec:update:pre:db}, page~\pageref{sec:update:pre:db} basé sur la \gls{fol}.
 En conséquence, ces requêtes peuvent être facilement traduites vers une modélisation graphe ou relationnelle en utilisant les langages de requêtes tels que \gls{sql}, \gls{sparql}, \gls{cypher}, etc.
 On définit une formule logique $\phi$ ayant pour atomes :
 \begin{enumerate}
@@ -47,7 +47,7 @@ Si l'utilisateur souhaite identifier des médecins ayant rédigé un livre, il d
 Plus simplement, on ne considère que des requêtes simples qui sont traduites en requêtes conjonctives de base de données identifiant des instances d'une classe particulière, même si elles fournissent également des informations sur les propriétés de ces instances.
 
 \begin{definition}[DB-query]
-    Une DB-query $q$ est une requête conjonctive sur un schéma donné $\mathcal{S}$ de la forme $R_0(u_0) \leftarrow \phi$ où $\phi = R_1(u_1) \dots  R_n(u_n), comp_1, \dots, comp_m$ où $n \geq 0$, $R_i$ sont des symboles de prédicats avec $0 \leq i \leq n$, $u_i$ est le tuple de termes de $R_i$ de longueur égale à l'arité de $R_i$ et $com_j$ sont des formules de comparaison qui incluent des variables trouvées dans au moins un tuple de $u_i$ avec $0 \leq j \leq m$.
+    Une DB-query $q$ est une requête conjonctive sur un schéma donné $\mathcal{S}$ de la forme $R_0(u_0) \leftarrow \phi$ où $\phi = R_1(u_1) \dots  R_n(u_n), comp_1, \dots, comp_m$ où $n \geq 0$, $R_i$ sont des symboles de prédicats avec $0 \leq i \leq n$, $u_i$ est le tuple de termes de $R_i$ de longueur égale à l'arité de $R_i$ et $comp_j$ sont des formules de comparaison qui incluent des variables trouvées dans au moins un tuple de $u_i$ avec $0 \leq j \leq m$.
     $head(q)$ (respectivement $body(q)$) représente la partie gauche de la règle, dénommée tête (respectivement la partie droite, dénommée corps) de $q$.
     $\mathbb{I}_q$ représente l'ensemble de réponses de $q$.
 
@@ -113,11 +113,11 @@ Plus simplement, on ne considère que des requêtes simples qui sont traduites e
 
 En s'appuyant sur les sections précédentes, l'ensemble des classes présentes dans la base de données peuvent être représentées par un lexique.
 Dans l'exemple de $NLQ_{run}$, on suppose que l'on a un lexique de \emph{Personne} qui a pour valeur les identifiants des individus associés au nom, prénom, etc. de chaque personne.
-Ainsi, l'ensemble des individus de la base peuvent être reconnus et associé directement à la classe (correspondant au type de l'entité).
-Un lexique des classes cible disponible et un lexique des champs/propriété dans la base sont aussi construit.
+Ainsi, l'ensemble des individus de la base peuvent être reconnus et associés directement à la classe (correspondant au type de l'entité).
+Un lexique des classes cibles disponibles et un lexique des champs/propriétés dans la base sont aussi construits.
 Ces lexiques nécessitent généralement une intervention humaine pour compléter la liste des synonymes pour ne pas uniquement dépendre du nom de la classe.
 Pour identifier les dates et les nombres (ex : 30 euros), on utilise un ensemble de grammaire locale.
-Les \emph{textes libres}, comme le titre dans $NLQ_{run}$, sont extrait à l'aide d'un \gls{crf} appris sur un jeu de donnée généré en utilisant un \gls{dsl}.
+Les \emph{textes libres}, comme le titre dans $NLQ_{run}$, sont extraits à l'aide d'un \gls{crf} appris sur un jeu de donnée généré en utilisant un \gls{dsl}.
 L'exemple~\ref{ex:nl-query:simpleEnts} montre les entités extraites pour la requête $NLQ_{run}$.
 
 \begin{example}
@@ -125,7 +125,7 @@ L'exemple~\ref{ex:nl-query:simpleEnts} montre les entités extraites pour la req
     Ci-dessous nous présentons la requête $NLQ_{run}$ avec les entités extraites dans des rectangles.
     Chaque entité est numérotée.
     Les entités \ref{nl-query:e1}, \ref{nl-query:e3}, \ref{nl-query:e4} et \ref{nl-query:e5} sont extraite par l'intermédiaire de lexiques.
-    L'entité \ref{nl-query:e6} est obtenu en utilisant une grammaire locale et \ref{nl-query:e2} et extraite à l'aide d'un \gls{crf}.
+    L'entité \ref{nl-query:e6} est obtenue en utilisant une grammaire locale et \ref{nl-query:e2} est extraite à l'aide d'un \gls{crf}.
 
     \begin{displayquote}
         \fbox{Livres~\tiny{1}} intitulés \fbox{\textquote{Principes de médecine}~\tiny{2}} écrits par \fbox{Alice~\tiny{3}} et \fbox{Bob~\tiny{4}} et dont le \fbox{prix~\tiny{5}} est \fbox{inférieur à~\tiny{6}} \fbox{30 euros~\tiny{7}}.
@@ -148,7 +148,7 @@ L'exemple~\ref{ex:nl-query:simpleEnts} montre les entités extraites pour la req
     Pour des raisons de lecture, on ne représente pas la notation des ensembles de valeurs et de types.
     Ici, chaque entité n'a qu'une seule valeur et chaque valeur est associée à un unique type.
     Dans la pratique, il serait possible d'avoir plusieurs valeurs ou types à cause de l'ambiguïté.
-    Ainsi, si $p_1$ et $p_2$ sont deux personnes dans la base qui se prénomme Alice, alors on aurait :
+    Ainsi, si $p_1$ et $p_2$ sont deux personnes dans la base qui se prénomment Alice, alors on aurait :
     \begin{equation*}
         E_3 = (\{p_1, p_2\}, \{Personne\}, \langle p_1 \mapsto \{Personne\}, p_2 \mapsto \{Personne\} \rangle)
     \end{equation*}
@@ -156,23 +156,23 @@ L'exemple~\ref{ex:nl-query:simpleEnts} montre les entités extraites pour la req
 
 L'extraction des associations \emph{classe cible} -- attributs (c.-à-d. des arêtes dans le graphe) se fait par contextualisation.
 Comme discuté dans la section~\ref{sec:tal:ctx}, cette dernière peut s'opérer par extraction de marqueur de contexte (dans $NLQ_{run}$, on peut identifier les marqueurs \textquote{intitulés} et \textquote{écrits par}) ou en utilisant un \gls{crf}.
-Ici, on utilise des \acrshortpl{crf} pour les attributs génériques et l'ensemble de règles donné dans la section~\ref{sec:tal:ctx:rule} pou identifier le lien entre une entité correspondante à un attribut (ex : \ref{nl-query:e5} \textquote{prix}) et l'entité correspondante à la valeur de l'attribut (ex : \ref{nl-query:e6} \textquote{30 euros}).
+Ici, on utilise des \acrshortpl{crf} pour les attributs génériques et l'ensemble de règles donné dans la section~\ref{sec:tal:ctx:rule} pour identifier le lien entre une entité correspondant à un attribut (ex : \ref{nl-query:e5} \textquote{prix}) et l'entité correspondant à la valeur de l'attribut (ex : \ref{nl-query:e6} \textquote{30 euros}).
 Dans $NLQ_{run}$, on remarque la présence d'un opérateur \textquote{inférieur à}.
 Un opérateur est un modificateur (comme les contextes) qui vient enrichir la valeur (contrairement au type pour les contextes) d'une entité.
-Les opérateurs sont identifiés comme les contextes, on utilise un lexique pour le marqueur et la détection des liens avec une entité est effectué par l'ensemble de règles sur l'arbre de dépendances (figure~\ref{fig:nl-query:dep}) utilisées pour la contextualisation et listée dans la section~\ref{sec:tal:ctx:rule}.
-Il est possible d'avoir des opérateurs sans valeurs associées et qui peuvent être liée à un attribut de la \emph{classe cible}.
+Les opérateurs sont identifiés comme les contextes, on utilise un lexique pour le marqueur et la détection des liens avec une entité est effectuée par l'ensemble des règles sur l'arbre de dépendances (figure~\ref{fig:nl-query:dep}) utilisées pour la contextualisation et listée dans la section~\ref{sec:tal:ctx:rule}.
+Il est possible d'avoir des opérateurs sans valeurs associées et qui peuvent être liés à un attribut de la \emph{classe cible}.
 Par exemple, c'est le cas pour les opérateurs \textquote{est vide} et \textquote{est rempli}.
 
 \begin{example}
     \label{ex:nl-query:enrichEnts}
-    Pour $NLQ_{run}$, l'association entre les entités \ref{nl-query:e5} \textquote{prix} et \ref{nl-query:e6} \textquote{30 euros} est réalisé en deux temps.
+    Pour $NLQ_{run}$, l'association entre les entités \ref{nl-query:e5} \textquote{prix} et \ref{nl-query:e6} \textquote{30 euros} est réalisée en deux temps.
     On commence par associer l'opérateur \textquote{inférieur à} à l'entité \ref{nl-query:e7}.
     On obtient alors l'annotation suivante :
     \begin{displayquote}
         \fbox{Livres~\tiny{1}} intitulés \fbox{\textquote{Principes de médecine}~\tiny{2}} qui ont été écrits par \fbox{Alice~\tiny{3}} et \fbox{Bob~\tiny{4}} et dont le \fbox{prix~\tiny{5}} est \fbox{inférieur à 30 euros~\tiny{7}}.
     \end{displayquote}
-    Ensuite, on identifie que l'entité \ref{nl-query:e7} ($<30$) est associé à l'attribut pointé par l'entité \ref{nl-query:e5} ($hasPrice$).
-    Seule les types associée au schéma de la base sont gardés ainsi, les types \emph{Text}, \emph{Number} et \emph{Date} sont filtrés.
+    Ensuite, on identifie que l'entité \ref{nl-query:e7} ($<30$) est associée à l'attribut pointé par l'entité \ref{nl-query:e5} ($hasPrice$).
+    Seuls les types associés au schéma de la base sont gardés ainsi, les types \emph{Text}, \emph{Number} et \emph{Date} sont filtrés.
     On obtient alors l'entité enrichie \ref{nl-query:e7} $= (30, \{Number, hasPrice\}, <)$.
     \begin{multicols}{2}
         \begin{enumerate}[label=$E_{e\arabic*}$]
@@ -249,8 +249,8 @@ Si, dans $E_e$, il y a plus d'une valeur, alors l'entité est ambiguë, soit par
 On matérialise l'ambiguïté par une union de requête.
 Pour ce faire, la procédure~\ref{algo:nl-query} divise les valeurs de $E_e$ en sous partie de la requête.
 Chaque $l \in Parts$ est un ensemble d'atomes à ajouter au corps de la requête en cours de construction.
-Dans la boucle à la ligne~\ref{algo:nl-query:queries} on calcule le produit cartésien entre les requêtes déjà construites et les parties correspondantes à chaque valeur de l'entité $E_e$.
-C'est-à-dire que si $E_e$ possède deux valeurs possibles, on aura le double de requêtes qui seront construite.
+Dans la boucle à la ligne~\ref{algo:nl-query:queries} on calcule le produit cartésien entre les requêtes déjà construites et les parties correspondant à chaque valeur de l'entité $E_e$.
+C'est-à-dire que si $E_e$ possède deux valeurs possibles, on aura le double de requêtes qui seront construites.
 
 D'après l'exemple~\ref{ex:nl-query:enrichEnts}, \ref{nl-query:ee3} a deux types : \emph{Person} et \emph{Author}.
 Ainsi, sur la ligne~\ref{algo:nl-query:part} on ajoute l'ensemble $\{ Person(y_2),$ $writtenBy(x, y_2),$ $(y_2= \text{:alice}) \}$ à $Parts$ et à la ligne~\ref{algo:nl-query:query} la requête construite est :
@@ -273,7 +273,7 @@ Après avoir pris en compte toutes les entités, la procédure~\ref{algo:nl-quer
 \end{equation*}
 
 Cependant, considérons qu'il existe une ambiguïté sur l'entité \ref{nl-query:ee3} avec les valeurs \emph{:alice1} et \emph{:alice2} tel que \ref{nl-query:ee3} $= \{(\text{:alice1},$ $\{Person, Author\}, =),$ $(\text{:alice2},$ $\{Person, Author\}, =)\}$.
-La procédure~\ref{algo:nl-query} (lignes~\ref{algo:nl-query:ent-start} à~\ref{algo:nl-query:ent-end}) produit deux sous requête à partir de la même entité, à savoir :
+La procédure~\ref{algo:nl-query} (lignes~\ref{algo:nl-query:ent-start} à~\ref{algo:nl-query:ent-end}) produit deux sous requêtes à partir de la même entité, à savoir :
 \begin{enumerate*}[label=(\roman*)]
     \item $part_1 = \{ Person(y_2),$ $writtenBy(x, y_2),$ $(y_2 = \text{:alice1}) \}$ et
     \item $part_2 = \{ Person(y_2),$ $writtenBy(x, y_2),$ $(y_2 = \text{:alice2}) \}$.
@@ -428,7 +428,7 @@ Ici on ne s'intéresse qu'à l'extraction des entités, mais un filtrage est eff
 \end{table}
 
 La table~\ref{tab:nl-query:result-dashboard} présente les résultats obtenus.
-Le premier groupe d'entités (de \emph{axis aggregate} à \emph{tables}) est extrait à partir de lexiques te le second groupe (de \emph{value axis} à \emph{y label}) sont extrait à partir de \acrshortpl{crf}.
+Le premier groupe d'entités (de \emph{axis aggregate} à \emph{tables}) est extrait à partir de lexiques et le second groupe (de \emph{value axis} à \emph{y label}) sont extraits à partir de \acrshortpl{crf}.
 L'extraction des axes (\emph{value axis}, \emph{x axis}, \emph{y axis}) se repose sur les entités : \emph{axis aggregate}, \emph{axis modifier}, \emph{chart type}, \emph{table} et \emph{fields}.
 Les étiquettes des axes (\emph{value label}, \emph{x label}, \emph{y label}) se basent sur l'extraction des entités : \emph{value axis}, \emph{x axis} et \emph{y axis}.
 
