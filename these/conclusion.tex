@@ -1,0 +1,157 @@
+\section{Contributions}
+
+Nous avons présenté dans ce manuscrit un ensemble de travaux pour la construction automatique de bases de données pour le domaine médical.
+En particulier, nos recherches se focalisent sur les bases de données graphes pouvant contenir des données incomplètes et s'articulent autour de deux axes principaux :
+\begin{itemize}
+    \item La maintenance et le maintien de la cohérence d'une base de données incomplète par rapport à un ensemble de règles définies.
+
+    \item L'extraction et la structuration automatique d'informations à partir de textes en vue de leur intégration dans une base de données.
+\end{itemize}
+
+Dans la suite de cette section, nous détaillerons les contributions majeures réalisées sur ces deux axes.
+
+\subsection{\nameref*{part:update}}
+
+Maintenir une base de données cohérente est essentiel pour faciliter l'analyse des données.
+Cette tâche devient particulièrement complexe lorsque la base de données peut contenir des données incomplètes, matérialisées par des valeurs nulles liées.
+Dans la première partie de ce manuscrit, nous avons examiné une politique de maintenance qui accorde la priorité aux mises à jour.
+Concrètement, au lieu de rejeter des mises à jour susceptibles de rendre les données incohérentes, nous cherchons à effectuer les modifications nécessaires pour que ces mises à jour soient applicables.
+À cette fin, nous avons proposé une extension des travaux de \cite{chabinConsistentUpdatingDatabases2020} basée sur la sémantique de \cite{reiterSoundSometimesComplete1986} et qui ne limite pas le pouvoir d'expressivité des contraintes.
+Contrairement à l'approche en mémoire présentée dans \cite{chabinConsistentUpdatingDatabases2020}, nos travaux se concentrent sur la maintenance en relation avec un \gls{sgbd}.
+
+Notre extension comporte les contributions suivantes :
+\begin{itemize}
+    \item Une modélisation d'un graphe attribué visant à optimiser les différentes opérations requises pour assurer la cohérence de la base de données, en particulier pour la recherche des atomes liés, une opération coûteuse dans une modélisation classique dans une base de données relationnelle.
+    
+    \item Une procédure de mise à jour incrémentale, en mode connecté, reposant sur un ensemble de requêtes.
+\end{itemize}
+
+L'évaluation présentée dans la section~\ref{sec:update:evaluation} (page~\pageref{sec:update:evaluation}) met en lumière l'évolution significative des performances de notre approche incrémentale par rapport à l'approche complète proposée dans \cite{chabinConsistentUpdatingDatabases2020}, malgré l'interaction avec un \gls{sgbd}.
+Cette étude des performances souligne également les qualités de notre modèle de graphe, qui permet de réduire de manière significative le coût de la recherche des atomes liés en construisant un graphe similaire à \acrshort{rdf}, où les individus sont représentés par des nœuds.
+Toutefois, elle met également en évidence les limitations du modèle de graphe, où les performances des requêtes dépendent fortement de la modélisation.
+Dans notre cas, la fragmentation des données en un grand nombre de nœuds et de relations rend la recherche d'homomorphismes difficile.
+
+\subsection{\nameref*{part:texts}}
+
+Ce second axe de recherche concerne l'exploitation des informations contenues dans les textes.
+L'approche proposée repose sur des techniques d'extraction d'information, en particulier l'extraction d'entités.
+Le cœur de ces travaux réside dans la structuration automatique des informations.
+Dans ce contexte, ce manuscrit propose :
+\begin{itemize}
+    \item Un méta-modèle permettant d'organiser les informations de manière cohérente ;
+
+    \item Une méta-grammaire capable de reconnaître l'ensemble des schémas valides du méta-modèle ;
+
+    \item Une procédure itérative de structuration de l'information ;
+
+    \item Une preuve de concept avec l'implémentation de la procédure, avec pour stratégie la minimisation de la grammaire cible.
+\end{itemize}
+
+Une évaluation préliminaire a démontré que la procédure proposée répond à la problématique et produit des résultats prometteur tant pour la structuration que pour l'intégration de données.
+L'évaluation souligne également l'importance de cette étape dans la construction automatique d'une base de données à partir de données textuelles.
+
+\paragraph{}
+Dans un second temps, nous proposons différentes techniques pour l'extraction d'entités permettant de répondre aux problématiques d'accès restreint aux données, d'efficacité et d'explicabilité.
+En particulier, nous proposons une approche itérative hybride reposant sur :
+\begin{itemize}
+    \item Une représentation multi-valuée des entités nommées, permettant de prendre en compte l'ambiguïté et l'incertitude ;
+    
+    \item L'utilisation de lexiques par la construction d'un \gls{fst} pour l'annotation efficace d'entités nommées ;
+    
+    \item La notion de contextualisation et de spécification basée sur des marqueurs, avec une approche basée sur des règles ainsi qu'une approche reposant sur une cascade de \glspl{crf}.
+\end{itemize}
+
+Nous avons également présenté deux cas d'application concrets reposant sur cette approche, l'un pour la classification de documents et l'autre pour la construction de \gls{nli} permettant l'interrogation et l'analyse de données.
+Ces deux cas d'application ont permis de démontrer les performances de notre approche en obtenant des résultats satisfaisants sans recourir à un apprentissage automatique nécessitant de vastes corpus d'entraînement.
+Cette approche permet ainsi de travailler efficacement avec des données sensibles ou difficilement accessibles.
+Ces deux cas d'usage témoignent également de la flexibilité et de la simplicité d'adaptation du processus itératif d'extraction.
+
+\section{Perspectives}
+
+Les travaux présentés dans cette thèse offrent des résultats importants et ouvrent de nombreuses perspectives pour la suite.
+En particulier, nous nous intéressons à trois d'entre elles que nous souhaitons développer davantage.
+
+\subsection{Maintien de la cohérence de graphes attribués}
+
+Dans le chapitre~\ref{chp:update:algos}, nous avons présenté un modèle de graphe attribué conçu pour répondre à la problématique de la mise à jour cohérente.
+Cette représentation de la base de données vise à optimiser les interactions nécessaires au maintien de la cohérence, telles que la recherche des nœuds liés et la recherche d'homomorphismes pour le calcul du cœur.
+Cette approche repose sur un modèle qui ne correspond pas nécessairement à une représentation intuitive des données, ce qui rend l'interrogation du graphe difficile, contrairement à l'approche proposée avec le modèle relationnel (voir la section~\ref{sec:update:evaluation:mysql}, page~\pageref{sec:update:evaluation:mysql}).
+À l'usage, il est envisageable qu'une autre représentation des données sous forme de graphe soit utilisée pour l'interrogation par un utilisateur.
+
+Pour répondre à cette problématique, nous envisageons d'explorer et de comparer deux approches :
+\begin{enumerate}
+    \item Les deux graphes existent simultanément et notre modélisation du graphe est considérée comme un index utilisé pour le maintien de la cohérence.
+    Cette approche implique un coût de maintenance supplémentaire pour maintenir les deux représentations à jour.
+    Elle s'inscrit dans la perspective d'utiliser des bases de données hybrides \cite{hassanGRFusionGraphsFirstClass2018} permettant d'exploiter efficacement le modèle relationnel et le modèle de graphe attribué de manière simultanée.
+
+    \item Seule notre représentation est utilisée pour la sauvegarde en base, mais l'ensemble des requêtes émises lors de l'interrogation est automatiquement traduit vers notre modélisation.
+    Cette approche pourrait simplifier la maintenance, mais elle pourrait également entraîner des coûts supplémentaires lors de la traduction des requêtes, surtout si elles sont complexes \cite{sujanskyHeterogeneousDatabaseIntegration2001,asfand-e-yarSemanticIntegrationHeterogeneous2020}.
+\end{enumerate}
+
+Dans la section~\ref{sec:update:evaluation} (page~\pageref{sec:update:evaluation}), nous avons examiné les coûts engendrés par notre modélisation pour la recherche d'homomorphismes.
+Une perspective de ces travaux consiste à proposer l'application de notre politique de mise à jour sur un graphe attribué plus intuitif pour améliorer la recherche des homomorphismes.
+Bien que cette approche ait été envisagée dans nos travaux, elle présente les défis suivants :
+\begin{enumerate}
+    \item Dans un graphe quelconque, l'incomplétude peut se situer au niveau des propriétés d'un nœud ou d'une relation, mais peut également concerner les nœuds ou les relations eux-mêmes.
+    Cette approche complexifie grandement la recherche des valeurs nulles et la détection des ensembles liés.
+
+    \item Dans notre approche, nous proposons une vision \acrshort{rdf} où les individus sont les termes de nos faits logiques.
+    En revanche, dans le cadre des graphes de propriété, les individus sont des nœuds, et il est donc nécessaire de définir quand deux nœuds sont équivalents pour le calcul du \gls{core}.
+    Contrairement au modèle relationnel, les graphes n'ont pas de notion de dépendances fonctionnelles ni de clés.
+    Bien que des travaux tentent de répondre à cette question, comme nous l'avons vu avec les \gls{gfd} \cite{fanDependenciesGraphs2019}, cette question n'est pas encore résolue.
+\end{enumerate}
+
+\subsection{Uniformisation de données pour l'application de processus}
+
+Dans le chapitre~\ref{chp:struct} (section~\ref{sec:struct:implem:integration}, page~\pageref{sec:struct:implem:integration}), nous avons examiné comment notre approche de structuration automatique de l'information pourrait être appliquée à l'intégration de données.
+En particulier, on s'intéresse à développer l'idée d'unification des données.
+En effet, on remarque de plus en plus le besoin de construire des méta-modèles afin de standardiser la représentation des données et de les rendre interopérables, facilitant ainsi leur intégration et leur utilisation cohérente à travers différentes applications et systèmes.
+
+Malgré l'existence de modèles unifiés comme les graphes \gls{rdf} et l'implémentation de l'Open Linked Data, leur adoption reste limitée.
+De plus, les ontologies mises en place présentent souvent des chevauchements et les liens d'équivalence ne sont pas toujours spécifiés, ce qui requiert une vigilance accrue pour garantir une interopérabilité optimale entre les différentes sources de données \cite{rulaDataQualityIssues2016}.
+Par ailleurs, un grand nombre de données proviennent généralement de divers outils utilisant des formats variés, certains étant plus structurés que d'autres.
+Les bases de données sont régulièrement fragmentées avec des schémas variés, souvent pour des raisons historiques.
+Il est courant que chaque service au sein d'une même entreprise enregistre ses données de manière indépendante et non uniforme afin de répondre à des besoins spécifiques.
+Cette diversité de formats complique l'interrogation, l'analyse et le traitement des données.
+
+L'adoption d'une approche uniforme pour la gestion de ces données offre des avantages significatifs dans des domaines tels que le journalisme de données en facilitant la corrélation des données provenant de différentes sources et services.
+En s'appuyant sur les travaux présentés dans le chapitre~\ref{chp:struct}, notamment le méta-modèle proposé, une perspective de recherche de chercher à utiliser ce modèle pour pouvoir agréger de manière dynamique et automatique un ensemble de ressources, ainsi que l'ensemble des entrées et sorties des différents processus en place.
+Cette approche permettrait de rendre un processus appliqué à des données d'une ressource également applicable aux données d'autres ressources.
+Elle pourrait également faciliter l'enchaînement de divers processus et leur application sur l'ensemble des ressources disponibles de manière simultanée.
+
+Contrairement à l'approche proposée dans le chapitre~\ref{chp:struct}, le méta-modèle servirait de représentation intermédiaire de l'ensemble des ressources.
+Le défi de cette approche réside dans la capacité à identifier les correspondances entre les différentes ressources.
+Une approche envisagée serait d'utiliser des mécanismes similaires à ceux présentés dans la structuration automatique pour l'identification des regroupements équivalents.
+La différence majeure est que l'on ne cherche pas à construire une base unifiée, mais à identifier les transformations nécessaires pour convertir dynamiquement une ressource vers un autre format.
+Plutôt que de reconstruire l'ensemble des ressources, l'idée est de fournir une couche supplémentaire d'interopérabilité, permettant ainsi une intégration dynamique et une utilisation cohérente des données provenant de différentes sources et formats.
+
+\subsection{Base de données floues}
+
+Dans le chapitre~\ref{chp:struct}, nous avons examiné la structuration automatique d'informations basée sur l'extraction d'entités nommées, mais qui ne repose pas sur les valeurs spécifiques associées à ces entités.
+Dans le chapitre~\ref{chp:tal}, nous avons proposé une représentation multi-valuée des entités nommées pour capturer l'ambiguïté inhérente aux textes.
+Une partie de cette ambiguïté peut être résolue par le contexte : par exemple, pour le mot \textquote{Paris}, qui peut faire référence à une personne ou à la ville, si la valeur est détectée comme une adresse, alors la valeur associée à la personne peut être supprimée.
+Cependant, toutes les ambiguïtés ne peuvent pas être résolues de cette manière et l'insertion d'informations structurées dans une base de données implique nécessairement la résolution préalable de ces ambiguïtés.
+
+Une perspective envisagée consiste à enregistrer les données sans résoudre leur ambiguïté, en s'appuyant sur les principes de la logique floue.
+Dans cette approche, chaque valeur serait associée à une valeur de vérité comprise entre $0$ et $1$.
+La valeur de vérité n'est pas nécessairement déterminée par le nombre de valeurs ambiguës, mais pourrait également refléter un certain niveau de confiance dans les données.
+L'idée sous-jacente est que l'ambiguïté pourrait être résolue progressivement au fil des mises à jour : en étant contraintes par un ensemble de règles, ces dernières pourraient contribuer à clarifier l'ambiguïté.
+De même, l'ambiguïté pourrait être résolue au moment de l'interrogation en croisant des résultats.
+Cette valeur de vérité pourrait ensuite être utilisée pour filtrer ou organiser les résultats.
+
+\begin{example}
+    Par exemple, supposons qu'un événement ait pour adresse \emph{Paris, France} et \emph{Orléans, France}.
+    Interroger la base pour obtenir l'adresse exacte pourrait renvoyer deux solutions possibles (\emph{Paris, France} et \emph{Orléans, France}), chacune avec une valeur de vérité de $0.5$.
+    En revanche, si l'utilisateur demande uniquement le pays, la réponse peut être unique (\emph{France}) avec une valeur de vérité de $1$ (\SI{100}{\percent} des entrées dans la base ont la valeur \emph{France}).
+
+    L'introduction de contraintes supplémentaires lors de la requête, telles que la ville, pourrait conduire à une réponse unique, mais la valeur de vérité est plus incertaine : elle pourrait être de $0.5$ si l'on prend en compte l'ensemble de la base de données ou de $1$ si l'on ne considère que l'ensemble des résultats de la requête.
+    Cette deuxième approche est justifiable si l'on suppose que les deux réponses sont vraies, mais pas simultanément.
+    Ainsi, demander l'adresse en précisant la ville reviendrait à préciser le contexte d'interrogation.
+    Ce dernier point révèle l'une des difficultés de la tâche, à savoir le calcul de cette valeur de vérité et pourrait nécessiter l'ajout de la notion de contexte au moment de l'interrogation.
+\end{example}
+
+Cette idée présente des similitudes avec les solutions proposées dans le modèle relationnel pour la gestion des données temporelles \cite{kulkarniTemporalFeaturesSQL2012}.
+Un parallèle peut également être établi avec les travaux sur les bases de données contextuelles \cite{stavrakasMultidimensionalSemistructuredData2002,stavrakasMultidimensionalSemistructuredData2003}.
+Ces travaux s'attardent sur la représentation de données contextuelles en introduisant un modèle multidimensionnel qui se réduit à un modèle conventionnel pour un contexte donné.
+La mise en place de bases de données floues pourrait également représenter un cas d'application des moteurs de recommandation, où la valeur de vérité serait propre à chaque utilisateur et correspondrait au score de recommandation.
+Cette proposition soulève plusieurs questions : Comment rendre l'interrogation de données efficace dans ce contexte ? Comment calculer de manière cohérente cette valeur de vérité lors de l'interrogation, en particulier lors de l'agrégation ? Et comment garantir la cohérence de la base de données avec un ensemble de règles dans ce contexte ?

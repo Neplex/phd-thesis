@@ -26,6 +26,7 @@
 
 \bookmarksetup{startatroot}
 \chapter{Introduction}
+\label{chp:intro}
 \minitoc
 \subfile{introduction}
 
@@ -71,11 +72,14 @@
 
 %%%%%%%%%%%%%%%%%%
 
-% \bookmarksetup{startatroot}
-% \chapter{Conclusion et perspectives}
-% \glsresetall
-% \minitoc
-% \subfile{conclusion}
+\addtocontents{toc}{\protect\begin{adjustwidth}{0cm}{0cm}}
+\bookmarksetup{startatroot}
+\chapter{Conclusion et perspectives}
+\label{chp:conclusion}
+\glsresetall
+\minitoc
+\subfile{conclusion}
+\addtocontents{toc}{\protect\end{adjustwidth}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fin de la thèse
