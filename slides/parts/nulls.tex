@@ -1,0 +1,366 @@
+
+\section{Introduction}
+
+\begin{frame}{Incomplete databases}
+    \begin{block}{}
+        \begin{itemize}
+            \item Incompleteness in database due to missing but connected values \pause
+            \item Named null as Reiter's semantic: \hyphentextcquote{english}[p.1]{reiterSoundSometimesComplete1986}{\textelp{} these nulls represent existing but unknown individuals}
+        \end{itemize}
+    \end{block}
+
+    \pause
+
+    \begin{multline*}
+        \mathcal{D} = \{
+        PrescExam(Mia, \textit{x-ray}),\\ExamResult(Mia, {\color{blue} N_1}, {\color{blue} N_2}), SOSY(Mia, {\color{blue} N_2})
+        \}
+    \end{multline*}
+\end{frame}
+
+\begin{frame}{Consistency}
+    \begin{block}{}
+        Consistency means that all data in the database must be valid according to a set of predefined rules\\~
+
+        \centering here, $\mathcal{D}$ is
+        \only<1,3>{\color{green}Valid}%
+        \only<2>{\color{red}Invalid}%
+    \end{block}
+
+    \begin{multline*}
+        \mathcal{D} = \{
+        PrescExam(Mia, \textit{x-ray}), ExamResult(Mia, \textit{x-ray}, \textit{join inflammation})
+        \only<3>{,\\{\color{blue}SOSY(Mia, \textit{join inflammation})}}
+        \}
+    \end{multline*}
+
+    \vfill
+
+    \begin{itemize}
+        \item[$c_1$] $PrescExam(X, Y) \to ExamResult(X, Y, Z)$
+        \item<only@2,3>[$c_2$] $ExamResult(X, Y, Z) \to SOSY(X, Z)$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Update}
+    \begin{block}{}
+        \begin{itemize}
+            \item How do we check consistency during an update?
+                  \begin{itemize}
+                      \item<only@2-6> Refusing updates that do not satisfy the constraints
+                      \item<only@3-6> \emph{Update-first} and making sure the data complies with the specified constraints
+                  \end{itemize}
+            \item<only@4-6> Using constraints as tuple-generating dependency (TGD)
+            \item<only@5-6> How to manage existential variables within constraints?
+        \end{itemize}
+    \end{block}
+
+    \begin{multline*}
+        \mathcal{D} = \{
+        PrescExam(Mia, \textit{x-ray})
+        \only<6>{,\\ExamResult(Mia, \textit{x-ray}, {\color{blue} N_1}), SOSY(Mia, {\color{blue} N_1})}
+        \}\\
+    \end{multline*}
+
+    \vfill
+
+    \begin{itemize}
+        \item[$c_1$] $PrescExam(X, Y) \to ExamResult(X, Y, Z)$
+        \item[$c_2$] $ExamResult(X, Y, Z) \to SOSY(X, Z)$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Simplification}
+    \begin{block}{}
+        Redundancies means there exist an equivalent or more specific information
+        Simplification means eliminate redundancies
+
+        \[
+            \mathcal{D} = \{P(a, b), P(b, c), P(c, d)\}
+        \]
+    \end{block}
+    \vfill
+    \begin{center}
+        \only<1>{$P(a, N_1)$ is redundant}
+        \only<2>{$P(a, N_1), P(N_1, d)$ is not redundant}
+        \only<3>{$P(a, N_1), P(N_1, N_2), P(N_2, d)$ is redundant}
+    \end{center}
+    % \only<3->{\begin{align*}
+    %     \only<3->{P(N_1, N_2)            & ~\to~ P(a, b)                      \\}
+    %     \only<4->{P(N_1, N_2)            & ~\xcancel{\to}~ P(a, N_2)          \\}
+    %     \only<5->{P(N_1, N_2), P(N_2, c) & ~\xcancel{\to}~ P(a, b), P(N_2, c) \\}
+    %     \only<6->{P(N_1, N_2), P(N_2, c) & ~\to~ P(a, b), P(b, c)}
+    % \end{align*}}
+\end{frame}
+
+\begin{frame}{How to?}
+    \cite{chabinConsistentUpdatingDatabases2020} propose an update method to handle this with an in-memory implementation\\~
+
+    Our proposal is:
+    \begin{itemize}
+        \item Incremental, we do not recompute all database consistency
+        \item In database, using an optimal data modelisation
+        \item Query-driven, all our methods are based on a small set of queries
+    \end{itemize}
+\end{frame}
+
+\section{Incrementality}
+\begin{frame}{Chase}
+    \begin{block}{}
+        Only considering instantiation of rules given by the update.
+        \begin{itemize}
+            \item[$c_1$] $PrescExam(X, Y) \to ExamResult(X, Y, Z)$
+            \item[$c_2$] $ExamResult(X, Y, Z) \to SOSY(X, Z)$
+        \end{itemize}
+
+        \[ Q_{chase}^{[c]}(X) \leftarrow body(c), \lnot head(c) \]
+    \end{block}
+
+    \vfill
+
+    \begin{enumerate}
+        \item Insertion of $PrescExam(Diego, RMI)$
+              \pause
+        \item only $c_1$ : $PrescExam(Diego, RMI) \to ExamResult(Diego, RMI, Z)$ is triggered
+              \pause
+        \item only $c_2$ : $ExamResult(Diego, RMI, N_Z), \to SOSY(Diego, N_Z)$ is triggered\\
+    \end{enumerate}
+
+    % \vfill
+    % \pause How to deal with infinite generation of atoms? \pause Null degree
+\end{frame}
+
+\begin{frame}{Simplification}
+    During an update $U$, only atoms $a_i$ respecting one of the following conditions is considered and checked against the database $\mathcal{D}$ :
+    \vfill
+    \begin{enumerate}
+        \item $a_i$ is in $U$ and contains nulls
+              \pause\vfill
+        \item $a_i$ is in $\mathcal{D}$, have the same predicate symbol than an atom $a_i'$ in $U$ and has for each term a compatible and equivalent or less specific value
+    \end{enumerate}
+    \vfill
+    \pause
+    \begin{columns}
+        \begin{column}{.25\textwidth}
+            Given $A(a, b)$\\
+        \end{column}
+        \hfill
+        \begin{column}{.25\textwidth}
+            \centering
+            $B(a, b)$\\ is not compatible
+        \end{column}
+        \hfill
+        \begin{column}{.25\textwidth}
+            \centering
+            $A(b, c)$\\ is not compatible
+        \end{column}
+        \hfill
+        \begin{column}{.25\textwidth}
+            \centering
+            $A(a, N_1)$\\ is compatible
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\section{Evaluation}
+\begin{frame}{Datasets}
+    \centering
+    \begin{tabular}{l|c|c|c|c}
+        Instances              & Nb Atomes   & Nb Nulls    & Nb Rules & Null/Atome ($\tau$) \\
+        \hline
+        \hline
+        $Movie$                & \num{604}   & \num{340}   & \num{12} & \num{0.56}          \\
+        $GOT$                  & \num{24818} & \num{17232} & \num{32} & \num{0.69}          \\
+        \hline
+        $Social_{1K}$          & \num{2248}  & \num{190}   & \num{39} & \num{0.08}          \\
+        $Social_{10K}$         & \num{16559} & \num{1183}  & \num{39} & \num{0.07}          \\
+        \hline
+        $Social_{10K}^{0N}$    & \num{16559} & \num{0}     & \num{39} & \num{0.00}          \\
+        $Social_{10K}^{50N}$   & \num{16559} & \num{50}    & \num{39} & \num{0.00}          \\
+        $Social_{10K}^{100N}$  & \num{16559} & \num{100}   & \num{39} & \num{0.01}          \\
+        $Social_{10K}^{500N}$  & \num{16559} & \num{500}   & \num{39} & \num{0.03}          \\
+        $Social_{10K}^{1000N}$ & \num{16559} & \num{1000}  & \num{39} & \num{0.06}          \\
+    \end{tabular}
+\end{frame}
+
+\begin{frame}{Benchmarks: Execution time per database}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[xbar, every axis plot/.append style={fill}, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.9\textheight]
+            \addplot+[area legend] table [y=db, x=chase, col sep=comma] {time_mysql.csv};
+            \addlegendentry{Chase};
+
+            \addplot+[area legend] table [y=db, x=nullBucket, col sep=comma] {time_mysql.csv};
+            \addlegendentry{Null bucket};
+
+            \addplot+[area legend] table [y=db, x=partitions, col sep=comma, col sep=comma] {time_mysql.csv};
+            \addlegendentry{LinkedNulls};
+
+            \addplot+[area legend] table [y=db, x=simplifications, col sep=comma] {time_mysql.csv};
+            \addlegendentry{Simplifications};
+        \end{axis}
+    \end{tikzpicture}
+\end{frame}
+
+
+\section{Using graphs}
+\begin{frame}{Graph model}
+    \centering
+    \begin{adjustbox}{width=.8\textwidth}
+        \begin{tikzpicture}[shorten >=3pt,->,node distance=16em,on grid,every text node part/.style={align=center}]
+            \node[draw] (a) {\textbf{:Atom}\\\textit{symbol}: $P$\\\textit{terms}: $\{t_1, \dots, t_n\}$};        % Atom
+            \node[draw,circle,left = of a] (nc) {\textbf{:Element}\\\textbf{:Constant}\\\textit{value}: $t_i$};   % Element/Constant
+            \node[draw,circle,right = of a] (nn) {\textbf{:Element}\\\textbf{:Null}\\\textit{value}: $t_j$};      % Element/Null
+            \path
+            (a) edge [] node[below, near start] {$0..*$} node[below, near end] {$1..*$} node[above] {\textbf{:P} \{\textit{rank}: $i$\}} (nc)
+            (a) edge [] node[below, near start] {$0..*$} node[below, near end] {$1..*$} node[above] {\textbf{:P} \{\textit{rank}: $j$\}} (nn)
+            ;
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{frame}
+
+\begin{frame}{Example}
+    \centering
+    \begin{multline*}
+        \mathcal{D} = \{ Pat(Mia), PrescExam(Mia, N_1), SOSY(Mia, pain),\\
+        Diag(Mia, N_3, N_2), ResultExam(Mia, \textit{x-ray}, N_3) \}
+    \end{multline*}
+    \vfill
+    \begin{adjustbox}{width=.8\linewidth}
+        \begin{tikzpicture}[shorten >=3pt,->,node distance=4cm,on grid,every text node part/.style={align=center}]
+            \node[draw,circle] (Mia) {$n_1$\\Mia};
+            \node[draw,left = of Mia] (pat) {$n_{11}$\\Pat};
+            \node[draw,circle,above = 2cm of pat] (n1) {$n_2$\\$N_1$};
+            \node[draw,circle,below = 2cm of pat] (temp) {$n_3$\\x-ray};
+            \node[draw,right = of n1] (presc) {$n_4$\\PrescExam};
+            \node[draw,right = of presc] (sosy) {$n_5$\\SOSY};
+            \node[draw,right = of temp] (res) {$n_6$\\ResultExam};
+            \node[draw,circle,right = of res] (n4) {$n_7$\\$N_3$};
+            \node[draw,circle,right = of sosy] (fever) {$n_8$\\pain};
+            \node[draw,right = of Mia] (diag) {$n_9$\\Diag};
+            \node[draw,circle,right = of diag] (n2) {$n_{10}$\\$N_2$};
+            \path
+            (pat) edge [] node[above] {$r_1$} node[below] {rank: 0} (Mia)
+            (presc) edge [] node[right] {$r_2$} node[left] {rank: 0} (Mia)
+            edge [] node[above] {$r_3$} node[below] {rank: 1} (n1)
+            (sosy) edge [] node[left] {$r_4$} node[right] {rank: 0} (Mia)
+            edge [] node[above] {$r_5$} node[below] {rank: 1} (fever)
+            (diag) edge [] node[above] {$r_6$} node[below] {rank: 0} (Mia)
+            edge [] node[right] {$r_7$} node[left] {rank: 1} (n4)
+            edge [] node[above] {$r_8$} node[below] {rank: 2} (n2)
+            (res) edge [] node[right] {$r_9$} node[left] {rank: 0} (Mia)
+            edge [] node[above] {$r_{10}$} node[below] {rank: 1} (temp)
+            edge [] node[above] {$r_{11}$} node[below] {rank: 2} (n4)
+            ;
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{frame}
+
+
+\begin{frame}{LinkedNulls}
+    \begin{multline*}
+        \mathcal{D} = \{ Pat(Mia), PrescExam(Mia, N_1), SOSY(Mia, pain),\\
+        {\only<2->{\color{red}}Diag(Mia, N_3, N_2)},
+        {\only<3>{\color{red}}ResultExam(Mia, \textit{x-ray}, N_3)}
+        \}
+    \end{multline*}
+    \vfill
+    \centering
+    \begin{adjustbox}{width=.8\linewidth}
+        \begin{tikzpicture}[shorten >=3pt,->,node distance=4cm,on grid,every text node part/.style={align=center}]
+            \node[draw,circle] (Mia) {$n_1$\\Mia};
+            \node[draw,left = of Mia] (pat) {$n_{11}$\\Pat};
+            \node[draw,circle,above = 2cm of pat] (n1) {$n_2$\\$N_1$};
+            \node[draw,circle,below = 2cm of pat] (temp) {$n_3$\\x-ray};
+            \node[draw,right = of n1] (presc) {$n_4$\\PrescExam};
+            \node[draw,right = of presc] (sosy) {$n_5$\\SOSY};
+            \node[draw,circle,right = of sosy] (fever) {$n_8$\\pain};
+
+            \only<1-2>{\node[draw,right = of temp] (res) {$n_6$\\ResultExam};}
+            \only<3>{\node[draw,right = of temp,red] (res) {$n_6$\\ResultExam};}
+
+            \only<1>{\node[draw,circle,right = of res] (n4) {$n_7$\\$N_3$};}
+            \only<2-3>{\node[draw,circle,right = of res,red] (n4) {$n_7$\\$N_3$};}
+
+            \only<1>{\node[draw,right = of Mia] (diag) {$n_9$\\Diag};}
+            \only<2-3>{\node[draw,right = of Mia,red] (diag) {$n_9$\\Diag};}
+
+            \node[draw,circle,right = of diag,red] (n2) {$n_{10}$\\$N_2$};
+
+            \path (pat) edge [] node[above] {$r_1$} node[below] {rank: 0} (Mia);
+            \path (presc) edge [] node[right] {$r_2$} node[left] {rank: 0} (Mia);
+            \path (presc) edge [] node[above] {$r_3$} node[below] {rank: 1} (n1);
+            \path (sosy) edge [] node[left] {$r_4$} node[right] {rank: 0} (Mia);
+            \path (sosy) edge [] node[above] {$r_5$} node[below] {rank: 1} (fever);
+            \path (diag) edge [] node[above] {$r_6$} node[below] {rank: 0} (Mia);
+            \path (res) edge [] node[right] {$r_9$} node[left] {rank: 0} (Mia);
+            \path (res) edge [] node[above] {$r_{10}$} node[below] {rank: 1} (temp);
+
+            \only<1>{\path (diag) edge [] node[right] {$r_7$} node[left] {rank: 1} (n4);}
+            \only<2-3>{\path (diag) edge [red] node[right] {$r_7$} node[left] {rank: 1} (n4);}
+
+            \only<1>{\path (diag) edge [] node[above] {$r_8$} node[below] {rank: 2} (n2);}
+            \only<2-3>{\path (diag) edge [red] node[above] {$r_8$} node[below] {rank: 2} (n2);}
+
+            \only<1-2>{\path (res) edge [] node[above] {$r_{11}$} node[below] {rank: 2} (n4);}
+            \only<3>{\path (res) edge [red] node[above] {$r_{11}$} node[below] {rank: 2} (n4);}
+            ;
+        \end{tikzpicture}
+    \end{adjustbox}
+\end{frame}
+
+\begin{frame}{Benchmarks: Execution time per database}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[xbar, every axis plot/.append style={fill}, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL,Neo4J}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.9\textheight]
+            \addplot+[area legend] table [y=db, x=chase, col sep=comma] {time_per_db.csv};
+            \addlegendentry{Chase};
+
+            \addplot+[area legend] table [y=db, x=nullBucket, col sep=comma] {time_per_db.csv};
+            \addlegendentry{Null bucket};
+
+            \addplot+[area legend] table [y=db, x=partitions, col sep=comma, col sep=comma] {time_per_db.csv};
+            \addlegendentry{LinkedNulls};
+
+            \addplot+[area legend] table [y=db, x=simplifications, col sep=comma] {time_per_db.csv};
+            \addlegendentry{Simplifications};
+        \end{axis}
+    \end{tikzpicture}
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}{Results}
+    \begin{itemize}
+        \item Incrementality is done in two ways:
+              \begin{itemize}
+                  \item Only consider instantiation of rules from the update
+                  \item Only check simplifications on \emph{impacted} nulls
+              \end{itemize}\vfill
+        \item The incrementality improve performance and allow using databases\vfill
+        \item Graph database and path query helps with the LinkedNulls set retrieval\vfill
+        \item We identify a flaw due to our modelisation causing complex pattern retrieval and costly negation queries
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Next steps}
+    \begin{itemize}
+        \item Mixed Relational and Graph-based modelisations \cite{hassanGRFusionGraphsFirstClass2018}\vfill
+        \item Adapt our work to more standard LPG modelisations
+    \end{itemize}
+    \vfill
+    \begin{block}{Acknowledgements}
+        \begin{columns}
+            \begin{column}{.7\textwidth}
+                \small
+                \justifying
+                Work partially supported by project SENDUP (ANR-18-CE23-0010) and developed in the context of the DOING action (MADICS and DIAMS).
+                We express our gratitude to the interns who contributed to this project, in particular Lucas Moret-Bailly for his valuable suggestions.
+            \end{column}
+            \begin{column}{.3\textwidth}
+                \vfill
+                \includegraphics[width=\textwidth]{../logos/logoDOING.png}
+                \vfill
+            \end{column}
+        \end{columns}
+    \end{block}
+\end{frame}

@@ -1,0 +1,257 @@
+\documentclass[english,french,table,aspectratio=43]{beamer}
+
+\pdfinclusioncopyfonts=1
+\pdfgentounicode=1
+\pdfminorversion=5 
+\pdfcompresslevel=9
+\pdfobjcompresslevel=2
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages :
+\usepackage{etex}
+\usepackage[utf8]{inputenc}          % Attention encodage => UTF 8
+\usepackage[T1]{fontenc}             % Codage de caractères T1
+\usepackage{lmodern}
+\usepackage{cmap}
+
+\rmfamily
+
+% Declare that Latin Modern Roman (lmr) should take
+% its bold (b) and bold extended (bx) weight, and small capital (sc) shape, 
+% from the corresponding Computer Modern Roman (cmr) font, for the T1 font encoding.
+\DeclareFontShape{T1}{lmr}{b}{sc}{<->ssub*cmr/bx/sc}{}
+\DeclareFontShape{T1}{lmr}{bx}{sc}{<->ssub*cmr/bx/sc}{}
+
+\usepackage{xspace}
+\usepackage{babel}
+\usepackage[fixlanguage]{babelbib}
+\usepackage[autolanguage]{numprint}
+\usepackage[sectionbib]{bibunits}
+\usepackage{hyphenat}
+\usepackage{csquotes}
+\usepackage{changepage}
+\usepackage{subfiles}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{latexsym}
+
+\usepackage{circledsteps}
+\usepackage{orcidlink}
+\usepackage{adjustbox}
+\usepackage{ragged2e}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{bookmark}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{siunitx}
+\usepackage{framed}
+\usepackage{cancel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{doi}
+
+\usepackage{tikz}
+\usepackage{tikz-dependency}
+\usepackage{tikz-qtree}
+\usepackage{tikz-qtree-compat}
+\usepackage{forest}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+\usepackage[svgnames]{xcolor}
+%\usepackage[inline]{enumitem}
+\usepackage[linesnumbered,ruled,vlined,boxed,frenchkw,onelanguage]{algorithm2e}
+\usepackage[type={CC},modifier={by-nc-nd},lang=french,version={4.0}]{doclicense}
+
+%\usepackage[a-3u,ua,x-4]{pdfx}
+
+% Bib
+\selectbiblanguage{french}
+
+% Algorithm2e
+\renewcommand{\CommentSty}[1]{\footnotesize\ttfamily\textcolor{Green}{#1}}
+\renewcommand{\KwSty}[1]{\textnormal{\textcolor{blue}{\bfseries #1}}\unskip}
+\renewcommand{\FuncSty}[1]{\textsf{#1}}
+\renewcommand{\ProcFnt}[1]{\textsf{#1}}
+
+\NewCommandCopy{\legacyunderscore}{\_}
+\renewcommand{\_}{\ifincsname_\else\legacyunderscore\fi}
+
+\makeatletter
+\def\@algocf@pre@ruled{\begin{shaded}}%
+\def\@algocf@post@ruled{\end{shaded}\relax}%
+\makeatother
+
+\colorlet{shadecolor}{WhiteSmoke}
+
+% Tikz
+\usetikzlibrary{
+  automata, graphs, positioning, fit, tikzmark,
+  shapes, shapes.multipart, arrows.meta, quotes
+}
+\usetikzmarklibrary{listings}
+
+% \drawBrace[xshift]{beginningNode}{endingNode}{comment}
+% This command draws a brace between two tikzmarks, to their right, no matter which
+% one is the rightmost, and includes a node midway the brace, to write the comment.
+\newcommand*{\drawBrace}[4][.5em]{%
+    \node[draw=none, fit={(#2) (#3)}] (rectg) {};
+    \draw [decoration={brace,amplitude=0.5em},decorate,thick] ([xshift=#1]rectg.north east) -- ([xshift=#1]rectg.south east) node[midway,right,xshift=1em]{#4};
+}%
+
+\tikzset{
+  labeled node/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split draw splits=false,
+    rounded corners,
+    very thick,
+    draw=blue!50,
+    rectangle split part fill={blue!50, white},
+    align=left,
+    font=\sffamily\bfseries\boldmath\small
+  },
+  labeled edge/.style={
+    rectangle split, rectangle split parts=1,
+    rectangle split draw splits=false,
+    rounded corners,
+    very thick,
+    draw=orange!60,
+    rectangle split part fill={orange!60, white},
+    align=left,
+    font=\sffamily\bfseries\boldmath\small
+  },
+  labeled property edge/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split draw splits=false,
+    rounded corners,
+    very thick,
+    draw=orange!60,
+    rectangle split part fill={orange!60, white},
+    align=left,
+    font=\sffamily\bfseries\boldmath\small
+  },
+  every two node part/.style={font=\sffamily\small},
+}
+
+% Pgf
+\usepgfplotslibrary{units}
+\usepgfplotslibrary{colorbrewer}
+\usepgfplotslibrary{groupplots}
+
+\pgfplotsset{
+    compat=newest,
+    cycle list/Paired,
+    scaled x ticks=false,
+    scaled y ticks=false
+}
+
+% Listing
+\renewcommand{\lstlistingname}{Extrait de code}
+\renewcommand{\lstlistlistingname}{Liste des extraits de code}
+
+\lstset{
+  commentstyle=\color{Green},
+  keywordstyle=\color{blue}\bfseries,
+  stringstyle=\color{teal},
+  backgroundcolor=\color{WhiteSmoke},
+  numberstyle=\footnotesize\color{gray},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=true,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+	stepnumber=1,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=lines
+}
+
+\lstdefinelanguage{cypher}{
+	morekeywords={
+		MATCH, OPTIONAL, WHERE, NOT, AND, OR, XOR, RETURN, DISTINCT, ORDER, BY,
+    ASC, ASCENDING, DESC, DESCENDING, UNWIND, AS, UNION, WITH, ALL, CREATE,
+    DELETE, DETACH, REMOVE, SET, MERGE, SET, SKIP, LIMIT, IN, CALL, CASE, WHEN, EXISTS,
+    INDEX, DROP, UNIQUE, CONSTRAINT, EXPLAIN, PROFILE, START, FOREACH, GROUP, HAVING},
+	sensitive=true,
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]{"},
+	literate=*
+	  {<<}{\color{instruction}\guillemotleft{}}{1}
+	  {>>}{\textcolor{instruction}{\guillemotright{}}\color{black}}{1}
+}
+
+\lstdefinelanguage{sparql}{
+	morekeywords={SELECT, DISTINCT, WHERE, OPTIONAL, FILTER, NOT, EXISTS, MINUS, sameTerm, bound},
+}
+
+\mode<presentation> {
+    \usetheme{Madrid}
+    \useoutertheme[subsection=false]{miniframes}
+    \setbeamertemplate{frametitle}[default][center]
+    \setbeamertemplate{navigation symbols}{}
+}
+
+\date{1er Juillet, 2024}
+\title[Construction automatique de BD m\'edicale]{Construction automatique de bases de donnée pour le domaine m\'edical:\\Int\'egration de texte et maintien de la coh\'erence}
+\author[Nicolas Hiot]{
+    Nicolas Hiot\inst{1,2}\and\\
+    \url{nicolas.hiot@etu.univ-orleans.fr}\qquad
+    \url{nhiot@ennov.com}
+}
+\institute[]{
+    \inst{1}LIFO -- Universit\'e d'Orl\'eans, INSA CVL, France\qquad
+    \inst{2}EnnovLabs -- Ennov, France\and
+}
+\titlegraphic{
+    \hspace{\fill}
+    \includegraphics[height=1cm]{../logos/logoOrleans2022.png}
+    \hspace{\fill}
+    \includegraphics[height=1cm]{../logos/logoLIFO.png}
+    \hspace{\fill}
+    \includegraphics[height=9cm]{../logos/logoEnnov.png}
+    \hspace{\fill}
+    \includegraphics[height=.7cm]{../logos/logoDOING.png}
+    \hspace{\fill}
+}
+
+\AtBeginSection{
+  \begin{frame}{Sommaire}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\part{Maintenance et cohérence d'une base de données incomplète}
+
+\frame{\partpage}
+
+\subfile{parts/nulls}
+
+\part{Intégration de données textuelles}
+
+\frame{\partpage}
+
+\begin{frame}[allowframebreaks]{References}
+    \bibliographystyle{apalike}
+    \bibliography{../these/biblio}
+\end{frame}
+
+\frame{\titlepage}
+
+\end{document}
