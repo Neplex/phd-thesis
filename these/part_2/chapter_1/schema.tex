@@ -45,23 +45,32 @@ Le processus consiste en plusieurs itérations et est résumé visuellement dans
 
 \begin{figure}[htb]
     \centering
-    \begin{tabular}{llllllll|l}
-        Données textuelles & $\rightarrow$
-                           & $I_0$         & $\rightarrow$ & $ I_1$ & $\rightarrow$ & $ \dots$ & $I_t$    & Instances (arbres)                    \\
-                           &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
-                           &               & $S_0$         &        & $S_1$         &          & $ \dots$ & $S_t$              & Arbres quotients \\
-                           &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
-                           &               & $G_0$         &        & $G_1$         &          & $ \dots$ & $G$                & Grammaires       \\
-                           &               & $\searrow$    &        & $\downarrow$  &          &          & $\swarrow$                            \\
-        \multicolumn{9}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}
+    \begin{tabular}{cccccccc|l}
+        Données textuelles & $\rightarrow$ & $I_0$         & $\rightarrow$ & $ I_1$        & $\rightarrow$ & $ \dots$ & $I_t$         & Instances (arbres) \\
+                           &               & $\downarrow$  &               & $\downarrow$  &               &          & $\downarrow$  &                    \\
+                           &               & $S_0$         &               & $S_1$         &               & $ \dots$ & $S_t$         & Arbres quotients   \\
+                           &               & $\downarrow$  &               & $\downarrow$  &               &          & $\downarrow$  &                    \\
+                           &               & $G_0$         &               & $G_1$         &               & $ \dots$ & $G_T$         & Grammaires         \\
+                           &               & ~ $\searrow$  &               & $\downarrow$  &               &          & $\swarrow$ ~  &                    \\
+                           &               & \multicolumn{6}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}                       &
     \end{tabular}
-    \caption{Procéssus itératif pour la structuration automatique}
+%     \begin{tabular}{llllllll|l}
+%         Données textuelles & $\rightarrow$
+%                            & $I_0$         & $\rightarrow$ & $ I_1$ & $\rightarrow$ & $ \dots$ & $I_t$    & Instances (arbres)                    \\
+%                            &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
+%                            &               & $S_0$         &        & $S_1$         &          & $ \dots$ & $S_t$              & Arbres quotients \\
+%                            &               & $\downarrow$  &        & $\downarrow$  &          &          & $\downarrow$                          \\
+%                            &               & $G_0$         &        & $G_1$         &          & $ \dots$ & $G$                & Grammaires       \\
+%                            &               & $\searrow$    &        & $\downarrow$  &          &          & $\swarrow$                            \\
+%         \multicolumn{9}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}
+%     \end{tabular}
+    \caption{Processus itératif pour la structuration automatique}
     \label{fig:struct:general}
 \end{figure}
 
 L'axe horizontal de la figure~\ref{fig:struct:general} représente la progression du processus de l'étape $i$ à l'étape $i+1$. Cette progression est basée sur le raisonnement suivant :
 \begin{description}
-    \item[Initialisation] Le processus commence par la transformation des phrases en arbres syntaxique, ce qui donne lieu à une instance désignée par $I_0$.
+    \item[Initialisation] Le processus commence par la transformation des phrases en arbres syntaxiques, ce qui donne lieu à une instance désignée par $I_0$.
 
     \item[Enrichissement] Une seconde étape consiste à enrichir les arbres de l'instance $I_0$ en incorporant les informations extraites par une analyse du texte.
           Il peut s'agir d'insérer des entités, des noms de relations ou d'autres informations pertinentes dans les arbres.
