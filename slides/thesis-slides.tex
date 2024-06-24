@@ -29,7 +29,6 @@
 \usepackage[sectionbib]{bibunits}
 \usepackage{hyphenat}
 \usepackage{csquotes}
-\usepackage{changepage}
 \usepackage{subfiles}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -40,16 +39,13 @@
 \usepackage{circledsteps}
 \usepackage{orcidlink}
 \usepackage{adjustbox}
-\usepackage{ragged2e}
+%\usepackage{ragged2e}
 \usepackage{graphicx}
 \usepackage{hyperref}
-\usepackage{csquotes}
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{bookmark}
 \usepackage{listings}
-\usepackage{amsmath}
-\usepackage{lmodern}
 \usepackage{siunitx}
 \usepackage{framed}
 \usepackage{cancel}
@@ -59,8 +55,8 @@
 
 \usepackage{tikz}
 \usepackage{tikz-dependency}
-\usepackage{tikz-qtree}
-\usepackage{tikz-qtree-compat}
+%\usepackage{tikz-qtree}
+%\usepackage{tikz-qtree-compat}
 \usepackage{forest}
 
 \usepackage{pgfplots}
@@ -68,6 +64,7 @@
 
 \usepackage[svgnames]{xcolor}
 %\usepackage[inline]{enumitem}
+\usepackage[acronym,shortcuts,translate=babel]{glossaries}
 \usepackage[linesnumbered,ruled,vlined,boxed,frenchkw,onelanguage]{algorithm2e}
 \usepackage[type={CC},modifier={by-nc-nd},lang=french,version={4.0}]{doclicense}
 
@@ -107,6 +104,10 @@
     \draw [decoration={brace,amplitude=0.5em},decorate,thick] ([xshift=#1]rectg.north east) -- ([xshift=#1]rectg.south east) node[midway,right,xshift=1em]{#4};
 }%
 
+\newcommand*{\drawCircle}[1]{%
+    \raisebox{-.5ex}{\tikz{\draw[fill=#1,line width=.5pt] circle[radius=1ex];}}%
+}%
+
 \tikzset{
   labeled node/.style={
     rectangle split, rectangle split parts=2,
@@ -140,6 +141,13 @@
   },
   every two node part/.style={font=\sffamily\small},
 }
+
+\tikzstyle{flow-node} = [text centered, minimum height=2em, minimum width=4em, text width=4em, draw]
+\tikzstyle{flow-start} = [rectangle, rounded corners, flow-node]
+\tikzstyle{flow-process} = [rectangle, text centered, minimum height=2em, text width=7em, draw]
+\tikzstyle{flow-data} = [trapezium, trapezium left angle=70, trapezium right angle=110, flow-node]
+\tikzstyle{flow-decision} = [diamond, aspect=2.5, flow-node]
+\tikzstyle{flow-arrow} = [thick, ->, >=latex, rounded corners]
 
 % Pgf
 \usepgfplotslibrary{units}
@@ -204,48 +212,201 @@
     \setbeamertemplate{navigation symbols}{}
 }
 
+\makeglossaries          
+\loadglsentries{../these/glossaries}
+
 \date{1er Juillet, 2024}
-\title[Construction automatique de BD m\'edicale]{Construction automatique de bases de donnée pour le domaine m\'edical:\\Int\'egration de texte et maintien de la coh\'erence}
+\title[Construction automatique de BD m\'edicale]{Construction automatique de bases de donnée pour le domaine m\'edical: Int\'egration de texte et maintien de la coh\'erence}
 \author[Nicolas Hiot]{
-    Nicolas Hiot\inst{1,2}\and\\
-    \url{nicolas.hiot@etu.univ-orleans.fr}\qquad
-    \url{nhiot@ennov.com}
+    Nicolas Hiot\inst{1,2}
 }
 \institute[]{
     \inst{1}LIFO -- Universit\'e d'Orl\'eans, INSA CVL, France\qquad
-    \inst{2}EnnovLabs -- Ennov, France\and
+    \inst{2}EnnovLabs -- Ennov, France\\
+    \url{nicolas.hiot@etu.univ-orleans.fr}\qquad
+    \url{nhiot@ennov.com}
 }
 \titlegraphic{
-    \hspace{\fill}
     \includegraphics[height=1cm]{../logos/logoOrleans2022.png}
-    \hspace{\fill}
+    \hspace{.8cm}
     \includegraphics[height=1cm]{../logos/logoLIFO.png}
-    \hspace{\fill}
-    \includegraphics[height=9cm]{../logos/logoEnnov.png}
-    \hspace{\fill}
-    \includegraphics[height=.7cm]{../logos/logoDOING.png}
-    \hspace{\fill}
+    \hspace{.8cm}
+    \includegraphics[height=.9cm]{../logos/logoEnnov.png}
+    \hspace{.8cm}
+    \includegraphics[height=.8cm]{../logos/logoDOING.png}
 }
 
-\AtBeginSection{
-  \begin{frame}{Sommaire}
-    \tableofcontents[currentsection]
-  \end{frame}
-}
+% \AtBeginSection{
+%   \begin{frame}{Sommaire}
+%     \tableofcontents[currentsection]
+%   \end{frame}
+% }
 
 \begin{document}
 
 \frame{\titlepage}
 
-\part{Maintenance et cohérence d'une base de données incomplète}
+\section{Introduction}
 
-\frame{\partpage}
+\begin{frame}{Contexte}
+  Textes médicaux : cas cliniques, pharmacovigilance, cosméto-vigilance, etc.\pause
+  \begin{description}
+      \item[Objectif] Exploiter ces données en les rendant interrogeables\pause
+      \item[Solution] Construire une base de données\pause
+          \begin{itemize}
+              \item Structurer automatiquement les information du texte
+              \item Garantir la qualité et la cohérence des données
+          \end{itemize}
+  \end{description}
+\end{frame}
+
+% \begin{frame}{Contexte}
+%   \begin{block}{Genèse}
+%     Textes médicaux : cas cliniques, pharmacovigilance, cosméto-vigilance, etc.\pause
+%     \begin{description}
+%         \item[Objectif] Exploiter ces données en les rendant interrogeables\pause
+%         \item[Solution] Construire une base de données
+%             \begin{itemize}
+%                 \item Structurer les information pour les rendre exploitable
+%                 \item Garantir la qualité et la cohérence des données
+%             \end{itemize}
+%     \end{description}
+%     \end{block}
+
+%   \pause
+
+%   \begin{block}{Contraintes}
+%     \begin{itemize}
+%         \item Données spécifiques à chaque client
+%         \item Absence de données annotées
+%         \item Puissance de calcul et quantité de données limitées
+%         \item Nécessité d'un système rapide et efficace
+%         %\item Besoin d'explicabilité des résultats
+%     \end{itemize}
+%     \end{block}
+% \end{frame}
+
+\begin{frame}{}
+  \includegraphics[width=\textwidth]{images/deft2020.png}
+\end{frame}
+
+\begin{frame}{Exemple}
+    \centering
+
+    \begin{displaycquote}[extrait de PubMed]{mandalDeepBlueDot2022}
+        A female patient in the age group 55-60 years presented to us with blurring of vision in both eyes.
+        On slit-lamp examination, numerous circular to oval fleck-like discrete blue opacities at the level of deep corneal stroma and Descemet's membrane was observed.
+    \end{displaycquote}
+
+    \pause
+
+    \vfill
+
+    \Huge$\Downarrow$\normalsize
+
+    %\vfill
+
+    \begin{figure}[htb]
+        \small
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{tikzpicture}[node distance=5em]
+                \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
+                \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
+                \node[labeled node, right=8em of sosy] (Person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
+                \node[labeled node, right=8em of Person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
+                \node[labeled node, right=8em of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
+                \node[labeled node, below=of exam] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
+                \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
+
+                \path [very thick, -Latex]
+                (Person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
+                (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
+                (Person) edge node[labeled edge, anchor=center] {PassExam} (exam)
+                (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
+            \end{tikzpicture}
+        \end{adjustbox}
+    \end{figure}
+\end{frame}
+
+% \begin{frame}{Corpus médical}
+%     \begin{block}{Corpus de cas cliniques en français (DEFT)} % \cite{grabar2020cas} 
+%         \begin{itemize}
+%             \item 100 fichiers dé-identifiés
+%             \item Situations réelles et fictives
+%             \item Imbrication d'entités
+%             \item Annoté  en entités (8350 annotations), mais pas en relations
+%         \end{itemize}
+%     \end{block}
+
+%     \begin{block}{Entités}
+%         \begin{itemize}
+%             \item Patient (anatomie)
+%             \item Pratique clinique (examen, pathologie, signe ou symptôme)
+%             \item Traitements (dose, durée, fréquence, mode, substance, traitement, valeur)
+%             \item Temporalité (date, moment)
+%         \end{itemize}
+%     \end{block}
+% \end{frame}
+
+% \begin{frame}{Relations}
+%     \begin{table}[htb]
+%         \centering
+%         \footnotesize
+%         \resizebox{\textwidth}{!}{ 
+%             \def\arraystretch{1.1}%
+%             \begin{tabular}{p{2.2cm}p{3.3cm}p{8cm}}
+%                 %\hline
+%                 Relation                             & Paire d'entités                               & Exemples                                                                                                                                                                 \\ \hline\hline
+%                 \multirow{2}{*}{\emph{means}}        & \multirow{2}{*}{\emph{mode}-\emph{substance}} & \multirow{2}{*}{\shortstack[l]{\emph{une} [\emph{crème}]{\textsuperscript{\emph{mode}}} \emph{de} [\emph{nistatin}]{\textsuperscript{\emph{sub}}} \emph{a été préscrite} \\
+%                 'an [ointment]{\textsuperscript{\emph{mode}}} of [nistatin]{\textsuperscript{\emph{sub}}} was prescribed'}}                                                                                                                                                     \\
+%                                                      &                                               &                                                                                                                                                                          \\
+%                 \hline
+
+%                 \multirow{2}{*}{\emph{measure\_of}}  & \emph{dose}-\emph{substance}                  & \multirow{2}{*}{\shortstack[l]{\emph{la} [\emph{doxorubicine}]{\textsuperscript{\emph{sub}}} \emph{à raison de} [\emph{37,5 mg/m2/dose}]{\textsuperscript{\emph{dose}}}  \\ '[\emph{37,5 mg/m2/dose}]{\textsuperscript{\emph{dose}}} of [doxorubicine]{\textsuperscript{\emph{sub}}}'}}  \\
+%                                                      & \emph{value}-\emph{substance}                 &                                                                                                                                                                          \\
+%                 \hline
+
+%                 \multirow{4}{*}{\emph{accompagnies}} & \emph{pathology}-\emph{pathology}             & \multirow{4}{*}{\shortstack[l]{\emph{le patient présentait une} [\emph{fatigue importante}]{\textsuperscript{\emph{sosy}}} \emph{de même}                                \\\emph{qu'une} [\emph{hyperthermie}]{\textsuperscript{\emph{sosy}}} \\ 'the patient displayed [great tiredness]{\textsuperscript{\emph{sosy}}} as well \\ as [hyperthermia]{\textsuperscript{\emph{sosy}}}'}} \\
+%                                                      & \emph{sosy}-\emph{sosy}                       &                                                                                                                                                                          \\
+%                                                      & \emph{pathology}-\emph{sosy}                  &                                                                                                                                                                          \\
+%                                                      & \emph{substance}-\emph{substance}             &                                                                                                                                                                          \\
+%                 \hline
+
+%                 \multirow{3}{*}{\shortstack[l]{\emph{reveals}/                                                                                                                                                                                                                  \\\emph{searches}/\\\emph{tests}}}  & \emph{exam}-\emph{value} & \multirow{3}{*}{\shortstack[l]{\emph{l'}[\emph{échographie abdominale et pelvienne}]{\textsuperscript{\emph{exam}}} \emph{révèle la} \\ \emph{présence d'une} [\emph{masse surrénalienne à droite}]{\textsuperscript{\emph{sosy}}} \\ 'the [abdominal and pelvic ultrasonography]{\textsuperscript{\emph{exam}}} reveals \\ a [growth in the right adrenal gland]{\textsuperscript{\emph{sosy}}}' }} \\
+%                                                      & \emph{exam}-\emph{sosy}                       &                                                                                                                                                                          \\
+%                                                      & \emph{exam}-\emph{pathology}                  &                                                                                                                                                                          \\
+%                                                      &                                               &                                                                                                                                                                          \\
+%                 \hline
+
+%                 \multirow{4}{*}{\emph{location}}     & \emph{anatomy}-\emph{pathology}               & \multirow{4}{*}{\shortstack[l]{\emph{elle a subi une} [\emph{résection au niveau}                                                                                        \\ \emph{du} [\emph{lobe supérieur droit}]{\textsuperscript{\emph{anat}}}]{\textsuperscript{\emph{treat}}} \\ 'she underwent a [resection of the [upper right lobe]{\textsuperscript{\emph{anat}}}]{\textsuperscript{\emph{treat}}}'}} \\
+%                                                      & \emph{anatomy}-\emph{sosy}                    &                                                                                                                                                                          \\
+%                                                      & \emph{anatomy}-\emph{exam}                    &                                                                                                                                                                          \\
+%                                                      & \emph{anatomy}-\emph{treatment}               &                                                                                                                                                                          \\
+%                 %\hline
+%             \end{tabular}
+%         }
+%     \end{table}
+% \end{frame}
+
+%\part{Intégration de données textuelles}
+
+%\frame{\partpage}
+
+\subfile{parts/struct}
+
+%\part{Maintenance et cohérence d'une base de données incomplète}
+
+%\frame{\partpage}
 
 \subfile{parts/nulls}
 
-\part{Intégration de données textuelles}
+% \part{Extraction d'informations}
 
-\frame{\partpage}
+% \frame{\partpage}
+
+%\subfile{parts/tal}
 
 \begin{frame}[allowframebreaks]{References}
     \bibliographystyle{apalike}
