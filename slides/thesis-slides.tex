@@ -248,16 +248,58 @@
 
 \section{Introduction}
 
-\begin{frame}{Contexte}
-  Textes médicaux : cas cliniques, pharmacovigilance, cosméto-vigilance, etc.\pause
-  \begin{description}
-      \item[Objectif] Exploiter ces données en les rendant interrogeables\pause
-      \item[Solution] Construire une base de données\pause
-          \begin{itemize}
-              \item Structurer automatiquement les information du texte
-              \item Garantir la qualité et la cohérence des données
-          \end{itemize}
-  \end{description}
+% \begin{frame}{Contexte}
+%   Textes médicaux : cas cliniques, pharmacovigilance, cosméto-vigilance, etc.\pause
+%   \begin{description}
+%       \item[Objectif] Exploiter ces données en les rendant interrogeables\pause
+%       \item[Solution] Construire automatiquement une base de données\pause
+%           \begin{itemize}
+%               \item Structurer automatiquement les information du texte
+%               \item Garantir la qualité et la cohérence des données
+%           \end{itemize}
+%   \end{description}
+% \end{frame}
+
+\begin{frame}{Données textuelles médicales}
+  \begin{itemize}
+      \item Le domaine médical génère en quantité des données textuelles difficiles à exploiter efficacement.
+      \begin{itemize}
+          \item Cas cliniques
+          \item Pharmacovigilance
+          \item Cosmetovigilance
+      \end{itemize}
+      \vfill
+      \item Décrivent l'historique des patients:
+      \begin{itemize}
+          \item Diagnostiques
+          \item Traitements et réactions
+          \item Antécédents médicaux
+      \end{itemize}
+      \vfill
+      \item Importance pour la prise de décision clinique:
+      \begin{itemize}
+          \item Meilleure compréhension des cas complexes
+          \item Amélioration de la qualité des soins
+          \item Détection précoce des effets indésirables
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Axes de Recherches}
+  \begin{itemize}
+      \item Proposition : Construire automatiquement une base de données à partir d'un corpus textuel médical
+      \item Objectifs :
+      \begin{itemize}
+          \item Faciliter l'accès à des informations précises et structurées
+          \item Permettre l'interrogation et l'exploitation defficaces des données
+      \end{itemize}
+      \vfill\pause
+      \item Axes de Recherches :
+      \begin{itemize}
+          \item Extraction et Structuration automatique de l'information
+          \item Assurer de la qualité et de la cohérence des données:
+      \end{itemize}
+  \end{itemize}
 \end{frame}
 
 % \begin{frame}{Contexte}
@@ -285,10 +327,6 @@
 %     \end{itemize}
 %     \end{block}
 % \end{frame}
-
-\begin{frame}{}
-  \includegraphics[width=\textwidth]{images/deft2020.png}
-\end{frame}
 
 \begin{frame}{Exemple}
     \centering
@@ -408,11 +446,21 @@
 
 %\subfile{parts/tal}
 
+\begin{frame}{Perspectives}
+    \vfill
+    \begin{itemize}
+        \item Comment prendre en compte les contraintes dés la structuration automatique
+        \vfill
+        \item Construire une vue unifiée de multiples sources de données (IA, Journalisme des données, \dots)
+    \end{itemize}
+    \vfill
+\end{frame}
+
+\frame{\titlepage}
+
 \begin{frame}[allowframebreaks]{References}
     \bibliographystyle{apalike}
     \bibliography{../these/biblio}
 \end{frame}
-
-\frame{\titlepage}
 
 \end{document}

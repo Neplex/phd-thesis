@@ -44,11 +44,11 @@
     \centering
     \begin{adjustbox}{max width=.8\linewidth}
         \begin{tabular}{cccccccc|l}
-            Textes & $\rightarrow$ & $I_0$         & $\rightarrow$ & $ I_1$        & $\rightarrow$ & $ \dots$ & $I_t$         & Instances (arbres) \\
-                   &               & $\downarrow$  &               & $\downarrow$  &               &          & $\downarrow$  &                    \\
-                   &               & $G_0$         &               & $G_1$         &               & $ \dots$ & $G_t$         & Grammaires         \\
-                %    &               & ~ $\searrow$  &               & $\downarrow$  &               &          & $\swarrow$ ~  &                    \\
-                %    &               & \multicolumn{6}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}                       &
+            Textes & $\rightarrow$ & $I_0$        & $\rightarrow$ & $ I_1$       & $\rightarrow$ & $ \dots$ & $I_t$        & Instances (arbres) \\
+                   &               & $\downarrow$ &               & $\downarrow$ &               &          & $\downarrow$ &                    \\
+                   &               & $G_0$        &               & $G_1$        &               & $ \dots$ & $G_t$        & Grammaires         \\
+            %    &               & ~ $\searrow$  &               & $\downarrow$  &               &          & $\swarrow$ ~  &                    \\
+            %    &               & \multicolumn{6}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}                       &
         \end{tabular}
     \end{adjustbox}
 
@@ -64,6 +64,10 @@
             \item Réécrire l'instance pour obtenir une grammaire cible correspondant à un schéma de base de données ;
         \end{enumerate}
     \end{block}
+\end{frame}
+
+\begin{frame}{}
+    \includegraphics[width=\textwidth]{images/deft2020.png}
 \end{frame}
 
 % \begin{frame}{Texte et arbres}
@@ -97,85 +101,85 @@
     \begin{center}
         \begin{adjustbox}{max width=\linewidth, max height=.5\textheight}
             \only<1>{\begin{forest}
-                where n children=0{tier=word}{}
-                [S, for tree={s sep=2em}
-                    [NP
-                        [DT [la]]
-                        [NN,before computing xy={s/.average={s}{siblings}} [fréquence]]
-                        [NN [cardiaque]]
-                    ]
-                    [VP
-                        [VBD [était]]
-                        [PP
-                            [IN [à]]
-                            [NP
-                                [CD [100]]
-                                [NN [b/min]]
-                            ]
+                    where n children=0{tier=word}{}
+                    [S, for tree={s sep=2em}
+                        [NP
+                                [DT [la]]
+                                [NN,before computing xy={s/.average={s}{siblings}} [fréquence]]
+                                [NN [cardiaque]]
+                        ]
+                        [VP
+                                [VBD [était]]
+                                [PP
+                                        [IN [à]]
+                                        [NP
+                                                [CD [100]]
+                                                [NN [b/min]]
+                                        ]
+                                ]
                         ]
                     ]
-                ]
-            \end{forest}}
+                \end{forest}}
             \only<2>{\begin{forest}
-                where n children=0{tier=word}{}
-                [S, for tree={s sep=2em}
-                    [NP
-                        [DT [la]]
-                        [ENT\_EXAM
-                            [NN [fréquence]]
-                            [NN [cardiaque]]
+                    where n children=0{tier=word}{}
+                    [S, for tree={s sep=2em}
+                        [NP
+                                [DT [la]]
+                                [ENT\_EXAM
+                                    [NN [fréquence]]
+                                    [NN [cardiaque]]
+                                ]
+                        ]
+                        [VP
+                                [VBD [était]]
+                                [PP
+                                        [IN [à]]
+                                        [NP
+                                                [CD [ENT\_VALUE [100]]]
+                                                [NN [ENT\_UNIT [b/min]]]
+                                        ]
+                                ]
                         ]
                     ]
-                    [VP
-                        [VBD [était]]
-                        [PP
-                            [IN [à]]
-                            [NP
-                                [CD [ENT\_VALUE [100]]]
-                                [NN [ENT\_UNIT [b/min]]]
-                            ]
-                        ]
-                    ]
-                ]
-            \end{forest}}
+                \end{forest}}
             \only<3>{\begin{forest}
-                where n children=0{tier=word}{}
-                [S, for tree={s sep=2em}
-                    [NP
-                        [ENT\_EXAM
-                            [NN [fréquence]]
-                            [NN [cardiaque]]
+                    where n children=0{tier=word}{}
+                    [S, for tree={s sep=2em}
+                        [NP
+                                [ENT\_EXAM
+                                    [NN [fréquence]]
+                                    [NN [cardiaque]]
+                                ]
+                        ]
+                        [VP
+                                [PP
+                                        [NP
+                                                [CD [ENT\_VALUE [100]]]
+                                                [NN [ENT\_UNIT [b/min]]]
+                                        ]
+                                ]
                         ]
                     ]
-                    [VP
-                        [PP
-                            [NP
-                                [CD [ENT\_VALUE [100]]]
-                                [NN [ENT\_UNIT [b/min]]]
-                            ]
-                        ]
-                    ]
-                ]
-            \end{forest}}
+                \end{forest}}
             \only<4>{\begin{forest}
-                where n children=0{tier=word}{}
-                [S, for tree={s sep=2em}
-                    [ENT\_EXAM [fréquence] [cardiaque]]
-                    [NP
-                        [ENT\_VALUE [100]]
-                        [ENT\_UNIT [b/min]]
+                    where n children=0{tier=word}{}
+                    [S, for tree={s sep=2em}
+                        [ENT\_EXAM [fréquence] [cardiaque]]
+                        [NP
+                                [ENT\_VALUE [100]]
+                                [ENT\_UNIT [b/min]]
+                        ]
                     ]
-                ]
-            \end{forest}}
+                \end{forest}}
         \end{adjustbox}
         \vfill
         \only<2->{\begin{block}{Etapes}
-            \begin{itemize}
-                %\item Unification des structures linguistique (conjonctions)
-                \only<2->{\item Insertion des entités dans l'arbre}
-                \only<3->{\item Supprimer termes et nœuds superflus}
-            \end{itemize}
-        \end{block}}
+                \begin{itemize}
+                    %\item Unification des structures linguistique (conjonctions)
+                    \only<2->{\item Insertion des entités dans l'arbre}
+                          \only<3->{\item Supprimer termes et nœuds superflus}
+                \end{itemize}
+            \end{block}}
     \end{center}
 \end{frame}
 
@@ -188,81 +192,84 @@
 \begin{frame}{Extraction de la grammaire (arbre quotient)}
     \begin{columns}
         \only<1>{\begin{column}{.5\textwidth}
-            \centering
-            \begin{forest}
-                for tree={circle,draw}
-                [, for tree={s sep=2em}
-                    [
-                        []
-                        []
-                    ]
-                    [
-                        []
+                \centering
+                \begin{forest}
+                    for tree={circle,draw}
+                    [, for tree={s sep=2em}
                         [
                             []
-                            []
+                                []
                         ]
                         [
                             []
+                                [
+                                    []
+                                        []
+                                ]
+                                [
+                                    []
+                                ]
                         ]
                     ]
-                ]
-              \end{forest}
-        \end{column}}%
+                \end{forest}\\
+                Arbre d'instance ($I_i$)
+            \end{column}}%
         \only<2->{\begin{column}{.5\textwidth}
-            \centering
-            \begin{forest}
-                for tree={circle,draw}
-                [, fill=white, for tree={s sep=2em}
-                    [, {fill=red}
-                        [, {fill=black}]
-                        [, {fill=blue}]
-                    ]
-                    [, {fill=green}
-                        [, {fill=blue}]
-                        [, {fill=red}
-                            [, {fill=black}]
-                            [, {fill=blue}]
+                \centering
+                \begin{forest}
+                    for tree={circle,draw}
+                    [, fill=white, for tree={s sep=2em}
+                        [, fill=red
+                                [, fill=black]
+                                [, fill=blue]
                         ]
-                        [, {fill=red}
-                            [, {fill=black}]
+                        [, fill=DarkGreen
+                                [, fill=blue]
+                                [, fill=red
+                                        [, fill=black]
+                                        % [, fill=blue]
+                                ]
+                                [, fill=red
+                                        [, fill=black]
+                                ]
                         ]
                     ]
-                ]
-              \end{forest}
-        \end{column}}%
+                \end{forest}\\
+                Arbre d'instance ($I_i$)
+            \end{column}}%
         \only<3->{\begin{column}{.1\textwidth}
-            \centering
-            \LARGE
-            $\Longrightarrow$
-        \end{column}%
-        \begin{column}{.4\textwidth}
-            \centering
-            \begin{forest}
-                for tree={circle,draw}
-                [, fill=white, for tree={s sep=2em}
-                    [, {fill=red}
-                        [, {fill=black}]
-                        [, {fill=blue}]
-                    ]
-                    [, {fill=green}
-                        [, {fill=blue}]
-                        [, {fill=red}
-                            [, {fill=black}]
-                            [, {fill=blue}]
+                \centering
+                \LARGE
+                $\Longrightarrow$
+            \end{column}%
+            \begin{column}{.4\textwidth}
+                \centering
+                \begin{forest}
+                    for tree={circle,draw}
+                    [, fill=white, for tree={s sep=2em}
+                        [, fill=red
+                                [, fill=black]
+                                [, fill=blue]
+                        ]
+                        [, fill=DarkGreen
+                                [, fill=blue]
+                                [, fill=red
+                                        [, fill=black]
+                                        % [, fill=blue]
+                                ]
                         ]
                     ]
-                ]
-              \end{forest}
-        \end{column}}%
+                \end{forest}\\
+                Arbre quotient ($S_i$)
+            \end{column}}%
     \end{columns}
-    \vspace{1em}
-    \onslide<4->{\begin{block}{Grammaire}
-        \vspace{-1em}
-        \begin{alignat*}{6}
-            \drawCircle{white} & \to \drawCircle{red} ~ \drawCircle{green} && \qquad\qquad \drawCircle{red} & \to \drawCircle{black} ~ \drawCircle{blue} && \qquad\qquad \drawCircle{green} & \to \drawCircle{blue} ~ \drawCircle{red}^+
-        \end{alignat*}
-    \end{block}}
+    \vspace{2em}
+    \onslide<4->{\begin{block}{Grammaire ($G_i$)}
+            \vspace{-1em}
+            \begin{alignat*}{6}
+                \drawCircle{white} & \to \drawCircle{red} ~ \drawCircle{green} &  & \qquad\qquad \drawCircle{red} & \to \drawCircle{black} ~ \drawCircle{blue} &  & \qquad\qquad \drawCircle{green} & \to \drawCircle{blue} ~ \drawCircle{red}^+
+            \end{alignat*}
+        \end{block}}
 \end{frame}
 
 % \begin{frame}{Extraction de la grammaire (arbre quotient)}
@@ -307,53 +314,53 @@
 
 \begin{frame}{Grammaire cible}
     \begin{columns}
-        \begin{column}{.7\textwidth}
+        \begin{column}{.6\textwidth}
             \only<-5>{\begin{description}
-                \uncover<2->{\item[Attribut] Une donnée associée à un nom.}
-        
-                \uncover<3->{\item[Groupe] Un ensemble nommé d'attributs distincts.}
-        
-                \uncover<4->{\item[Relation] Une relation entre deux groupes distincts.}
-        
-                \uncover<5->{\item[Collection] Un ensemble de groupes équivalents.}
-            \end{description}}
+                    \uncover<2->{\item[Attribut] Une donnée associée à un nom}
+
+                          \uncover<3->{\item[Groupe] Un ensemble nommé d'attributs distincts}
+
+                          \uncover<4->{\item[Relation] Une relation entre deux groupes distincts}
+
+                          \uncover<5->{\item[Collection] Un ensemble de groupes et de relations équivalents}
+                \end{description}}
             \only<6->{\begin{alignat*}{2}
-                \lambda & \to Coll_1 ~ Coll_2 ~ Coll_3 \\
-                Coll_1 & \to Grp_1^+ \\
-                Coll_2 & \to Grp_2^+ \\
-                Coll_3 & \to Rel_1^+ \\
-                Rel_1 & \to Grp_1 ~ Grp_2 \\
-                Grp_1 & \to a ~ b \\
-                Grp_2 & \to c \\
-                a & \to \langle data \rangle \\
-                b & \to \langle data \rangle \\
-                c & \to \langle data \rangle
-            \end{alignat*}}
+                    \lambda & \to COLL_1 ~ COLL_2 ~ COLL_3 \\
+                    COLL_1  & \to GROUP_1^+                \\
+                    COLL_2  & \to GROUP_2^+                \\
+                    COLL_3  & \to REL_1^+                  \\
+                    REL_1   & \to GROUP_1 ~ GROUP          \\
+                    GROUP_1 & \to a ~ b                    \\
+                    GROUP_2 & \to c                        \\
+                    a       & \to \langle data \rangle     \\
+                    b       & \to \langle data \rangle     \\
+                    c       & \to \langle data \rangle
+                \end{alignat*}}
         \end{column}
-        \begin{column}{.3\textwidth}
+        \begin{column}{.4\textwidth}
             \begin{center}
                 \begin{tikzpicture}[-latex,on grid]
-                    \onslide<2->{\node (v1) {$v_1$};}
-                    \onslide<2->{\node[right = of v1] (v2) {$v_2$};}
-                    \onslide<2->{\node[right = of v2] (v3) {$v_3$};}
-                    \onslide<2->{\node[above = of v1] (a) {a};}
-                    \onslide<2->{\node[above = of v2] (b) {b};}
-                    \onslide<2->{\node[above = of v3] (c) {c};}
-                    \onslide<3->{\node[above = of a] (g1) {$Grp_1$};}
-                    \onslide<3->{\node[above = of c] (g2) {$Grp_2$};}
-                    \onslide<4->{\node[above right = of g1] (r) {$Rel_1$};}
-                    \onslide<5->{\node[above = of r] (cr) {$Coll_{3}$};}
-                    \onslide<5->{\node[left = of cr] (c1) {$Coll_1$};}
-                    \onslide<5->{\node[right = of cr] (c2) {$Coll_2$};}
+                    \onslide<2->{\node (v1) at (0,0) {$v_1$};}
+                    \onslide<2->{\node (v2) at (1.3,0) {$v_2$};}
+                    \onslide<2->{\node (v3) at (2.6,0) {$v_3$};}
+                    \onslide<2->{\node (a)  at (0,1.3) {a};}
+                    \onslide<2->{\node (b)  at (1.3,1.3) {b};}
+                    \onslide<2->{\node (c)  at (2.6,1.3) {c};}
+                    \onslide<3->{\node (g1) at (0,2.6) {$GROUP_1$};}
+                    \onslide<3->{\node (g2) at (2.6,2.6) {$GROUP_2$};}
+                    \onslide<4->{\node (r)  at (1.3,3.9) {$REL_1$};}
+                    \onslide<5->{\node (cr) at (1.3,5.2) {$COLL_{3}$};}
+                    \onslide<5->{\node (c1) at (0,5.2) {$COLL_1$};}
+                    \onslide<5->{\node (c2) at (2.6,5.2) {$COLL_2$};}
 
-                    \only<2->{\path (a) edge (v1);}
-                    \only<2->{\path (b) edge (v2);}
-                    \only<2->{\path (c) edge (v3);}
+                    \only<2->{\path (a)  edge (v1);}
+                    \only<2->{\path (b)  edge (v2);}
+                    \only<2->{\path (c)  edge (v3);}
                     \only<3->{\path (g1) edge (a);}
                     \only<3->{\path (g1) edge (b);}
                     \only<3->{\path (g2) edge (c);}
-                    \only<4->{\path (r) edge (g1);}
-                    \only<4->{\path (r) edge (g2);}
+                    \only<4->{\path (r)  edge (g1);}
+                    \only<4->{\path (r)  edge (g2);}
                     \only<5->{\path (c1) edge (g1);}
                     \only<5->{\path (c2) edge (g2);}
                     \only<5->{\path (cr) edge (r);}
@@ -367,8 +374,8 @@
     \begin{example}
         \vspace{-1em}
         \begin{alignat*}{6}
-            P_{\only<2->{val}} & \to 0 \quad && \onslide<3->{[val \gets 0]} \qquad && P_{\only<2->{val}} & \to P_{\only<2->{val'}}~0 \quad & \onslide<3->{[val \gets 2 * val']} \\
-            P_{\only<2->{val}} & \to 1 \quad && \onslide<3->{[val \gets 1]} \qquad && P_{\only<2->{val}} & \to P_{\only<2->{val'}}~1 \quad & \onslide<3->{[val \gets 2 * val' + 1]}
+            P_{\only<2->{val}} & \to 0 \quad &  & \onslide<3->{\color<4>{blue}[val \gets 0]} \qquad &  & P_{\only<2->{val}} & \to P_{\only<2->{val'}}~0 \quad & \onslide<3->{\color<5>{blue}[val \gets 2 * val']}       \\
+            P_{\only<2->{val}} & \to 1 \quad &  & \onslide<3->{[val \gets 1]} \qquad                &  & P_{\only<2->{val}} & \to P_{\only<2->{val'}}~1 \quad & \onslide<3->{\color<6,7>{blue}[val \gets 2 * val' + 1]}
         \end{alignat*}
     \end{example}
 
@@ -401,7 +408,7 @@
         On distingue deux types de règles sémantiques pour une règle $r$ :
         \begin{itemize}
             \item $a \gets \alpha$ %où $a$ est l'attribut qui est évalué et $\alpha$
-            où $\alpha$ est une formule sur les attributs dans $r$ ;
+                  où $\alpha$ est une formule sur les attributs dans $r$ ;
             \item $\gamma \gets \beta$ où $\beta$ est une formule logique sur les attributs dans $r$.
                   \pause
                   \begin{itemize}
@@ -461,33 +468,33 @@
 
     \begin{adjustbox}{max width=\linewidth}
         \only<1>{\begin{tabular}{cccccccc|l}
-            Textes & $\rightarrow$ & $I_0$         & $\rightarrow$ & $ I_1$        & $\rightarrow$ & $ \dots$ & $I_t$         & Instances (arbres) \\
-                   &               & $\downarrow$  &               & $\downarrow$  &               &          & $\downarrow$  &                    \\
-                   &               & $S_0$         &               & $S_1$         &               & $ \dots$ & $S_t$         & Quotients          \\
-                   &               & $\downarrow$  &               & $\downarrow$  &               &          & $\downarrow$  &                    \\
-                   &               & $G_0$         &               & $G_1$         &               & $ \dots$ & $G_t$         & Grammaires         \\
-                   &               & ~ $\searrow$  &               & $\downarrow$  &               &          & $\swarrow$ ~  &                    \\
-                   &               & \multicolumn{6}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}}                       &
-        \end{tabular}}
+                Textes & $\rightarrow$ & $I_0$                                                              & $\rightarrow$ & $ I_1$       & $\rightarrow$ & $ \dots$ & $I_t$        & Instances (arbres) \\
+                       &               & $\downarrow$                                                       &               & $\downarrow$ &               &          & $\downarrow$ &                    \\
+                       &               & $S_0$                                                              &               & $S_1$        &               & $ \dots$ & $S_t$        & Quotients          \\
+                       &               & $\downarrow$                                                       &               & $\downarrow$ &               &          & $\downarrow$ &                    \\
+                       &               & $G_0$                                                              &               & $G_1$        &               & $ \dots$ & $G_t$        & Grammaires         \\
+                       &               & ~ $\searrow$                                                       &               & $\downarrow$ &               &          & $\swarrow$ ~ &                    \\
+                       &               & \multicolumn{6}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}} &
+            \end{tabular}}
         \only<2>{\begin{tikzpicture}[node distance=1.5em and 2em]
-            %\node (start) [flow-start] {Debut};
-            %\node (tal) [flow-data] {Textes analysés};
-            \node (enriched) [flow-process] {Enrichissement des arbres};
-            \node (grammar) [flow-process, right=of enriched] {Extraction de la grammaire $G_i$};
-            \node (check) [flow-decision, right=of grammar] {$G_i = G_T$};
-            \node (end) [flow-start, below=of check] {Fin};
-            \node (equiv) [flow-process, right=of check] {Construction des classes d'équivalence};
-            \node (rewrite) [flow-process, right=of equiv] {Réécriture des arbres};
+                %\node (start) [flow-start] {Debut};
+                %\node (tal) [flow-data] {Textes analysés};
+                \node (enriched) [flow-process] {Enrichissement des arbres};
+                \node (grammar) [flow-process, right=of enriched] {Extraction de la grammaire $G_i$};
+                \node (check) [flow-decision, right=of grammar] {$G_i = G_t$};
+                \node (end) [flow-start, below=of check] {Fin};
+                \node (equiv) [flow-process, right=of check] {Construction des classes d'équivalence};
+                \node (rewrite) [flow-process, right=of equiv] {Réécriture des arbres};
 
-            %\draw [flow-arrow] (start) -- (tal);
-            %\draw [flow-arrow] (tal) -- (enriched);
-            \draw [flow-arrow] (enriched) -- (grammar);
-            \draw [flow-arrow] (grammar) -- (check);
-            \draw [flow-arrow] (check) -- node[left] {Oui} (end);
-            \draw [flow-arrow] (check) -- node[above] {Non} (equiv);
-            \draw [flow-arrow] (equiv) -- (rewrite);
-            \draw [flow-arrow] (rewrite) -| + (2, 1.5) -| (grammar);
-        \end{tikzpicture}}
+                %\draw [flow-arrow] (start) -- (tal);
+                %\draw [flow-arrow] (tal) -- (enriched);
+                \draw [flow-arrow] (enriched) -- (grammar);
+                \draw [flow-arrow] (grammar) -- (check);
+                \draw [flow-arrow] (check) -- node[left] {Oui} (end);
+                \draw [flow-arrow] (check) -- node[above] {Non} (equiv);
+                \draw [flow-arrow] (equiv) -- (rewrite);
+                \draw [flow-arrow] (rewrite) -| + (2, 1.5) -| (grammar);
+            \end{tikzpicture}}
     \end{adjustbox}
 
     \vfill
@@ -513,10 +520,10 @@
 %             \end{itemize}
 %         \end{column}
 %         \begin{column}{.5\textwidth}
-            
+
 
 %             \begin{adjustbox}{max width=\linewidth,max height=.95\textheight,valign=c}
-                
+
 %             \end{adjustbox}
 %         \end{column}
 %     \end{columns}
@@ -527,9 +534,9 @@
     \begin{itemize}
         \item Identifier les groupements similaires (ensemble d'entités)
         \item L'instance est incomplètes, un groupe peut contenir qu'un sous-ensemble d'attributs
-        \pause
+              \pause
         \item Équivalence régulière : \textquote{deux individus sont régulièrement équivalents s'ils sont connectés à des individus équivalents}
-        \pause
+              \pause
         \item Utilisation de similarité contextuelle
     \end{itemize}
 
@@ -542,16 +549,21 @@
 
 \begin{frame}{Preuve de concept}
     \begin{block}{Objectif}
-        Minimiser la taille de la grammaire \pause= maximiser le support des groupes
+        Minimiser la taille de la grammaire
+        \pause
+        \begin{itemize}
+            \item maximiser le support des groupes
+            \item maximiser la taille des groupes
+        \end{itemize}
     \end{block}
 
     \vfill
     \pause
 
     \begin{enumerate}
-        \item Identifier les candidats groupes ;
-        \item Construire les sous-groupes fréquents ;
-        \item Étendre les groupes avec d'autres informations, en maintenant sa similarité avec sa classe d'équivalence ;
+        \item Identifier les groupes candidats
+        \item Extraire les sous-groupes fréquents
+        \item Étendre les groupes avec d'autres informations\\(en maintenant sa classe d'équivalence)
         \item Identifier les collections de groupes ;
         \item Identifier les relations entre deux groupes ;
         \item Identifier les collections de relations.
@@ -593,102 +605,57 @@
     \only<1>{\begin{adjustbox}{max width=\linewidth}
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [. [SEX] [AGE]] [. [SOSY] [DURATION]]]
-            \end{forest}
-        \end{adjustbox}
-
-        \vfill
-
-        \begin{adjustbox}{max width=\linewidth}
+                [. [. [$ENT_{sex}$ [femme]] [$ENT_{age}$ [32 ans]]] [. [$ENT_{sosy}$ [enceinte]] [$ENT_{duration}$ [14 semaines]]]]
+            \end{forest}\qquad
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [SEX] [SOSY] [DURATION]]
+                [. [$ENT_{sex}$ [homme]] [$ENT_{sosy}$ [diabètes]] [$ENT_{duration}$ [5 ans]]]
             \end{forest}
         \end{adjustbox}}
 
     \only<2>{\begin{adjustbox}{max width=\linewidth}
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [Person [SEX] [AGE]] [Condition [SOSY] [DURATION]]]
-            \end{forest}
-        \end{adjustbox}
-
-        \vfill
-
-        \begin{adjustbox}{max width=\linewidth}
+                [. [$GROUP_{person}$ [$ENT_{sex}$ [femme]] [$ENT_{age}$ [32 ans]]] [$GROUP_{condition}$ [$ENT_{sosy}$ [enceinte]] [$ENT_{duration}$ [14 semaines]]]]
+            \end{forest}\qquad
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [SEX] [SOSY] [DURATION]]
+                [$GROUP_{profile}$ [$ENT_{sex}$ [homme]] [$ENT_{sosy}$ [diabètes]] [$ENT_{duration}$ [5 ans]]]
             \end{forest}
         \end{adjustbox}}
 
     \only<3>{\begin{adjustbox}{max width=\linewidth}
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [Person [SEX] [AGE]] [Condition [SOSY] [DURATION]]]
-            \end{forest}
-        \end{adjustbox}
-
-        \vfill
-
-        \begin{adjustbox}{max width=\linewidth}
+                [. [$GROUP_{person}$ [$ENT_{sex}$ [femme]] [$ENT_{age}$ [32 ans]]] [$GROUP_{condition}$ [$ENT_{sosy}$ [enceinte]] [$ENT_{duration}$ [14 semaines]]]]
+            \end{forest}\qquad
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [SEX] [Condition [SOSY] [DURATION]]]
+                [. [$ENT_{sex}$ [homme]] [$GROUP_{condition}$ [$ENT_{sosy}$ [diabètes]] [$ENT_{duration}$ [5 ans]]]]
             \end{forest}
         \end{adjustbox}}
 
     \only<4>{\begin{adjustbox}{max width=\linewidth}
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [Person [SEX] [AGE]] [Condition [SOSY] [DURATION]]]
-            \end{forest}
-        \end{adjustbox}
-
-        \vfill
-
-        \begin{adjustbox}{max width=\linewidth}
+                [. [$GROUP_{person}$ [$ENT_{sex}$ [femme]] [$ENT_{age}$ [32 ans]]] [$GROUP_{condition}$ [$ENT_{sosy}$ [enceinte]] [$ENT_{duration}$ [14 semaines]]]]
+            \end{forest}\qquad
             \begin{forest}
                 where n children=0{tier=word}{}
-                [. [Person [SEX]] [Condition [SOSY] [DURATION]]]
+                [. [$GROUP_{person}$ [$ENT_{sex}$ [homme]]] [$GROUP_{condition}$ [$ENT_{sosy}$ [diabètes]] [$ENT_{duration}$ [5 ans]]]]
             \end{forest}
         \end{adjustbox}}
 
-    \only<5>{\begin{adjustbox}{max width=\linewidth}
+    \only<5,6>{\begin{adjustbox}{max width=\linewidth}
             \begin{forest}
                 where n children=0{tier=word}{}
-                [hasCondition [Person [SEX] [AGE]] [Condition [SOSY] [DURATION]]]
-            \end{forest}
-        \end{adjustbox}
-
-        \vfill
-
-        \begin{adjustbox}{max width=\linewidth}
+                [$REL_{hasCondition}$ [$GROUP_{person}$ [$ENT_{sex}$ [femme]] [$ENT_{age}$ [32 ans]]] [$GROUP_{condition}$ [$ENT_{sosy}$ [enceinte]] [$ENT_{duration}$ [14 semaines]]]]
+            \end{forest}\qquad
             \begin{forest}
                 where n children=0{tier=word}{}
-                [hasCondition [Person [SEX]] [Condition [SOSY] [DURATION]]]
+                [$REL_{hasCondition}$ [$GROUP_{person}$ [$ENT_{sex}$ [homme]]] [$GROUP_{condition}$ [$ENT_{sosy}$ [diabètes]] [$ENT_{duration}$ [5 ans]]]]
             \end{forest}
         \end{adjustbox}}
-
-    \only<6>{\begin{adjustbox}{max width=\linewidth}
-        \begin{forest}
-            where n children=0{tier=word}{}
-            [hasCondition [Person [SEX] [AGE]] [Condition [SOSY] [DURATION]]]
-        \end{forest}\qquad
-        \begin{forest}
-            where n children=0{tier=word}{}
-            [hasCondition [Person [SEX]] [Condition [SOSY] [DURATION]]]
-        \end{forest}
-    \end{adjustbox}
-
-    \vfill
-
-    \begin{block}{}
-        \begin{alignat*}{4}
-            ROOT         & \to hasCondition       && hasCondition & \to Person ~ Condition \\
-            Person       & \to SEX ~ AGE          && Condition    & \to SOSY ~ DURATION
-        \end{alignat*}
-    \end{block}}
 
     \only<7>{\begin{adjustbox}{max width=\linewidth}
         \begin{tikzpicture}[node distance=15em]
@@ -698,19 +665,24 @@
             \node[labeled node, right=of Person2] (sosy2) {Condition \nodepart{two} name: \emph{diabètes}\\duration: \emph{5ans}};
 
             \path [very thick, -Latex]
-            (Person) edge node[labeled edge, anchor=center] {hasCondition} (sosy)
+            (Person)  edge node[labeled edge, anchor=center] {hasCondition} (sosy)
             (Person2) edge node[labeled edge, anchor=center] {hasCondition} (sosy2);
         \end{tikzpicture}
-    \end{adjustbox}
+    \end{adjustbox}}
 
-    \vfill
-
-    \begin{block}{}
-        \begin{alignat*}{4}
-            ROOT         & \to hasCondition && \qquad hasCondition & \to Person ~ Condition \\
-            Person       & \to SEX ~ AGE    && \qquad Condition    & \to SOSY ~ DURATION
-        \end{alignat*}
-    \end{block}}
+    \only<6->{\vfill
+        \begin{block}{Grammaire}
+            \vspace{-1em}
+            \begin{adjustbox}{max width=\linewidth}
+                \parbox{\linewidth}{\begin{alignat*}{4}
+                    \lambda         & \to REL_{hasCondition}    & \qquad REL_{hasCondition} & \to GROUP_{person} ~ GROUP_{condition} \\
+                    GROUP_{person}  & \to ENT_{sex} ~ ENT_{age} & \qquad GROUP_{condition}  & \to ENT_{sosy} ~ ENT_{duration}        \\
+                    ENT_{sex}       & \to \langle data \rangle  & \qquad ENT_{age}          & \to \langle data \rangle               \\
+                    ENT_{sosy}      & \to \langle data \rangle  & \qquad ENT_{duration}     & \to \langle data \rangle
+                \end{alignat*}}
+            \end{adjustbox}
+        \end{block}
+    }
 \end{frame}
 
 % \begin{frame}{Exemple}
@@ -742,22 +714,37 @@
 % \end{frame}
 
 %\section{Conclusion}
-\begin{frame}{Conclusion}
-    \vfill
+\begin{frame}{Résultats}
+    % \begin{itemize}
+    %     \item Étude qualitative montrant des résultats prometteurs
+    %           \begin{itemize}
+    %               \item Regroupement sémantiquement correct
+    %               \item On identifie des associations qui se recoupent
+    %           \end{itemize}
+    %     \item Défis liés à l'évaluation de la qualité des résultats
+    % \end{itemize}
 
-    \begin{itemize}
-        \item 
-        \item Défis liés à l'évaluation de la qualité des résultats\vfill
-        \item Étude qualitative montrant des résultats prometteurs\vfill
+    \begin{adjustbox}{max width=.9\textwidth}
+        \centering
+        \parbox{\linewidth}{\begin{align*}
+            GROUP_0                     \to & ~ ENT_{Dose} ~ ENT_{Frequence}  & \qquad GROUP_1                    \to & ~ ENT_{Examen} ~ ENT_{Valeur}   \\
+                                            & ~ ENT_{Mode} ~ ENT_{Substance}  & \qquad GROUP_2                    \to & ~ ENT_{Frequence}               \\
+                                            & ~ ENT_{Sosy} ~ ENT_{Traitement} & \qquad GROUP_4                    \to & ~ ENT_{Anatomie} ~ ENT_{Examen} \\
+            GROUP_3                     \to & ~ ENT_{Dose} ~ ENT_{Examen}     & \qquad                                & ~ ENT_{Sosy}                    \\
+                                            & ~ ENT_{Sosy} ~ ENT_{Substance}  & \qquad GROUP_6                    \to & ~ ENT_{Dose}                    \\
+            GROUP_8                     \to & ~ ENT_{Examen} ~ ENT_{Sosy}     & \qquad GROUP_9                    \to & ~ ENT_{Mode}                    \\
+            GROUP_{10}                  \to & ~ ENT_{Substance}               & \qquad GROUP_{11}                 \to & ~ ENT_{Anatomie}                \\
+            REL_{10 \leftrightarrow 9}  \to & ~ GROUP_{10} ~ GROUP_9          & \qquad REL_{11 \leftrightarrow 8} \to & ~ GROUP_{11} ~ GROUP_8          \\
+            REL_{2 \leftrightarrow 6}   \to & ~ GROUP_2 ~ GROUP_6
+        \end{align*}}
+    \end{adjustbox}
+
+    \vfill\pause
+
+    \begin{block}{Perspectives}
         \begin{itemize}
-            \item Regroupement sémantiquement correct
-            \item On identifie des associations qui se recoupent
+            \item Évaluer différentes stratégies de réécriture
+            \item Prendre en compte des valeurs : extraction de dépendances fonctionnelles \cite{papenbrockFunctionalDependencyDiscovery2015}
         \end{itemize}
-        \vfill\vline\vfill
-        \item Évaluer différentes stratégies de réécriture\vfill
-        \item Prendre en compte des valeurs : extraction de dépendances fonctionnelles \cite{papenbrockFunctionalDependencyDiscovery2015}
-        \item Utilisation de l'approche pour l'intégration de données
-    \end{itemize}
-
-    \vfill
+    \end{block}
 \end{frame}
