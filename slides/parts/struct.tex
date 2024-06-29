@@ -40,6 +40,57 @@
 
 \section{Grammaire et schéma}
 
+\begin{frame}{}
+    \setbeamercolor{block body}{bg=blue, fg=white}
+    \begin{block}{}
+        \Huge
+        \centering
+        \vspace{1em}
+        Structuration automatique de l'information
+        \vspace{1em}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Exemple}
+    \centering
+
+    \begin{displaycquote}[extrait de PubMed]{mandalDeepBlueDot2022}
+        A female patient in the age group 55-60 years presented to us with blurring of vision in both eyes.
+        On slit-lamp examination, numerous circular to oval fleck-like discrete blue opacities at the level of deep corneal stroma and Descemet's membrane was observed.
+    \end{displaycquote}
+
+    \pause
+
+    \vfill
+
+    \Huge$\Downarrow$\normalsize
+
+    %\vfill
+
+    \begin{figure}[htb]
+        \small
+        \begin{adjustbox}{max width=\linewidth}
+            \begin{tikzpicture}[node distance=5em]
+                \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
+                \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
+                \node[labeled node, right=8em of sosy] (Person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
+                \node[labeled node, right=8em of Person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
+                \node[labeled node, right=8em of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
+                \node[labeled node, below=of exam] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
+                \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
+
+                \path [very thick, -Latex]
+                (Person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
+                (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
+                (Person) edge node[labeled edge, anchor=center] {PassExam} (exam)
+                (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
+                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
+            \end{tikzpicture}
+        \end{adjustbox}
+    \end{figure}
+\end{frame}
+
 \begin{frame}{Construction automatique de base de données}
     \centering
     \begin{adjustbox}{max width=.8\linewidth}
@@ -204,7 +255,6 @@
                             []
                                 [
                                     []
-                                        []
                                 ]
                                 [
                                     []
@@ -267,7 +317,7 @@
     \onslide<4->{\begin{block}{Grammaire ($G_i$)}
             \vspace{-1em}
             \begin{alignat*}{6}
-                \drawCircle{white} & \to \drawCircle{red} ~ \drawCircle{green} &  & \qquad\qquad \drawCircle{red} & \to \drawCircle{black} ~ \drawCircle{blue} &  & \qquad\qquad \drawCircle{green} & \to \drawCircle{blue} ~ \drawCircle{red}^+
+                \drawCircle{white} & \to \drawCircle{red} ~ \drawCircle{DarkGreen} &  & \qquad\qquad \drawCircle{red} & \to \drawCircle{black} ~ \drawCircle{blue} &  & \qquad\qquad \drawCircle{DarkGreen} & \to \drawCircle{blue} ~ \drawCircle{red}^+
             \end{alignat*}
         \end{block}}
 \end{frame}
@@ -329,7 +379,7 @@
                     COLL_1  & \to GROUP_1^+                \\
                     COLL_2  & \to GROUP_2^+                \\
                     COLL_3  & \to REL_1^+                  \\
-                    REL_1   & \to GROUP_1 ~ GROUP          \\
+                    REL_1   & \to GROUP_1 ~ GROUP_2        \\
                     GROUP_1 & \to a ~ b                    \\
                     GROUP_2 & \to c                        \\
                     a       & \to \langle data \rangle     \\
@@ -533,7 +583,7 @@
     % Exemple d'arbres a unifier. Exemple de pas a pas du fonctionnement de l'equivalence
     \begin{itemize}
         \item Identifier les groupements similaires (ensemble d'entités)
-        \item L'instance est incomplètes, un groupe peut contenir qu'un sous-ensemble d'attributs
+        \item L'instance est incomplète, un groupe peut contenir qu'un sous-ensemble d'attributs
               \pause
         \item Équivalence régulière : \textquote{deux individus sont régulièrement équivalents s'ils sont connectés à des individus équivalents}
               \pause
@@ -739,9 +789,7 @@
         \end{align*}}
     \end{adjustbox}
 
-    \vfill\pause
-
-    \begin{block}{Perspectives}
+    \begin{block}{Travaux futurs}
         \begin{itemize}
             \item Évaluer différentes stratégies de réécriture
             \item Prendre en compte des valeurs : extraction de dépendances fonctionnelles \cite{papenbrockFunctionalDependencyDiscovery2015}

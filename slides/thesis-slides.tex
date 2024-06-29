@@ -92,7 +92,8 @@
 % Tikz
 \usetikzlibrary{
   automata, graphs, positioning, fit, tikzmark,
-  shapes, shapes.multipart, arrows.meta, quotes
+  shapes, shapes.multipart, arrows.meta, quotes,
+  overlay-beamer-styles
 }
 \usetikzmarklibrary{listings}
 
@@ -216,7 +217,7 @@
 \loadglsentries{../these/glossaries}
 
 \date{1er Juillet, 2024}
-\title[Construction automatique de BD m\'edicale]{Construction automatique de bases de donnée pour le domaine m\'edical: Int\'egration de texte et maintien de la coh\'erence}
+\title[Construction automatique de BD m\'edicale]{Construction automatique de bases de données pour le domaine m\'edical: Int\'egration de texte et maintien de la coh\'erence}
 \author[Nicolas Hiot]{
     Nicolas Hiot\inst{1,2}
 }
@@ -288,16 +289,17 @@
 \begin{frame}{Axes de Recherches}
   \begin{itemize}
       \item Proposition : Construire automatiquement une base de données à partir d'un corpus textuel médical
+      \vfill\pause
       \item Objectifs :
       \begin{itemize}
           \item Faciliter l'accès à des informations précises et structurées
-          \item Permettre l'interrogation et l'exploitation defficaces des données
+          \item Permettre l'interrogation et l'exploitation efficaces des données
       \end{itemize}
       \vfill\pause
       \item Axes de Recherches :
       \begin{itemize}
-          \item Extraction et Structuration automatique de l'information
-          \item Assurer de la qualité et de la cohérence des données:
+          \item Extraction et structuration automatique de l'information
+          \item Assurer la qualité et la cohérence des données:
       \end{itemize}
   \end{itemize}
 \end{frame}
@@ -327,46 +329,6 @@
 %     \end{itemize}
 %     \end{block}
 % \end{frame}
-
-\begin{frame}{Exemple}
-    \centering
-
-    \begin{displaycquote}[extrait de PubMed]{mandalDeepBlueDot2022}
-        A female patient in the age group 55-60 years presented to us with blurring of vision in both eyes.
-        On slit-lamp examination, numerous circular to oval fleck-like discrete blue opacities at the level of deep corneal stroma and Descemet's membrane was observed.
-    \end{displaycquote}
-
-    \pause
-
-    \vfill
-
-    \Huge$\Downarrow$\normalsize
-
-    %\vfill
-
-    \begin{figure}[htb]
-        \small
-        \begin{adjustbox}{max width=\linewidth}
-            \begin{tikzpicture}[node distance=5em]
-                \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
-                \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
-                \node[labeled node, right=8em of sosy] (Person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
-                \node[labeled node, right=8em of Person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
-                \node[labeled node, right=8em of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
-                \node[labeled node, below=of exam] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
-                \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
-
-                \path [very thick, -Latex]
-                (Person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
-                (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
-                (Person) edge node[labeled edge, anchor=center] {PassExam} (exam)
-                (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
-                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
-                (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
-            \end{tikzpicture}
-        \end{adjustbox}
-    \end{figure}
-\end{frame}
 
 % \begin{frame}{Corpus médical}
 %     \begin{block}{Corpus de cas cliniques en français (DEFT)} % \cite{grabar2020cas} 
@@ -430,13 +392,9 @@
 
 %\part{Intégration de données textuelles}
 
-%\frame{\partpage}
-
 \subfile{parts/struct}
 
 %\part{Maintenance et cohérence d'une base de données incomplète}
-
-%\frame{\partpage}
 
 \subfile{parts/nulls}
 
@@ -446,21 +404,81 @@
 
 %\subfile{parts/tal}
 
-\begin{frame}{Perspectives}
-    \vfill
+\section{Conlusion}
+
+\begin{frame}{}
+    \setbeamercolor{block body}{bg=blue, fg=white}
+    \begin{block}{}
+        \Huge
+        \centering
+        \vspace{1em}
+        Conclusion et perspectives
+        \vspace{1em}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Contributions}
+    \begin{block}{Structuration automatique de l'information}
+        \begin{itemize}
+            \item Méthode combinant approches symboliques et statistiques pour structurer les données
+            \item Formalisation du processus de structuration avec des règles de réécriture d'arbres
+            \item Proposition d'une métagrammaire correspondant à un modèle général (indépendante du modèle de données)
+        \end{itemize}
+    \end{block}
+    \begin{block}{Qualité et cohérence des données}
+        \begin{itemize}
+            \item Politique de mise à jour incrémentale pour le maintient de la cohérence d'une base de données
+            \item Approche basée sur un \acrshort{sgbd} permettant le passage à l'echelle
+            \item Utilisation de bases de données graphes et de requêtes récursives pour récupérer les LinkedNulls
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Productions scientifiques et perspectives}
+    \begin{columns}
+        \begin{column}{.5\linewidth}
+            7 publications scientifiques :
+            \begin{itemize}
+                \item 1 revue (IJIWIS)
+                \item 2 conférences internationales (iiWAS, ADBIS)
+                \item 4 workshops (DEFT, Doing)
+            \end{itemize}
+        \end{column}
+        \begin{column}{.5\linewidth}
+            Participation projets :
+            \begin{itemize}
+                \item ANR SENDUP
+                \item APR-IA Doing
+                \item MaDICS - Action Doing
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    2 logiciels :
     \begin{itemize}
-        \item Comment prendre en compte les contraintes dés la structuration automatique
-        \vfill
-        \item Construire une vue unifiée de multiples sources de données (IA, Journalisme des données, \dots)
+        \begin{columns}
+            \begin{column}{.5\linewidth}
+                \item ArchiTxt : Structuration automatique
+            \end{column}
+            \begin{column}{.5\linewidth}
+                \item DataFix : Maintenance cohérente
+            \end{column}
+        \end{columns}
     \end{itemize}
     \vfill
+    \begin{block}{Perspectives}
+        \begin{itemize} 
+            \item Intégrer les contraintes dès la structuration automatique (guider la structuration pour garantir leur respect)
+            \vfill
+            \item Créer une vue unifiée de multiples sources de données (IA, data journalisme, etc.)
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 \frame{\titlepage}
 
-\begin{frame}[allowframebreaks]{References}
-    \bibliographystyle{apalike}
-    \bibliography{../these/biblio}
-\end{frame}
+% \begin{frame}[allowframebreaks]{References}
+%     \bibliographystyle{apalike}
+%     \bibliography{../these/biblio}
+% \end{frame}
 
 \end{document}

@@ -1,5 +1,16 @@
 \section{Mise à jour cohérente}
 
+\begin{frame}{}
+    \setbeamercolor{block body}{bg=blue, fg=white}
+    \begin{block}{}
+        \Huge
+        \centering
+        \vspace{1em}
+        Qualité et cohérence des données
+        \vspace{1em}
+    \end{block}
+\end{frame}
+
 \begin{frame}{Cohérence à base de règles}
     \begin{multline*}
         \mathcal{D} = \{
@@ -102,7 +113,7 @@
 
 \begin{frame}{Simplification}
     \begin{block}{}
-        La redondance signifient qu'il existe des informations équivalentes ou plus spécifiques.
+        La redondance signifie qu'il existe des informations équivalentes ou plus spécifiques.
         La simplification consiste à éliminer les redondances.
 
         \[
@@ -124,7 +135,7 @@
                 \[P(a, N_1), P(N_1, b) \Rightarrow Q \gets P(a, x), P(x, b)\]
         \end{itemize}
     }
-    \only<5>{\vfill\begin{columns}
+    \only<5>{\vfill\begin{columns}[t]
         \begin{column}{.25\textwidth}
             \centering
             Étant donné\\$A(a, b)$
@@ -156,12 +167,13 @@
 \begin{frame}{Évaluation : Temps d'exécution par \acrshort{sgbd}}
     \centering
     \begin{tikzpicture}
-        \begin{axis}[xbar, every axis plot/.append style={fill}, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.9\textheight]
+        \tikzstyle{every node}=[font=\small]
+        \begin{axis}[xmax=1000, bar width=.6em, xbar, every axis plot/.append style={fill}, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.4\textheight]
             \addplot+[area legend] table [y=db, x=chase, col sep=comma] {time_mysql.csv};
             \addlegendentry{Chase};
 
             \addplot+[area legend] table [y=db, x=nullBucket, col sep=comma] {time_mysql.csv};
-            \addlegendentry{Null bucket};
+            \addlegendentry{NullBucket};
 
             \addplot+[area legend] table [y=db, x=partitions, col sep=comma, col sep=comma] {time_mysql.csv};
             \addlegendentry{LinkedNulls};
@@ -169,6 +181,54 @@
             \addplot+[area legend] table [y=db, x=simplifications, col sep=comma] {time_mysql.csv};
             \addlegendentry{Simplifications};
         \end{axis}
+    \end{tikzpicture}
+
+    \vfill
+    \[
+        \only<2->{A(N_1, \dots, N_2)}
+        \only<3->{, B(N_2, \dots, N_3, \dots)}
+        \only<5->{, B(\dots, N_4, \dots, N_3)}
+        \only<5->{, C(N_3, \dots, N_5)}
+    \]
+    \begin{columns}[t]
+        \begin{column}{.3\textwidth}
+            \begin{tabular}{ccc}
+                A \\
+                \hline
+                \dots & \dots & \dots \\
+                $N_1$\tikzmark{n11} & \dots & $N_2$\tikzmark{n21} \\
+                \dots & \dots & \dots
+            \end{tabular}
+        \end{column}
+        \begin{column}{.3\textwidth}
+            \begin{tabular}{cccc}
+                B \\
+                \hline
+                \dots & \dots & \dots & \dots \\
+                $N_2$\tikzmark{n22} & \dots & $N_3$\tikzmark{n31} & \dots \\
+                \dots & \dots & \dots & \dots \\
+                \dots & $N_4$\tikzmark{n41} & \dots & $N_3$\tikzmark{n32}
+            \end{tabular}
+            \vfill
+        \end{column}
+        \begin{column}{.3\textwidth}
+            \begin{tabular}{ccc}
+                C \\
+                \hline
+                \dots & \dots & \dots \\
+                $N_3$\tikzmark{n33} & \dots & $N_5$\tikzmark{n51} \\
+                \dots & \dots & \dots
+            \end{tabular}
+        \end{column}
+    \end{columns}
+    \begin{tikzpicture}[overlay, remember picture, shorten >=1.2em, shorten <=.5em, -latex, thick, red, bend left]
+        \path<2-> (pic cs:n11) edge[bend left=20] (pic cs:n21);
+        \path<3-> (pic cs:n21) edge (pic cs:n22);
+        \path<4-> (pic cs:n22) edge (pic cs:n31);
+        \path<5->[shorten >=.5em] (pic cs:n31) edge (pic cs:n32);
+        \path<5-> (pic cs:n31) edge (pic cs:n33);
+        \path<6->[shorten >=.5em] (pic cs:n32) edge (pic cs:n41);
+        \path<6-> (pic cs:n33) edge (pic cs:n51);
     \end{tikzpicture}
 \end{frame}
 
@@ -281,12 +341,13 @@
 \begin{frame}{Évaluation : Temps d'exécution par \acrshort{sgbd}}
     \centering
     \begin{tikzpicture}
-        \begin{axis}[xbar, every axis plot/.append style={fill}, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL,Neo4J}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.9\textheight]
+        \tikzstyle{every node}=[font=\small]
+        \begin{axis}[xmax=1000, bar width=.6em, xbar, every axis plot/.append style={fill}, axis x line=none, axis line style={draw=none}, tick style={draw=none}, symbolic y coords = {MySQL,Neo4J}, enlarge y limits = 0.5, restrict x to domain=0:*, nodes near coords, ytick=data, xlabel={Temps}, x unit=\si{\ms}, legend columns=-1, legend style={draw=none, at={(0.5,0)}, anchor=north}, width=.9\linewidth, height=.6\textheight]
             \addplot+[area legend] table [y=db, x=chase, col sep=comma] {time_per_db.csv};
             \addlegendentry{Chase};
 
             \addplot+[area legend] table [y=db, x=nullBucket, col sep=comma] {time_per_db.csv};
-            \addlegendentry{Null bucket};
+            \addlegendentry{NullBucket};
 
             \addplot+[area legend] table [y=db, x=partitions, col sep=comma, col sep=comma] {time_per_db.csv};
             \addlegendentry{LinkedNulls};
@@ -295,21 +356,11 @@
             \addlegendentry{Simplifications};
         \end{axis}
     \end{tikzpicture}
-\end{frame}
 
-%\section{Conclusion}
-
-\begin{frame}{Résultats}
-    \begin{itemize}
-        \item L'incrémentalité se fait de deux manières :
-              \begin{itemize}
-                  \item Ne considérer que l'instanciation des règles à partir de la mise à jour
-                  \item Ne vérifier que les simplifications sur les valeurs nulles \emph{impactées}
-              \end{itemize}
-        \item L'incrémentalité améliore les performances
-        \item L'approche basée sur un \gls{sgbd} permet le passage à l'échelle
-        \item Les bases de données graphes et les requêtes récursives aident à la récupération de l'ensemble des LinkedNulls\vfill\vline\vfill
-        \item Les bases de données graphes n'offrent pas de performances intéressantes (chase)
-        \item Modélisations mixtes relationnelles et basées sur les graphes \cite{hassanGRFusionGraphsFirstClass2018}
-    \end{itemize}
+    \begin{block}{Travaux futures}
+        \begin{itemize}
+            \item Les bases de données graphes n'offrent pas de performances intéressantes (chase)
+            \item Modélisations mixtes relationnelles et basées sur les graphes \cite{hassanGRFusionGraphsFirstClass2018}
+        \end{itemize}
+    \end{block}
 \end{frame}
