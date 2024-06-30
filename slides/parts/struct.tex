@@ -73,10 +73,10 @@
             \begin{tikzpicture}[node distance=5em]
                 \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
                 \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
-                \node[labeled node, right=7em of sosy] (person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
-                \node[labeled node, right=7em of person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
-                \node[labeled node, below=of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
-                \node[labeled node, below=of person] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
+                \node[labeled node, right=7.5em of sosy] (person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
+                \node[labeled node, right=7.5em of person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
+                \node[labeled node, right=7.5em of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
+                \node[labeled node, below=of exam] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
                 \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
 
                 \path [very thick, -Latex]
@@ -89,6 +89,10 @@
             \end{tikzpicture}
         \end{adjustbox}
     \end{figure}
+\end{frame}
+
+\begin{frame}{}
+    \includegraphics[width=\textwidth]{images/deft2020.png}
 \end{frame}
 
 \begin{frame}{Construction automatique de bases de données}
@@ -115,10 +119,6 @@
             \item Réécrire l'instance pour obtenir une grammaire cible correspondant à un schéma de base de données ;
         \end{enumerate}
     \end{block}
-\end{frame}
-
-\begin{frame}{}
-    \includegraphics[width=\textwidth]{images/deft2020.png}
 \end{frame}
 
 % \begin{frame}{Texte et arbres}
