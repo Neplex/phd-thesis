@@ -217,7 +217,7 @@
 \loadglsentries{../these/glossaries}
 
 \date{1er Juillet, 2024}
-\title[Construction automatique de BD m\'edicale]{Construction automatique de bases de données pour le domaine m\'edical: Int\'egration de texte et maintien de la coh\'erence}
+\title[Construction automatique de BD m\'edicale]{Construction automatique de bases de données\\pour le domaine m\'edical:\\Int\'egration de texte et maintien de la coh\'erence}
 \author[Nicolas Hiot]{
     Nicolas Hiot\inst{1,2}
 }
@@ -263,21 +263,21 @@
 
 \begin{frame}{Données textuelles médicales}
   \begin{itemize}
-      \item Le domaine médical génère en quantité des données textuelles difficiles à exploiter efficacement.
+      \item Le domaine médical génère en quantité des données textuelles difficiles à exploiter efficacement
       \begin{itemize}
           \item Cas cliniques
           \item Pharmacovigilance
           \item Cosmetovigilance
       \end{itemize}
       \vfill
-      \item Décrivent l'historique des patients:
+      \item Décrivent l'historique des patients :
       \begin{itemize}
           \item Diagnostiques
           \item Traitements et réactions
           \item Antécédents médicaux
       \end{itemize}
       \vfill
-      \item Importance pour la prise de décision clinique:
+      \item Importance pour la prise de décision clinique :
       \begin{itemize}
           \item Meilleure compréhension des cas complexes
           \item Amélioration de la qualité des soins
@@ -288,7 +288,7 @@
 
 \begin{frame}{Axes de Recherches}
   \begin{itemize}
-      \item Proposition : Construire automatiquement une base de données à partir d'un corpus textuel médical
+      \item Proposition : construire automatiquement une base de données à partir d'un corpus de textes médicaux
       \vfill\pause
       \item Objectifs :
       \begin{itemize}
@@ -409,11 +409,11 @@
 \begin{frame}{}
     \setbeamercolor{block body}{bg=blue, fg=white}
     \begin{block}{}
-        \Huge
+        \Large
         \centering
-        \vspace{1em}
-        Conclusion et perspectives
-        \vspace{1em}
+        \vspace{.5em}
+        Contributions et perspectives
+        \vspace{.5em}
     \end{block}
 \end{frame}
 
@@ -422,13 +422,13 @@
         \begin{itemize}
             \item Méthode combinant approches symboliques et statistiques pour structurer les données
             \item Formalisation du processus de structuration avec des règles de réécriture d'arbres
-            \item Proposition d'une métagrammaire correspondant à un modèle général (indépendante du modèle de données)
+            \item Proposition d'une méta-grammaire correspondant à un modèle général (indépendante du modèle de données)
         \end{itemize}
     \end{block}
     \begin{block}{Qualité et cohérence des données}
         \begin{itemize}
-            \item Politique de mise à jour incrémentale pour le maintient de la cohérence d'une base de données
-            \item Approche basée sur un \acrshort{sgbd} permettant le passage à l'echelle
+            \item Politique de mise à jour incrémentale pour le maintien de la cohérence d'une base de données
+            \item Approche basée sur un \acrshort{sgbd} permettant le passage à l'échelle
             \item Utilisation de bases de données graphes et de requêtes récursives pour récupérer les LinkedNulls
         \end{itemize}
     \end{block}
@@ -445,6 +445,11 @@
             \end{itemize}
         \end{column}
         \begin{column}{.5\linewidth}
+            2 logiciels :
+            \begin{itemize}
+                \item ArchiTxt : Structuration automatique
+                \item DataFix : Maintenance cohérente
+            \end{itemize}
             Participation projets :
             \begin{itemize}
                 \item ANR SENDUP
@@ -453,23 +458,11 @@
             \end{itemize}
         \end{column}
     \end{columns}
-    2 logiciels :
-    \begin{itemize}
-        \begin{columns}
-            \begin{column}{.5\linewidth}
-                \item ArchiTxt : Structuration automatique
-            \end{column}
-            \begin{column}{.5\linewidth}
-                \item DataFix : Maintenance cohérente
-            \end{column}
-        \end{columns}
-    \end{itemize}
     \vfill
     \begin{block}{Perspectives}
         \begin{itemize} 
             \item Intégrer les contraintes dès la structuration automatique (guider la structuration pour garantir leur respect)
-            \vfill
-            \item Créer une vue unifiée de multiples sources de données (IA, data journalisme, etc.)
+            \item Créer une vue unifiée de multiples sources de données (IA, data journalism, etc.)
         \end{itemize}
     \end{block}
 \end{frame}

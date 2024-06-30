@@ -43,11 +43,11 @@
 \begin{frame}{}
     \setbeamercolor{block body}{bg=blue, fg=white}
     \begin{block}{}
-        \Huge
+        \Large
         \centering
-        \vspace{1em}
+        \vspace{.5em}
         Structuration automatique de l'information
-        \vspace{1em}
+        \vspace{.5em}
     \end{block}
 \end{frame}
 
@@ -61,7 +61,7 @@
 
     \pause
 
-    \vfill
+    %\vfill
 
     \Huge$\Downarrow$\normalsize
 
@@ -73,16 +73,16 @@
             \begin{tikzpicture}[node distance=5em]
                 \node[labeled node] (eyes) {Anatomy \nodepart{two} name: \emph{both eyes}};
                 \node[labeled node, above=of eyes] (sosy) {Symptom \nodepart{two} name: \emph{blurring of vision}};
-                \node[labeled node, right=8em of sosy] (Person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
-                \node[labeled node, right=8em of Person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
-                \node[labeled node, right=8em of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
-                \node[labeled node, below=of exam] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
+                \node[labeled node, right=7em of sosy] (person) {Person \nodepart{two} name: \emph{unknown}\\age: \emph{55-60}};
+                \node[labeled node, right=7em of person] (exam) {Examination \nodepart{two} name: \emph{slit-lamp}};
+                \node[labeled node, below=of exam] (result) {Symptom \nodepart{two} name: \emph{numerous circular}\\~~~~~~~~~~~\emph{to oval fleck-like}};
+                \node[labeled node, below=of person] (stroma) {Anatomy \nodepart{two} name: \emph{corneal stroma}};
                 \node[labeled node, below=of result] (membrane) {Anatomy \nodepart{two} name: \emph{descemet membrane}};
 
                 \path [very thick, -Latex]
-                (Person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
+                (person) edge node[labeled edge, anchor=center] {HasSym} (sosy)
                 (sosy) edge node[labeled edge, anchor=center] {ConcernsAnat} (eyes)
-                (Person) edge node[labeled edge, anchor=center] {PassExam} (exam)
+                (person) edge node[labeled edge, anchor=center] {PassExam} (exam)
                 (exam) edge node[labeled edge, anchor=center] {GivesRes} (result)
                 (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (stroma)
                 (result) edge node[labeled edge, anchor=center] {ConcernsAnat} (membrane);
@@ -91,7 +91,7 @@
     \end{figure}
 \end{frame}
 
-\begin{frame}{Construction automatique de base de données}
+\begin{frame}{Construction automatique de bases de données}
     \centering
     \begin{adjustbox}{max width=.8\linewidth}
         \begin{tabular}{cccccccc|l}
@@ -176,7 +176,7 @@
                     [S, for tree={s sep=2em}
                         [NP
                                 [DT [la]]
-                                [ENT\_EXAM
+                                [{\color{blue}ENT\_EXAM}
                                     [NN [fréquence]]
                                     [NN [cardiaque]]
                                 ]
@@ -186,8 +186,8 @@
                                 [PP
                                         [IN [à]]
                                         [NP
-                                                [CD [ENT\_VALUE [100]]]
-                                                [NN [ENT\_UNIT [b/min]]]
+                                                [CD [{\color{blue}ENT\_VALUE} [100]]]
+                                                [NN [{\color{blue}ENT\_UNIT} [b/min]]]
                                         ]
                                 ]
                         ]
@@ -224,11 +224,11 @@
                 \end{forest}}
         \end{adjustbox}
         \vfill
-        \only<2->{\begin{block}{Etapes}
+        \only<2->{\begin{block}{Étapes}
                 \begin{itemize}
                     %\item Unification des structures linguistique (conjonctions)
                     \only<2->{\item Insertion des entités dans l'arbre}
-                          \only<3->{\item Supprimer termes et nœuds superflus}
+                    \only<3->{\item Supprimer termes et nœuds superflus}
                 \end{itemize}
             \end{block}}
     \end{center}
@@ -367,12 +367,9 @@
         \begin{column}{.6\textwidth}
             \only<-5>{\begin{description}
                     \uncover<2->{\item[Attribut] Une donnée associée à un nom}
-
-                          \uncover<3->{\item[Groupe] Un ensemble nommé d'attributs distincts}
-
-                          \uncover<4->{\item[Relation] Une relation entre deux groupes distincts}
-
-                          \uncover<5->{\item[Collection] Un ensemble de groupes et de relations équivalents}
+                    \uncover<3->{\item[Groupe] Un ensemble nommé d'attributs distincts}
+                    \uncover<4->{\item[Relation] Une relation entre deux groupes distincts}
+                    \uncover<5->{\item[Collection] Un ensemble de groupes et de relations équivalents}
                 \end{description}}
             \only<6->{\begin{alignat*}{2}
                     \lambda & \to COLL_1 ~ COLL_2 ~ COLL_3 \\
@@ -453,7 +450,7 @@
 
 \begin{frame}{Méta-grammaire}
     \begin{definition}
-        Une méta-grammaire $\mathbb{G} = (N, T, R, S)$ est une grammaire S-attribuée qui reconnait l'ensemble de règles d'une CFG condensée.
+        Une méta-grammaire $\mathbb{G} = (N, T, R, S)$ est une grammaire S-attribuée qui reconnaît l'ensemble de règles d'une CFG condensée.
 
         On distingue deux types de règles sémantiques pour une règle $r$ :
         \begin{itemize}
@@ -527,7 +524,7 @@
                        &               & \multicolumn{6}{c}{\fbox{Vérification par rapport à $\mathbb{G}$}} &
             \end{tabular}}
         \only<2>{\begin{tikzpicture}[node distance=1.5em and 2em]
-                %\node (start) [flow-start] {Debut};
+                %\node (start) [flow-start] {Début};
                 %\node (tal) [flow-data] {Textes analysés};
                 \node (enriched) [flow-process] {Enrichissement des arbres};
                 \node (grammar) [flow-process, right=of enriched] {Extraction de la grammaire $G_i$};
