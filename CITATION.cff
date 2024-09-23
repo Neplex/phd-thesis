@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: If you want to cite this thesis, please use the following citation.
+authors:
+  - family-names: Hiot
+    given-names: Nicolas
+    email: nicolas.hiot@univ-orleans.fr
+    affiliation: 'LIFO, Université d''Orléans'
+    orcid: 'https://orcid.org/0000-0003-4318-4906'
+title: 'Construction automatique de bases de données pour le domaine médical : Intégration de texte et maintien de la cohérence'
+date-released: '2024-07-01'
+repository-code: 'https://github.com/Neplex/phd-thesis'
+preferred-citation:
+  authors:
+    - family-names: Hiot
+      given-names: Nicolas
+      email: nicolas.hiot@univ-orleans.fr
+      affiliation: 'LIFO, Université d''Orléans'
+      orcid: 'https://orcid.org/0000-0003-4318-4906'
+  title: 'Construction automatique de bases de données pour le domaine médical : Intégration de texte et maintien de la cohérence'
+  thesis-type: "PhD thesis"
+  type: thesis
+  year: '2024'
+  conference: {}
+  publisher: {}
